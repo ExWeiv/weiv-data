@@ -1,0 +1,27 @@
+{
+  "name": "@exweiv/weiv-data",
+  "version": "1.0.0",
+  "description": "Custom API Library built top of MongoDB to use with Wix/Velo websites. Clone of wix-data APIs with better features and removed limits.",
+  "main": "/lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "exweiv",
+    "wix",
+    "velo",
+    "wix-data",
+    "weiv-data",
+    "mongodb",
+    "nosql",
+    "database"
+  ],
+  "author": "ExWeiv",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@types/lodash": "^4.14.201",
+    "lodash": "^4.17.21",
+    "mongodb": "^6.2.0",
+    "typescript": "^5.2.2"
+  }
+}
