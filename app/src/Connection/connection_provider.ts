@@ -1,5 +1,7 @@
 import { MongoClient, MongoClientOptions } from 'mongodb';
 import _ from 'lodash';
+import loadEnv from '../Helpers/env_variables_loader';
+loadEnv();
 // import { getMemberURI } from './permission_helpers';
 
 const customOptions: MongoClientOptions = {
@@ -19,7 +21,6 @@ const getCustomOptions = (): MongoClientOptions => {
         w: "majority",
         retryWrites: true
     };
-
 
     if (process.env.MONGO_CLIENT_OPTIONS) {
         customOptions = JSON.parse(process.env.MONGO_CLIENT_OPTIONS) || {};
@@ -44,15 +45,26 @@ let savedClients: { [uri: string]: { client: MongoClient | MongoStubClient, clea
  * @param uri Connection URI to connect MongoDB Cluster (Options are predefined but you can add more with URI options)
  * @returns A `MongoClient` and a cleanup function to close connection when the job is done.
  */
-async function setupClient(uri: string): Promise<{ pool: MongoClient | MongoStubPool, cleanup: ConnectionCleanUp }> {
-    if (!savedClients[uri]) {
+async function setupClient(uri: string, newConnection: boolean = false): Promise<{ pool: MongoClient | MongoStubPool, cleanup: ConnectionCleanUp }> {
+    if (newConnection) {
+        const newClient = uri ? new MongoClient(uri, getCustomOptions()) : emptyClient();
+        _.set(savedClients, [uri, 'client'], newClient);
+    }
+
+    if (!savedClients[uri] && newConnection != true) {
         const newClient = uri ? new MongoClient(uri, getCustomOptions()) : emptyClient();
         _.set(savedClients, [uri, 'client'], newClient);
     }
 
     const { pool, cleanup }: { pool: MongoClient | MongoStubPool, cleanup: ConnectionCleanUp } = await savedClients[uri].client.connect()
         .then((res: MongoClient | MongoStubPool) => {
-            return { pool: res, cleanup: async (): Promise<void> => await pool.close() }
+            return {
+                pool: res,
+                cleanup: async (): Promise<void> => {
+                    delete savedClients[uri];
+                    await pool.close();
+                }
+            }
         }).catch(err => {
             return { pool: notConnectedPool(err), cleanup: async () => { } }
         })
@@ -80,8 +92,14 @@ export async function useClient(suppressAuth = false): Promise<ClientSetupResult
     // const { uri, memberId } = await getMemberURI(suppressAuth);
     const uri = process.env.URI || "";
     const memberId = undefined;
-    const { pool, cleanup } = await memoizedSetupClient(uri);
-    return { pool, cleanup, memberId };
+
+    if (savedClients[uri]) {
+        const { pool, cleanup } = await memoizedSetupClient(uri, false);
+        return { pool, cleanup, memberId };
+    } else {
+        const { pool, cleanup } = await setupClient(uri, true);
+        return { pool, cleanup, memberId };
+    }
 }
 
 /**

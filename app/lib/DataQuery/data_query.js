@@ -6,18 +6,20 @@ const log_handlers_1 = require("../Log/log_handlers");
 const lodash_1 = require("lodash");
 const connection_provider_1 = require("../Connection/connection_provider");
 const query_result_1 = require("./query_result");
+const name_helpers_1 = require("../Helpers/name_helpers");
 class DataQuery extends data_query_filters_1.DataQueryFilter {
-    constructor(collectionName, dbName) {
+    constructor(collectionId) {
         super();
         this.dbName = "exweiv";
         this.query = {};
         this.includeValues = [];
         this.limitNumber = 50;
         this.referenceLenght = {};
-        this.setDataQuery(this);
-        if (!collectionName) {
+        if (!collectionId) {
             (0, log_handlers_1.reportError)("Collection name required");
         }
+        this.setDataQuery(this);
+        const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
         this.dbName = dbName;
     }
@@ -35,10 +37,10 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     async count(options = {
         suppressAuth: false,
         consistentRead: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         suppressHooks: false
     }) {
-        const { suppressAuth, consistentRead, cleanAfterRun } = options;
+        const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
         if (memberId && suppressAuth != true) {
             this.eq("_owner", memberId);
@@ -49,8 +51,8 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
             countOptions = (0, lodash_1.merge)(countOptions, { readConcern: 'majority' });
         }
         const totalCount = await collection.countDocuments(this.query, countOptions);
-        if (cleanAfterRun === true) {
-            cleanup();
+        if (cleanupAfter === true) {
+            await cleanup();
         }
         return totalCount;
     }
@@ -68,7 +70,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     async distinct(propertyName, options = {
         suppressAuth: false,
         suppressHooks: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         consistentRead: false
     }) {
         if (!propertyName) {
@@ -91,7 +93,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     async find(options = {
         suppressAuth: false,
         suppressHooks: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         consistentRead: false
     }) {
         return this.runQuery(options);
@@ -130,21 +132,23 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         return this;
     }
     limit(limit) {
-        if (!limit) {
+        if (!limit && limit != 0) {
             (0, log_handlers_1.reportError)("Limit number is required!");
         }
-        this.limitNumber = limit;
+        if (limit != 0) {
+            this.limitNumber = limit;
+        }
         return this;
     }
     skip(skip) {
-        if (!skip) {
+        if (!skip && skip != 0) {
             (0, log_handlers_1.reportError)("Skip number is required!");
         }
         this.skipNumber = skip;
         return this;
     }
     async runQuery(options) {
-        const { suppressAuth, suppressHooks, cleanAfterRun, consistentRead } = options;
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
         const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
         if (memberId && suppressAuth != true) {
             this.eq("_owner", memberId);
@@ -169,8 +173,8 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
                 addFields: this.referenceLenght
             }
         }).getResult();
-        if (cleanAfterRun === true) {
-            cleanup();
+        if (cleanupAfter === true) {
+            await cleanup();
         }
         return result;
     }
@@ -192,7 +196,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
 }
 exports.DataQuery = DataQuery;
-function ExWeivDataQuery(collectionName, dbName = "exweiv") {
-    return new DataQuery(collectionName, dbName);
+function ExWeivDataQuery(dynamicName) {
+    return new DataQuery(dynamicName);
 }
 exports.ExWeivDataQuery = ExWeivDataQuery;

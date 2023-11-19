@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanupClientConnections = exports.useClient = void 0;
 const mongodb_1 = require("mongodb");
 const lodash_1 = __importDefault(require("lodash"));
+const env_variables_loader_1 = __importDefault(require("../Helpers/env_variables_loader"));
+(0, env_variables_loader_1.default)();
 const customOptions = {
     maxIdleTimeMS: 15000,
     maxPoolSize: 3
@@ -33,14 +35,24 @@ const emptyClient = () => ({
     connect: async () => notConnectedPool(new Error('No URI was provided')),
 });
 let savedClients = {};
-async function setupClient(uri) {
-    if (!savedClients[uri]) {
+async function setupClient(uri, newConnection = false) {
+    if (newConnection) {
+        const newClient = uri ? new mongodb_1.MongoClient(uri, getCustomOptions()) : emptyClient();
+        lodash_1.default.set(savedClients, [uri, 'client'], newClient);
+    }
+    if (!savedClients[uri] && newConnection != true) {
         const newClient = uri ? new mongodb_1.MongoClient(uri, getCustomOptions()) : emptyClient();
         lodash_1.default.set(savedClients, [uri, 'client'], newClient);
     }
     const { pool, cleanup } = await savedClients[uri].client.connect()
         .then((res) => {
-        return { pool: res, cleanup: async () => await pool.close() };
+        return {
+            pool: res,
+            cleanup: async () => {
+                delete savedClients[uri];
+                await pool.close();
+            }
+        };
     }).catch(err => {
         return { pool: notConnectedPool(err), cleanup: async () => { } };
     });
@@ -51,8 +63,14 @@ const memoizedSetupClient = lodash_1.default.memoize(setupClient);
 async function useClient(suppressAuth = false) {
     const uri = process.env.URI || "";
     const memberId = undefined;
-    const { pool, cleanup } = await memoizedSetupClient(uri);
-    return { pool, cleanup, memberId };
+    if (savedClients[uri]) {
+        const { pool, cleanup } = await memoizedSetupClient(uri, false);
+        return { pool, cleanup, memberId };
+    }
+    else {
+        const { pool, cleanup } = await setupClient(uri, true);
+        return { pool, cleanup, memberId };
+    }
 }
 exports.useClient = useClient;
 async function cleanupClientConnections() {

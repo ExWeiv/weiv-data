@@ -5,12 +5,14 @@ const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const log_handlers_1 = require("../Log/log_handlers");
 const aggregate_result_1 = require("./aggregate_result");
 const connection_provider_1 = require("../Connection/connection_provider");
+const name_helpers_1 = require("../Helpers/name_helpers");
 class DataAggregate {
-    constructor(collectionName, dbName) {
+    constructor(collectionId) {
         this.dbName = "exweiv";
-        if (!collectionName) {
-            (0, log_handlers_1.reportError)("Collection name required");
+        if (!collectionId) {
+            (0, log_handlers_1.reportError)("Database and Collection name required");
         }
+        const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
         this.dbName = dbName;
     }
@@ -96,10 +98,12 @@ class DataAggregate {
         return this;
     }
     limit(limit) {
-        if (!limit) {
+        if (!limit && limit != 0) {
             (0, log_handlers_1.reportError)("Limit number is required please specify a limit amount");
         }
-        this.limitNumber = limit;
+        if (limit != 0) {
+            this.limitNumber = limit;
+        }
         return this;
     }
     max(propertyName, projectedName = `${propertyName}Max`) {
@@ -129,9 +133,9 @@ class DataAggregate {
     async run(options = {
         suppressAuth: false,
         consistentRead: false,
-        cleanAfterRun: false
+        cleanupAfter: false
     }) {
-        const { suppressAuth, consistentRead, cleanAfterRun } = options;
+        const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
         if (memberId && suppressAuth != true) {
             this.pipeline.push({
@@ -174,7 +178,7 @@ class DataAggregate {
         if (consistentRead === true) {
             aggregation.readConcern("majority");
         }
-        const aggregateResult = await (0, aggregate_result_1.WeivDataAggregateResult)(this.limitNumber, this.pipeline, this.dbName, this.collectionName, suppressAuth).getResult();
+        const aggregateResult = await (0, aggregate_result_1.WeivDataAggregateResult)({ pageSize: this.limitNumber, pipeline: this.pipeline, databaseName: this.dbName, collectionName: this.collectionName, suppressAuth }).getResult();
         let modifiedItems = aggregateResult.items.map((document) => {
             if (document._exweivDocument) {
                 const _exweivDocumentExtracted = document._exweivDocument;
@@ -189,8 +193,8 @@ class DataAggregate {
                 return document;
             }
         });
-        if (cleanAfterRun === true) {
-            cleanup();
+        if (cleanupAfter === true) {
+            await cleanup();
         }
         return {
             ...aggregateResult,
@@ -198,7 +202,7 @@ class DataAggregate {
         };
     }
     skip(skip) {
-        if (!skip) {
+        if (!skip && skip != 0) {
             (0, log_handlers_1.reportError)("Skip number is required please specify a skip number");
         }
         this.skipNumber = skip;
@@ -276,7 +280,7 @@ class DataAggregate {
     }
 }
 exports.DataAggregate = DataAggregate;
-function ExWeivDataAggregate(collectionName, dbName = "exweiv") {
-    return new DataAggregate(collectionName, dbName);
+function ExWeivDataAggregate(dynamicName) {
+    return new DataAggregate(dynamicName);
 }
 exports.ExWeivDataAggregate = ExWeivDataAggregate;

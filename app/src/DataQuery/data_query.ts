@@ -5,6 +5,7 @@ import { reportError } from '../Log/log_handlers';
 import { merge, size } from 'lodash';
 import { useClient } from '../Connection/connection_provider';
 import { WeivDataQueryResult } from './query_result';
+import { splitCollectionId } from '../Helpers/name_helpers'
 
 export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     private collectionName: string;
@@ -20,13 +21,14 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     private limitNumber = 50;
     private referenceLenght: ReferenceLenghtObject = {};
 
-    constructor(collectionName: string, dbName: string) {
+    constructor(collectionId: string) {
         super();
-        this.setDataQuery(this);
-
-        if (!collectionName) {
+        if (!collectionId) {
             reportError("Collection name required");
         }
+
+        this.setDataQuery(this);
+        const { dbName, collectionName } = splitCollectionId(collectionId);
 
         this.collectionName = collectionName;
         this.dbName = dbName;
@@ -59,10 +61,10 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     async count(options: QueryOptions = {
         suppressAuth: false,
         consistentRead: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         suppressHooks: false
     }): Promise<number> {
-        const { suppressAuth, consistentRead, cleanAfterRun } = options;
+        const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
 
         // Filter results to only member author data
@@ -80,9 +82,9 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
 
         const totalCount = await collection.countDocuments(this.query, countOptions);
 
-        // Close the connection to space up the connection pool in MongoDB (if cleanAfterRun === true)
-        if (cleanAfterRun === true) {
-            cleanup();
+        // Close the connection to space up the connection pool in MongoDB (if cleanupAfter === true)
+        if (cleanupAfter === true) {
+            await cleanup();
         }
 
         return totalCount;
@@ -110,7 +112,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     async distinct(propertyName: string, options: QueryOptions = {
         suppressAuth: false,
         suppressHooks: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         consistentRead: false
     }): Promise<QueryResult> {
         if (!propertyName) {
@@ -142,7 +144,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     async find(options: QueryOptions = {
         suppressAuth: false,
         suppressHooks: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         consistentRead: false
     }): Promise<QueryResult> {
         return this.runQuery(options);
@@ -197,10 +199,14 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      * @returns A `WeivDataQuery` object representing the refined query.
      */
     limit(limit: number): DataQuery {
-        if (!limit) {
+        if (!limit && limit != 0) {
             reportError("Limit number is required!");
         }
-        this.limitNumber = limit;
+
+        if (limit != 0) {
+            this.limitNumber = limit;
+        }
+
         return this;
     }
 
@@ -210,7 +216,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      * @returns A `WeivDataQuery` object representing the refined query.
      */
     skip(skip: number): DataQuery {
-        if (!skip) {
+        if (!skip && skip != 0) {
             reportError("Skip number is required!");
         }
         this.skipNumber = skip;
@@ -219,7 +225,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
 
     // HELPER FUNCTIONS IN CLASS
     private async runQuery(options: QueryOptions): Promise<QueryResult> {
-        const { suppressAuth, suppressHooks, cleanAfterRun, consistentRead } = options;
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
         const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
 
         // Filter results to only member author data
@@ -250,8 +256,8 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
             }
         }).getResult();
 
-        if (cleanAfterRun === true) {
-            cleanup();
+        if (cleanupAfter === true) {
+            await cleanup();
         }
 
         return result;
@@ -278,6 +284,6 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 }
 
-export function ExWeivDataQuery(collectionName: string, dbName = "exweiv") {
-    return new DataQuery(collectionName, dbName);
+export function ExWeivDataQuery(dynamicName: string) {
+    return new DataQuery(dynamicName);
 }

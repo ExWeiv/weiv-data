@@ -5,6 +5,7 @@ import { DataFilter } from "../DataFilter/data_filter";
 import { DataAggregateInterface } from "../Interfaces/interfaces";
 import { WeivDataAggregateResult } from "./aggregate_result";
 import { useClient } from '../Connection/connection_provider';
+import { splitCollectionId } from '../Helpers/name_helpers';
 
 export class DataAggregate implements DataAggregateInterface {
     private collectionName: string;
@@ -19,10 +20,12 @@ export class DataAggregate implements DataAggregateInterface {
     private countCalled!: boolean;
     private havingFilter!: HavingFilter;
 
-    constructor(collectionName: string, dbName: string) {
-        if (!collectionName) {
-            reportError("Collection name required");
+    constructor(collectionId: string) {
+        if (!collectionId) {
+            reportError("Database and Collection name required");
         }
+
+        const { dbName, collectionName } = splitCollectionId(collectionId);
 
         this.collectionName = collectionName;
         this.dbName = dbName;
@@ -264,10 +267,14 @@ export class DataAggregate implements DataAggregateInterface {
      * ```
      */
     limit(limit: number): DataAggregate {
-        if (!limit) {
+        if (!limit && limit != 0) {
             reportError("Limit number is required please specify a limit amount");
         }
-        this.limitNumber = limit;
+
+        if (limit != 0) {
+            this.limitNumber = limit;
+        }
+
         return this;
     }
 
@@ -368,11 +375,11 @@ export class DataAggregate implements DataAggregateInterface {
         options: AggregateRunOptions = {
             suppressAuth: false,
             consistentRead: false,
-            cleanAfterRun: false
+            cleanupAfter: false
         }
     ): Promise<AggregateResult> {
         // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
-        const { suppressAuth, consistentRead, cleanAfterRun } = options;
+        const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
 
         // Check if suppressAuth false and if there is a memberId
@@ -437,7 +444,7 @@ export class DataAggregate implements DataAggregateInterface {
         }
 
         // Make the call to the MongoDB and convert it to an array via result function
-        const aggregateResult = await WeivDataAggregateResult(this.limitNumber, this.pipeline, this.dbName, this.collectionName, suppressAuth).getResult();
+        const aggregateResult = await WeivDataAggregateResult({ pageSize: this.limitNumber, pipeline: this.pipeline, databaseName: this.dbName, collectionName: this.collectionName, suppressAuth }).getResult();
 
         // Modify result of call
         let modifiedItems = aggregateResult.items.map((document: Document) => {
@@ -455,9 +462,9 @@ export class DataAggregate implements DataAggregateInterface {
             }
         });
 
-        // Close the connection to space up the connection pool in MongoDB (if cleanAfterRun === true)
-        if (cleanAfterRun === true) {
-            cleanup();
+        // Close the connection to space up the connection pool in MongoDB (if cleanupAfter === true)
+        if (cleanupAfter === true) {
+            await cleanup();
         }
 
         // Return the WeivDataAggregateResult
@@ -485,7 +492,7 @@ export class DataAggregate implements DataAggregateInterface {
      * ```
      */
     skip(skip: number): DataAggregate {
-        if (!skip) {
+        if (!skip && skip != 0) {
             reportError("Skip number is required please specify a skip number");
         }
 
@@ -593,6 +600,6 @@ export class DataAggregate implements DataAggregateInterface {
     }
 }
 
-export function ExWeivDataAggregate(collectionName: string, dbName = "exweiv") {
-    return new DataAggregate(collectionName, dbName);
+export function ExWeivDataAggregate(dynamicName: string) {
+    return new DataAggregate(dynamicName);
 }

@@ -156,7 +156,7 @@ export class DataQueryFilter implements DataQueryFilterInterface {
             this.memoizedIsEmpty = memoize((propertyName) => {
                 return this.addFilter({
                     [propertyName]: {
-                        $exist: true,
+                        $exists: false,
                     },
                 });
             })
@@ -172,7 +172,7 @@ export class DataQueryFilter implements DataQueryFilterInterface {
             this.memoizedIsNotEmpty = memoize((propertyName) => {
                 return this.addFilter({
                     [propertyName]: {
-                        $exist: false,
+                        $exists: true,
                     },
                 });
             })

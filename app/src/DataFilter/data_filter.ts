@@ -2,7 +2,7 @@ import { DataFilterInterface } from '../Interfaces/interfaces'
 import { memoize, merge } from 'lodash';
 
 export class DataFilter implements DataFilterInterface {
-    protected filters = {};
+    filters = {};
     constructor() { }
 
     and(query: DataFilter): DataFilter {
@@ -153,7 +153,7 @@ export class DataFilter implements DataFilterInterface {
             this.memoizedIsEmpty = memoize((propertyName) => {
                 return this.addFilter({
                     [propertyName]: {
-                        $exist: true,
+                        $exists: false,
                     },
                 });
             })
@@ -169,7 +169,7 @@ export class DataFilter implements DataFilterInterface {
             this.memoizedIsNotEmpty = memoize((propertyName) => {
                 return this.addFilter({
                     [propertyName]: {
-                        $exist: false,
+                        $exists: true,
                     },
                 });
             })
