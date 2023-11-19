@@ -61,7 +61,7 @@ async function setupClient(uri, newConnection = false) {
 }
 const memoizedSetupClient = lodash_1.default.memoize(setupClient);
 async function useClient(suppressAuth = false) {
-    const uri = process.env.MONGO_URI || "";
+    const uri = process.env.URI || "";
     const memberId = undefined;
     if (savedClients[uri]) {
         const { pool, cleanup } = await memoizedSetupClient(uri, false);

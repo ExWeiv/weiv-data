@@ -90,7 +90,7 @@ const memoizedSetupClient = _.memoize(setupClient);
  */
 export async function useClient(suppressAuth = false): Promise<ClientSetupResult> {
     // const { uri, memberId } = await getMemberURI(suppressAuth);
-    const uri = process.env.MONGO_URI || "";
+    const uri = process.env.URI || "";
     const memberId = undefined;
 
     if (savedClients[uri]) {
