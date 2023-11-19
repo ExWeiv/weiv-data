@@ -146,16 +146,16 @@ class DataQueryResult {
                     return this.currentPage > 1;
                 }
             },
-            next: async (cleanAfterRun) => {
+            next: async (cleanupAfter) => {
                 this.currentPage++;
-                if (cleanAfterRun === true) {
+                if (cleanupAfter === true) {
                     await this.cleanup();
                 }
                 return this.getResult();
             },
-            prev: async (cleanAfterRun) => {
+            prev: async (cleanupAfter) => {
                 this.currentPage--;
-                if (cleanAfterRun === true) {
+                if (cleanupAfter === true) {
                     await this.cleanup();
                 }
                 return this.getResult();

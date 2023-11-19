@@ -37,10 +37,10 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     async count(options = {
         suppressAuth: false,
         consistentRead: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         suppressHooks: false
     }) {
-        const { suppressAuth, consistentRead, cleanAfterRun } = options;
+        const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
         if (memberId && suppressAuth != true) {
             this.eq("_owner", memberId);
@@ -51,7 +51,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
             countOptions = (0, lodash_1.merge)(countOptions, { readConcern: 'majority' });
         }
         const totalCount = await collection.countDocuments(this.query, countOptions);
-        if (cleanAfterRun === true) {
+        if (cleanupAfter === true) {
             await cleanup();
         }
         return totalCount;
@@ -70,7 +70,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     async distinct(propertyName, options = {
         suppressAuth: false,
         suppressHooks: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         consistentRead: false
     }) {
         if (!propertyName) {
@@ -93,7 +93,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     async find(options = {
         suppressAuth: false,
         suppressHooks: false,
-        cleanAfterRun: false,
+        cleanupAfter: false,
         consistentRead: false
     }) {
         return this.runQuery(options);
@@ -148,7 +148,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         return this;
     }
     async runQuery(options) {
-        const { suppressAuth, suppressHooks, cleanAfterRun, consistentRead } = options;
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
         const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
         if (memberId && suppressAuth != true) {
             this.eq("_owner", memberId);
@@ -173,7 +173,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
                 addFields: this.referenceLenght
             }
         }).getResult();
-        if (cleanAfterRun === true) {
+        if (cleanupAfter === true) {
             await cleanup();
         }
         return result;

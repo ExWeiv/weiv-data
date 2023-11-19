@@ -43,14 +43,14 @@ declare global {
     type AggregateRunOptions = {
         suppressAuth?: boolean;
         consistentRead?: boolean;
-        cleanAfterRun?: boolean;
+        cleanupAfter?: boolean;
     };
 
     type AggregateResult = {
         items: Array<object>;
         length: number;
         hasNext(): boolean;
-        next(cleanAfterRun?: boolean): Promise<AggregateResult>;
+        next(cleanupAfter?: boolean): Promise<AggregateResult>;
     };
 
     type ConnectionResult = {
@@ -82,7 +82,7 @@ declare global {
         suppressAuth: boolean,
         suppressHooks: boolean,
         consistentRead: boolean,
-        cleanAfterRun: boolean
+        cleanupAfter: boolean
     }
 
     type QueryFields = {
@@ -99,8 +99,8 @@ declare global {
         totalPages: number,
         hasNext(): boolean,
         hasPrev(): boolean,
-        next(cleanAfterRun?: boolean): Promise<QueryResult>,
-        prev(cleanAfterRun?: boolean): Promise<QueryResult>
+        next(cleanupAfter?: boolean): Promise<QueryResult>,
+        prev(cleanupAfter?: boolean): Promise<QueryResult>
     }
 
     type IncludeObject = {

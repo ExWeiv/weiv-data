@@ -58,10 +58,10 @@ class DataAggregateResult {
             items,
             length: items.length,
             hasNext: () => this.currentPage * this.pageSize < length,
-            next: async (cleanAfterRun: boolean = false) => {
+            next: async (cleanupAfter: boolean = false) => {
                 this.currentPage++;
-                if (cleanAfterRun === true) {
-                    // Close the connection after job completed (if cleanAfterRun === true)
+                if (cleanupAfter === true) {
+                    // Close the connection after job completed (if cleanupAfter === true)
                     await cleanup();
                 }
                 return this.getResult();

@@ -131,9 +131,9 @@ class DataAggregate {
     async run(options = {
         suppressAuth: false,
         consistentRead: false,
-        cleanAfterRun: false
+        cleanupAfter: false
     }) {
-        const { suppressAuth, consistentRead, cleanAfterRun } = options;
+        const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
         if (memberId && suppressAuth != true) {
             this.pipeline.push({
@@ -191,7 +191,7 @@ class DataAggregate {
                 return document;
             }
         });
-        if (cleanAfterRun === true) {
+        if (cleanupAfter === true) {
             await cleanup();
         }
         return {

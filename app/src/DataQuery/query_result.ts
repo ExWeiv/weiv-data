@@ -180,17 +180,17 @@ class DataQueryResult {
                     return this.currentPage > 1;
                 }
             }, //todo
-            next: async (cleanAfterRun?: boolean) => {
+            next: async (cleanupAfter?: boolean) => {
                 this.currentPage++;
-                if (cleanAfterRun === true) {
+                if (cleanupAfter === true) {
                     // Close the connection
                     await this.cleanup();
                 }
                 return this.getResult();
             },
-            prev: async (cleanAfterRun?: boolean) => {
+            prev: async (cleanupAfter?: boolean) => {
                 this.currentPage--;
-                if (cleanAfterRun === true) {
+                if (cleanupAfter === true) {
                     // Close the connection
                     await this.cleanup();
                 }

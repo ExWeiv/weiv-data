@@ -45,9 +45,9 @@ class DataAggregateResult {
             items,
             length: items.length,
             hasNext: () => this.currentPage * this.pageSize < length,
-            next: async (cleanAfterRun = false) => {
+            next: async (cleanupAfter = false) => {
                 this.currentPage++;
-                if (cleanAfterRun === true) {
+                if (cleanupAfter === true) {
                     await cleanup();
                 }
                 return this.getResult();

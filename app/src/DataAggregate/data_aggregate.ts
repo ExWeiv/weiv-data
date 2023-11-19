@@ -371,11 +371,11 @@ export class DataAggregate implements DataAggregateInterface {
         options: AggregateRunOptions = {
             suppressAuth: false,
             consistentRead: false,
-            cleanAfterRun: false
+            cleanupAfter: false
         }
     ): Promise<AggregateResult> {
         // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
-        const { suppressAuth, consistentRead, cleanAfterRun } = options;
+        const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
 
         // Check if suppressAuth false and if there is a memberId
@@ -458,8 +458,8 @@ export class DataAggregate implements DataAggregateInterface {
             }
         });
 
-        // Close the connection to space up the connection pool in MongoDB (if cleanAfterRun === true)
-        if (cleanAfterRun === true) {
+        // Close the connection to space up the connection pool in MongoDB (if cleanupAfter === true)
+        if (cleanupAfter === true) {
             await cleanup();
         }
 
