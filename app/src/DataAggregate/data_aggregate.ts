@@ -267,10 +267,14 @@ export class DataAggregate implements DataAggregateInterface {
      * ```
      */
     limit(limit: number): DataAggregate {
-        if (!limit) {
+        if (!limit && limit != 0) {
             reportError("Limit number is required please specify a limit amount");
         }
-        this.limitNumber = limit;
+
+        if (limit != 0) {
+            this.limitNumber = limit;
+        }
+
         return this;
     }
 
@@ -440,7 +444,7 @@ export class DataAggregate implements DataAggregateInterface {
         }
 
         // Make the call to the MongoDB and convert it to an array via result function
-        const aggregateResult = await WeivDataAggregateResult(this.limitNumber, this.pipeline, this.dbName, this.collectionName, suppressAuth).getResult();
+        const aggregateResult = await WeivDataAggregateResult({ pageSize: this.limitNumber, pipeline: this.pipeline, databaseName: this.dbName, collectionName: this.collectionName, suppressAuth }).getResult();
 
         // Modify result of call
         let modifiedItems = aggregateResult.items.map((document: Document) => {
@@ -488,7 +492,7 @@ export class DataAggregate implements DataAggregateInterface {
      * ```
      */
     skip(skip: number): DataAggregate {
-        if (!skip) {
+        if (!skip && skip != 0) {
             reportError("Skip number is required please specify a skip number");
         }
 

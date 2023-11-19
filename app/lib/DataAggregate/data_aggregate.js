@@ -98,10 +98,12 @@ class DataAggregate {
         return this;
     }
     limit(limit) {
-        if (!limit) {
+        if (!limit && limit != 0) {
             (0, log_handlers_1.reportError)("Limit number is required please specify a limit amount");
         }
-        this.limitNumber = limit;
+        if (limit != 0) {
+            this.limitNumber = limit;
+        }
         return this;
     }
     max(propertyName, projectedName = `${propertyName}Max`) {
@@ -176,7 +178,7 @@ class DataAggregate {
         if (consistentRead === true) {
             aggregation.readConcern("majority");
         }
-        const aggregateResult = await (0, aggregate_result_1.WeivDataAggregateResult)(this.limitNumber, this.pipeline, this.dbName, this.collectionName, suppressAuth).getResult();
+        const aggregateResult = await (0, aggregate_result_1.WeivDataAggregateResult)({ pageSize: this.limitNumber, pipeline: this.pipeline, databaseName: this.dbName, collectionName: this.collectionName, suppressAuth }).getResult();
         let modifiedItems = aggregateResult.items.map((document) => {
             if (document._exweivDocument) {
                 const _exweivDocumentExtracted = document._exweivDocument;
@@ -200,7 +202,7 @@ class DataAggregate {
         };
     }
     skip(skip) {
-        if (!skip) {
+        if (!skip && skip != 0) {
             (0, log_handlers_1.reportError)("Skip number is required please specify a skip number");
         }
         this.skipNumber = skip;
