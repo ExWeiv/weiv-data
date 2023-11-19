@@ -126,7 +126,7 @@ class DataFilter {
             this.memoizedIsEmpty = (0, lodash_1.memoize)((propertyName) => {
                 return this.addFilter({
                     [propertyName]: {
-                        $exist: true,
+                        $exists: false,
                     },
                 });
             });
@@ -139,7 +139,7 @@ class DataFilter {
             this.memoizedIsNotEmpty = (0, lodash_1.memoize)((propertyName) => {
                 return this.addFilter({
                     [propertyName]: {
-                        $exist: false,
+                        $exists: true,
                     },
                 });
             });

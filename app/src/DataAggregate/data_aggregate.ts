@@ -5,6 +5,7 @@ import { DataFilter } from "../DataFilter/data_filter";
 import { DataAggregateInterface } from "../Interfaces/interfaces";
 import { WeivDataAggregateResult } from "./aggregate_result";
 import { useClient } from '../Connection/connection_provider';
+import { splitCollectionId } from '../Helpers/name_helpers';
 
 export class DataAggregate implements DataAggregateInterface {
     private collectionName: string;
@@ -19,10 +20,12 @@ export class DataAggregate implements DataAggregateInterface {
     private countCalled!: boolean;
     private havingFilter!: HavingFilter;
 
-    constructor(collectionName: string, dbName: string) {
-        if (!collectionName) {
-            reportError("Collection name required");
+    constructor(collectionId: string) {
+        if (!collectionId) {
+            reportError("Database and Collection name required");
         }
+
+        const { dbName, collectionName } = splitCollectionId(collectionId);
 
         this.collectionName = collectionName;
         this.dbName = dbName;
@@ -457,7 +460,7 @@ export class DataAggregate implements DataAggregateInterface {
 
         // Close the connection to space up the connection pool in MongoDB (if cleanAfterRun === true)
         if (cleanAfterRun === true) {
-            cleanup();
+            await cleanup();
         }
 
         // Return the WeivDataAggregateResult
@@ -593,6 +596,6 @@ export class DataAggregate implements DataAggregateInterface {
     }
 }
 
-export function ExWeivDataAggregate(collectionName: string, dbName = "exweiv") {
-    return new DataAggregate(collectionName, dbName);
+export function ExWeivDataAggregate(dynamicName: string) {
+    return new DataAggregate(dynamicName);
 }

@@ -5,9 +5,11 @@ const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const connection_provider_1 = require("../Connection/connection_provider");
 const log_handlers_1 = require("../Log/log_handlers");
 class DataAggregateResult {
-    constructor(pageSize = 50, pipeline, databaseName, collectionName, suppressAuth = false) {
+    constructor(options) {
+        this.pageSize = 50;
         this.currentPage = 1;
         this.suppressAuth = false;
+        const { pageSize, pipeline, databaseName, collectionName, suppressAuth } = options;
         if (!pipeline || !databaseName || !collectionName) {
             (0, log_handlers_1.reportError)("Required Parameters Missing (Internal Error)");
         }
@@ -16,7 +18,7 @@ class DataAggregateResult {
         this.collectionName = collectionName;
         this.databaseName = databaseName;
         this.pipeline = pipeline;
-        this.suppressAuth = suppressAuth;
+        this.suppressAuth = suppressAuth || false;
     }
     async getItems() {
         const currentSkip = this.pipeline.find((stage) => "$skip" in stage);
@@ -35,25 +37,18 @@ class DataAggregateResult {
         const items = await this.collection.aggregate(this.pipeline).toArray();
         return items;
     }
-    async getTotalItems() {
-        const result = await this.collection
-            .aggregate([{ $count: "totalItems" }])
-            .toArray();
-        return result.length > 0 ? result[0].totalItems : 0;
-    }
     async getResult() {
         const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
         this.collection = collection;
         const items = await this.getItems();
-        const length = await this.getTotalItems();
         return {
             items,
-            length,
+            length: items.length,
             hasNext: () => this.currentPage * this.pageSize < length,
             next: async (cleanAfterRun = false) => {
                 this.currentPage++;
                 if (cleanAfterRun === true) {
-                    cleanup();
+                    await cleanup();
                 }
                 return this.getResult();
             },
@@ -71,7 +66,7 @@ class DataAggregateResult {
         return { collection, cleanup, memberId };
     }
 }
-function WeivDataAggregateResult(pageSize = 50, pipeline, databaseName, collectionName, suppressAuth = false) {
-    return new DataAggregateResult(pageSize, pipeline, databaseName, collectionName, suppressAuth);
+function WeivDataAggregateResult(options) {
+    return new DataAggregateResult(options);
 }
 exports.WeivDataAggregateResult = WeivDataAggregateResult;

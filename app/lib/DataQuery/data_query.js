@@ -6,18 +6,20 @@ const log_handlers_1 = require("../Log/log_handlers");
 const lodash_1 = require("lodash");
 const connection_provider_1 = require("../Connection/connection_provider");
 const query_result_1 = require("./query_result");
+const name_helpers_1 = require("../Helpers/name_helpers");
 class DataQuery extends data_query_filters_1.DataQueryFilter {
-    constructor(collectionName, dbName) {
+    constructor(collectionId) {
         super();
         this.dbName = "exweiv";
         this.query = {};
         this.includeValues = [];
         this.limitNumber = 50;
         this.referenceLenght = {};
-        this.setDataQuery(this);
-        if (!collectionName) {
+        if (!collectionId) {
             (0, log_handlers_1.reportError)("Collection name required");
         }
+        this.setDataQuery(this);
+        const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
         this.dbName = dbName;
     }
@@ -50,7 +52,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         }
         const totalCount = await collection.countDocuments(this.query, countOptions);
         if (cleanAfterRun === true) {
-            cleanup();
+            await cleanup();
         }
         return totalCount;
     }
@@ -130,14 +132,16 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         return this;
     }
     limit(limit) {
-        if (!limit) {
+        if (!limit && limit != 0) {
             (0, log_handlers_1.reportError)("Limit number is required!");
         }
-        this.limitNumber = limit;
+        if (limit != 0) {
+            this.limitNumber = limit;
+        }
         return this;
     }
     skip(skip) {
-        if (!skip) {
+        if (!skip && skip != 0) {
             (0, log_handlers_1.reportError)("Skip number is required!");
         }
         this.skipNumber = skip;
@@ -170,7 +174,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
             }
         }).getResult();
         if (cleanAfterRun === true) {
-            cleanup();
+            await cleanup();
         }
         return result;
     }
@@ -192,7 +196,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
 }
 exports.DataQuery = DataQuery;
-function ExWeivDataQuery(collectionName, dbName = "exweiv") {
-    return new DataQuery(collectionName, dbName);
+function ExWeivDataQuery(dynamicName) {
+    return new DataQuery(dynamicName);
 }
 exports.ExWeivDataQuery = ExWeivDataQuery;

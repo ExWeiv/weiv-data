@@ -5,12 +5,14 @@ const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const log_handlers_1 = require("../Log/log_handlers");
 const aggregate_result_1 = require("./aggregate_result");
 const connection_provider_1 = require("../Connection/connection_provider");
+const name_helpers_1 = require("../Helpers/name_helpers");
 class DataAggregate {
-    constructor(collectionName, dbName) {
+    constructor(collectionId) {
         this.dbName = "exweiv";
-        if (!collectionName) {
-            (0, log_handlers_1.reportError)("Collection name required");
+        if (!collectionId) {
+            (0, log_handlers_1.reportError)("Database and Collection name required");
         }
+        const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
         this.dbName = dbName;
     }
@@ -190,7 +192,7 @@ class DataAggregate {
             }
         });
         if (cleanAfterRun === true) {
-            cleanup();
+            await cleanup();
         }
         return {
             ...aggregateResult,
@@ -276,7 +278,7 @@ class DataAggregate {
     }
 }
 exports.DataAggregate = DataAggregate;
-function ExWeivDataAggregate(collectionName, dbName = "exweiv") {
-    return new DataAggregate(collectionName, dbName);
+function ExWeivDataAggregate(dynamicName) {
+    return new DataAggregate(dynamicName);
 }
 exports.ExWeivDataAggregate = ExWeivDataAggregate;

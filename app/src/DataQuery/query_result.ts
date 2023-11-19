@@ -73,7 +73,6 @@ class DataQueryResult {
                     })
                 }
 
-
                 for (const include of includes) {
                     if (include.$lookup) {
                         pipeline.push({
@@ -97,6 +96,8 @@ class DataQueryResult {
                 pipeline.push({
                     $limit: this.pageSize
                 })
+
+                console.log(pipeline);
 
                 const aggregateCursor = this.collection.aggregate(pipeline);
 
@@ -127,7 +128,23 @@ class DataQueryResult {
     }
 
     private async getTotalCount(): Promise<number> {
-        const { query } = this.queryOptions;
+        const { query, distinctProperty } = this.queryOptions;
+
+        if (distinctProperty) {
+            const pipeline = [
+                { $group: { _id: `$${distinctProperty}`, count: { $sum: 1 }, }, },
+                { $group: { _id: null, distinctCount: { $sum: 1 }, }, }
+            ]
+
+            const result = await this.collection.aggregate(pipeline).toArray();
+
+            if (result.length > 0) {
+                return result[0].distinctCount;
+            } else {
+                return 0;
+            }
+        }
+
         const totalCount = await this.collection.countDocuments(query);
         return totalCount;
     }
@@ -139,6 +156,7 @@ class DataQueryResult {
             this.cleanup = cleanup;
         }
 
+        const { skip } = this.queryOptions;
         const items = await this.getItems();
         const totalCount = await this.getTotalCount();
 
@@ -150,13 +168,23 @@ class DataQueryResult {
             query: this.dataQueryClass,
             totalCount,
             totalPages: Math.ceil(totalCount / this.pageSize),
-            hasNext: () => this.currentPage * this.pageSize < totalCount, //check
-            hasPrev: () => this.currentPage > 1, //todo
+            hasNext: () => this.currentPage * this.pageSize < totalCount,
+            hasPrev: () => {
+                if (skip) {
+                    if (skip > 0 && skip >= this.pageSize) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return this.currentPage > 1;
+                }
+            }, //todo
             next: async (cleanAfterRun?: boolean) => {
                 this.currentPage++;
                 if (cleanAfterRun === true) {
                     // Close the connection
-                    this.cleanup();
+                    await this.cleanup();
                 }
                 return this.getResult();
             },
@@ -164,7 +192,7 @@ class DataQueryResult {
                 this.currentPage--;
                 if (cleanAfterRun === true) {
                     // Close the connection
-                    this.cleanup();
+                    await this.cleanup();
                 }
                 return this.getResult();
             }

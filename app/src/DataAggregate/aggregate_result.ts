@@ -4,7 +4,7 @@ import { useClient } from '../Connection/connection_provider';
 import { reportError } from '../Log/log_handlers';
 
 class DataAggregateResult {
-    private pageSize: number;
+    private pageSize: number = 50;
     private currentPage = 1;
     private pipeline: object[];
     private db!: Db;
@@ -13,7 +13,9 @@ class DataAggregateResult {
     private suppressAuth = false
     private collection!: Collection;
 
-    constructor(pageSize: number = 50, pipeline: object[], databaseName: string, collectionName: string, suppressAuth: boolean = false) {
+    constructor(options: AggregateResultOptions) {
+        const { pageSize, pipeline, databaseName, collectionName, suppressAuth } = options;
+
         if (!pipeline || !databaseName || !collectionName) {
             reportError("Required Parameters Missing (Internal Error)");
         }
@@ -23,7 +25,7 @@ class DataAggregateResult {
         this.collectionName = collectionName;
         this.databaseName = databaseName;
         this.pipeline = pipeline;
-        this.suppressAuth = suppressAuth;
+        this.suppressAuth = suppressAuth || false;
     }
 
     private async getItems(): Promise<Document[]> {
@@ -45,30 +47,22 @@ class DataAggregateResult {
         return items;
     }
 
-    private async getTotalItems(): Promise<number> {
-        const result = await this.collection
-            .aggregate([{ $count: "totalItems" }])
-            .toArray();
-        return result.length > 0 ? result[0].totalItems : 0;
-    }
-
     async getResult(): Promise<AggregateResult> {
         // Setup a connection from the pool
         const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
         this.collection = collection;
 
         const items = await this.getItems();
-        const length = await this.getTotalItems();
 
         return {
             items,
-            length,
+            length: items.length,
             hasNext: () => this.currentPage * this.pageSize < length,
             next: async (cleanAfterRun: boolean = false) => {
                 this.currentPage++;
                 if (cleanAfterRun === true) {
                     // Close the connection after job completed (if cleanAfterRun === true)
-                    cleanup();
+                    await cleanup();
                 }
                 return this.getResult();
             },
@@ -89,6 +83,6 @@ class DataAggregateResult {
     }
 }
 
-export function WeivDataAggregateResult(pageSize: number = 50, pipeline: object[], databaseName: string, collectionName: string, suppressAuth: boolean = false) {
-    return new DataAggregateResult(pageSize, pipeline, databaseName, collectionName, suppressAuth);
+export function WeivDataAggregateResult(options: AggregateResultOptions) {
+    return new DataAggregateResult(options);
 }

@@ -1,4 +1,4 @@
-import { MongoClient, Collection } from 'mongodb/mongodb';
+import { MongoClient, Collection, ObjectId } from 'mongodb/mongodb';
 import { DataQuery } from './src/DataQuery/data_query'
 
 declare global {
@@ -155,5 +155,23 @@ declare global {
                 else: 0
             }
         }
+    }
+
+    type WeivDataOptions = {
+        suppressAuth?: boolean,
+        suppressHooks?: boolean,
+        consistentRead?: boolean,
+        cleanupAfter?: boolean,
+        enableOwnerId?: boolean
+    }
+
+    type DataItemValues = { [key: string]: any; };
+
+    type AggregateResultOptions = {
+        pageSize: number,
+        pipeline: PipelineArray,
+        databaseName: string,
+        collectionName: string,
+        suppressAuth?: boolean
     }
 }

@@ -5,6 +5,7 @@ import { reportError } from '../Log/log_handlers';
 import { merge, size } from 'lodash';
 import { useClient } from '../Connection/connection_provider';
 import { WeivDataQueryResult } from './query_result';
+import { splitCollectionId } from '../Helpers/name_helpers'
 
 export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     private collectionName: string;
@@ -20,13 +21,14 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     private limitNumber = 50;
     private referenceLenght: ReferenceLenghtObject = {};
 
-    constructor(collectionName: string, dbName: string) {
+    constructor(collectionId: string) {
         super();
-        this.setDataQuery(this);
-
-        if (!collectionName) {
+        if (!collectionId) {
             reportError("Collection name required");
         }
+
+        this.setDataQuery(this);
+        const { dbName, collectionName } = splitCollectionId(collectionId);
 
         this.collectionName = collectionName;
         this.dbName = dbName;
@@ -82,7 +84,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
 
         // Close the connection to space up the connection pool in MongoDB (if cleanAfterRun === true)
         if (cleanAfterRun === true) {
-            cleanup();
+            await cleanup();
         }
 
         return totalCount;
@@ -197,10 +199,14 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      * @returns A `WeivDataQuery` object representing the refined query.
      */
     limit(limit: number): DataQuery {
-        if (!limit) {
+        if (!limit && limit != 0) {
             reportError("Limit number is required!");
         }
-        this.limitNumber = limit;
+
+        if (limit != 0) {
+            this.limitNumber = limit;
+        }
+
         return this;
     }
 
@@ -210,7 +216,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      * @returns A `WeivDataQuery` object representing the refined query.
      */
     skip(skip: number): DataQuery {
-        if (!skip) {
+        if (!skip && skip != 0) {
             reportError("Skip number is required!");
         }
         this.skipNumber = skip;
@@ -251,7 +257,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         }).getResult();
 
         if (cleanAfterRun === true) {
-            cleanup();
+            await cleanup();
         }
 
         return result;
@@ -278,6 +284,6 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 }
 
-export function ExWeivDataQuery(collectionName: string, dbName = "exweiv") {
-    return new DataQuery(collectionName, dbName);
+export function ExWeivDataQuery(dynamicName: string) {
+    return new DataQuery(dynamicName);
 }
