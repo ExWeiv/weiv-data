@@ -5,9 +5,13 @@ import { ExWeivDataQuery } from './DataQuery/data_query';
 import { insert } from './Functions/insert';
 import { update } from './Functions/update';
 import { get } from './Functions/get';
-import { save } from './Functions/save'
-import { remove } from './Functions/remove'
-import { truncate } from './Functions/truncate'
+import { save } from './Functions/save';
+import { remove } from './Functions/remove';
+import { truncate } from './Functions/truncate';
+import { insertReference } from './Functions/insertReference';
+import { replaceReferences } from './Functions/replaceReferences';
+import { isReferenced } from './Functions/isReferenced';
+import { removeReference } from './Functions/removeReference';
 
 type weivData = {
     aggregate: typeof ExWeivDataAggregate
@@ -17,12 +21,12 @@ type weivData = {
     bulkUpdate: Function,
     get: typeof get,
     insert: typeof insert,
-    insertReference: Function,
-    isReferenced: Function,
+    insertReference: typeof insertReference,
+    isReferenced: typeof isReferenced,
     queryReferenced: Function,
     remove: typeof remove,
-    removeReferenced: Function,
-    replaceReferences: Function,
+    removeReference: typeof removeReference,
+    replaceReferences: typeof replaceReferences,
     save: typeof save,
     truncate: typeof truncate,
     update: typeof update,
@@ -41,7 +45,11 @@ const weivData: weivData = {
     get: get,
     save: save,
     remove: remove,
-    truncate: truncate
+    truncate: truncate,
+    insertReference: insertReference,
+    replaceReferences: replaceReferences,
+    isReferenced: isReferenced,
+    removeReference: removeReference
 };
 
 export = weivData;

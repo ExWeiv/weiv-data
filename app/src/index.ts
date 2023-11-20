@@ -32,15 +32,15 @@ async function test() {
     // counter++;
     // return { duration, result };
 
-    // const result = await weivData.save("Tests/TestingActions", { _id: "65576b89dc3d1c231db20062", name: "AMCIK SIKMEYI SEVERIM" })
-    // const endTime = new Date().getTime();
-    // const duration = endTime - startTime;
-    // console.log(result, duration);
-    // return result;
+    const result = await weivData.removeReference("Tests/PopulationData", "cityId", "654b9d7f504ddb218237f92d", "655397840dde5495f604ace0")
+    const endTime = new Date().getTime();
+    const duration = endTime - startTime;
+    console.log(result, duration);
+    return result;
 }
 
 setTimeout(async () => {
-    await testWeivData();
+    await test();
 
     // setTimeout(async () => {
     //     await test();

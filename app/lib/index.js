@@ -21,7 +21,12 @@ async function testWeivData() {
 }
 async function test() {
     const startTime = new Date().getTime();
+    const result = await app_1.default.removeReference("Tests/PopulationData", "cityId", "654b9d7f504ddb218237f92d", "655397840dde5495f604ace0");
+    const endTime = new Date().getTime();
+    const duration = endTime - startTime;
+    console.log(result, duration);
+    return result;
 }
 setTimeout(async () => {
-    await testWeivData();
+    await test();
 }, 1);

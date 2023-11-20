@@ -9,6 +9,10 @@ const get_1 = require("./Functions/get");
 const save_1 = require("./Functions/save");
 const remove_1 = require("./Functions/remove");
 const truncate_1 = require("./Functions/truncate");
+const insertReference_1 = require("./Functions/insertReference");
+const replaceReferences_1 = require("./Functions/replaceReferences");
+const isReferenced_1 = require("./Functions/isReferenced");
+const removeReference_1 = require("./Functions/removeReference");
 const weivData = {
     aggregate: data_aggregate_1.ExWeivDataAggregate,
     filter: data_filter_1.ExWeivDataFilter,
@@ -19,6 +23,10 @@ const weivData = {
     get: get_1.get,
     save: save_1.save,
     remove: remove_1.remove,
-    truncate: truncate_1.truncate
+    truncate: truncate_1.truncate,
+    insertReference: insertReference_1.insertReference,
+    replaceReferences: replaceReferences_1.replaceReferences,
+    isReferenced: isReferenced_1.isReferenced,
+    removeReference: removeReference_1.removeReference
 };
 module.exports = weivData;
