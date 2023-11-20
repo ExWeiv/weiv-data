@@ -174,4 +174,8 @@ declare global {
         collectionName: string,
         suppressAuth?: boolean
     }
+
+    type ReferringItem = DataItemValues | string
+    type ReferencedItemSingle = DataItemValues | string
+    type ReferencedItem = DataItemValues | string | DataItemValues[] | string[]
 }
