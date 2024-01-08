@@ -8,6 +8,7 @@ const mongodb_1 = require("mongodb");
 const lodash_1 = __importDefault(require("lodash"));
 const env_variables_loader_1 = __importDefault(require("../Helpers/env_variables_loader"));
 (0, env_variables_loader_1.default)();
+const permission_helpers_1 = require("./permission_helpers");
 const customOptions = {
     maxIdleTimeMS: 15000,
     maxPoolSize: 3
@@ -61,8 +62,7 @@ async function setupClient(uri, newConnection = false) {
 }
 const memoizedSetupClient = lodash_1.default.memoize(setupClient);
 async function useClient(suppressAuth = false) {
-    const uri = process.env.URI || "";
-    const memberId = undefined;
+    const { uri, memberId } = await (0, permission_helpers_1.getMemberURI)(suppressAuth);
     if (savedClients[uri]) {
         const { pool, cleanup } = await memoizedSetupClient(uri, false);
         return { pool, cleanup, memberId };

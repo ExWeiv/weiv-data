@@ -2,7 +2,7 @@ import { MongoClient, MongoClientOptions } from 'mongodb';
 import _ from 'lodash';
 import loadEnv from '../Helpers/env_variables_loader';
 loadEnv();
-// import { getMemberURI } from './permission_helpers';
+import { getMemberURI } from './permission_helpers';
 
 const customOptions: MongoClientOptions = {
     maxIdleTimeMS: 15000,
@@ -89,9 +89,9 @@ const memoizedSetupClient = _.memoize(setupClient);
  * ```
  */
 export async function useClient(suppressAuth = false): Promise<ClientSetupResult> {
-    // const { uri, memberId } = await getMemberURI(suppressAuth);
-    const uri = process.env.URI || "";
-    const memberId = undefined;
+    const { uri, memberId } = await getMemberURI(suppressAuth);
+    // const uri = process.env.URI || "";
+    // const memberId = undefined;
 
     if (savedClients[uri]) {
         const { pool, cleanup } = await memoizedSetupClient(uri, false);
