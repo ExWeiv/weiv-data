@@ -28,5 +28,5 @@ async function test() {
     return result;
 }
 setTimeout(async () => {
-    await test();
+    await testWeivData();
 }, 1);

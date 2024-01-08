@@ -13,7 +13,7 @@ export async function getMemberURI(
 ): Promise<PermissionsReturn> {
     try {
         if (suppressAuth != true) {
-            const { title } = await currentMember.getRole();
+            const { title } = await currentMember.getRoles()[0];
             if (title === "Admin") {
                 const uri = await getCachedSecret("AdminURI");
                 return { uri };
