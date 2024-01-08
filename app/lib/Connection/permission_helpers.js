@@ -6,7 +6,7 @@ const secret_helpers_1 = require("./secret_helpers");
 async function getMemberURI(suppressAuth = false) {
     try {
         if (suppressAuth != true) {
-            const { title } = await wix_members_backend_1.currentMember.getRole();
+            const { title } = await wix_members_backend_1.currentMember.getRoles()[0];
             if (title === "Admin") {
                 const uri = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
                 return { uri };
