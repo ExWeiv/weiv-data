@@ -178,4 +178,12 @@ declare global {
     type ReferringItem = DataItemValues | string
     type ReferencedItemSingle = DataItemValues | string
     type ReferencedItem = DataItemValues | string | DataItemValues[] | string[]
+
+    type bulkInsertResult = {
+        insertedItems: DataItemValues[],
+        insertedItemIds: {
+            [key: number]: InferIdType<TSchema>;
+        },
+        inserted: number
+    }
 }

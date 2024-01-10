@@ -13,6 +13,10 @@ const insertReference_1 = require("./Functions/insertReference");
 const replaceReferences_1 = require("./Functions/replaceReferences");
 const isReferenced_1 = require("./Functions/isReferenced");
 const removeReference_1 = require("./Functions/removeReference");
+const bulkInsert_1 = require("./Functions/bulkInsert");
+const bulkRemove_1 = require("./Functions/bulkRemove");
+const bulkSave_1 = require("./Functions/bulkSave");
+const bulkUpdate_1 = require("./Functions/bulkUpdate");
 const weivData = {
     aggregate: data_aggregate_1.ExWeivDataAggregate,
     filter: data_filter_1.ExWeivDataFilter,
@@ -27,6 +31,10 @@ const weivData = {
     insertReference: insertReference_1.insertReference,
     replaceReferences: replaceReferences_1.replaceReferences,
     isReferenced: isReferenced_1.isReferenced,
-    removeReference: removeReference_1.removeReference
+    removeReference: removeReference_1.removeReference,
+    bulkInsert: bulkInsert_1.bulkInsert,
+    bulkRemove: bulkRemove_1.bulkRemove,
+    bulkSave: bulkSave_1.bulkSave,
+    bulkUpdate: bulkUpdate_1.bulkUpdate
 };
 module.exports = weivData;
