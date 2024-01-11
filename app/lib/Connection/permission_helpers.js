@@ -24,6 +24,7 @@ async function getMemberURI(suppressAuth = false) {
         ;
     }
     catch (err) {
+        console.error("Error on getting URI for MongoDB", err);
         const uri = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
         return { uri };
     }

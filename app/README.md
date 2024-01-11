@@ -40,3 +40,22 @@ Soon we will create a YouTube video to show how you can setup your MongoDB env a
 - **Data Hooks Support**
 
 and more...
+
+---
+
+### Setup MongoDB and Wix
+
+First of all go ahead and create a MongoDB account and a database in your account. You can find many tutorials on YouTube about this. Then come back here, if you already own a MongoDB acount then create a new cluster and do the following steps:
+
+1. Go to Database Access and create 3 different user each user will have different roles/permissions.
+    1. Create one for Admin and give it needed permissions for Admin (you can use built-in roles too or create custom roles)
+    2. Create one for Member and give it needed permissions that you want to give to site members.
+    3. Create one for Visitor and give it needed permissions that you want to give to site visitors.
+2. Every time you create a new user you will also create a password save these passwords because we will need them in the nex step.
+3. After creating 3 different roles you will need the "connection URI" this will be used to connect your MongoDB clusters.
+4. Go to "Database" section in MongoDB dashboard and click "Connect" button select "drivers" you will see an example connection string/uri. Copy this and change the username and password for each user we've created before (Admin, Member, Visitor).
+5. After you prepared your connection strings/uris go to your Wix dashboard and open "Secrets Manager"
+6. In secret manager create three different secret:
+    1. Create a secret named as AdminURI (this is case sensitive) and paste the URI for admin.
+    2. Do the same for MemberURI and VisitorURI.
+7. Now you are ready to use weivData library in your code. 

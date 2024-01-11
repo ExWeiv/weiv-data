@@ -11,8 +11,10 @@ const customOptions = {
     maxIdleTimeMS: 15000,
     maxPoolSize: 3
 };
-process.env.MONGO_CLIENT_OPTIONS = JSON.stringify(customOptions);
 const getCustomOptions = () => {
+    if (!process.env.MONGO_CLIENT_OPTIONS) {
+        process.env.MONGO_CLIENT_OPTIONS = JSON.stringify(customOptions);
+    }
     let customOptions = {};
     const defaultOptions = {
         tls: true,

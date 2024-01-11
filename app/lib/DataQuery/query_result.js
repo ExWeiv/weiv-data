@@ -5,12 +5,19 @@ const connection_provider_1 = require("../Connection/connection_provider");
 const log_handlers_1 = require("../Log/log_handlers");
 const lodash_1 = require("lodash");
 class DataQueryResult {
+    dataQueryClass;
+    suppressAuth = false;
+    consistentRead = false;
+    suppressHooks = false;
+    pageSize = 50;
+    dbName;
+    collectionName;
+    currentPage = 1;
+    queryOptions;
+    db;
+    collection;
+    cleanup;
     constructor(options) {
-        this.suppressAuth = false;
-        this.consistentRead = false;
-        this.suppressHooks = false;
-        this.pageSize = 50;
-        this.currentPage = 1;
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, suppressHooks } = options;
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
             (0, log_handlers_1.reportError)("Required Param/s Missing");

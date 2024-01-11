@@ -3,6 +3,7 @@ import { currentMember } from 'wix-members-backend';
 import { currentUser } from 'wix-users-backend';
 
 export async function getOwnerId(): Promise<string> {
+    // return "ownerId"
     if (currentUser.loggedIn) {
         // Check if member is already logged-in and get the memberId directly.
         const { _id } = await currentMember.getMember({ fieldsets: ['PUBLIC'] });

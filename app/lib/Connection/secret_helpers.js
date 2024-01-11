@@ -37,7 +37,7 @@ async function getCachedSecret(secretName) {
         return secret;
     }
     catch (err) {
-        console.error(err);
+        console.error("Error on getting cached secret", err);
         const visitorURI = await getSecretValue("visitorURI");
         return visitorURI;
     }

@@ -7,9 +7,11 @@ const customOptions: MongoClientOptions = {
     maxPoolSize: 3
 }
 
-process.env.MONGO_CLIENT_OPTIONS = JSON.stringify(customOptions);
-
 const getCustomOptions = (): MongoClientOptions => {
+    if (!process.env.MONGO_CLIENT_OPTIONS) {
+        process.env.MONGO_CLIENT_OPTIONS = JSON.stringify(customOptions);
+    }
+
     // Default options - https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/connection-options/
     let customOptions: MongoClientOptions = {};
     const defaultOptions: MongoClientOptions = {
