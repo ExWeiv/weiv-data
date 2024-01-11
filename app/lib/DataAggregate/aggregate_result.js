@@ -5,15 +5,10 @@ const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const connection_provider_1 = require("../Connection/connection_provider");
 const log_handlers_1 = require("../Log/log_handlers");
 class DataAggregateResult {
-    pageSize = 50;
-    currentPage = 1;
-    pipeline;
-    db;
-    databaseName;
-    collectionName;
-    suppressAuth = false;
-    collection;
     constructor(options) {
+        this.pageSize = 50;
+        this.currentPage = 1;
+        this.suppressAuth = false;
         const { pageSize, pipeline, databaseName, collectionName, suppressAuth } = options;
         if (!pipeline || !databaseName || !collectionName) {
             (0, log_handlers_1.reportError)("Required Parameters Missing (Internal Error)");

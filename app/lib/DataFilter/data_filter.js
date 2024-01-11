@@ -3,13 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExWeivDataFilter = exports.DataFilter = void 0;
 const lodash_1 = require("lodash");
 class DataFilter {
-    filters = {};
-    constructor() { }
+    constructor() {
+        this.filters = {};
+    }
     and(query) {
         this.filters = (0, lodash_1.merge)(this.filters, query.filters);
         return this;
     }
-    memoizedBetween;
     between(propertyName, rangeStart, rangeEnd) {
         if (!this.memoizedBetween) {
             this.memoizedBetween = (0, lodash_1.memoize)((propertyName, rangeStart, rangeEnd) => {
@@ -24,7 +24,6 @@ class DataFilter {
         this.memoizedBetween(propertyName, rangeStart, rangeEnd);
         return this;
     }
-    memoizedContains;
     contains(propertyName, string) {
         if (!this.memoizedContains) {
             this.memoizedContains = (0, lodash_1.memoize)((propertyName, string) => {
@@ -39,7 +38,6 @@ class DataFilter {
         this.memoizedContains(propertyName, string);
         return this;
     }
-    memoizedEndsWith;
     endsWith(propertyName, string) {
         if (!this.memoizedEndsWith) {
             this.memoizedEndsWith = (0, lodash_1.memoize)((propertyName, string) => {
@@ -54,7 +52,6 @@ class DataFilter {
         this.memoizedEndsWith(propertyName, string);
         return this;
     }
-    memoizedEq;
     eq(propertyName, value) {
         if (!this.memoizedEq) {
             this.memoizedEq = (0, lodash_1.memoize)((propertyName, value) => {
@@ -66,7 +63,6 @@ class DataFilter {
         this.memoizedEq(propertyName, value);
         return this;
     }
-    memoizedGe;
     ge(propertyName, value) {
         if (!this.memoizedGe) {
             this.memoizedGe = (0, lodash_1.memoize)((propertyName, value) => {
@@ -80,7 +76,6 @@ class DataFilter {
         this.memoizedGe(propertyName, value);
         return this;
     }
-    memoizedGt;
     gt(propertyName, value) {
         if (!this.memoizedGt) {
             this.memoizedGt = (0, lodash_1.memoize)((propertyName, value) => {
@@ -94,7 +89,6 @@ class DataFilter {
         this.memoizedGt(propertyName, value);
         return this;
     }
-    memoizedHasAll;
     hasAll(propertyName, value) {
         if (!Array.isArray(value)) {
             value = [value];
@@ -111,7 +105,6 @@ class DataFilter {
         this.memoizedHasAll(propertyName, value);
         return this;
     }
-    memoizedHasSome;
     hasSome(propertyName, value) {
         if (!Array.isArray(value)) {
             value = [value];
@@ -128,7 +121,6 @@ class DataFilter {
         this.memoizedHasSome(propertyName, value);
         return this;
     }
-    memoizedIsEmpty;
     isEmpty(propertyName) {
         if (!this.memoizedIsEmpty) {
             this.memoizedIsEmpty = (0, lodash_1.memoize)((propertyName) => {
@@ -142,7 +134,6 @@ class DataFilter {
         this.memoizedIsEmpty(propertyName);
         return this;
     }
-    memoizedIsNotEmpty;
     isNotEmpty(propertyName) {
         if (!this.memoizedIsNotEmpty) {
             this.memoizedIsNotEmpty = (0, lodash_1.memoize)((propertyName) => {
@@ -156,7 +147,6 @@ class DataFilter {
         this.memoizedIsNotEmpty(propertyName);
         return this;
     }
-    memoizedLe;
     le(propertyName, value) {
         if (!this.memoizedLe) {
             this.memoizedLe = (0, lodash_1.memoize)((propertyName, value) => {
@@ -170,7 +160,6 @@ class DataFilter {
         this.memoizedLe(propertyName, value);
         return this;
     }
-    memoizedLt;
     lt(propertyName, value) {
         if (!this.memoizedLt) {
             this.memoizedLt = (0, lodash_1.memoize)((propertyName, value) => {
@@ -184,7 +173,6 @@ class DataFilter {
         this.memoizedLt(propertyName, value);
         return this;
     }
-    memoizedNe;
     ne(propertyName, value) {
         if (!this.memoizedNe) {
             this.memoizedNe = (0, lodash_1.memoize)((propertyName, value) => {
@@ -212,7 +200,6 @@ class DataFilter {
         };
         return this;
     }
-    memoizedStartsWith;
     startsWith(propertyName, string) {
         if (!this.memoizedStartsWith) {
             this.memoizedStartsWith = (0, lodash_1.memoize)((propertyName, string) => {

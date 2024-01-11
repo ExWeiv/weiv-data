@@ -9,7 +9,7 @@ const getSecretValue = wixAuth.elevate(secrets.getSecretValue);
  * @param secretName Secret's name
  * @returns The secret/URI for given secret name.
  */
-export async function getCachedSecret(secretName: string): Promise<string> {
+export async function getCachedSecret(secretName: string): Promise<{ value: string }> {
     try { //@ts-ignore
         let secret = global[secretName.toUpperCase()];
 

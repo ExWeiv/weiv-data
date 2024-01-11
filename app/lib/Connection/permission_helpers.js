@@ -8,25 +8,25 @@ async function getMemberURI(suppressAuth = false) {
         if (suppressAuth != true) {
             const { title } = await wix_members_backend_1.currentMember.getRoles()[0];
             if (title === "Admin") {
-                const uri = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
-                return { uri };
+                const { value } = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
+                return { uri: value };
             }
             else {
                 const { _id } = await wix_members_backend_1.currentMember.getMember();
-                const uri = await (0, secret_helpers_1.getCachedSecret)("MemberURI");
-                return { memberId: _id, uri };
+                const { value } = await (0, secret_helpers_1.getCachedSecret)("MemberURI");
+                return { memberId: _id, uri: value };
             }
         }
         else {
-            const uri = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
-            return { uri };
+            const { value } = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
+            return { uri: value };
         }
         ;
     }
     catch (err) {
         console.error("Error on getting URI for MongoDB", err);
-        const uri = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
-        return { uri };
+        const { value } = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
+        return { uri: value };
     }
 }
 exports.getMemberURI = getMemberURI;

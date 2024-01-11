@@ -13,7 +13,7 @@ async function update(collectionId, item, options) {
         if (!item._id) {
             (0, log_handlers_1.reportError)("_id is required in the item object when updating");
         }
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         const defaultValues = {
             _updatedDate: new Date()
         };

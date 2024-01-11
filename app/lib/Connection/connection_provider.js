@@ -7,13 +7,13 @@ exports.cleanupClientConnections = exports.useClient = void 0;
 const mongodb_1 = require("mongodb");
 const lodash_1 = __importDefault(require("lodash"));
 const permission_helpers_1 = require("./permission_helpers");
-const customOptions = {
+const gCustomOptions = {
     maxIdleTimeMS: 15000,
     maxPoolSize: 3
 };
 const getCustomOptions = () => {
     if (!process.env.MONGO_CLIENT_OPTIONS) {
-        process.env.MONGO_CLIENT_OPTIONS = JSON.stringify(customOptions);
+        process.env.MONGO_CLIENT_OPTIONS = JSON.stringify(gCustomOptions);
     }
     let customOptions = {};
     const defaultOptions = {

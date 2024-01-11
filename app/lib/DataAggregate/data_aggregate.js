@@ -7,18 +7,8 @@ const aggregate_result_1 = require("./aggregate_result");
 const connection_provider_1 = require("../Connection/connection_provider");
 const name_helpers_1 = require("../Helpers/name_helpers");
 class DataAggregate {
-    collectionName;
-    dbName = "exweiv";
-    db;
-    pipeline;
-    limitNumber;
-    skipNumber;
-    currentGroup;
-    sorting;
-    groupCreated;
-    countCalled;
-    havingFilter;
     constructor(collectionId) {
+        this.dbName = "exweiv";
         if (!collectionId) {
             (0, log_handlers_1.reportError)("Database and Collection name required");
         }

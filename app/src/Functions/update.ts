@@ -20,7 +20,7 @@ export async function update(collectionId: string, item: DataItemValues, options
             reportError("_id is required in the item object when updating");
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         const defaultValues = {
             _updatedDate: new Date()
         }

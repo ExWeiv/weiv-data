@@ -8,19 +8,13 @@ const connection_provider_1 = require("../Connection/connection_provider");
 const query_result_1 = require("./query_result");
 const name_helpers_1 = require("../Helpers/name_helpers");
 class DataQuery extends data_query_filters_1.DataQueryFilter {
-    collectionName;
-    dbName = "exweiv";
-    db;
-    query = {};
-    sorting;
-    queryFields;
-    distinctValue;
-    includeValues = [];
-    skipNumber;
-    limitNumber = 50;
-    referenceLenght = {};
     constructor(collectionId) {
         super();
+        this.dbName = "exweiv";
+        this.query = {};
+        this.includeValues = [];
+        this.limitNumber = 50;
+        this.referenceLenght = {};
         if (!collectionId) {
             (0, log_handlers_1.reportError)("Collection name required");
         }

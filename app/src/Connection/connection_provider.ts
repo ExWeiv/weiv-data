@@ -2,14 +2,14 @@ import { MongoClient, MongoClientOptions } from 'mongodb';
 import _ from 'lodash';
 import { getMemberURI } from './permission_helpers';
 
-const customOptions: MongoClientOptions = {
+const gCustomOptions: MongoClientOptions = {
     maxIdleTimeMS: 15000,
     maxPoolSize: 3
 }
 
 const getCustomOptions = (): MongoClientOptions => {
     if (!process.env.MONGO_CLIENT_OPTIONS) {
-        process.env.MONGO_CLIENT_OPTIONS = JSON.stringify(customOptions);
+        process.env.MONGO_CLIENT_OPTIONS = JSON.stringify(gCustomOptions);
     }
 
     // Default options - https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/connection-options/

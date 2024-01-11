@@ -27,7 +27,7 @@ type weivData = {
     insert: typeof insert,
     insertReference: typeof insertReference,
     isReferenced: typeof isReferenced,
-    queryReferenced: Function,
+    // queryReferenced: Function,
     remove: typeof remove,
     removeReference: typeof removeReference,
     replaceReferences: typeof replaceReferences,
