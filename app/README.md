@@ -35,7 +35,7 @@ Soon we will create a YouTube video to show how you can setup your MongoDB env a
 - **Performance Improvements**
 - Caching Mechanism Implementation
 - Adding TS Support
-- **Adding `queryReferenced` Function**
+- **Adding [queryReferenced](https://www.wix.com/velo/reference/wix-data/queryreferenced?experiment_id=%5E%5E530755701281%5E%5E_DSA) Function**
 - Multilanguage Support
 - **Data Hooks Support**
 
