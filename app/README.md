@@ -28,7 +28,7 @@ Soon we will create a YouTube video to show how you can setup your MongoDB env a
 
 ### Currently we are working on:
 
-> We are still building this library and we will update this README when the library is fully ready to use.
+*We are still building this library and we will update this README when the library is fully ready to use.*
 
 - Documenting APIs
 - **Better Error Handling**

@@ -1,6 +1,5 @@
 //@ts-ignore
 import { currentMember } from "wix-members-backend"; //@ts-ignore
-import { secrets } from "wix-secrets-backend.v2";
 import { getCachedSecret } from './secret_helpers';
 
 /**
@@ -28,6 +27,7 @@ export async function getMemberURI(
             return { uri };
         };
     } catch (err) {
+        console.error("Error on getting URI for MongoDB", err);
         //If Function Rejected Return Visitor Permission
         const uri = await getCachedSecret("VisitorURI");
         return { uri };
