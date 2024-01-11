@@ -1,7 +1,5 @@
 import { MongoClient, MongoClientOptions } from 'mongodb';
 import _ from 'lodash';
-import loadEnv from '../Helpers/env_variables_loader';
-loadEnv();
 import { getMemberURI } from './permission_helpers';
 
 const customOptions: MongoClientOptions = {

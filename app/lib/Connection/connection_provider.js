@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanupClientConnections = exports.useClient = void 0;
 const mongodb_1 = require("mongodb");
 const lodash_1 = __importDefault(require("lodash"));
-const env_variables_loader_1 = __importDefault(require("../Helpers/env_variables_loader"));
-(0, env_variables_loader_1.default)();
 const permission_helpers_1 = require("./permission_helpers");
 const customOptions = {
     maxIdleTimeMS: 15000,
