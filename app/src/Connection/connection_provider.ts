@@ -89,6 +89,7 @@ const memoizedSetupClient = _.memoize(setupClient);
  * ```
  */
 export async function useClient(suppressAuth = false): Promise<ClientSetupResult> {
+    console.log("Connecting to MongoDB Cluster...");
     const { uri, memberId } = await getMemberURI(suppressAuth);
     // const uri = process.env.URI || "";
     // const memberId = undefined;

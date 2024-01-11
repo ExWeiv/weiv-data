@@ -62,6 +62,7 @@ async function setupClient(uri, newConnection = false) {
 }
 const memoizedSetupClient = lodash_1.default.memoize(setupClient);
 async function useClient(suppressAuth = false) {
+    console.log("Connecting to MongoDB Cluster...");
     const { uri, memberId } = await (0, permission_helpers_1.getMemberURI)(suppressAuth);
     if (savedClients[uri]) {
         const { pool, cleanup } = await memoizedSetupClient(uri, false);
