@@ -12,6 +12,9 @@ In this file you can find what's changed in each version.
 ### 1.2.3
 - README updated with a missing detail on setup.
 
+### 1.2.4
+- Performance differences (test results) added to README.
+
 ---
 
 *When a new version is released you can see the update notes here.*

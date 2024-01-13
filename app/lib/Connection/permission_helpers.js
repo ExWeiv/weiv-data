@@ -33,22 +33,22 @@ const getVisitorURI = async () => {
     if (cachedVisitorURI) {
         return { uri: cachedVisitorURI };
     }
-    const { value } = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
-    cache.set("VisitorMongoDB_URI", value, 3600 * 2);
-    return { uri: { value } };
+    const secret = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
+    cache.set("VisitorMongoDB_URI", secret, 3600 * 2);
+    return { uri: secret };
 };
 const getAdminURI = async () => {
     const cachedAdminURI = cache.get("AdminMongoDB_URI");
     if (cachedAdminURI) {
         return {
-            uri: { value: cachedAdminURI },
+            uri: cachedAdminURI,
             memberId: wix_users_backend_1.currentUser.id
         };
     }
-    const { value } = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
-    cache.set("AdminMongoDB_URI", value, 3600);
+    const secret = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
+    cache.set("AdminMongoDB_URI", secret, 3600);
     return {
-        uri: { value },
+        uri: secret,
         memberId: wix_users_backend_1.currentUser.id
     };
 };
@@ -56,7 +56,7 @@ const getMemberURI = async () => {
     const cachedMemberURI = cache.get(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`);
     if (cachedMemberURI) {
         return {
-            uri: { value: cachedMemberURI },
+            uri: cachedMemberURI,
             memberId: wix_users_backend_1.currentUser.id
         };
     }
@@ -76,10 +76,10 @@ const getMemberURI = async () => {
     else {
         cache.set(`MemberRoles${wix_users_backend_1.currentUser.id}`, "Member", 3600 * 2);
     }
-    const { value } = await (0, secret_helpers_1.getCachedSecret)("MemberURI");
-    cache.set(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`, value, 3600);
+    const secret = await (0, secret_helpers_1.getCachedSecret)("MemberURI");
+    cache.set(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`, secret, 3600);
     return {
-        uri: { value },
+        uri: secret,
         memberId: wix_users_backend_1.currentUser.id
     };
 };

@@ -3,9 +3,7 @@ import { DataQuery } from './src/DataQuery/data_query'
 
 declare global {
     type PermissionsReturn = {
-        uri: {
-            value: string
-        }
+        uri: string,
         memberId?: string
     }
 

@@ -30,7 +30,7 @@ export async function loadConnectionOptions(): Promise<MongoClientOptions> {
     try {
         const optionsSecret = await getCachedSecret("WeivDataConnectionOptions");
         if (optionsSecret) {
-            let customOptions = optionsSecret.value;
+            let customOptions = optionsSecret;
 
             if (customOptions) {
                 customOptions = await JSON.parse(customOptions);

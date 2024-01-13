@@ -31,14 +31,14 @@ export async function getMongoURI(suppressAuth = false): Promise<PermissionsRetu
 
 const getVisitorURI = async (): Promise<PermissionsReturn> => {
     //Direct Visitor (not logged in)
-    const cachedVisitorURI: { value: string } | undefined = cache.get("VisitorMongoDB_URI");
+    const cachedVisitorURI: string | undefined = cache.get("VisitorMongoDB_URI");
     if (cachedVisitorURI) {
         return { uri: cachedVisitorURI };
     }
 
-    const { value } = await getCachedSecret("VisitorURI");
-    cache.set("VisitorMongoDB_URI", value, 3600 * 2);
-    return { uri: { value } }
+    const secret = await getCachedSecret("VisitorURI");
+    cache.set("VisitorMongoDB_URI", secret, 3600 * 2);
+    return { uri: secret }
 }
 
 const getAdminURI = async (): Promise<PermissionsReturn> => {
@@ -46,15 +46,15 @@ const getAdminURI = async (): Promise<PermissionsReturn> => {
     const cachedAdminURI: string | undefined = cache.get("AdminMongoDB_URI");
     if (cachedAdminURI) {
         return {
-            uri: { value: cachedAdminURI },
+            uri: cachedAdminURI,
             memberId: currentUser.id
         };
     }
 
-    const { value } = await getCachedSecret("AdminURI");
-    cache.set("AdminMongoDB_URI", value, 3600);
+    const secret = await getCachedSecret("AdminURI");
+    cache.set("AdminMongoDB_URI", secret, 3600);
     return {
-        uri: { value },
+        uri: secret,
         memberId: currentUser.id
     }
 }
@@ -64,7 +64,7 @@ const getMemberURI = async (): Promise<PermissionsReturn> => {
     const cachedMemberURI: string | undefined = cache.get(`MemberMongoDB_URI${currentUser.id}`);
     if (cachedMemberURI) {
         return {
-            uri: { value: cachedMemberURI },
+            uri: cachedMemberURI,
             memberId: currentUser.id
         }
     }
@@ -86,10 +86,10 @@ const getMemberURI = async (): Promise<PermissionsReturn> => {
         cache.set(`MemberRoles${currentUser.id}`, "Member", 3600 * 2);
     }
 
-    const { value } = await getCachedSecret("MemberURI");
-    cache.set(`MemberMongoDB_URI${currentUser.id}`, value, 3600);
+    const secret = await getCachedSecret("MemberURI");
+    cache.set(`MemberMongoDB_URI${currentUser.id}`, secret, 3600);
     return {
-        uri: { value },
+        uri: secret,
         memberId: currentUser.id
     }
 }

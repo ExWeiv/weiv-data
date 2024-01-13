@@ -133,4 +133,26 @@ You can also compare which is available in weivData and wixData. (We will publis
 
 ---
 
+<!-- ### Performance Test Examples
+
+We have tested same **weivData** and **wixData** functions in same site with duplicated (both database has same items) databases and here are the results from some functions. Both functions also tested in a free Wix Studio website.
+
+#### weivData.get & wixData.get - Before Mongo Client Cached - First Time Run
+
+![Before Mongo Client Cached - First Time Run](https://img001.prntscr.com/file/img001/Xq1X8Ag2RESQIp84sU-zZA.png)
+
+#### weivData.get & wixData.get - After Mongo Client Cached - After First Run
+
+![After Mongo Client Cached - After First Run](https://img001.prntscr.com/file/img001/aoJxhQbCSkalpKuwPDH78w.png)
+
+#### weivData.update & wixData.update - Before Mongo Client Cached - First Time Run
+
+![Before Mongo Client Cached - First Time Run](https://img001.prntscr.com/file/img001/5lOf36ZYRdmqE3GsJmkRPA.png)
+
+#### weivData.update & wixData.update - After Mongo Client Cached - After First Run
+
+![After Mongo Client Cached - After First Run](https://img001.prntscr.com/file/img001/48-dNRX0S-quqCSdEXdv6g.png)
+
+--- -->
+
 Please report BUGs and leave your feedbacks. info@apps.exweiv.com or you can create an issue in [GitHub repo](https://github.com/ExWeiv/weiv-data/issues)

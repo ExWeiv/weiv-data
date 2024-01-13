@@ -4,12 +4,12 @@ import NodeCache from 'node-cache';
 
 // Initialize a global cache instance
 const cache = new NodeCache();
-const getSecretValue: (secretName: string) => Promise<{ value: string }> = wixAuth.elevate(secrets.getSecretValue);
+const getSecretValue: (secretName: string) => Promise<string> = wixAuth.elevate(secrets.getSecretValue);
 
-export async function getCachedSecret(secretName: string): Promise<{ value: string } | undefined> {
+export async function getCachedSecret(secretName: string): Promise<string | undefined> {
     try {
         // Try to get the secret from the cache
-        let secret: { value: string } | undefined = cache.get(secretName);
+        let secret: string | undefined = cache.get(secretName);
 
         if (secret === undefined) {
             // If not in cache, fetch from the API

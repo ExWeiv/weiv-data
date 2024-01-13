@@ -28,7 +28,7 @@ async function loadConnectionOptions() {
     try {
         const optionsSecret = await (0, secret_helpers_1.getCachedSecret)("WeivDataConnectionOptions");
         if (optionsSecret) {
-            let customOptions = optionsSecret.value;
+            let customOptions = optionsSecret;
             if (customOptions) {
                 customOptions = await JSON.parse(customOptions);
                 return (0, lodash_1.defaultsDeep)(defaultOptions, customOptions);
