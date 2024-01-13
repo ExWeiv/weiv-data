@@ -10,7 +10,7 @@ import { reportError } from '../Log/log_handlers';
  * @param options An object containing options to use when processing this operation.
  * @returns Fulfilled - The results of the bulk insert. Rejected - The error that caused the rejection.
  */
-export async function bulkInsert(collectionId: string, items: DataItemValues[], options?: WeivDataOptions): Promise<bulkInsertResult> {
+export async function bulkInsert(collectionId: string, items: DataItemValues[], options?: WeivDataOptions): Promise<BulkInsertResult> {
     try {
         if (!collectionId) {
             reportError("CollectionID is required when inserting an item in a collection");

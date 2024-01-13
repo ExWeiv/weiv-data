@@ -6,12 +6,7 @@ import NodeCache from 'node-cache';
 const cache = new NodeCache();
 const getSecretValue: (secretName: string) => Promise<{ value: string }> = wixAuth.elevate(secrets.getSecretValue);
 
-/**
- * @description Get's the secret data (connection URI) and caches it using node-cache.
- * @param secretName Secret's name
- * @returns The secret/URI for the given secret name.
- */
-export async function getCachedSecret(secretName: string): Promise<{ value: string }> {
+export async function getCachedSecret(secretName: string): Promise<{ value: string } | undefined> {
     try {
         // Try to get the secret from the cache
         let secret: { value: string } | undefined = cache.get(secretName);
@@ -25,8 +20,7 @@ export async function getCachedSecret(secretName: string): Promise<{ value: stri
 
         return secret;
     } catch (err) {
-        console.error("Error on getting cached secret", err);
-        const visitorURI = await getSecretValue("VisitorURI");
-        return visitorURI;
+        console.error(err);
+        return undefined;
     }
 }

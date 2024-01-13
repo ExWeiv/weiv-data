@@ -3,6 +3,9 @@
   "version": "1.1.8",
   "description": "Custom API Library built top of MongoDB to use with Wix/Velo websites. Clone of wix-data APIs with better features and removed limits.",
   "main": "./lib/app.js",
+  "scripts": {
+    "test": "nodemon ./lib/testing.js"
+  },
   "keywords": [
     "exweiv",
     "wix",
@@ -17,7 +20,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "lodash": "^4.17.21",
-    "mongodb": "^6.3.0",
+    "mongodb": "^5.9.2",
+    "node-cache": "^5.1.2",
     "typescript": "^5.3.3",
     "uuid": "^9.0.1"
   },

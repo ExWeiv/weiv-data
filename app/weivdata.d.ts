@@ -2,30 +2,18 @@ import { MongoClient, Collection, ObjectId } from 'mongodb/mongodb';
 import { DataQuery } from './src/DataQuery/data_query'
 
 declare global {
-    type ConnectionCleanUp = () => Promise<void> | void
-
-    type MongoStubPool = {
-        db(): any,
-        close: () => Promise<void>,
-    }
-
-    type MongoStubClient = {
-        connect: () => Promise<MongoStubPool>
-    }
-
-    type MongoClientPool = {
-        [uri: string]: MongoClient | MongoStubClient
-    }
-
     type PermissionsReturn = {
-        uri: string,
+        uri: {
+            value: string
+        }
         memberId?: string
     }
 
+    type ConnectionCleanUp = () => Promise<void> | void
     type ClientSetupResult = {
-        pool: MongoClient | MongoStubPool,
+        pool: MongoClient,
         cleanup: ConnectionCleanUp,
-        memberId?: string | undefined
+        memberId?: string
     }
 
     type PipelineArray = {
@@ -179,11 +167,15 @@ declare global {
     type ReferencedItemSingle = DataItemValues | string
     type ReferencedItem = DataItemValues | string | DataItemValues[] | string[]
 
-    type bulkInsertResult = {
+    type BulkInsertResult = {
         insertedItems: DataItemValues[],
         insertedItemIds: {
             [key: number]: InferIdType<TSchema>;
         },
         inserted: number
+    }
+
+    type CachedMongoClients = {
+        [key: string]: MongoClient
     }
 }
