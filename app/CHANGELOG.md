@@ -9,6 +9,9 @@ In this file you can find what's changed in each version.
 ### 1.2.2
 - Changelog created.
 
+### 1.2.3
+- README updated with a missing detail on setup.
+
 ---
 
 *When a new version is released you can see the update notes here.*

@@ -31,18 +31,37 @@ Soon we will create a YouTube video to show how you can setup your MongoDB env a
 First of all go ahead and create a MongoDB account and a database in your account. You can find many tutorials on YouTube about this. Then come back here, if you already own a MongoDB acount then create a new cluster and do the following steps:
 
 1. Go to Database Access and create 3 different user each user will have different roles/permissions.
-    1. Create one for Admin and give it needed permissions for Admin (you can use built-in roles too or create custom roles)
-    2. Create one for Member and give it needed permissions that you want to give to site members.
-    3. Create one for Visitor and give it needed permissions that you want to give to site visitors.
+   1. Create one for Admin and give it needed permissions for Admin (you can use built-in roles too or create custom roles)
+   2. Create one for Member and give it needed permissions that you want to give to site members.
+   3. Create one for Visitor and give it needed permissions that you want to give to site visitors.
 2. Every time you create a new user you will also create a password save these passwords because we will need them in the nex step.
 3. After creating 3 different roles you will need the "connection URI" this will be used to connect your MongoDB clusters.
 4. Go to "Database" section in MongoDB dashboard and click "Connect" button select "drivers" you will see an example connection string/uri. Copy this and change the username and password for each user we've created before (Admin, Member, Visitor).
 5. After you prepared your connection strings/uris go to your Wix dashboard and open "Secrets Manager"
 6. In secret manager create three different secret:
-    1. Create a secret named as AdminURI (this is case sensitive) and paste the URI for admin.
-    2. Do the same for MemberURI and VisitorURI.
+   1. Create a secret named as AdminURI (this is case sensitive) and paste the URI for admin.
+   2. Do the same for MemberURI and VisitorURI.
 7. Then create another secret for connection options named "WeivDataConnectionOptions" if you don't want to set custom options paste empty object as value. If you want to add custom options when connecting to MongoDB Clusters add your custom object into value. [Connection Options](https://www.mongodb.com/docs/manual/administration/connection-pool-overview/)
-8. And now you should be ready to go.
+8. Lastly go to your Wix collections (CMS) and create a collection named as "WeivOwnerID" you don't need to add any data. Just create the collection with the same exact name and leave it as it is. This collection help library to get visitors ID. Since Wix doesn't provide a way to get visitors temporary ID we use a collection to create a data and get the \_owner field value from that data. (Find a ready to paste code to clear that collection per hour or do it manually - check below)
+9. And you should be ready to go.
+
+```js
+//Paste this code into any .js or .web.js file (.jsw)
+
+
+import wixData from 'wix-data';
+
+export async function clearWeivDataTempFiles() {
+    try {
+        await wixData.truncate("WeivOwnerID", { consistentRead: true, suppressAuth: true, suppressHooks: true });
+        return null;
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+//Use this function with your scheduled jobs to clear collection per hour.
+```
 
 **Note:**
 Use indexes to faster your queries. We are also working on other APIs that will allow you to create collections with custom options. Also we don't use mongoose in our library for better performance.
@@ -56,20 +75,20 @@ First of all this library is designed to make switch from wixData easy so most o
 Since we add some extra features or we use different style for our library it's different than wixData in some cases.
 
 ```js
-import weivData from '@exweiv/weiv-data';
+import weivData from "@exweiv/weiv-data";
 
 export async function testFunction() {
-    try {
-        const item = await weivData.get("<databaseName>/<collectionName>", itemId, options);
-        /* You can access to collections in different databases same as how you access Wix App collections using wixData. */
+  try {
+    const item = await weivData.get("<databaseName>/<collectionName>", itemId, options);
+    /* You can access to collections in different databases same as how you access Wix App collections using wixData. */
 
-        const updated = await weivData.update("<databaseName>/<collectionName>", item, options);
-        /* Same syntax with wixData when you use update function. */
+    const updated = await weivData.update("<databaseName>/<collectionName>", item, options);
+    /* Same syntax with wixData when you use update function. */
 
-        return { item, updated };
-    } catch(err) {
-        console.error(err);
-    }
+    return { item, updated };
+  } catch (err) {
+    console.error(err);
+  }
 }
 ```
 
@@ -77,9 +96,9 @@ You can play with library to see how it works. As we said you should see autocom
 
 ## Functions
 
-You can also compare which is available in weivData and wixData.
+You can also compare which is available in weivData and wixData. (We will publish a real docs asap for each function and feature)
 
-- Data Hooks *(not available yet but will be available soon)*
+- Data Hooks _(not available yet but will be available soon)_
 - Aggregate (available)
 - Query (available)
 - bulkInsert (available)
@@ -91,7 +110,7 @@ You can also compare which is available in weivData and wixData.
 - insert (available)
 - insertReference (available)
 - isReferenced (available)
-- queryReferenced *(not available)*
+- queryReferenced _(not available)_
 - remove (available)
 - removeReference (available)
 - replaceReferences (available)
@@ -111,3 +130,7 @@ You can also compare which is available in weivData and wixData.
 - queryReferenced function.
 - Data Hooks (afterInsert, beforeInsert, afterUpdate etc.)
 - Multilanguage Support (read and write data in multilanguage)
+
+---
+
+Please report BUGs and leave your feedbacks. info@apps.exweiv.com or you can create an issue in [GitHub repo](https://github.com/ExWeiv/weiv-data/issues)
