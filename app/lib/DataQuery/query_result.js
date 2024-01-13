@@ -74,7 +74,6 @@ class DataQueryResult {
                 pipeline.push({
                     $limit: this.pageSize
                 });
-                console.log(pipeline);
                 const aggregateCursor = this.collection.aggregate(pipeline);
                 if (this.consistentRead === true) {
                     aggregateCursor.readConcern('majority');

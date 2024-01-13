@@ -97,8 +97,6 @@ class DataQueryResult {
                     $limit: this.pageSize
                 })
 
-                console.log(pipeline);
-
                 const aggregateCursor = this.collection.aggregate(pipeline);
 
                 if (this.consistentRead === true) {
