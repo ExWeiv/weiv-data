@@ -26,23 +26,6 @@ Soon we will create a YouTube video to show how you can setup your MongoDB env a
 
 ---
 
-### Currently we are working on:
-
-*We are still building this library and we will update this README when the library is fully ready to use.*
-
-- Documenting APIs
-- **Better Error Handling**
-- **Performance Improvements**
-- Caching Mechanism Implementation
-- Adding TS Support
-- **Adding [queryReferenced](https://www.wix.com/velo/reference/wix-data/queryreferenced?experiment_id=%5E%5E530755701281%5E%5E_DSA) Function**
-- Multilanguage Support
-- **Data Hooks Support**
-
-and more...
-
----
-
 ### Setup MongoDB and Wix
 
 First of all go ahead and create a MongoDB account and a database in your account. You can find many tutorials on YouTube about this. Then come back here, if you already own a MongoDB acount then create a new cluster and do the following steps:
@@ -58,4 +41,73 @@ First of all go ahead and create a MongoDB account and a database in your accoun
 6. In secret manager create three different secret:
     1. Create a secret named as AdminURI (this is case sensitive) and paste the URI for admin.
     2. Do the same for MemberURI and VisitorURI.
-7. Now you are ready to use weivData library in your code. 
+7. Then create another secret for connection options named "WeivDataConnectionOptions" if you don't want to set custom options paste empty object as value. If you want to add custom options when connecting to MongoDB Clusters add your custom object into value. [Connection Options](https://www.mongodb.com/docs/manual/administration/connection-pool-overview/)
+8. And now you should be ready to go.
+
+**Note:**
+Use indexes to faster your queries. We are also working on other APIs that will allow you to create collections with custom options. Also we don't use mongoose in our library for better performance.
+
+## APIs and Examples
+
+Currently we don't have a documentation we are working on one to create so you can see all functions but we have TS included in our library so you should be able to use autocomplete and even see some examples for some of the functions. But here are some examples and the logic of this library.
+
+First of all this library is designed to make switch from wixData easy so most of the functions are same with wixData which means you can use wixData API docs to understand the syntax or APIs. But everything is not same even if they are similar.
+
+Since we add some extra features or we use different style for our library it's different than wixData in some cases.
+
+```js
+import weivData from '@exweiv/weiv-data';
+
+export async function testFunction() {
+    try {
+        const item = await weivData.get("<databaseName>/<collectionName>", itemId, options);
+        /* You can access to collections in different databases same as how you access Wix App collections using wixData. */
+
+        const updated = await weivData.update("<databaseName>/<collectionName>", item, options);
+        /* Same syntax with wixData when you use update function. */
+
+        return { item, updated };
+    } catch(err) {
+        console.error(err);
+    }
+}
+```
+
+You can play with library to see how it works. As we said you should see autocompletes and type checking enabled in most cases (%99). And here is all functions listed:
+
+## Functions
+
+You can also compare which is available in weivData and wixData.
+
+- Data Hooks *(not available yet but will be available soon)*
+- Aggregate (available)
+- Query (available)
+- bulkInsert (available)
+- bulkRemove (available)
+- bulkSave (available)
+- bulkUpdate (available)
+- filter (not available)
+- get (available)
+- insert (available)
+- insertReference (available)
+- isReferenced (available)
+- queryReferenced *(not available)*
+- remove (available)
+- removeReference (available)
+- replaceReferences (available)
+- save (available)
+- truncate (available)
+- update (available)
+
+### About wixData.v2 features in weivData
+
+- Indexes (not available yet but will be available soon)
+- Collections (not available yet but will be available soon)
+- Events (not available yet but will be available soon)
+
+### Features We're Work On
+
+- wixData.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.)
+- queryReferenced function.
+- Data Hooks (afterInsert, beforeInsert, afterUpdate etc.)
+- Multilanguage Support (read and write data in multilanguage)
