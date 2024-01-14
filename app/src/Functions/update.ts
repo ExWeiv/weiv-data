@@ -21,21 +21,22 @@ export async function update(collectionId: string, item: DataItemValuesUpdate, o
         }
 
         const itemId = convertStringId(item._id);
-        const updateItem = merge(item, defaultValues);
+        const updateItem: { [key: string]: any } = merge(item, defaultValues);
+        delete updateItem._id;
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { acknowledged } = await collection.updateOne({ _id: itemId }, { $set: { ...updateItem, _id: undefined } }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate({ _id: itemId }, { $set: updateItem }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
-        if (acknowledged) {
-            return updateItem;
+        if (ok === 1) {
+            return value || {};
         } else {
-            throw Error(`WeivData - Error when updating an item, acknowledged: ${acknowledged}`)
+            throw Error(`WeivData - Error when updating an item, acknowledged: ${lastErrorObject}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when updating an item: ${err}`)
+        throw Error(`WeivData - Error when updating an item: ${err}`);
     }
 }

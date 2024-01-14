@@ -15,16 +15,17 @@ async function update(collectionId, item, options) {
         };
         const itemId = (0, item_helpers_1.convertStringId)(item._id);
         const updateItem = (0, lodash_1.merge)(item, defaultValues);
+        delete updateItem._id;
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { acknowledged } = await collection.updateOne({ _id: itemId }, { $set: { ...updateItem, _id: undefined } }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate({ _id: itemId }, { $set: updateItem }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
         if (cleanupAfter === true) {
             await cleanup();
         }
-        if (acknowledged) {
-            return updateItem;
+        if (ok === 1) {
+            return value || {};
         }
         else {
-            throw Error(`WeivData - Error when updating an item, acknowledged: ${acknowledged}`);
+            throw Error(`WeivData - Error when updating an item, acknowledged: ${lastErrorObject}`);
         }
     }
     catch (err) {
