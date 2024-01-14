@@ -147,6 +147,28 @@ We have tested same **weivData** and **wixData** functions in same site with dup
   - wixData for first run (cold start): 800ms
   - weivData after cold start: 30ms
   - wixData after cold start: 720ms
+
+## Tested Functions in Wix Env
+
+- weivData.aggreagete ⏰
+- weivData.query ⏰
+- weivData.bulkInsert ⏰
+- weivData.bulkRemove ⏰
+- weivData.bulkSave ⏰
+- weivData.bulkUpdate ⏰
+- weivData.filter ⏰
+- weivData.get ✅
+- weivData.insert ⏰
+- weivData.insertReference ⏰
+- weivData.isReferenced ⏰
+- weivData.queryReferenced ❌
+- weivData.remove ⏰
+- weivData.removeReference ⏰
+- weivData.replaceReferences ⏰
+- weivData.save ⏰
+- weivData.truncate ⏰
+- weivData.update ✅
+
 ---
 
 Please report BUGs and leave your feedbacks. info@apps.exweiv.com or you can create an issue in [GitHub repo](https://github.com/ExWeiv/weiv-data/issues)
