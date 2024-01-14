@@ -143,10 +143,10 @@ We have tested same **weivData** and **wixData** functions in same site with dup
   - weivData after cold start: 17ms
   - wixData after cold start: 112ms
 - **update Function Tests:**
-  - weivData for first run (cold start): 700ms
-  - wixData for first run (cold start): 120ms
-  - weivData after cold start: 17ms
-  - wixData after cold start: 112ms
+  - weivData for first run (cold start): 900ms
+  - wixData for first run (cold start): 800ms
+  - weivData after cold start: 30ms
+  - wixData after cold start: 720ms
 ---
 
 Please report BUGs and leave your feedbacks. info@apps.exweiv.com or you can create an issue in [GitHub repo](https://github.com/ExWeiv/weiv-data/issues)
