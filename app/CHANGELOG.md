@@ -20,6 +20,10 @@ In this file you can find what's changed in each version.
 - README updated with recent info.
 - Started to test performance of library.
 
+### 1.3.1
+- BUG Fixes
+- Error Handling (error messages added to almost every function)
+
 ---
 
 *When a new version is released you can see the update notes here.*
