@@ -25,6 +25,9 @@ In this file you can find what's changed in each version.
 - Error Handling (error messages added to almost every function)
 - Performance Tests and Results (README)
 
+## 1.3.9
+- List of tested/working functions in Wix env
+
 ---
 
 *When a new version is released you can see the update notes here.*
