@@ -30,19 +30,23 @@ async function setupClient(uri) {
         }
     }
     catch (err) {
-        console.error("Error when returning from setupClient function", err);
-        return createNewClient(uri);
+        throw Error(`Error when connecting to MongoDB Client via setupClient: ${err}`);
     }
 }
 const createNewClient = async (uri) => {
-    const newMongoClient = new mongodb_1.MongoClient(uri, await (0, connection_helpers_1.loadConnectionOptions)());
-    cachedMongoClient[uri] = newMongoClient;
-    const { cleanup, connection } = await connectClient(newMongoClient, uri);
-    if (connection) {
-        return { cleanup, connection };
+    try {
+        const newMongoClient = new mongodb_1.MongoClient(uri, await (0, connection_helpers_1.loadConnectionOptions)());
+        cachedMongoClient[uri] = newMongoClient;
+        const { cleanup, connection } = await connectClient(newMongoClient, uri);
+        if (connection) {
+            return { cleanup, connection };
+        }
+        else {
+            throw Error(`Failed to connect to a MongoClient: connection: ${connection} and cleanup: ${cleanup}`);
+        }
     }
-    else {
-        throw Error("Failed to connect to a MongoClient");
+    catch (err) {
+        throw Error(`Error when creating a new MongoDB client: ${err}`);
     }
 };
 const connectClient = async (client, uri) => {
@@ -54,24 +58,30 @@ const connectClient = async (client, uri) => {
         };
     }
     catch (err) {
-        console.error("Failed to connect (MongoClient)", err);
-        return {
-            connection: undefined,
-            cleanup: () => { cachedMongoClient[uri]?.close(); }
-        };
+        throw Error(`Error when trying to connect existing client: ${err}`);
     }
 };
 async function useClient(suppressAuth = false) {
-    const { uri, memberId } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
-    const { connection, cleanup } = await setupClient(uri.value);
-    return { pool: connection, cleanup, memberId };
+    try {
+        const { uri, memberId } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
+        const { connection, cleanup } = await setupClient(uri);
+        return { pool: connection, cleanup, memberId };
+    }
+    catch (err) {
+        throw Error(`Error when connecting to cached MongoClient via useClient: ${err}`);
+    }
 }
 exports.useClient = useClient;
 async function cleanupClientConnections() {
-    const allCachedClients = Object.keys(cachedMongoClient);
-    for (const uri of allCachedClients) {
-        cachedMongoClient[uri]?.close();
+    try {
+        const allCachedClients = Object.keys(cachedMongoClient);
+        for (const uri of allCachedClients) {
+            cachedMongoClient[uri]?.close();
+        }
+        console.info("All MongoDB Cached Connections Closed and Cleared - Cached Clients Removed");
     }
-    console.log("All MongoDB Cached Connections Closed and Cleared - Cached Clients Removed");
+    catch (err) {
+        throw Error(`Erroe when cleaning all existing client connections ${err}`);
+    }
 }
 exports.cleanupClientConnections = cleanupClientConnections;

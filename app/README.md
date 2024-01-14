@@ -41,7 +41,7 @@ First of all go ahead and create a MongoDB account and a database in your accoun
 6. In secret manager create three different secret:
    1. Create a secret named as AdminURI (this is case sensitive) and paste the URI for admin.
    2. Do the same for MemberURI and VisitorURI.
-7. Then create another secret for connection options named "WeivDataConnectionOptions" if you don't want to set custom options paste empty object as value. If you want to add custom options when connecting to MongoDB Clusters add your custom object into value. [Connection Options](https://www.mongodb.com/docs/manual/administration/connection-pool-overview/)
+7. Then create another secret for connection options named "WeivDataConnectionOptions" if you don't want to set custom options paste empty object as value. If you want to add custom options when connecting to MongoDB Clusters add your custom object into value. [Connection Options](https://www.mongodb.com/docs/manual/administration/connection-pool-overview/) (Do not paste object as strings Wix will stringify it otherwise you will see errors when connecting).
 8. Lastly go to your Wix collections (CMS) and create a collection named as "WeivOwnerID" you don't need to add any data. Just create the collection with the same exact name and leave it as it is. This collection help library to get visitors ID. Since Wix doesn't provide a way to get visitors temporary ID we use a collection to create a data and get the \_owner field value from that data. (Find a ready to paste code to clear that collection per hour or do it manually - check below)
 9. And you should be ready to go.
 

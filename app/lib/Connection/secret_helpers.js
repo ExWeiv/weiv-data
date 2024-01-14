@@ -36,15 +36,14 @@ async function getCachedSecret(secretName) {
     try {
         let secret = cache.get(secretName);
         if (secret === undefined) {
-            secret = await getSecretValue(secretName);
-            cache.set(secretName, secret, 3600);
+            const { value } = await getSecretValue(secretName);
+            secret = value.toString();
+            cache.set(secretName, value.toString(), 3600);
         }
         return secret;
     }
     catch (err) {
-        console.error("Error on getting cached secret", err);
-        const visitorURI = await getSecretValue("VisitorURI");
-        return visitorURI;
+        throw Error(`Error on getting cached secret for URIs: ${err}`);
     }
 }
 exports.getCachedSecret = getCachedSecret;

@@ -36,14 +36,14 @@ async function getCachedSecret(secretName) {
     try {
         let secret = cache.get(secretName);
         if (secret === undefined) {
-            secret = await getSecretValue(secretName);
-            cache.set(secretName, secret, 3600);
+            const { value } = await getSecretValue(secretName);
+            secret = value;
+            cache.set(secretName, value, 3600);
         }
         return secret;
     }
     catch (err) {
-        console.error(err);
-        return undefined;
+        throw Error(`Error on general cached secret helpers: ${err}`);
     }
 }
 exports.getCachedSecret = getCachedSecret;

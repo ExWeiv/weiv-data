@@ -11,7 +11,7 @@ const cache = new node_cache_1.default();
 async function getMongoURI(suppressAuth = false) {
     try {
         if (suppressAuth != true) {
-            if (wix_users_backend_1.currentUser.loggedIn) {
+            if (wix_users_backend_1.currentUser.loggedIn === true) {
                 return getMemberURI();
             }
             else {
@@ -23,63 +23,77 @@ async function getMongoURI(suppressAuth = false) {
         }
     }
     catch (err) {
-        console.error("Error on getting URI for MongoDB based on permission of current user", err);
-        return getVisitorURI();
+        throw Error(`Error on getting URI for MongoDB based on permission of current user: ${err}`);
     }
 }
 exports.getMongoURI = getMongoURI;
 const getVisitorURI = async () => {
-    const cachedVisitorURI = cache.get("VisitorMongoDB_URI");
-    if (cachedVisitorURI) {
-        return { uri: cachedVisitorURI };
+    try {
+        const cachedVisitorURI = cache.get("VisitorMongoDB_URI");
+        if (cachedVisitorURI) {
+            return { uri: cachedVisitorURI };
+        }
+        const secret = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
+        cache.set("VisitorMongoDB_URI", secret.toString(), 3600 * 2);
+        return { uri: secret };
     }
-    const secret = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
-    cache.set("VisitorMongoDB_URI", secret, 3600 * 2);
-    return { uri: secret };
+    catch (err) {
+        throw Error(`Error when getting VisitorURI: ${err}`);
+    }
 };
 const getAdminURI = async () => {
-    const cachedAdminURI = cache.get("AdminMongoDB_URI");
-    if (cachedAdminURI) {
+    try {
+        const cachedAdminURI = cache.get("AdminMongoDB_URI");
+        if (cachedAdminURI) {
+            return {
+                uri: cachedAdminURI,
+                memberId: wix_users_backend_1.currentUser.id
+            };
+        }
+        const secret = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
+        cache.set("AdminMongoDB_URI", secret.toString(), 3600);
         return {
-            uri: cachedAdminURI,
+            uri: secret,
             memberId: wix_users_backend_1.currentUser.id
         };
     }
-    const secret = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
-    cache.set("AdminMongoDB_URI", secret, 3600);
-    return {
-        uri: secret,
-        memberId: wix_users_backend_1.currentUser.id
-    };
+    catch (err) {
+        throw Error(`Error when getting AdminURI: ${err}`);
+    }
 };
 const getMemberURI = async () => {
-    const cachedMemberURI = cache.get(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`);
-    if (cachedMemberURI) {
+    try {
+        const cachedMemberURI = cache.get(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`);
+        if (cachedMemberURI) {
+            return {
+                uri: cachedMemberURI,
+                memberId: wix_users_backend_1.currentUser.id
+            };
+        }
+        const cachedRole = cache.get(`MemberRoles${wix_users_backend_1.currentUser.id}`);
+        if (cachedRole) {
+            if (cachedRole === "Admin") {
+                return getAdminURI();
+            }
+        }
+        const roles = await wix_users_backend_1.currentUser.getRoles();
+        if (roles.length > 0) {
+            cache.set(`MemberRoles${wix_users_backend_1.currentUser.id}`, roles[0].name, 3600 * 2);
+            if (roles[0].name === "Admin") {
+                return getAdminURI();
+            }
+        }
+        else {
+            cache.set(`MemberRoles${wix_users_backend_1.currentUser.id}`, "Member", 3600 * 2);
+        }
+        const secret = await (0, secret_helpers_1.getCachedSecret)("MemberURI");
+        cache.set(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`, secret, 3600);
         return {
-            uri: cachedMemberURI,
+            uri: secret,
             memberId: wix_users_backend_1.currentUser.id
         };
     }
-    const cachedRole = cache.get(`MemberRoles${wix_users_backend_1.currentUser.id}`);
-    if (cachedRole) {
-        if (cachedRole === "Admin") {
-            return getAdminURI();
-        }
+    catch (err) {
+        throw Error(`Error when getting MemberURI: ${err}`);
     }
-    const roles = await wix_users_backend_1.currentUser.getRoles();
-    if (roles.length > 0) {
-        cache.set(`MemberRoles${wix_users_backend_1.currentUser.id}`, roles[0].name, 3600 * 2);
-        if (roles[0].name === "Admin") {
-            return getAdminURI();
-        }
-    }
-    else {
-        cache.set(`MemberRoles${wix_users_backend_1.currentUser.id}`, "Member", 3600 * 2);
-    }
-    const secret = await (0, secret_helpers_1.getCachedSecret)("MemberURI");
-    cache.set(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`, secret, 3600);
-    return {
-        uri: secret,
-        memberId: wix_users_backend_1.currentUser.id
-    };
 };
