@@ -1,5 +1,4 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { reportError } from '../Log/log_handlers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { ObjectId } from 'mongodb/mongodb';
 
@@ -12,12 +11,8 @@ import { ObjectId } from 'mongodb/mongodb';
  */
 export async function remove(collectionId: string, itemId: ObjectId | string, options?: WeivDataOptions): Promise<object | null> {
     try {
-        if (!collectionId) {
-            reportError("CollectionID is required when removing an item from a collection");
-        }
-
-        if (!itemId) {
-            reportError("ItemId is required when removing an item from a collection");
+        if (!collectionId || !itemId) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
@@ -31,17 +26,16 @@ export async function remove(collectionId: string, itemId: ObjectId | string, op
             await cleanup();
         }
 
-        if (acknowledged === true) {
+        if (acknowledged) {
             if (deletedCount === 1) {
                 return item;
             } else {
                 return null;
             }
         } else {
-            return null;
+            throw Error(`WeivData - Error when removing an item from collection, acknowledged: ${acknowledged}`);
         }
     } catch (err) {
-        console.error(err); //@ts-ignore
-        return err;
+        throw Error(`WeivData - Error when removing an item from collection: ${err}`);
     }
 }

@@ -1,7 +1,6 @@
 import { Collection, Db, Document } from "mongodb/mongodb";
 import { sortAggregationPipeline } from "../Helpers/pipeline_helpers";
 import { useClient } from '../Connection/connection_provider';
-import { reportError } from '../Log/log_handlers';
 
 class DataAggregateResult {
     private pageSize: number = 50;
@@ -17,7 +16,7 @@ class DataAggregateResult {
         const { pageSize, pipeline, databaseName, collectionName, suppressAuth } = options;
 
         if (!pipeline || !databaseName || !collectionName) {
-            reportError("Required Parameters Missing (Internal Error)");
+            throw Error(`WeivData - Required Parameters Missing (Internal API Error) - please report this BUG`);
         }
 
         this.pageSize = pageSize;
@@ -70,16 +69,20 @@ class DataAggregateResult {
     }
 
     private async connectionHandler(suppressAuth: boolean): Promise<ConnectionResult> {
-        const { pool, cleanup, memberId } = await useClient(suppressAuth);
+        try {
+            const { pool, cleanup, memberId } = await useClient(suppressAuth);
 
-        if (this.databaseName) {
-            this.db = pool.db(this.databaseName);
-        } else {
-            this.db = pool.db("exweiv");
+            if (this.databaseName) {
+                this.db = pool.db(this.databaseName);
+            } else {
+                this.db = pool.db("exweiv");
+            }
+
+            const collection = this.db.collection(this.collectionName);
+            return { collection, cleanup, memberId };
+        } catch (err) {
+            throw Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
         }
-
-        const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
     }
 }
 

@@ -8,6 +8,10 @@ import { memoize } from 'lodash';
 export const splitCollectionId = memoize(splitCollectionIdMain);
 
 function splitCollectionIdMain(collectionId: string): { dbName: string, collectionName: string } {
+    if (!collectionId) {
+        throw Error(`WeivData - CollectionID is Required with this syntax: <database>/<collection>`);
+    }
+
     const [dbName, collectionName] = collectionId.split('/');
 
     if (!dbName || !collectionName) {

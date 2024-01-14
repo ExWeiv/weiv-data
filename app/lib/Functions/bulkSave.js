@@ -6,18 +6,15 @@ const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 async function bulkSave(collectionId, items, options) {
     try {
-        if (!collectionId) {
-            reportError("CollectionID is required when saving an item in a collection");
-        }
-        if (!items || items.length === 0) {
-            reportError('Items array is required and it should not ve empty');
+        if (!collectionId || !items || items.length <= 0) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
         const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         let ownerId = "";
         if (enableOwnerId === true) {
             ownerId = await (0, member_id_helpers_1.getOwnerId)();
         }
-        items = items.map((item) => {
+        const newItems = items.map((item) => {
             if (item._id) {
                 item._id = (0, item_helpers_1.convertStringId)(item._id);
             }
@@ -32,15 +29,15 @@ async function bulkSave(collectionId, items, options) {
         });
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const query = {
-            _id: { $in: items.map((item) => item._id) },
+            _id: { $in: newItems.map((item) => item._id) },
         };
-        const updateObjects = items.map((item) => ({
+        const updateObjects = newItems.map((item) => ({
             $set: item.updatedFields,
         }));
         let succeed = true;
         let inserted = 0;
         let updated = 0;
-        for (let i = 0; i < items.length; i += 50) {
+        for (let i = 0; i < newItems.length; i += 50) {
             const updateBatch = updateObjects.slice(i, i + 50);
             const { upsertedCount, acknowledged, modifiedCount } = await collection.updateMany(query, updateBatch, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
             succeed = acknowledged;
@@ -54,16 +51,15 @@ async function bulkSave(collectionId, items, options) {
             return {
                 inserted,
                 updated,
-                items
+                newItems
             };
         }
         else {
-            reportError('Failed to save items!');
+            throw Error(`WeivData - Error when saving items using bulkSave, acknowledged: ${succeed}, updated: ${updated}, inserted: ${inserted}`);
         }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when saving items using bulkSave: ${err}`);
     }
 }
 exports.bulkSave = bulkSave;

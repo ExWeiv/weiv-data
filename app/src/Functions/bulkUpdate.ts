@@ -1,6 +1,5 @@
 import { merge } from 'lodash';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { reportError } from '../Log/log_handlers';
 import { convertStringId } from '../Helpers/item_helpers';
 
 /**
@@ -10,19 +9,15 @@ import { convertStringId } from '../Helpers/item_helpers';
  * @param options An object containing options to use when processing this operation.
  * @returns Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
  */
-export async function bulkUpdate(collectionId: string, items: DataItemValues[], options?: WeivDataOptions): Promise<object> {
+export async function bulkUpdate(collectionId: string, items: DataItemValuesUpdate[], options?: WeivDataOptions): Promise<object> {
     try {
-        if (!collectionId) {
-            reportError("CollectionID is required when updating an item from a collection");
+        if (!collectionId || !items) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
 
-        if (!items) {
-            reportError("items are required when bulk updating");
-        } else {
-            for (const item of items) {
-                if (!item._id) {
-                    reportError("_id is required in the item object when updating");
-                }
+        for (const item of items) {
+            if (!item._id) {
+                throw Error(`WeivData - Item (_id) ID is required for each item when bulk updating ID is missing for one or more item in your array!`);
             }
         }
 
@@ -31,17 +26,17 @@ export async function bulkUpdate(collectionId: string, items: DataItemValues[], 
             _updatedDate: new Date()
         }
 
-        items = items.map((item) => {
+        const editedItems = items.map((item) => {
             item._id = convertStringId(item._id);
-            item = merge(item, defaultValues);
+            item = merge(defaultValues, item);
             return item;
         })
 
         const query = {
-            _id: { $in: items.map((item) => item._id) },
+            _id: { $in: editedItems.map((item) => convertStringId(item._id)) },
         };
 
-        const updateObjects = items.map((item) => ({
+        const updateObjects = editedItems.map((item) => ({
             $set: item.updatedFields,
         }));
 
@@ -49,7 +44,7 @@ export async function bulkUpdate(collectionId: string, items: DataItemValues[], 
 
         let succeed = true;
         let updated = 0;
-        for (let i = 0; i < items.length; i += 50) {
+        for (let i = 0; i < editedItems.length; i += 50) {
             const updateBatch = updateObjects.slice(i, i + 50);
             const { modifiedCount, acknowledged } = await collection.updateMany(query, updateBatch, { readConcern: consistentRead === true ? "majority" : "local" });
             succeed = acknowledged;
@@ -63,13 +58,12 @@ export async function bulkUpdate(collectionId: string, items: DataItemValues[], 
         if (succeed === true) {
             return {
                 updated,
-                updatedItemIds: items.map((item) => item._id)
+                updatedItemIds: editedItems.map((item) => item._id)
             }
         } else {
-            reportError('Failed to update items');
+            throw Error(`WeivData - Error when updating items using bulkUpdate, acknowledged: ${succeed}, updated: ${updated}`);
         }
     } catch (err) {
-        console.error(err); //@ts-ignore
-        return err;
+        throw Error(`WeivData - Error when updating items using bulkUpdate: ${err}`);
     }
 }

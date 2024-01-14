@@ -5,25 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isReferenced = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
 const reference_helpers_1 = require("../Helpers/reference_helpers");
 const lodash_1 = __importDefault(require("lodash"));
 async function isReferenced(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("Collection and Database name is required");
-        }
-        if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name is required");
-        }
-        if (!referringItem) {
-            (0, log_handlers_1.reportError)("Referring item is required");
-        }
-        if (!referencedItem) {
-            (0, log_handlers_1.reportError)("Referenced item is required");
+        if (!collectionId || !propertyName || !referringItem || !referencedItem) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
         if (lodash_1.default.isArray(referencedItem)) {
-            (0, log_handlers_1.reportError)("Wrong type for referencedItem");
+            throw Error(`WeivData - Wrong item type for referencedItem, it shouldn't be an array`);
         }
         const { suppressAuth, cleanupAfter, consistentRead } = options || { suppressAuth: false, cleanupAfter: false, consistentRead: false };
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
@@ -41,8 +31,7 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
         }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when checking if item is referenced: ${err}`);
     }
 }
 exports.isReferenced = isReferenced;

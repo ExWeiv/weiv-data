@@ -1,6 +1,5 @@
 import { Db, Document } from "mongodb/mongodb";
 import { checkPipelineArray, sortAggregationPipeline, } from "../Helpers/pipeline_helpers";
-import { reportError } from '../Log/log_handlers';
 import { DataFilter } from "../DataFilter/data_filter";
 import { DataAggregateInterface } from "../Interfaces/interfaces";
 import { WeivDataAggregateResult } from "./aggregate_result";
@@ -22,7 +21,7 @@ export class DataAggregate implements DataAggregateInterface {
 
     constructor(collectionId: string) {
         if (!collectionId) {
-            reportError("Database and Collection name required");
+            throw Error(`WeivData - Database and Collection name required`);
         }
 
         const { dbName, collectionName } = splitCollectionId(collectionId);
@@ -50,7 +49,7 @@ export class DataAggregate implements DataAggregateInterface {
      */
     ascending(propertyName: string): DataAggregate {
         if (!propertyName) {
-            reportError("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
         this.sorting = {
             propertyName,
@@ -82,7 +81,7 @@ export class DataAggregate implements DataAggregateInterface {
         projectedName = `${propertyName}Avg`
     ): DataAggregate {
         if (!propertyName) {
-            reportError("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -134,7 +133,7 @@ export class DataAggregate implements DataAggregateInterface {
      */
     descending(propertyName: string): DataAggregate {
         if (!propertyName) {
-            reportError("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.sorting = {
             propertyName,
@@ -163,7 +162,7 @@ export class DataAggregate implements DataAggregateInterface {
      */
     filter(filter: DataFilter): DataAggregate {
         if (!filter) {
-            reportError("Filter is empty, please add a filter using weivData.filter method!");
+            throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
         this.pipeline = checkPipelineArray(this.pipeline);
         this.pipeline.push({
@@ -193,10 +192,10 @@ export class DataAggregate implements DataAggregateInterface {
      */
     group(propertyName: string | string[]): DataAggregate {
         if (!propertyName) {
-            reportError("Property or properties are required!");
+            throw Error(`WeivData - Property or properties are required!`);
         }
         if (this.groupCreated === true) {
-            reportError("Group is already set!");
+            throw Error(`WeivData - Group is already set!`);
         }
 
         let propertyNames: { [key: string]: string } = {};
@@ -239,7 +238,7 @@ export class DataAggregate implements DataAggregateInterface {
      */
     having(filter: DataFilter): DataAggregate {
         if (!filter) {
-            reportError("Filter is empty, please add a filter using weivData.filter method!");
+            throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
         this.havingFilter = {
             $match: {
@@ -268,7 +267,7 @@ export class DataAggregate implements DataAggregateInterface {
      */
     limit(limit: number): DataAggregate {
         if (!limit && limit != 0) {
-            reportError("Limit number is required please specify a limit amount");
+            throw Error(`WeivData - Limit number is required please specify a limit amount`);
         }
 
         if (limit != 0) {
@@ -302,7 +301,7 @@ export class DataAggregate implements DataAggregateInterface {
         projectedName = `${propertyName}Max`
     ): DataAggregate {
         if (!propertyName) {
-            reportError("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -337,7 +336,7 @@ export class DataAggregate implements DataAggregateInterface {
         projectedName = `${propertyName}Min`
     ): DataAggregate {
         if (!propertyName) {
-            reportError("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -493,7 +492,7 @@ export class DataAggregate implements DataAggregateInterface {
      */
     skip(skip: number): DataAggregate {
         if (!skip && skip != 0) {
-            reportError("Skip number is required please specify a skip number");
+            throw Error(`WeivData - Skip number is required please specify a skip number`);
         }
 
         this.skipNumber = skip;
@@ -523,7 +522,7 @@ export class DataAggregate implements DataAggregateInterface {
         projectedName = `${propertyName}Sum`
     ): DataAggregate {
         if (!propertyName) {
-            reportError("Property name is required!")
+            throw Error(`WeivData - Property name is required!`)
         }
 
         this.addGroup({

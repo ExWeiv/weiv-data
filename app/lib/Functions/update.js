@@ -3,32 +3,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.update = void 0;
 const lodash_1 = require("lodash");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 async function update(collectionId, item, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("CollectionID is required when updating an item from a collection");
-        }
-        if (!item._id) {
-            (0, log_handlers_1.reportError)("_id is required in the item object when updating");
+        if (!collectionId || !item._id) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item._id`);
         }
         const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         const defaultValues = {
             _updatedDate: new Date()
         };
-        item._id = (0, item_helpers_1.convertStringId)(item._id);
+        const itemId = (0, item_helpers_1.convertStringId)(item._id);
         item = (0, lodash_1.merge)(item, defaultValues);
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        await collection.updateOne({ _id: item._id }, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { acknowledged } = await collection.updateOne({ _id: itemId }, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();
         }
-        return item;
+        if (acknowledged) {
+            return item;
+        }
+        else {
+            throw Error(`WeivData - Error when updating an item, acknowledged: ${acknowledged}`);
+        }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when updating an item: ${err}`);
     }
 }
 exports.update = update;

@@ -1,7 +1,6 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { reportError } from '../Log/log_handlers';
 import { convertStringId } from '../Helpers/item_helpers';
-import { ObjectId } from 'mongodb/mongodb'
+import { ObjectId } from 'mongodb/mongodb';
 
 /**
  * @description Retrieves an item from a collection.
@@ -12,31 +11,26 @@ import { ObjectId } from 'mongodb/mongodb'
  */
 export async function get(collectionId: string, itemId: ObjectId | string, options?: WeivDataOptions): Promise<object | null> {
     try {
-        if (!collectionId) {
-            reportError("CollectionID is required when getting an item from a collection");
-        }
-
-        if (!itemId) {
-            reportError("ItemId is required when getting an item from a collection");
+        if (!collectionId || !itemId) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        itemId = convertStringId(itemId);
+        const newItemId = convertStringId(itemId);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: itemId }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const item = await collection.findOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
-        if (!item) {
-            reportError("Item not found in collection");
+        if (item) {
+            return item;
+        } else {
+            throw Error(`WeivData - Error when trying to get item from the collectin by itemId, itemId: ${newItemId}`);
         }
-
-        return item;
     } catch (err) {
-        console.error(err); //@ts-ignore
-        return err;
+        throw Error(`WeivData - Error when trying to get item from the collectin by itemId: ${err}`);
     }
 }

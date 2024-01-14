@@ -1,5 +1,4 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { reportError } from '../Log/log_handlers';
 
 /**
  * @description Removes all items from a collection.
@@ -10,20 +9,23 @@ import { reportError } from '../Log/log_handlers';
 export async function truncate(collectionId: string, options?: WeivDataOptions): Promise<null> {
     try {
         if (!collectionId) {
-            reportError("CollectionID is required when truncating a collection");
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        await collection.deleteMany({});
+        const { acknowledged } = await collection.deleteMany({});
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
-        return null;
+        if (acknowledged) {
+            return null;
+        } else {
+            throw Error(`WeivData - Error when removing all items in a collection (truncate), acknowledged: ${acknowledged}`);
+        }
     } catch (err) {
-        console.error(err);
-        return null;
+        throw Error(`WeivData - Error when removing all items in a collection (truncate): ${err}`);
     }
 }

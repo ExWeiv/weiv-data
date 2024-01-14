@@ -21,6 +21,6 @@ export async function getCachedSecret(secretName: string): Promise<string | unde
 
         return secret;
     } catch (err) {
-        throw Error(`Error on general cached secret helpers: ${err}`);
+        throw Error(`WeivData - Error on general cached secret helpers: ${err}`);
     }
 }

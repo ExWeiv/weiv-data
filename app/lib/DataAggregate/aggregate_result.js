@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeivDataAggregateResult = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const connection_provider_1 = require("../Connection/connection_provider");
-const log_handlers_1 = require("../Log/log_handlers");
 class DataAggregateResult {
     constructor(options) {
         this.pageSize = 50;
@@ -11,7 +10,7 @@ class DataAggregateResult {
         this.suppressAuth = false;
         const { pageSize, pipeline, databaseName, collectionName, suppressAuth } = options;
         if (!pipeline || !databaseName || !collectionName) {
-            (0, log_handlers_1.reportError)("Required Parameters Missing (Internal Error)");
+            throw Error(`WeivData - Required Parameters Missing (Internal API Error) - please report this BUG`);
         }
         this.pageSize = pageSize;
         this.currentPage = 1;
@@ -55,15 +54,20 @@ class DataAggregateResult {
         };
     }
     async connectionHandler(suppressAuth) {
-        const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
-        if (this.databaseName) {
-            this.db = pool.db(this.databaseName);
+        try {
+            const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
+            if (this.databaseName) {
+                this.db = pool.db(this.databaseName);
+            }
+            else {
+                this.db = pool.db("exweiv");
+            }
+            const collection = this.db.collection(this.collectionName);
+            return { collection, cleanup, memberId };
         }
-        else {
-            this.db = pool.db("exweiv");
+        catch (err) {
+            throw Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
         }
-        const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
     }
 }
 function WeivDataAggregateResult(options) {

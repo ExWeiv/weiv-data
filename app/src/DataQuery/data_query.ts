@@ -1,7 +1,6 @@
 import { Db, CountOptions } from 'mongodb/mongodb';
 import { DataQueryInterface } from '../Interfaces/interfaces';
 import { DataQueryFilter } from './data_query_filters';
-import { reportError } from '../Log/log_handlers';
 import { merge, size } from 'lodash';
 import { useClient } from '../Connection/connection_provider';
 import { WeivDataQueryResult } from './query_result';
@@ -24,7 +23,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     constructor(collectionId: string) {
         super();
         if (!collectionId) {
-            reportError("Collection name required");
+            throw Error(`WeivData - Collection name required`);
         }
 
         this.setDataQuery(this);
@@ -41,7 +40,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      */
     ascending(...propertyName: string[]): DataQuery {
         if (!propertyName) {
-            reportError("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
 
         for (const name of propertyName) {
@@ -97,7 +96,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      */
     descending(...propertyName: string[]): DataQuery {
         if (!propertyName) {
-            reportError("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
 
         for (const name of propertyName) {
@@ -116,7 +115,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         consistentRead: false
     }): Promise<QueryResult> {
         if (!propertyName) {
-            reportError("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
         this.distinctValue = propertyName;
         return this.runQuery(options);
@@ -129,7 +128,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      */
     fields(...propertyName: string[]): DataQuery {
         if (!propertyName) {
-            reportError("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
 
         for (const name of propertyName) {
@@ -157,7 +156,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      */
     include(...propertyName: IncludeObject[]): DataQuery {
         if (!propertyName) {
-            reportError("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
 
         for (const { fieldName, collectionName, foreignField, as, type = "mixed", maxItems, countItems } of propertyName) {
@@ -200,7 +199,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      */
     limit(limit: number): DataQuery {
         if (!limit && limit != 0) {
-            reportError("Limit number is required!");
+            throw Error(`WeivData - Limit number is required!`);
         }
 
         if (limit != 0) {
@@ -217,7 +216,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      */
     skip(skip: number): DataQuery {
         if (!skip && skip != 0) {
-            reportError("Skip number is required!");
+            throw Error(`WeivData - Skip number is required!`);
         }
         this.skipNumber = skip;
         return this;

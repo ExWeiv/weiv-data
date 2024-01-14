@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeivDataQueryResult = void 0;
 const connection_provider_1 = require("../Connection/connection_provider");
-const log_handlers_1 = require("../Log/log_handlers");
 const lodash_1 = require("lodash");
 class DataQueryResult {
     constructor(options) {
@@ -13,7 +12,7 @@ class DataQueryResult {
         this.currentPage = 1;
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, suppressHooks } = options;
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
-            (0, log_handlers_1.reportError)("Required Param/s Missing");
+            throw Error(`WeivData - Required Param/s Missing`);
         }
         this.collection = collection;
         this.consistentRead = consistentRead || false;
@@ -162,15 +161,20 @@ class DataQueryResult {
         };
     }
     async connectionHandler(suppressAuth) {
-        const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
-        if (this.dbName) {
-            this.db = pool.db(this.dbName);
+        try {
+            const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
+            if (this.dbName) {
+                this.db = pool.db(this.dbName);
+            }
+            else {
+                this.db = pool.db("exweiv");
+            }
+            const collection = this.db.collection(this.collectionName);
+            return { collection, cleanup, memberId };
         }
-        else {
-            this.db = pool.db("exweiv");
+        catch (err) {
+            throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }
-        const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
     }
 }
 function WeivDataQueryResult(options) {

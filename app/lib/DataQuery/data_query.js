@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExWeivDataQuery = exports.DataQuery = void 0;
 const data_query_filters_1 = require("./data_query_filters");
-const log_handlers_1 = require("../Log/log_handlers");
 const lodash_1 = require("lodash");
 const connection_provider_1 = require("../Connection/connection_provider");
 const query_result_1 = require("./query_result");
@@ -16,7 +15,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         this.limitNumber = 50;
         this.referenceLenght = {};
         if (!collectionId) {
-            (0, log_handlers_1.reportError)("Collection name required");
+            throw Error(`WeivData - Collection name required`);
         }
         this.setDataQuery(this);
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
@@ -25,7 +24,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
     ascending(...propertyName) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
         for (const name of propertyName) {
             this.sorting = (0, lodash_1.merge)(this.sorting, {
@@ -58,7 +57,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
     descending(...propertyName) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
         for (const name of propertyName) {
             this.sorting = (0, lodash_1.merge)(this.sorting, {
@@ -74,14 +73,14 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         consistentRead: false
     }) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
         this.distinctValue = propertyName;
         return this.runQuery(options);
     }
     fields(...propertyName) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
         for (const name of propertyName) {
             this.queryFields = (0, lodash_1.merge)(this.queryFields, {
@@ -100,7 +99,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
     include(...propertyName) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
         for (const { fieldName, collectionName, foreignField, as, type = "mixed", maxItems, countItems } of propertyName) {
             if (countItems === true) {
@@ -133,7 +132,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
     limit(limit) {
         if (!limit && limit != 0) {
-            (0, log_handlers_1.reportError)("Limit number is required!");
+            throw Error(`WeivData - Limit number is required!`);
         }
         if (limit != 0) {
             this.limitNumber = limit;
@@ -142,7 +141,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
     skip(skip) {
         if (!skip && skip != 0) {
-            (0, log_handlers_1.reportError)("Skip number is required!");
+            throw Error(`WeivData - Skip number is required!`);
         }
         this.skipNumber = skip;
         return this;

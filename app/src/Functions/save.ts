@@ -11,14 +11,14 @@ import { convertStringId } from '../Helpers/item_helpers';
  */
 export async function save(collectionId: string, item: DataItemValues, options?: WeivDataOptions): Promise<object> {
     try {
-        if (!collectionId) {
-            reportError("CollectionID is required when saving an item in a collection");
+        if (!collectionId || !item) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
 
         // Convert ID to ObjectId if exist
-        if (item._id) {
+        if (item._id && typeof item._id === "string") {
             item._id = convertStringId(item._id);
         }
 
@@ -36,22 +36,25 @@ export async function save(collectionId: string, item: DataItemValues, options?:
         }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { upsertedId } = await collection.updateOne({ _id: item._id }, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
+        const { upsertedId, acknowledged } = await collection.updateOne(item._id === undefined ? { _id: item._id } : {}, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
-        // Hooks handling
-        if (upsertedId) {
-            // Item Inserted
-        } else {
-            // Item Updated
-        }
+        if (acknowledged) {
+            // Hooks handling
+            if (upsertedId) {
+                // Item Inserted
+            } else {
+                // Item Updated
+            }
 
-        return item;
+            return item;
+        } else {
+            throw Error(`WeivData - Error when saving an item to collection, acknowledged: ${acknowledged}`);
+        }
     } catch (err) {
-        console.error(err); //@ts-ignore
-        return err;
+        throw Error(`WeivData - Error when saving an item to collection: ${err}`);
     }
 }

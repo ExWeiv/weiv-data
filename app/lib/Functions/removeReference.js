@@ -2,21 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeReference = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
 const reference_helpers_1 = require("../Helpers/reference_helpers");
 async function removeReference(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("Collection and Database name is required");
-        }
-        if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name is required");
-        }
-        if (!referringItem) {
-            (0, log_handlers_1.reportError)("Referring item is required");
-        }
-        if (!referencedItem) {
-            (0, log_handlers_1.reportError)("Referenced item is required");
+        if (!collectionId || !propertyName || !referringItem || !referencedItem) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
         const { suppressAuth, cleanupAfter, consistentRead } = options || { suppressAuth: false, cleanupAfter: false, consistentRead: false };
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
@@ -27,16 +17,16 @@ async function removeReference(collectionId, propertyName, referringItem, refere
         const updateOperation = isMultiReference
             ? { $pull: { [propertyName]: { $in: references } }, $set: { _updatedDate: new Date() } }
             : { $set: { [propertyName]: undefined, _updatedDate: new Date() } };
-        const { modifiedCount } = await collection.updateOne({ _id: itemId }, { ...updateOperation }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (modifiedCount <= 0) {
-            (0, log_handlers_1.reportError)("Operation is not succeed");
-        }
+        const { acknowledged } = await collection.updateOne({ _id: itemId }, { ...updateOperation }, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();
         }
+        if (!acknowledged) {
+            throw Error(`WeivData - Error when removing references, acknowledged: ${acknowledged}`);
+        }
     }
     catch (err) {
-        console.error(err);
+        throw Error(`WeivData - Error when removing references: ${err}`);
     }
 }
 exports.removeReference = removeReference;

@@ -1,6 +1,5 @@
 import { Db, Document, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/connection_provider';
-import { reportError } from '../Log/log_handlers';
 import { DataQuery } from './data_query';
 import { size } from 'lodash';
 
@@ -22,7 +21,7 @@ class DataQueryResult {
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, suppressHooks } = options;
 
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
-            reportError("Required Param/s Missing");
+            throw Error(`WeivData - Required Param/s Missing`);
         }
 
         this.collection = collection;
@@ -198,16 +197,20 @@ class DataQueryResult {
     }
 
     private async connectionHandler(suppressAuth: boolean): Promise<ConnectionResult> {
-        const { pool, cleanup, memberId } = await useClient(suppressAuth);
+        try {
+            const { pool, cleanup, memberId } = await useClient(suppressAuth);
 
-        if (this.dbName) {
-            this.db = pool.db(this.dbName);
-        } else {
-            this.db = pool.db("exweiv");
+            if (this.dbName) {
+                this.db = pool.db(this.dbName);
+            } else {
+                this.db = pool.db("exweiv");
+            }
+
+            const collection = this.db.collection(this.collectionName);
+            return { collection, cleanup, memberId };
+        } catch (err) {
+            throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }
-
-        const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
     }
 }
 

@@ -6,8 +6,11 @@ function convertStringId(_id) {
     if (typeof _id === "string") {
         return new mongodb_1.ObjectId(_id);
     }
-    else {
+    else if (typeof _id === "object") {
         return _id;
+    }
+    else {
+        throw Error(`WeivData - Wrong _id type!`);
     }
 }
 exports.convertStringId = convertStringId;

@@ -1,7 +1,6 @@
 import { merge } from 'lodash';
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { reportError } from '../Log/log_handlers';
 
 /**
  * @description Adds a number of items to a collection.
@@ -10,14 +9,10 @@ import { reportError } from '../Log/log_handlers';
  * @param options An object containing options to use when processing this operation.
  * @returns Fulfilled - The results of the bulk insert. Rejected - The error that caused the rejection.
  */
-export async function bulkInsert(collectionId: string, items: DataItemValues[], options?: WeivDataOptions): Promise<BulkInsertResult> {
+export async function bulkInsert(collectionId: string, items: DataItemValuesInsert[], options?: WeivDataOptions): Promise<BulkInsertResult> {
     try {
-        if (!collectionId) {
-            reportError("CollectionID is required when inserting an item in a collection");
-        }
-
-        if (items.length === 0) {
-            reportError('Items array is empty');
+        if (!collectionId || !items || items.length <= 0) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
@@ -31,13 +26,13 @@ export async function bulkInsert(collectionId: string, items: DataItemValues[], 
             defaultValues._owner = await getOwnerId();
         }
 
-        items = items.map((item) => {
-            item = merge(item, defaultValues);
+        const newItems = items.map((item) => {
+            item = merge(defaultValues, item);
             return item;
         })
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(items);
+        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(newItems);
 
         if (cleanupAfter === true) {
             await cleanup();
@@ -46,10 +41,9 @@ export async function bulkInsert(collectionId: string, items: DataItemValues[], 
         if (acknowledged === true) {
             return { insertedItems: items, insertedItemIds: insertedIds, inserted: insertedCount };
         } else {
-            reportError('Failed to insert items!');
+            throw Error(`WeivData - Error when inserting items using bulkInsert, acknowledged: ${acknowledged}, insertedCount: ${insertedCount}`);
         }
     } catch (err) {
-        console.error(err); //@ts-ignore
-        return err;
+        throw Error(`WeivData - Error when inserting items using bulkInsert: ${err}`);
     }
 }

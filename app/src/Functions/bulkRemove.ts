@@ -1,5 +1,4 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { reportError } from '../Log/log_handlers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { ObjectId } from 'mongodb/mongodb';
 
@@ -12,21 +11,17 @@ import { ObjectId } from 'mongodb/mongodb';
  */
 export async function bulkRemove(collectionId: string, itemIds: ObjectId[] | string[], options?: WeivDataOptions): Promise<object | null> {
     try {
-        if (!collectionId) {
-            reportError("CollectionID is required when removing an item from a collection");
-        }
-
-        if (!itemIds) {
-            reportError("ItemIds are required when removing items from a collection");
+        if (!collectionId || !itemIds) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemIds`);
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        itemIds = itemIds.map((itemId) => {
+        const newItemIds = itemIds.map((itemId) => {
             return convertStringId(itemId);
         })
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { acknowledged, deletedCount, } = await collection.deleteMany({ _id: { $in: itemIds } });
+        const { acknowledged, deletedCount } = await collection.deleteMany({ _id: { $in: newItemIds } });
 
         if (cleanupAfter === true) {
             await cleanup();
@@ -35,13 +30,12 @@ export async function bulkRemove(collectionId: string, itemIds: ObjectId[] | str
         if (acknowledged === true) {
             return {
                 removed: deletedCount,
-                removedItemIds: itemIds
+                removedItemIds: newItemIds
             }
         } else {
-            reportError('Failed to remove items!');
+            throw Error(`WeivData - Error when removing items using bulkRemove, acknowledged: ${acknowledged}, deletedCount: ${deletedCount}`);
         }
     } catch (err) {
-        console.error(err); //@ts-ignore
-        return err;
+        throw Error(`WeivData - Error when removing items using bulkRemove: ${err}`);
     }
 }

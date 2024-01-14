@@ -2,15 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.remove = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 async function remove(collectionId, itemId, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("CollectionID is required when removing an item from a collection");
-        }
-        if (!itemId) {
-            (0, log_handlers_1.reportError)("ItemId is required when removing an item from a collection");
+        if (!collectionId || !itemId) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
         const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         itemId = (0, item_helpers_1.convertStringId)(itemId);
@@ -20,7 +16,7 @@ async function remove(collectionId, itemId, options) {
         if (cleanupAfter === true) {
             await cleanup();
         }
-        if (acknowledged === true) {
+        if (acknowledged) {
             if (deletedCount === 1) {
                 return item;
             }
@@ -29,12 +25,11 @@ async function remove(collectionId, itemId, options) {
             }
         }
         else {
-            return null;
+            throw Error(`WeivData - Error when removing an item from collection, acknowledged: ${acknowledged}`);
         }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when removing an item from collection: ${err}`);
     }
 }
 exports.remove = remove;

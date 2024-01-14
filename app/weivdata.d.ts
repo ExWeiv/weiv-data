@@ -151,7 +151,9 @@ declare global {
         enableOwnerId?: boolean
     }
 
-    type DataItemValues = { [key: string]: any; };
+    type DataItemValues = { _id?: ObjectId | string, [key: string]: any; };
+    type DataItemValuesUpdate = { _id: ObjectId | string, [key: string]: any; };
+    type DataItemValuesInsert = { [key: string]: any; };
 
     type AggregateResultOptions = {
         pageSize: number,
@@ -161,9 +163,9 @@ declare global {
         suppressAuth?: boolean
     }
 
-    type ReferringItem = DataItemValues | string
+    type ReferringItem = string | DataItemValuesUpdate
     type ReferencedItemSingle = DataItemValues | string
-    type ReferencedItem = DataItemValues | string | DataItemValues[] | string[]
+    type ReferencedItem = DataItemValuesUpdate | string | DataItemValuesUpdate[] | string[]
 
     type BulkInsertResult = {
         insertedItems: DataItemValues[],

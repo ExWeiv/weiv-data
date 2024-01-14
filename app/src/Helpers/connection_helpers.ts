@@ -26,7 +26,7 @@ export async function connectionHandler(collectionId: string, suppressAuth = fal
         const collection = db.collection(collectionName);
         return { collection, cleanup, memberId };
     } catch (err) {
-        throw Error(`Error when trying to connect to database via useClient and Mongo Client ${err}`);
+        throw Error(`WeivData - Error when trying to connect to database via useClient and Mongo Client ${err}`);
     }
 }
 
@@ -48,6 +48,6 @@ export async function loadConnectionOptions(): Promise<MongoClientOptions> {
             return defaultOptions;
         }
     } catch (err) {
-        throw Error(`Error when returning options for MongoDB Client connection: ${err}`);
+        throw Error(`WeivData - Error when returning options for MongoDB Client connection: ${err}`);
     }
 }

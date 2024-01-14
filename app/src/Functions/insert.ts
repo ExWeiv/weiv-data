@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { reportError } from '../Log/log_handlers';
+import { convertStringId } from '../Helpers/item_helpers'
 
 /**
  * @description Adds an item to a collection.
@@ -10,10 +10,10 @@ import { reportError } from '../Log/log_handlers';
  * @param options An object containing options to use when processing this operation.
  * @returns Fulfilled - The item that was added. Rejected - The error that caused the rejection.
  */
-export async function insert(collectionId: string, item: DataItemValues, options?: WeivDataOptions): Promise<object> {
+export async function insert(collectionId: string, item: DataItemValuesInsert, options?: WeivDataOptions): Promise<object> {
     try {
-        if (!collectionId) {
-            reportError("CollectionID is required when inserting an item in a collection");
+        if (!collectionId || !item) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
@@ -27,18 +27,24 @@ export async function insert(collectionId: string, item: DataItemValues, options
             defaultValues._owner = await getOwnerId();
         }
 
-        item = merge(item, defaultValues);
+        const modifiedItem = merge(defaultValues, item);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedId } = await collection.insertOne(item);
+        const { insertedId, acknowledged } = await collection.insertOne({
+            ...modifiedItem,
+            _id: typeof modifiedItem._id === "string" ? convertStringId(modifiedItem._id) : modifiedItem._id
+        });
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
-        return { ...item, _id: insertedId };
+        if (acknowledged) {
+            return { ...item, _id: insertedId };
+        } else {
+            throw Error(`WeivData - Error when inserting an item into a collection, acknowledged: ${acknowledged}`);
+        }
     } catch (err) {
-        console.error(err); //@ts-ignore
-        return err;
+        throw Error(`WeivData - Error when inserting an item into a collection: ${err}`);
     }
 }

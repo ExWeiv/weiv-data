@@ -1,4 +1,3 @@
-import { reportError } from '../Log/log_handlers';
 import { getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
 import { update } from './update';
 
@@ -13,30 +12,19 @@ import { update } from './update';
  */
 export async function replaceReferences(collectionId: string, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<void> {
     try {
-        if (!collectionId) {
-            reportError("Collection and Database name is required");
-        }
-
-        if (!propertyName) {
-            reportError("Property name is required");
-        }
-
-        if (!referringItem) {
-            reportError("Referring item is required");
-        }
-
-        if (!referencedItem) {
-            reportError("Referenced item/s required");
+        if (!collectionId || !propertyName || !referringItem || !referencedItem) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
 
         const references = getReferences(referencedItem);
         const itemId = getCurrentItemId(referringItem);
 
         const updated = await update(collectionId, { _id: itemId, [propertyName]: references.length > 1 ? references : references[0] }, options);
+
         if (!updated) {
-            reportError("Operation failed");
+            throw Error(`WeivData - Error when replacing references, result: ${updated}`)
         }
     } catch (err) {
-        console.error(err);
+        throw Error(`WeivData - Error when replacing references: ${err}`)
     }
 }

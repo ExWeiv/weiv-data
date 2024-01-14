@@ -25,7 +25,7 @@ async function connectionHandler(collectionId, suppressAuth = false) {
         return { collection, cleanup, memberId };
     }
     catch (err) {
-        throw Error(`Error when trying to connect to database via useClient and Mongo Client ${err}`);
+        throw Error(`WeivData - Error when trying to connect to database via useClient and Mongo Client ${err}`);
     }
 }
 exports.connectionHandler = connectionHandler;
@@ -49,7 +49,7 @@ async function loadConnectionOptions() {
         }
     }
     catch (err) {
-        throw Error(`Error when returning options for MongoDB Client connection: ${err}`);
+        throw Error(`WeivData - Error when returning options for MongoDB Client connection: ${err}`);
     }
 }
 exports.loadConnectionOptions = loadConnectionOptions;

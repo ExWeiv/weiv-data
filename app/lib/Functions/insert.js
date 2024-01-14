@@ -4,11 +4,11 @@ exports.insert = void 0;
 const lodash_1 = require("lodash");
 const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
+const item_helpers_1 = require("../Helpers/item_helpers");
 async function insert(collectionId, item, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("CollectionID is required when inserting an item in a collection");
+        if (!collectionId || !item) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
         const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         const defaultValues = {
@@ -19,17 +19,24 @@ async function insert(collectionId, item, options) {
         if (enableOwnerId === true) {
             defaultValues._owner = await (0, member_id_helpers_1.getOwnerId)();
         }
-        item = (0, lodash_1.merge)(item, defaultValues);
+        const modifiedItem = (0, lodash_1.merge)(defaultValues, item);
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { insertedId } = await collection.insertOne(item);
+        const { insertedId, acknowledged } = await collection.insertOne({
+            ...modifiedItem,
+            _id: typeof modifiedItem._id === "string" ? (0, item_helpers_1.convertStringId)(modifiedItem._id) : modifiedItem._id
+        });
         if (cleanupAfter === true) {
             await cleanup();
         }
-        return { ...item, _id: insertedId };
+        if (acknowledged) {
+            return { ...item, _id: insertedId };
+        }
+        else {
+            throw Error(`WeivData - Error when inserting an item into a collection, acknowledged: ${acknowledged}`);
+        }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when inserting an item into a collection: ${err}`);
     }
 }
 exports.insert = insert;

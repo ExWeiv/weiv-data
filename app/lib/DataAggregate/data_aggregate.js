@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExWeivDataAggregate = exports.DataAggregate = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
 const aggregate_result_1 = require("./aggregate_result");
 const connection_provider_1 = require("../Connection/connection_provider");
 const name_helpers_1 = require("../Helpers/name_helpers");
@@ -10,7 +9,7 @@ class DataAggregate {
     constructor(collectionId) {
         this.dbName = "exweiv";
         if (!collectionId) {
-            (0, log_handlers_1.reportError)("Database and Collection name required");
+            throw Error(`WeivData - Database and Collection name required`);
         }
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
@@ -18,7 +17,7 @@ class DataAggregate {
     }
     ascending(propertyName) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name required!");
+            throw Error(`WeivData - Property name required!`);
         }
         this.sorting = {
             propertyName,
@@ -28,7 +27,7 @@ class DataAggregate {
     }
     avg(propertyName, projectedName = `${propertyName}Avg`) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -44,7 +43,7 @@ class DataAggregate {
     }
     descending(propertyName) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.sorting = {
             propertyName,
@@ -54,7 +53,7 @@ class DataAggregate {
     }
     filter(filter) {
         if (!filter) {
-            (0, log_handlers_1.reportError)("Filter is empty, please add a filter using weivData.filter method!");
+            throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
         this.pipeline = (0, pipeline_helpers_1.checkPipelineArray)(this.pipeline);
         this.pipeline.push({
@@ -66,10 +65,10 @@ class DataAggregate {
     }
     group(propertyName) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property or properties are required!");
+            throw Error(`WeivData - Property or properties are required!`);
         }
         if (this.groupCreated === true) {
-            (0, log_handlers_1.reportError)("Group is already set!");
+            throw Error(`WeivData - Group is already set!`);
         }
         let propertyNames = {};
         if (typeof propertyName === "string") {
@@ -88,7 +87,7 @@ class DataAggregate {
     }
     having(filter) {
         if (!filter) {
-            (0, log_handlers_1.reportError)("Filter is empty, please add a filter using weivData.filter method!");
+            throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
         this.havingFilter = {
             $match: {
@@ -99,7 +98,7 @@ class DataAggregate {
     }
     limit(limit) {
         if (!limit && limit != 0) {
-            (0, log_handlers_1.reportError)("Limit number is required please specify a limit amount");
+            throw Error(`WeivData - Limit number is required please specify a limit amount`);
         }
         if (limit != 0) {
             this.limitNumber = limit;
@@ -108,7 +107,7 @@ class DataAggregate {
     }
     max(propertyName, projectedName = `${propertyName}Max`) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -120,7 +119,7 @@ class DataAggregate {
     }
     min(propertyName, projectedName = `${propertyName}Min`) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -203,14 +202,14 @@ class DataAggregate {
     }
     skip(skip) {
         if (!skip && skip != 0) {
-            (0, log_handlers_1.reportError)("Skip number is required please specify a skip number");
+            throw Error(`WeivData - Skip number is required please specify a skip number`);
         }
         this.skipNumber = skip;
         return this;
     }
     sum(propertyName, projectedName = `${propertyName}Sum`) {
         if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name is required!");
+            throw Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
