@@ -21,17 +21,17 @@ export async function update(collectionId: string, item: DataItemValuesUpdate, o
         }
 
         const itemId = convertStringId(item._id);
-        item = merge(item, defaultValues);
+        const updateItem = merge(item, defaultValues);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { acknowledged } = await collection.updateOne({ _id: itemId }, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { acknowledged } = await collection.updateOne({ _id: itemId }, { $set: { ...updateItem, _id: undefined } }, { readConcern: consistentRead === true ? "majority" : "local" });
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
         if (acknowledged) {
-            return item;
+            return updateItem;
         } else {
             throw Error(`WeivData - Error when updating an item, acknowledged: ${acknowledged}`)
         }

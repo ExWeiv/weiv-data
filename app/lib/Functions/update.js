@@ -14,14 +14,14 @@ async function update(collectionId, item, options) {
             _updatedDate: new Date()
         };
         const itemId = (0, item_helpers_1.convertStringId)(item._id);
-        item = (0, lodash_1.merge)(item, defaultValues);
+        const updateItem = (0, lodash_1.merge)(item, defaultValues);
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { acknowledged } = await collection.updateOne({ _id: itemId }, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { acknowledged } = await collection.updateOne({ _id: itemId }, { $set: { ...updateItem, _id: undefined } }, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();
         }
         if (acknowledged) {
-            return item;
+            return updateItem;
         }
         else {
             throw Error(`WeivData - Error when updating an item, acknowledged: ${acknowledged}`);

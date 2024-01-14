@@ -16,11 +16,11 @@ export async function remove(collectionId: string, itemId: ObjectId | string, op
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        itemId = convertStringId(itemId);
+        const newItemId = convertStringId(itemId);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: itemId });
-        const { acknowledged, deletedCount } = await collection.deleteOne({ _id: itemId });
+        const item = await collection.findOne({ _id: newItemId });
+        const { acknowledged, deletedCount } = await collection.deleteOne({ _id: newItemId });
 
         if (cleanupAfter === true) {
             await cleanup();
