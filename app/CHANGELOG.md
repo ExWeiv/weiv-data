@@ -28,6 +28,9 @@ In this file you can find what's changed in each version.
 ## 1.3.9
 - List of tested/working functions in Wix env
 
+## 1.3.10
+- BUG Fixes for weivData.query
+
 ---
 
 *When a new version is released you can see the update notes here.*

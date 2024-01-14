@@ -10,7 +10,6 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     private collectionName: string;
     private dbName = "exweiv";
     private db!: Db;
-
     private query: QueryFilters = {};
     private sorting!: QuerySort;
     private queryFields!: QueryFields;
@@ -224,42 +223,46 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
 
     // HELPER FUNCTIONS IN CLASS
     private async runQuery(options: QueryOptions): Promise<QueryResult> {
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
-        const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
+        try {
+            const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
+            const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
 
-        // Filter results to only member author data
-        if (memberId && suppressAuth != true) {
-            this.eq("_owner", memberId);
-        }
-
-        // Add filters to query
-        this.filtersHandler();
-
-        const result = await WeivDataQueryResult({
-            suppressAuth,
-            suppressHooks,
-            consistentRead,
-            collection,
-            pageSize: this.limitNumber,
-            dbName: this.dbName,
-            collectionName: this.collectionName,
-            queryClass: this,
-            queryOptions: {
-                query: this.query,
-                distinctProperty: this.distinctValue,
-                skip: this.skipNumber,
-                sort: this.sorting,
-                fields: this.queryFields,
-                includes: this.includeValues,
-                addFields: this.referenceLenght
+            // Filter results to only member author data
+            if (memberId && suppressAuth != true) {
+                this.eq("_owner", memberId);
             }
-        }).getResult();
 
-        if (cleanupAfter === true) {
-            await cleanup();
+            // Add filters to query
+            this.filtersHandler();
+
+            const result = await WeivDataQueryResult({
+                suppressAuth,
+                suppressHooks,
+                consistentRead,
+                collection,
+                pageSize: this.limitNumber,
+                dbName: this.dbName,
+                collectionName: this.collectionName,
+                queryClass: this,
+                queryOptions: {
+                    query: this.query,
+                    distinctProperty: this.distinctValue,
+                    skip: this.skipNumber,
+                    sort: this.sorting,
+                    fields: this.queryFields,
+                    includes: this.includeValues,
+                    addFields: this.referenceLenght
+                }
+            }).getResult();
+
+            if (cleanupAfter === true) {
+                await cleanup();
+            }
+
+            return result;
+        } catch (err) {
+            throw Error(`WeivData - Error when using query (runQuery): ${err}`);
         }
-
-        return result;
     }
 
     private filtersHandler(): void {

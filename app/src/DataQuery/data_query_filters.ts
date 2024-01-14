@@ -9,7 +9,7 @@ export class DataQueryFilter implements DataQueryFilterInterface {
     constructor() { }
 
     and(query: DataQueryFilter): DataQueryFilter {
-        this.filters = merge(this.filters, query.filters)
+        this.filters = merge(query.filters, this.filters);
         return this;
     }
 

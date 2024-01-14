@@ -7,7 +7,7 @@ class DataQueryFilter {
         this.filters = {};
     }
     and(query) {
-        this.filters = (0, lodash_1.merge)(this.filters, query.filters);
+        this.filters = (0, lodash_1.merge)(query.filters, this.filters);
         return this;
     }
     between(propertyName, rangeStart, rangeEnd) {

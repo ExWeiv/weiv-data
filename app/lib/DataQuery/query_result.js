@@ -25,140 +25,155 @@ class DataQueryResult {
         this.collectionName = collectionName;
     }
     async getItems() {
-        const { query, distinctProperty, skip, sort, fields, includes, addFields } = this.queryOptions;
-        if (distinctProperty) {
-            const distinctItems = await this.collection.distinct(distinctProperty, query);
-            return distinctItems;
-        }
-        else {
-            if ((0, lodash_1.size)(includes) > 0) {
-                const pipeline = [];
-                if ((0, lodash_1.size)(query) > 0) {
-                    pipeline.push({
-                        $match: query
-                    });
-                }
-                if (sort) {
-                    pipeline.push({
-                        $sort: sort
-                    });
-                }
-                if (fields) {
-                    pipeline.push({
-                        $project: fields
-                    });
-                }
-                if ((0, lodash_1.size)(addFields) > 0) {
-                    pipeline.push({
-                        $addFields: addFields
-                    });
-                }
-                for (const include of includes) {
-                    if (include.$lookup) {
-                        pipeline.push({
-                            $lookup: include.$lookup
-                        });
-                    }
-                }
-                for (const include of includes) {
-                    if (include.$unwind) {
-                        pipeline.push({
-                            $unwind: include.$unwind
-                        });
-                    }
-                }
-                pipeline.push({
-                    $skip: skip || 0 + ((this.currentPage - 1) * this.pageSize)
-                });
-                pipeline.push({
-                    $limit: this.pageSize
-                });
-                const aggregateCursor = this.collection.aggregate(pipeline);
-                if (this.consistentRead === true) {
-                    aggregateCursor.readConcern('majority');
-                }
-                const items = await aggregateCursor.toArray();
-                return items;
+        try {
+            const { query, distinctProperty, skip, sort, fields, includes, addFields } = this.queryOptions;
+            if (distinctProperty) {
+                const distinctItems = await this.collection.distinct(distinctProperty, query);
+                return distinctItems;
             }
             else {
-                const findCursor = this.collection.find(query, {
-                    sort,
-                    projection: fields
-                });
-                findCursor.skip(skip || 0 + ((this.currentPage - 1) * this.pageSize));
-                findCursor.limit(this.pageSize);
-                if (this.consistentRead === true) {
-                    findCursor.readConcern('majority');
+                if ((0, lodash_1.size)(includes) > 0) {
+                    const pipeline = [];
+                    if ((0, lodash_1.size)(query) > 0) {
+                        pipeline.push({
+                            $match: query
+                        });
+                    }
+                    if (sort) {
+                        pipeline.push({
+                            $sort: sort
+                        });
+                    }
+                    if (fields) {
+                        pipeline.push({
+                            $project: fields
+                        });
+                    }
+                    if ((0, lodash_1.size)(addFields) > 0) {
+                        pipeline.push({
+                            $addFields: addFields
+                        });
+                    }
+                    for (const include of includes) {
+                        if (include.$lookup) {
+                            pipeline.push({
+                                $lookup: include.$lookup
+                            });
+                        }
+                    }
+                    for (const include of includes) {
+                        if (include.$unwind) {
+                            pipeline.push({
+                                $unwind: include.$unwind
+                            });
+                        }
+                    }
+                    pipeline.push({
+                        $skip: skip || 0 + ((this.currentPage - 1) * this.pageSize)
+                    });
+                    pipeline.push({
+                        $limit: this.pageSize
+                    });
+                    const aggregateCursor = this.collection.aggregate(pipeline);
+                    if (this.consistentRead === true) {
+                        aggregateCursor.readConcern('majority');
+                    }
+                    const items = await aggregateCursor.toArray();
+                    return items;
                 }
-                const items = await findCursor.toArray();
-                return items;
+                else {
+                    const findCursor = this.collection.find(query, {
+                        sort,
+                        projection: fields
+                    });
+                    findCursor.skip(skip || 0 + ((this.currentPage - 1) * this.pageSize));
+                    findCursor.limit(this.pageSize);
+                    if (this.consistentRead === true) {
+                        findCursor.readConcern('majority');
+                    }
+                    const items = await findCursor.toArray();
+                    return items;
+                }
             }
+        }
+        catch (err) {
+            throw Error(`WeivData - Error when using query (getItems): ${err}`);
         }
     }
     async getTotalCount() {
-        const { query, distinctProperty } = this.queryOptions;
-        if (distinctProperty) {
-            const pipeline = [
-                { $group: { _id: `$${distinctProperty}`, count: { $sum: 1 }, }, },
-                { $group: { _id: null, distinctCount: { $sum: 1 }, }, }
-            ];
-            const result = await this.collection.aggregate(pipeline).toArray();
-            if (result.length > 0) {
-                return result[0].distinctCount;
-            }
-            else {
-                return 0;
-            }
-        }
-        const totalCount = await this.collection.countDocuments(query);
-        return totalCount;
-    }
-    async getResult() {
-        if (!this.collection) {
-            const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
-            this.collection = collection;
-            this.cleanup = cleanup;
-        }
-        const { skip } = this.queryOptions;
-        const items = await this.getItems();
-        const totalCount = await this.getTotalCount();
-        return {
-            currentPage: this.currentPage,
-            items,
-            length: items.length,
-            pageSize: this.pageSize,
-            query: this.dataQueryClass,
-            totalCount,
-            totalPages: Math.ceil(totalCount / this.pageSize),
-            hasNext: () => this.currentPage * this.pageSize < totalCount,
-            hasPrev: () => {
-                if (skip) {
-                    if (skip > 0 && skip >= this.pageSize) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
+        try {
+            const { query, distinctProperty } = this.queryOptions;
+            if (distinctProperty) {
+                const pipeline = [
+                    { $group: { _id: `$${distinctProperty}`, count: { $sum: 1 }, }, },
+                    { $group: { _id: null, distinctCount: { $sum: 1 }, }, }
+                ];
+                const result = await this.collection.aggregate(pipeline).toArray();
+                if (result.length > 0) {
+                    return result[0].distinctCount;
                 }
                 else {
-                    return this.currentPage > 1;
+                    return 0;
                 }
-            },
-            next: async (cleanupAfter) => {
-                this.currentPage++;
-                if (cleanupAfter === true) {
-                    await this.cleanup();
-                }
-                return this.getResult();
-            },
-            prev: async (cleanupAfter) => {
-                this.currentPage--;
-                if (cleanupAfter === true) {
-                    await this.cleanup();
-                }
-                return this.getResult();
             }
-        };
+            const totalCount = await this.collection.countDocuments(query);
+            return totalCount;
+        }
+        catch (err) {
+            throw Error(`WeivData - Error when using query (getTotalCount): ${err}`);
+        }
+    }
+    async getResult() {
+        try {
+            if (!this.collection) {
+                const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
+                this.collection = collection;
+                this.cleanup = cleanup;
+            }
+            const { skip } = this.queryOptions;
+            const items = await this.getItems();
+            const totalCount = await this.getTotalCount();
+            return {
+                currentPage: this.currentPage,
+                items,
+                length: items.length,
+                pageSize: this.pageSize,
+                query: this.dataQueryClass,
+                totalCount,
+                totalPages: Math.ceil(totalCount / this.pageSize),
+                hasNext: () => this.currentPage * this.pageSize < totalCount,
+                hasPrev: () => {
+                    if (skip) {
+                        if (skip > 0 && skip >= this.pageSize) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else {
+                        return this.currentPage > 1;
+                    }
+                },
+                next: async (cleanupAfter) => {
+                    this.currentPage++;
+                    if (cleanupAfter === true) {
+                        await this.cleanup();
+                    }
+                    return this.getResult();
+                },
+                prev: async (cleanupAfter) => {
+                    this.currentPage--;
+                    if (cleanupAfter === true) {
+                        await this.cleanup();
+                    }
+                    return this.getResult();
+                }
+            };
+        }
+        catch (err) {
+            throw Error(`WeivData - Error when using query: ${err}`);
+        }
     }
     async connectionHandler(suppressAuth) {
         try {

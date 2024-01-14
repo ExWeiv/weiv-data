@@ -147,35 +147,40 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         return this;
     }
     async runQuery(options) {
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
-        const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
-        if (memberId && suppressAuth != true) {
-            this.eq("_owner", memberId);
-        }
-        this.filtersHandler();
-        const result = await (0, query_result_1.WeivDataQueryResult)({
-            suppressAuth,
-            suppressHooks,
-            consistentRead,
-            collection,
-            pageSize: this.limitNumber,
-            dbName: this.dbName,
-            collectionName: this.collectionName,
-            queryClass: this,
-            queryOptions: {
-                query: this.query,
-                distinctProperty: this.distinctValue,
-                skip: this.skipNumber,
-                sort: this.sorting,
-                fields: this.queryFields,
-                includes: this.includeValues,
-                addFields: this.referenceLenght
+        try {
+            const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
+            const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
+            if (memberId && suppressAuth != true) {
+                this.eq("_owner", memberId);
             }
-        }).getResult();
-        if (cleanupAfter === true) {
-            await cleanup();
+            this.filtersHandler();
+            const result = await (0, query_result_1.WeivDataQueryResult)({
+                suppressAuth,
+                suppressHooks,
+                consistentRead,
+                collection,
+                pageSize: this.limitNumber,
+                dbName: this.dbName,
+                collectionName: this.collectionName,
+                queryClass: this,
+                queryOptions: {
+                    query: this.query,
+                    distinctProperty: this.distinctValue,
+                    skip: this.skipNumber,
+                    sort: this.sorting,
+                    fields: this.queryFields,
+                    includes: this.includeValues,
+                    addFields: this.referenceLenght
+                }
+            }).getResult();
+            if (cleanupAfter === true) {
+                await cleanup();
+            }
+            return result;
         }
-        return result;
+        catch (err) {
+            throw Error(`WeivData - Error when using query (runQuery): ${err}`);
+        }
     }
     filtersHandler() {
         if ((0, lodash_1.size)(this.filters) > 0) {
