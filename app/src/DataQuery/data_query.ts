@@ -228,13 +228,12 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
             const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
 
             // Filter results to only member author data
-            if (memberId && suppressAuth != true) {
-                this.eq("_owner", memberId);
-            }
+            // if (memberId && suppressAuth != true) {
+            //     this.eq("_owner", memberId);
+            // }
 
             // Add filters to query
             this.filtersHandler();
-
             const result = await WeivDataQueryResult({
                 suppressAuth,
                 suppressHooks,
@@ -254,6 +253,8 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
                     addFields: this.referenceLenght
                 }
             }).getResult();
+
+            console.log("Res 2:", result);
 
             if (cleanupAfter === true) {
                 await cleanup();
@@ -287,5 +288,9 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
 }
 
 export function ExWeivDataQuery(dynamicName: string) {
-    return new DataQuery(dynamicName);
+    try {
+        return new DataQuery(dynamicName);
+    } catch (err) {
+        throw Error(`WeivData - Error when returning query class: ${err}`);
+    }
 }

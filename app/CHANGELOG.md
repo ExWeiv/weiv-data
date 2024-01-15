@@ -25,11 +25,14 @@ In this file you can find what's changed in each version.
 - Error Handling (error messages added to almost every function)
 - Performance Tests and Results (README)
 
-## 1.3.9
+### 1.3.9
 - List of tested/working functions in Wix env
 
-## 1.3.10
+### 1.3.10
 - BUG Fixes for weivData.query
+
+### 1.3.10-beta.1-X
+- BUG Fixes started and everything will be published to beta version from this version until 1.4.X
 
 ---
 

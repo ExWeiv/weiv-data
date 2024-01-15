@@ -150,9 +150,6 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         try {
             const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
             const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
-            if (memberId && suppressAuth != true) {
-                this.eq("_owner", memberId);
-            }
             this.filtersHandler();
             const result = await (0, query_result_1.WeivDataQueryResult)({
                 suppressAuth,
@@ -173,6 +170,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
                     addFields: this.referenceLenght
                 }
             }).getResult();
+            console.log("Res 2:", result);
             if (cleanupAfter === true) {
                 await cleanup();
             }
@@ -201,6 +199,11 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
 }
 exports.DataQuery = DataQuery;
 function ExWeivDataQuery(dynamicName) {
-    return new DataQuery(dynamicName);
+    try {
+        return new DataQuery(dynamicName);
+    }
+    catch (err) {
+        throw Error(`WeivData - Error when returning query class: ${err}`);
+    }
 }
 exports.ExWeivDataQuery = ExWeivDataQuery;

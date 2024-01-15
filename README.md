@@ -48,7 +48,6 @@ First of all go ahead and create a MongoDB account and a database in your accoun
 ```js
 //Paste this code into any .js or .web.js file (.jsw)
 
-
 import wixData from 'wix-data';
 
 export async function clearWeivDataTempFiles() {
@@ -151,14 +150,14 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 ## Tested Functions in Wix Env
 
 - weivData.aggreagete ⏰
-- weivData.query ⏰
+- weivData.query ⏰❌
 - weivData.bulkInsert ⏰
 - weivData.bulkRemove ⏰
 - weivData.bulkSave ⏰
 - weivData.bulkUpdate ⏰
 - weivData.filter ⏰
 - weivData.get ✅
-- weivData.insert ⏰
+- weivData.insert ✅
 - weivData.insertReference ⏰
 - weivData.isReferenced ⏰
 - weivData.queryReferenced ❌

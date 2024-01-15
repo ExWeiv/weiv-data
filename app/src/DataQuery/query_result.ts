@@ -103,8 +103,7 @@ class DataQueryResult {
                         (aggregateCursor as any).readConcern('majority');
                     }
 
-                    const items = await aggregateCursor.toArray();
-                    return items;
+                    return await aggregateCursor.toArray();
                 } else {
                     // Use find()
                     const findCursor = this.collection.find(query, {
@@ -119,8 +118,7 @@ class DataQueryResult {
                         (findCursor as any).readConcern('majority');
                     }
 
-                    const items = await findCursor.toArray();
-                    return items;
+                    return await findCursor.toArray();
                 }
             }
         } catch (err) {
@@ -165,6 +163,8 @@ class DataQueryResult {
             const { skip } = this.queryOptions;
             const items = await this.getItems();
             const totalCount = await this.getTotalCount();
+
+            console.log("Res: ", items, totalCount);
 
             return {
                 currentPage: this.currentPage,
@@ -227,5 +227,9 @@ class DataQueryResult {
 }
 
 export function WeivDataQueryResult(options: QueryResultOptions) {
-    return new DataQueryResult(options);
+    try {
+        return new DataQueryResult(options);
+    } catch (err) {
+        throw Error(`WeivData - Error when returning query result class: ${err}`);
+    }
 }
