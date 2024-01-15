@@ -1,10 +1,9 @@
 import { Db, Document, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/connection_provider';
-import { DataQuery } from './data_query';
 import { size } from 'lodash';
 
 class DataQueryResult {
-    private dataQueryClass!: DataQuery;
+    private dataQueryClass!: { [key: string]: any };
     private suppressAuth = false;
     private consistentRead = false;
     private suppressHooks = false;

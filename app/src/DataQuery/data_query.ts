@@ -232,6 +232,14 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
             //     this.eq("_owner", memberId);
             // }
 
+            const query = {
+                filters: this.filters,
+                dbName: this.dbName,
+                includeValues: this.includeValues,
+                limit: this.limitNumber,
+                collectionName: this.collectionName
+            }
+
             // Add filters to query
             this.filtersHandler();
             const result = await WeivDataQueryResult({
@@ -242,7 +250,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
                 pageSize: this.limitNumber,
                 dbName: this.dbName,
                 collectionName: this.collectionName,
-                queryClass: this,
+                queryClass: query,
                 queryOptions: {
                     query: this.query,
                     distinctProperty: this.distinctValue,

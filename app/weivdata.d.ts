@@ -80,7 +80,7 @@ declare global {
         items: object[],
         length: number,
         pageSize: number,
-        query: DataQuery,
+        query: { [key: string]: any },
         totalCount: number,
         totalPages: number,
         hasNext(): boolean,
@@ -106,7 +106,7 @@ declare global {
         pageSize: number,
         dbName: string,
         collectionName: string,
-        queryClass: DataQuery,
+        queryClass: { [key: string]: any },
         queryOptions: QueryResultQueryOptions,
         collection: Collection
     }

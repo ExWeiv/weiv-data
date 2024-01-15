@@ -150,6 +150,13 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         try {
             const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
             const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
+            const query = {
+                filters: this.filters,
+                dbName: this.dbName,
+                includeValues: this.includeValues,
+                limit: this.limitNumber,
+                collectionName: this.collectionName
+            };
             this.filtersHandler();
             const result = await (0, query_result_1.WeivDataQueryResult)({
                 suppressAuth,
@@ -159,7 +166,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
                 pageSize: this.limitNumber,
                 dbName: this.dbName,
                 collectionName: this.collectionName,
-                queryClass: this,
+                queryClass: query,
                 queryOptions: {
                     query: this.query,
                     distinctProperty: this.distinctValue,
