@@ -34,6 +34,10 @@ In this file you can find what's changed in each version.
 ### 1.3.10-beta.1-X
 - BUG Fixes started and everything will be published to beta version from this version until 1.4.X
 
+### 1.3.10-dev.1-X
+- BUG Fixes and development of features for current version.
+- Error handling.
+
 ---
 
 *When a new version is released you can see the update notes here.*

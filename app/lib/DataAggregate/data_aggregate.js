@@ -136,9 +136,12 @@ class DataAggregate {
     }) {
         const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
-        if (memberId && suppressAuth != true) {
+        if (this.sorting) {
+            this.pipeline = (0, pipeline_helpers_1.checkPipelineArray)(this.pipeline);
             this.pipeline.push({
-                _owner: memberId,
+                $sort: {
+                    [this.sorting.propertyName]: this.sorting.type
+                }
             });
         }
         this.pipeline = (0, pipeline_helpers_1.sortAggregationPipeline)(this.pipeline);

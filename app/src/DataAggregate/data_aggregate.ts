@@ -5,6 +5,7 @@ import { DataAggregateInterface } from "../Interfaces/interfaces";
 import { WeivDataAggregateResult } from "./aggregate_result";
 import { useClient } from '../Connection/connection_provider';
 import { splitCollectionId } from '../Helpers/name_helpers';
+import { size } from "lodash";
 
 export class DataAggregate implements DataAggregateInterface {
     private collectionName: string;
@@ -382,11 +383,20 @@ export class DataAggregate implements DataAggregateInterface {
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
 
         // Check if suppressAuth false and if there is a memberId
-        if (memberId && suppressAuth != true) {
-            // Add a _owner field filter to query to only get member's items (do this before sorting the pipeline)
+        // if (memberId && suppressAuth != true) {
+        //     // Add a _owner field filter to query to only get member's items (do this before sorting the pipeline)
+        //     this.pipeline.push({
+        //         _owner: memberId,
+        //     });
+        // }
+
+        if (this.sorting) {
+            this.pipeline = checkPipelineArray(this.pipeline);
             this.pipeline.push({
-                _owner: memberId,
-            });
+                $sort: {
+                    [this.sorting.propertyName]: this.sorting.type
+                }
+            })
         }
 
         // Sort pipeline based on priority order of pipeline.

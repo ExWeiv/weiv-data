@@ -262,8 +262,6 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
                 }
             }).getResult();
 
-            console.log("Res 2:", result);
-
             if (cleanupAfter === true) {
                 await cleanup();
             }

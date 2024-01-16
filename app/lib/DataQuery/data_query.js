@@ -177,7 +177,6 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
                     addFields: this.referenceLenght
                 }
             }).getResult();
-            console.log("Res 2:", result);
             if (cleanupAfter === true) {
                 await cleanup();
             }

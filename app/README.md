@@ -150,7 +150,7 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 ## Tested Functions in Wix Env
 
 - weivData.aggreagete ⏰
-- weivData.query ⏰❌
+- weivData.query ✅
 - weivData.bulkInsert ⏰
 - weivData.bulkRemove ⏰
 - weivData.bulkSave ⏰

@@ -131,7 +131,6 @@ class DataQueryResult {
             const { skip } = this.queryOptions;
             const items = await this.getItems();
             const totalCount = await this.getTotalCount();
-            console.log("Res: ", items, totalCount);
             return {
                 currentPage: this.currentPage,
                 items,
