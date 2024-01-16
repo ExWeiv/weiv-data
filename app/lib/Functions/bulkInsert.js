@@ -9,18 +9,14 @@ async function bulkInsert(collectionId, items, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
         const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        const defaultValues = {
-            _updatedDate: new Date(),
-            _createdDate: new Date(),
-            _owner: ""
-        };
+        let ownerId = "";
         if (enableOwnerId === true) {
-            defaultValues._owner = await (0, member_id_helpers_1.getOwnerId)();
+            ownerId = await (0, member_id_helpers_1.getOwnerId)();
         }
         for (const item of items) {
             item._updatedDate = new Date();
             item._createdDate = new Date();
-            item._owner = "";
+            item._owner = ownerId;
         }
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(items);

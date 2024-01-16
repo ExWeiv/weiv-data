@@ -1,4 +1,3 @@
-import { merge } from 'lodash';
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { connectionHandler } from '../Helpers/connection_helpers';
 
@@ -16,20 +15,16 @@ export async function bulkInsert(collectionId: string, items: DataItemValuesInse
         }
 
         const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        const defaultValues = {
-            _updatedDate: new Date(),
-            _createdDate: new Date(),
-            _owner: ""
-        }
-
+       
+        let ownerId = "";
         if (enableOwnerId === true) {
-            defaultValues._owner = await getOwnerId();
+            ownerId = await getOwnerId();
         }
 
         for (const item of items) {
             item._updatedDate = new Date();
             item._createdDate = new Date();
-            item._owner = "";
+            item._owner = ownerId;
         }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
