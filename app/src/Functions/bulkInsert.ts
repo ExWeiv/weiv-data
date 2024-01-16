@@ -26,13 +26,14 @@ export async function bulkInsert(collectionId: string, items: DataItemValuesInse
             defaultValues._owner = await getOwnerId();
         }
 
-        const newItems = items.map((item) => {
-            item = merge(defaultValues, item);
-            return item;
-        })
+        for (const item of items) {
+            item._updatedDate = new Date();
+            item._createdDate = new Date();
+            item._owner = "";
+        }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(newItems);
+        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(items);
 
         if (cleanupAfter === true) {
             await cleanup();
