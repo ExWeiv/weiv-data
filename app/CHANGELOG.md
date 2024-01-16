@@ -37,6 +37,7 @@ In this file you can find what's changed in each version.
 ### 1.3.10-dev.1-X
 - BUG Fixes and development of features for current version.
 - Error handling.
+- Function testing and fixing.
 
 ---
 

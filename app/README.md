@@ -149,15 +149,15 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 
 ## Tested Functions in Wix Env
 
-- weivData.aggreagete ⏰
-- weivData.query ✅
-- weivData.bulkInsert ⏰
+- weivData.aggreagete ✅ (Main Function Tested)
+- weivData.query ✅ (Main Function Tested)
+- weivData.bulkInsert ✅ (Main Function Tested)
 - weivData.bulkRemove ⏰
 - weivData.bulkSave ⏰
 - weivData.bulkUpdate ⏰
 - weivData.filter ⏰
-- weivData.get ✅
-- weivData.insert ✅
+- weivData.get ✅ (Main Function Tested)
+- weivData.insert ✅ (Main Function Tested)
 - weivData.insertReference ⏰
 - weivData.isReferenced ⏰
 - weivData.queryReferenced ❌
@@ -166,7 +166,7 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 - weivData.replaceReferences ⏰
 - weivData.save ⏰
 - weivData.truncate ⏰
-- weivData.update ✅
+- weivData.update ✅ (Main Function Tested)
 
 ---
 
