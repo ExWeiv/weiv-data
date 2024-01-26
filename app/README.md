@@ -129,6 +129,7 @@ You can also compare which is available in weivData and wixData. (We will publis
 - queryReferenced function.
 - Data Hooks (afterInsert, beforeInsert, afterUpdate etc.)
 - Multilanguage Support (read and write data in multilanguage)
+- Returning string _id but using ObjectId internally
 
 ---
 
@@ -153,7 +154,7 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 - weivData.query ✅ (Main Function Tested)
 - weivData.bulkInsert ✅ (Main Function Tested)
 - weivData.bulkRemove ✅ (Main Function Tested)
-- weivData.bulkSave ⏰
+- weivData.bulkSave ✅ (Main Function Tested)
 - weivData.bulkUpdate ⏰
 - weivData.filter ⏰
 - weivData.get ✅ (Main Function Tested)

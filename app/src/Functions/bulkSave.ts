@@ -1,6 +1,6 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { getOwnerId } from '../Helpers/member_id_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertStringId, resultIdConverter } from '../Helpers/item_helpers';
 
 /**
  * @description Inserts or updates a number of items in a collection.
@@ -45,18 +45,26 @@ export async function bulkSave(collectionId: string, items: DataItemValues[], op
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
         const bulkOperations = newItems.map((item) => {
-            const { _id } = item;
-
-            return {
-                updateOne: {
-                    filter: { _id },
-                    update: { $set: item },
-                    upsert: true
+            if (item._id) {
+                return {
+                    updateOne: {
+                        filter: { _id: item._id },
+                        update: { $set: item },
+                        upsert: true
+                    }
+                }
+            } else {
+                return {
+                    insertOne: {
+                        document: item
+                    }
                 }
             }
         })
 
-        const { upsertedCount, modifiedCount, upsertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" })
+        console.log(newItems, bulkOperations);
+
+        const { insertedCount, modifiedCount, insertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" })
 
         if (cleanupAfter === true) {
             await cleanup();
@@ -70,10 +78,10 @@ export async function bulkSave(collectionId: string, items: DataItemValues[], op
         // }
 
         return {
-            insertedItemIds: upsertedIds,
-            inserted: upsertedCount,
+            insertedItemIds: resultIdConverter(insertedIds),
+            inserted: insertedCount,
             updated: modifiedCount,
-            newItems
+            savedItems: newItems
         }
     } catch (err) {
         throw Error(`WeivData - Error when saving items using bulkSave: ${err}`);

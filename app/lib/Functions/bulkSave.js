@@ -29,24 +29,33 @@ async function bulkSave(collectionId, items, options) {
         });
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const bulkOperations = newItems.map((item) => {
-            const { _id } = item;
-            return {
-                updateOne: {
-                    filter: { _id },
-                    update: { $set: item },
-                    upsert: true
-                }
-            };
+            if (item._id) {
+                return {
+                    updateOne: {
+                        filter: { _id: item._id },
+                        update: { $set: item },
+                        upsert: true
+                    }
+                };
+            }
+            else {
+                return {
+                    insertOne: {
+                        document: item
+                    }
+                };
+            }
         });
-        const { upsertedCount, modifiedCount, upsertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
+        console.log(newItems, bulkOperations);
+        const { insertedCount, modifiedCount, insertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();
         }
         return {
-            insertedItemIds: upsertedIds,
-            inserted: upsertedCount,
+            insertedItemIds: (0, item_helpers_1.resultIdConverter)(insertedIds),
+            inserted: insertedCount,
             updated: modifiedCount,
-            newItems
+            savedItems: newItems
         };
     }
     catch (err) {

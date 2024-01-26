@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertStringId = void 0;
+exports.resultIdConverter = exports.convertStringId = void 0;
 const mongodb_1 = require("mongodb");
 function convertStringId(_id) {
     if (typeof _id === "string") {
@@ -14,3 +14,14 @@ function convertStringId(_id) {
     }
 }
 exports.convertStringId = convertStringId;
+function resultIdConverter(ids) {
+    try {
+        return Object.keys(ids).map((key) => {
+            return ids[key.toString()];
+        });
+    }
+    catch (err) {
+        throw Error(`WeivData - Error when converting result ids!`);
+    }
+}
+exports.resultIdConverter = resultIdConverter;
