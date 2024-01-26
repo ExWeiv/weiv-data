@@ -8,12 +8,12 @@ async function bulkRemove(collectionId, itemIds, options) {
         if (!collectionId || !itemIds) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemIds`);
         }
-        const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         const newItemIds = itemIds.map((itemId) => {
             return (0, item_helpers_1.convertStringId)(itemId);
         });
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { acknowledged, deletedCount } = await collection.deleteMany({ _id: { $in: newItemIds } });
+        const { acknowledged, deletedCount } = await collection.deleteMany({ _id: { $in: newItemIds } }, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();
         }
