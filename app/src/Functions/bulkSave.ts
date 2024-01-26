@@ -62,8 +62,6 @@ export async function bulkSave(collectionId: string, items: DataItemValues[], op
             }
         })
 
-        console.log(newItems, bulkOperations);
-
         const { insertedCount, modifiedCount, insertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" })
 
         if (cleanupAfter === true) {

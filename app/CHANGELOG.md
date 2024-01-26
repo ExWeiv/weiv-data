@@ -40,8 +40,10 @@ In this file you can find what's changed in each version.
 - Function testing and fixing.
 - bulkInsert returned itemIds fixed (it was an object instead of an array)
 - consistentRead feature added to bulkInsert and bulkRemove
-- BUG Fixes for bulkInsert and bulkRemove
+- BUG fixes for bulkInsert and bulkRemove
 - BUG fixes for bulkSave
+- BUG fixes for bulkUpdate
+- Lodash merge function creates BUG in some cases. (fixed)
 
 ---
 

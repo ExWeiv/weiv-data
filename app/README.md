@@ -155,7 +155,7 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 - weivData.bulkInsert ✅ (Main Function Tested)
 - weivData.bulkRemove ✅ (Main Function Tested)
 - weivData.bulkSave ✅ (Main Function Tested)
-- weivData.bulkUpdate ⏰
+- weivData.bulkUpdate ✅ (Main Function Tested)
 - weivData.filter ⏰
 - weivData.get ✅ (Main Function Tested)
 - weivData.insert ✅ (Main Function Tested)
@@ -168,6 +168,8 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 - weivData.save ⏰
 - weivData.truncate ⏰
 - weivData.update ✅ (Main Function Tested)
+
+> After we test if the functions even run at all we will check if they running correctly with expected results. Right now we are only fixing general BUGs that's blocking function to run. After we complete the first test stage we will start testing if the functions returns expected results. All tests are made in Wix env.
 
 ---
 

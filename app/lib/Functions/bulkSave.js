@@ -46,7 +46,6 @@ async function bulkSave(collectionId, items, options) {
                 };
             }
         });
-        console.log(newItems, bulkOperations);
         const { insertedCount, modifiedCount, insertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();

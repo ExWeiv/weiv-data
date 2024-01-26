@@ -1,4 +1,3 @@
-import { merge } from 'lodash';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 
@@ -21,47 +20,35 @@ export async function bulkUpdate(collectionId: string, items: DataItemValuesUpda
             }
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        const defaultValues = {
-            _updatedDate: new Date()
-        }
-
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
         const editedItems = items.map((item) => {
             item._id = convertStringId(item._id);
-            item = merge(defaultValues, item);
-            return item;
+            return {
+                ...item,
+                _updatedDate: new Date()
+            }
         })
 
-        const query = {
-            _id: { $in: editedItems.map((item) => convertStringId(item._id)) },
-        };
-
-        const updateObjects = editedItems.map((item) => ({
-            $set: item.updatedFields,
-        }));
+        const bulkOperations = editedItems.map((item) => {
+            return {
+                updateOne: {
+                    filter: { _id: item._id },
+                    update: { $set: item }
+                }
+            }
+        })
+        console.log(editedItems, bulkOperations);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-
-        let succeed = true;
-        let updated = 0;
-        for (let i = 0; i < editedItems.length; i += 50) {
-            const updateBatch = updateObjects.slice(i, i + 50);
-            const { modifiedCount, acknowledged } = await collection.updateMany(query, updateBatch, { readConcern: consistentRead === true ? "majority" : "local" });
-            succeed = acknowledged;
-            updated = updated + modifiedCount;
-        }
+        const { matchedCount } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" })
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
-        if (succeed === true) {
-            return {
-                updated,
-                updatedItemIds: editedItems.map((item) => item._id)
-            }
-        } else {
-            throw Error(`WeivData - Error when updating items using bulkUpdate, acknowledged: ${succeed}, updated: ${updated}`);
+        return {
+            updated: matchedCount,
+            updatedItems: editedItems
         }
     } catch (err) {
         throw Error(`WeivData - Error when updating items using bulkUpdate: ${err}`);
