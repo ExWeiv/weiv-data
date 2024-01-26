@@ -38,6 +38,10 @@ In this file you can find what's changed in each version.
 - BUG Fixes and development of features for current version.
 - Error handling.
 - Function testing and fixing.
+- bulkInsert returned itemIds fixed (it was an object instead of an array)
+- consistentRead feature added to bulkInsert and bulkRemove
+- BUG Fixes for bulkInsert and bulkRemove
+- BUG fixes for bulkSave
 
 ---
 

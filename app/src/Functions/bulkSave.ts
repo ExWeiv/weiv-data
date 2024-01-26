@@ -44,25 +44,19 @@ export async function bulkSave(collectionId: string, items: DataItemValues[], op
         })
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const bulkOperations = newItems.map((item) => {
+            const { _id } = item;
 
-        const query = {
-            _id: { $in: newItems.map((item) => item._id) },
-        };
+            return {
+                updateOne: {
+                    filter: { _id },
+                    update: { $set: item },
+                    upsert: true
+                }
+            }
+        })
 
-        const updateObjects = newItems.map((item) => ({
-            $set: item.updatedFields,
-        }));
-
-        let succeed = true;
-        let inserted = 0;
-        let updated = 0;
-        for (let i = 0; i < newItems.length; i += 50) {
-            const updateBatch = updateObjects.slice(i, i + 50); //@ts-ignore
-            const { upsertedCount, acknowledged, modifiedCount } = await collection.updateMany(query, updateBatch, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
-            succeed = acknowledged;
-            inserted = inserted + upsertedCount;
-            updated = updated + modifiedCount;
-        }
+        const { upsertedCount, modifiedCount, upsertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" })
 
         if (cleanupAfter === true) {
             await cleanup();
@@ -75,14 +69,11 @@ export async function bulkSave(collectionId: string, items: DataItemValues[], op
         //     // Item Updated
         // }
 
-        if (succeed === true) {
-            return {
-                inserted,
-                updated,
-                newItems
-            }
-        } else {
-            throw Error(`WeivData - Error when saving items using bulkSave, acknowledged: ${succeed}, updated: ${updated}, inserted: ${inserted}`);
+        return {
+            insertedItemIds: upsertedIds,
+            inserted: upsertedCount,
+            updated: modifiedCount,
+            newItems
         }
     } catch (err) {
         throw Error(`WeivData - Error when saving items using bulkSave: ${err}`);

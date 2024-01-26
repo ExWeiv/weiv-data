@@ -14,8 +14,8 @@ export async function bulkInsert(collectionId: string, items: DataItemValuesInse
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-       
+        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+
         let ownerId = "";
         if (enableOwnerId === true) {
             ownerId = await getOwnerId();
@@ -28,14 +28,18 @@ export async function bulkInsert(collectionId: string, items: DataItemValuesInse
         }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(items);
+        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(items, { readConcern: consistentRead === true ? "majority" : "local" });
+
+        const insertedItemIds = Object.keys(insertedIds).map((key: any) => {
+            return insertedIds[key];
+        })
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
         if (acknowledged === true) {
-            return { insertedItems: items, insertedItemIds: insertedIds, inserted: insertedCount };
+            return { insertedItems: items, insertedItemIds, inserted: insertedCount };
         } else {
             throw Error(`WeivData - Error when inserting items using bulkInsert, acknowledged: ${acknowledged}, insertedCount: ${insertedCount}`);
         }

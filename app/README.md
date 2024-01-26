@@ -152,7 +152,7 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 - weivData.aggreagete ✅ (Main Function Tested)
 - weivData.query ✅ (Main Function Tested)
 - weivData.bulkInsert ✅ (Main Function Tested)
-- weivData.bulkRemove ⏰
+- weivData.bulkRemove ✅ (Main Function Tested)
 - weivData.bulkSave ⏰
 - weivData.bulkUpdate ⏰
 - weivData.filter ⏰

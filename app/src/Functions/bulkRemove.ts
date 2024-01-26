@@ -15,13 +15,13 @@ export async function bulkRemove(collectionId: string, itemIds: ObjectId[] | str
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemIds`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
         const newItemIds = itemIds.map((itemId) => {
             return convertStringId(itemId);
         })
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { acknowledged, deletedCount } = await collection.deleteMany({ _id: { $in: newItemIds } });
+        const { acknowledged, deletedCount } = await collection.deleteMany({ _id: { $in: newItemIds } }, { readConcern: consistentRead === true ? "majority" : "local" });
 
         if (cleanupAfter === true) {
             await cleanup();
