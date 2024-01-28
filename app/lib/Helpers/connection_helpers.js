@@ -6,9 +6,9 @@ const name_helpers_1 = require("./name_helpers");
 const secret_helpers_1 = require("./secret_helpers");
 const lodash_1 = require("lodash");
 const defaultOptions = {
-    maxPoolSize: 40,
-    minPoolSize: 1,
-    maxIdleTimeMS: 30000
+    maxPoolSize: 45,
+    minPoolSize: 5,
+    maxIdleTimeMS: 40000
 };
 async function connectionHandler(collectionId, suppressAuth = false) {
     try {

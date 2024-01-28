@@ -70,6 +70,9 @@ In this file you can find what's changed in each version.
 ### 1.4.5
 - Readme Update
 
+### 1.4.6
+- Performance upgrades and tests.
+
 ---
 
 *When a new version is released you can see the update notes here.*

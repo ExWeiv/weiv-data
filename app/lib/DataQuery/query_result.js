@@ -135,9 +135,7 @@ class DataQueryResult {
         try {
             const cacheKey = this.generateCacheKey();
             const cachedResult = cache.get(cacheKey);
-            console.log(cacheKey, cachedResult);
             if (cachedResult) {
-                console.log("Cached Result Returned");
                 return cachedResult;
             }
             if (!this.collection) {

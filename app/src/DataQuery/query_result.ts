@@ -164,10 +164,7 @@ class DataQueryResult {
             const cacheKey = this.generateCacheKey();
             const cachedResult = cache.get(cacheKey) as QueryResult | undefined;
 
-            console.log(cacheKey, cachedResult);
-
             if (cachedResult) {
-                console.log("Cached Result Returned");
                 return cachedResult;
             }
 

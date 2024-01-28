@@ -12,7 +12,7 @@ const getSecretValue: (secretName: string) => Promise<{ value: string }> = wixAu
  * @returns The secret/URI for the given secret name.
  */
 export async function getCachedSecret(secretName: string): Promise<string> {
-    try {
+    try { 
         let secret: string | undefined = cache.get(secretName);
 
         if (secret === undefined) {

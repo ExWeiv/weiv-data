@@ -5,9 +5,9 @@ import { getCachedSecret } from './secret_helpers';
 import { defaultsDeep } from 'lodash';
 
 const defaultOptions: MongoClientOptions = {
-    maxPoolSize: 40,
-    minPoolSize: 1,
-    maxIdleTimeMS: 30000
+    maxPoolSize: 45,
+    minPoolSize: 5,
+    maxIdleTimeMS: 40000
 }
 
 export async function connectionHandler(collectionId: string, suppressAuth = false): Promise<ConnectionResult> {

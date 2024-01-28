@@ -21,7 +21,6 @@ async function get(collectionId, itemId, options) {
         const cacheKey = `${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`;
         const cachedItem = cache.get(cacheKey);
         if (cachedItem) {
-            console.log("Cached Item Returned");
             return cachedItem;
         }
         const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
