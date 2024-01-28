@@ -165,7 +165,7 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 - weivData.remove ⏰
 - weivData.removeReference ⏰
 - weivData.replaceReferences ⏰
-- weivData.save ⏰
+- weivData.save ✅ (Main Function Tested)
 - weivData.truncate ⏰
 - weivData.update ✅ (Main Function Tested)
 

@@ -44,6 +44,7 @@ In this file you can find what's changed in each version.
 - BUG fixes for bulkSave
 - BUG fixes for bulkUpdate
 - Lodash merge function creates BUG in some cases. (fixed)
+- BUG fixes for save
 
 ---
 

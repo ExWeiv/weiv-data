@@ -1,5 +1,4 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { getOwnerId } from '../Helpers/member_id_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 
 /**
@@ -15,11 +14,13 @@ export async function save(collectionId: string, item: DataItemValues, options?:
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
 
         // Convert ID to ObjectId if exist
+        let itemId;
         if (item._id && typeof item._id === "string") {
             item._id = convertStringId(item._id);
+            delete item._id;
         }
 
         // Add _createdDate if there is not one
@@ -30,27 +31,27 @@ export async function save(collectionId: string, item: DataItemValues, options?:
         // Update _updatedDate value
         item._updatedDate = new Date();
 
-        // Set _owner if it's enabled and if there is not one yet
-        if (!item._owner && enableOwnerId === true) {
-            item._owner = await getOwnerId();
-        }
-
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { upsertedId, acknowledged } = await collection.updateOne(item._id === undefined ? { _id: item._id } : {}, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
+        const filter = itemId ? { _id: itemId } : {};
+        const { upsertedId, acknowledged } = await collection.updateOne(filter, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
+        const returnedItem = { ...item, _id: itemId }
+
         if (acknowledged) {
             // Hooks handling
             if (upsertedId) {
                 // Item Inserted
+
+                return { item: returnedItem, upsertedId };
             } else {
                 // Item Updated
-            }
 
-            return item;
+                return { item: returnedItem };
+            }
         } else {
             throw Error(`WeivData - Error when saving an item to collection, acknowledged: ${acknowledged}`);
         }

@@ -129,6 +129,7 @@ You can also compare which is available in weivData and wixData. (We will publis
 - queryReferenced function.
 - Data Hooks (afterInsert, beforeInsert, afterUpdate etc.)
 - Multilanguage Support (read and write data in multilanguage)
+- Returning string _id but using ObjectId internally
 
 ---
 
@@ -149,15 +150,15 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 
 ## Tested Functions in Wix Env
 
-- weivData.aggreagete ⏰
-- weivData.query ⏰❌
-- weivData.bulkInsert ⏰
-- weivData.bulkRemove ⏰
-- weivData.bulkSave ⏰
-- weivData.bulkUpdate ⏰
+- weivData.aggreagete ✅ (Main Function Tested)
+- weivData.query ✅ (Main Function Tested)
+- weivData.bulkInsert ✅ (Main Function Tested)
+- weivData.bulkRemove ✅ (Main Function Tested)
+- weivData.bulkSave ✅ (Main Function Tested)
+- weivData.bulkUpdate ✅ (Main Function Tested)
 - weivData.filter ⏰
-- weivData.get ✅
-- weivData.insert ✅
+- weivData.get ✅ (Main Function Tested)
+- weivData.insert ✅ (Main Function Tested)
 - weivData.insertReference ⏰
 - weivData.isReferenced ⏰
 - weivData.queryReferenced ❌
@@ -166,7 +167,9 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 - weivData.replaceReferences ⏰
 - weivData.save ⏰
 - weivData.truncate ⏰
-- weivData.update ✅
+- weivData.update ✅ (Main Function Tested)
+
+> After we test if the functions even run at all we will check if they running correctly with expected results. Right now we are only fixing general BUGs that's blocking function to run. After we complete the first test stage we will start testing if the functions returns expected results. All tests are made in Wix env.
 
 ---
 
