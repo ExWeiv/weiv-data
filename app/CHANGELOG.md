@@ -73,6 +73,9 @@ In this file you can find what's changed in each version.
 ### 1.4.6
 - Performance upgrades and tests.
 
+### 1.4.7
+- README updated
+
 ---
 
 *When a new version is released you can see the update notes here.*
