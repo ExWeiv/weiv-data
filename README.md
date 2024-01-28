@@ -138,6 +138,18 @@ We can't test it with high traffic right now but what we can say is it's MongoDB
 
 Soon we will add more details and some examples about performance difference. To let you also know **get, isReferenced and query** functions are comes with caching feature (will be improved later on).
 
+**Basic Test Results:**
+We have done few tests using the Wix's backend testing tool. We have run get, insert and update function in each 150ms for 100 times and here is the result for weivData and wixData:
+
+- **327ms avg for weivData**
+- **946ms avg for wixData**
+
+wixData is much better for cold starts and more consistent (wixData always completed in 900-1050ms) over weivData but slower after cold start. You may see up to 3000+ms in weivData for cold starts but this would never happen in wixData but as you use weivData (after cold start) it will respond much faster. (weivData completed it's first few calls arround 2000ms then it was more consistent and stayed arround 300ms) You can test it and see yourself.
+
+We were also able to see that when we lower the timing of calls to 100ms wixData was still stable at 1200ms average but weivData were performing much worse and was completing the job arround 2700ms average. And that was the result when we made 100 calls in each 100ms.
+
+> Tests are made in backend testing tool in a free Wix Studio website. And weivData library was also using free shared clusters of MongoDB.
+
 ## Tested Functions in Wix Env
 
 *If main function tested only there is a possiblity of BUG/s but if most of the features tested (Should be Fully Working) then it should be working fine but still there might be BUG/s.*
