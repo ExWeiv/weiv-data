@@ -64,6 +64,12 @@ In this file you can find what's changed in each version.
 - insert BUG fixes
 - save BUG fixes
 
+### 1.4.4
+- General BUG Fixes and readme update
+
+### 1.4.5
+- Readme Update
+
 ---
 
 *When a new version is released you can see the update notes here.*

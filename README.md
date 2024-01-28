@@ -133,20 +133,10 @@ You can also compare which is available in weivData and wixData. (We will publis
 
 ---
 
-### Performance Test Examples
+### Performance
+We can't test it with high traffic right now but what we can say is it's MongoDB and basically you are using MongoDB which is wixData is also using but generally weivData is a bit faster (**2x faster in general** sometimes more somtimes less depends on the function and call) and you can upgrade your MongoDB Cluster to upgrade the performance (MongoDB has a free version too and we have tested everything on that free version which is shared clusters).
 
-We have tested same **weivData** and **wixData** functions in same site with duplicated (both database has same items) databases and here are the results from some functions. Both functions also tested in a free Wix Studio website.
-
-- **get Function Tests:**
-  - weivData for first run (cold start): 700ms
-  - wixData for first run (cold start): 120ms
-  - weivData after cold start: 17ms
-  - wixData after cold start: 112ms
-- **update Function Tests:**
-  - weivData for first run (cold start): 900ms
-  - wixData for first run (cold start): 800ms
-  - weivData after cold start: 30ms
-  - wixData after cold start: 720ms
+Soon we will add more details and some examples about performance difference. To let you also know **get, isReferenced and query** functions are comes with caching feature (will be improved later on).
 
 ## Tested Functions in Wix Env
 
@@ -169,7 +159,7 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 - weivData.replaceReferences ✅ (Should be Fully Working)
 - weivData.save ✅ (Should be Fully Working)
 - weivData.truncate ✅ (Should be Fully Working)
-- weivData.update ✅ (Main Function Tested)
+- weivData.update ✅ (Should be Fully Working)
 
 > After we test if the functions even run at all we will check if they running correctly with expected results. Right now we are only fixing general BUGs that's blocking function to run. After we complete the first test stage we will start testing if the functions returns expected results. All tests are made in Wix env.
 
