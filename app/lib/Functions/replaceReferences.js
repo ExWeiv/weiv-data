@@ -10,7 +10,7 @@ async function replaceReferences(collectionId, propertyName, referringItem, refe
         }
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
-        const updated = await (0, update_1.update)(collectionId, { _id: itemId, [propertyName]: references.length > 1 ? references : references[0] }, options);
+        const updated = await (0, update_1.update)(collectionId, { _id: itemId, [propertyName]: references }, options);
         if (!updated) {
             throw Error(`WeivData - Error when replacing references, result: ${updated}`);
         }

@@ -66,9 +66,9 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
 
         // Filter results to only member author data
-        if (memberId && suppressAuth != true) {
-            this.eq("_owner", memberId);
-        }
+        // if (memberId && suppressAuth != true) {
+        //     this.eq("_owner", memberId);
+        // }
 
         // Add filters to query
         this.filtersHandler();

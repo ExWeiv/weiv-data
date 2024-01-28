@@ -11,7 +11,7 @@ async function save(collectionId, item, options) {
         const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
         let itemId;
         if (item._id && typeof item._id === "string") {
-            item._id = (0, item_helpers_1.convertStringId)(item._id);
+            itemId = (0, item_helpers_1.convertStringId)(item._id);
             delete item._id;
         }
         if (!item._createdDate) {

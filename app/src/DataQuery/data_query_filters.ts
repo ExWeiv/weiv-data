@@ -1,6 +1,7 @@
 import { DataQueryFilterInterface } from '../Interfaces/interfaces'
 import { memoize, merge } from 'lodash';
-import { DataQuery } from './data_query'
+import { DataQuery } from './data_query';
+import { convertStringId } from '../Helpers/item_helpers';
 
 export class DataQueryFilter implements DataQueryFilterInterface {
     protected filters: QueryFilters = {};
@@ -68,6 +69,12 @@ export class DataQueryFilter implements DataQueryFilterInterface {
     eq(propertyName: string, value: unknown): DataQuery {
         if (!this.memoizedEq) {
             this.memoizedEq = memoize((propertyName, value) => {
+                if (propertyName === "_id") {
+                    return this.addFilter({
+                        [propertyName]: convertStringId(value),
+                    });
+                }
+
                 return this.addFilter({
                     [propertyName]: value,
                 });

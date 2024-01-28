@@ -19,7 +19,7 @@ export async function save(collectionId: string, item: DataItemValues, options?:
         // Convert ID to ObjectId if exist
         let itemId;
         if (item._id && typeof item._id === "string") {
-            item._id = convertStringId(item._id);
+            itemId = convertStringId(item._id);
             delete item._id;
         }
 

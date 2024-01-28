@@ -12,17 +12,15 @@ async function removeReference(collectionId, propertyName, referringItem, refere
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const document = await collection.findOne({ _id: itemId }, { readConcern: consistentRead === true ? "majority" : "local" });
-        const isMultiReference = Array.isArray(document?.[propertyName]);
-        const updateOperation = isMultiReference
-            ? { $pull: { [propertyName]: { $in: references } }, $set: { _updatedDate: new Date() } }
-            : { $set: { [propertyName]: undefined, _updatedDate: new Date() } };
-        const { acknowledged } = await collection.updateOne({ _id: itemId }, { ...updateOperation }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { acknowledged, modifiedCount } = await collection.updateOne({ _id: itemId }, { $pull: { [propertyName]: { $in: references } }, $set: { _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();
         }
-        if (!acknowledged) {
-            throw Error(`WeivData - Error when removing references, acknowledged: ${acknowledged}`);
+        if (!acknowledged || modifiedCount === 0) {
+            throw Error(`WeivData - Error when removing references, acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
+        }
+        else {
+            return { result: true, updatedCount: modifiedCount };
         }
     }
     catch (err) {

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExWeivDataFilter = exports.DataFilter = void 0;
 const lodash_1 = require("lodash");
+const item_helpers_1 = require("../Helpers/item_helpers");
 class DataFilter {
     constructor() {
         this.filters = {};
@@ -55,6 +56,11 @@ class DataFilter {
     eq(propertyName, value) {
         if (!this.memoizedEq) {
             this.memoizedEq = (0, lodash_1.memoize)((propertyName, value) => {
+                if (propertyName === "_id") {
+                    return this.addFilter({
+                        [propertyName]: (0, item_helpers_1.convertStringId)(value),
+                    });
+                }
                 return this.addFilter({
                     [propertyName]: value,
                 });

@@ -41,9 +41,6 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }) {
         const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
-        if (memberId && suppressAuth != true) {
-            this.eq("_owner", memberId);
-        }
         this.filtersHandler();
         let countOptions = {};
         if (consistentRead === true) {

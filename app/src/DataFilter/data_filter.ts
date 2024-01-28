@@ -1,5 +1,6 @@
 import { DataFilterInterface } from '../Interfaces/interfaces'
 import { memoize, merge } from 'lodash';
+import { convertStringId } from '../Helpers/item_helpers';
 
 export class DataFilter implements DataFilterInterface {
     filters = {};
@@ -65,6 +66,12 @@ export class DataFilter implements DataFilterInterface {
     eq(propertyName: string, value: unknown): DataFilter {
         if (!this.memoizedEq) {
             this.memoizedEq = memoize((propertyName, value) => {
+                if (propertyName === "_id") {
+                    return this.addFilter({
+                        [propertyName]: convertStringId(value),
+                    });
+                }
+
                 return this.addFilter({
                     [propertyName]: value,
                 });

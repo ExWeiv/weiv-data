@@ -150,23 +150,25 @@ We have tested same **weivData** and **wixData** functions in same site with dup
 
 ## Tested Functions in Wix Env
 
+*If main function tested only there is a possiblity of BUG/s but if most of the features tested (Should be Fully Working) then it should be working fine but still there might be BUG/s.*
+
 - weivData.aggreagete ✅ (Main Function Tested)
 - weivData.query ✅ (Main Function Tested)
 - weivData.bulkInsert ✅ (Main Function Tested)
 - weivData.bulkRemove ✅ (Main Function Tested)
 - weivData.bulkSave ✅ (Main Function Tested)
 - weivData.bulkUpdate ✅ (Main Function Tested)
-- weivData.filter ⏰
+- weivData.filter ✅ (Main Function Tested)
 - weivData.get ✅ (Main Function Tested)
 - weivData.insert ✅ (Main Function Tested)
-- weivData.insertReference ⏰
-- weivData.isReferenced ⏰
+- weivData.insertReference ✅ (Should be Fully Working)
+- weivData.isReferenced ✅ (Should be Fully Working)
 - weivData.queryReferenced ❌
-- weivData.remove ⏰
-- weivData.removeReference ⏰
-- weivData.replaceReferences ⏰
-- weivData.save ⏰
-- weivData.truncate ⏰
+- weivData.remove ✅ (Should be Fully Working)
+- weivData.removeReference ✅ (Should be Fully Working)
+- weivData.replaceReferences ✅ (Should be Fully Working)
+- weivData.save ✅ (Main Function Tested)
+- weivData.truncate ✅ (Should be Fully Working)
 - weivData.update ✅ (Main Function Tested)
 
 > After we test if the functions even run at all we will check if they running correctly with expected results. Right now we are only fixing general BUGs that's blocking function to run. After we complete the first test stage we will start testing if the functions returns expected results. All tests are made in Wix env.

@@ -45,6 +45,12 @@ In this file you can find what's changed in each version.
 - BUG fixes for bulkUpdate
 - Lodash merge function creates BUG in some cases. (fixed)
 - BUG fixes for save
+- BUG fixes for removeReference
+- BUG fixes for _id .eq filter and weivData.filter
+
+### 1.4.0
+- Most features are fixed and should be working. Main operations such as get, remove, insert, update should work just fine. Still testing and fixing BUGs.
+- Still working on other features and improvements.
 
 ---
 
