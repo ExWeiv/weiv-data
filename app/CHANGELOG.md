@@ -52,6 +52,13 @@ In this file you can find what's changed in each version.
 - Most features are fixed and should be working. Main operations such as get, remove, insert, update should work just fine. Still testing and fixing BUGs.
 - Still working on other features and improvements.
 
+### 1.4.1
+- Wix NPM package indexing speed test.
+
+### 1.4.2
+- Performance upgrade to getOwnerId function now you can also enable visitorId. Defaults to false. (MemberIDs always saved but visitor ids will be saved if it's set to true)
+- Caching implemented to get, isReferenced and query
+
 ---
 
 *When a new version is released you can see the update notes here.*

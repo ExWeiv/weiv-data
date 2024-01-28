@@ -1,6 +1,14 @@
 import { Db, Document, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/connection_provider';
 import { size } from 'lodash';
+import NodeCache from "node-cache";
+
+const cache = new NodeCache({
+    stdTTL: 30,
+    checkperiod: 5,
+    useClones: true,
+    deleteOnExpire: true
+})
 
 class DataQueryResult {
     private dataQueryClass!: { [key: string]: any };
@@ -153,6 +161,16 @@ class DataQueryResult {
 
     async getResult(): Promise<QueryResult> {
         try {
+            const cacheKey = this.generateCacheKey();
+            const cachedResult = cache.get(cacheKey) as QueryResult | undefined;
+
+            console.log(cacheKey, cachedResult);
+
+            if (cachedResult) {
+                console.log("Cached Result Returned");
+                return cachedResult;
+            }
+
             if (!this.collection) {
                 const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
                 this.collection = collection;
@@ -163,7 +181,7 @@ class DataQueryResult {
             const items = await this.getItems();
             const totalCount = await this.getTotalCount();
 
-            return {
+            const result = {
                 currentPage: this.currentPage,
                 items,
                 length: items.length,
@@ -200,6 +218,9 @@ class DataQueryResult {
                     return this.getResult();
                 }
             }
+
+            cache.set(cacheKey, result);
+            return result;
         } catch (err) {
             throw Error(`WeivData - Error when using query: ${err}`);
         }
@@ -220,6 +241,10 @@ class DataQueryResult {
         } catch (err) {
             throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }
+    }
+
+    private generateCacheKey(): string {
+        return `${this.dbName}-${this.collectionName}-${this.currentPage}-${JSON.stringify(this.queryOptions)}`;
     }
 }
 

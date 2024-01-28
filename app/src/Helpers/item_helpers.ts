@@ -9,13 +9,3 @@ export function convertStringId(_id: string | ObjectId): ObjectId {
         throw Error(`WeivData - Wrong _id type!`);
     }
 }
-
-export function resultIdConverter(ids: { [key: number]: ObjectId }): ObjectId[] {
-    try {
-        return Object.keys(ids).map((key: any) => {
-            return ids[key.toString()];
-        })
-    } catch (err) {
-        throw Error(`WeivData - Error when converting result ids!`);
-    }
-}

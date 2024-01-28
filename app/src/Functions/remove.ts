@@ -15,7 +15,7 @@ export async function remove(collectionId: string, itemId: ObjectId | string, op
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false};
         const newItemId = convertStringId(itemId);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);

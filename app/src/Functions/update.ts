@@ -15,7 +15,7 @@ export async function update(collectionId: string, item: DataItemValuesUpdate, o
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item._id`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
         const defaultValues = {
             _updatedDate: new Date()
         }

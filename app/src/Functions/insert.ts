@@ -16,16 +16,14 @@ export async function insert(collectionId: string, item: DataItemValuesInsert, o
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        const defaultValues = {
+        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        const defaultValues: { [key: string]: any } = {
             _updatedDate: new Date(),
-            _createdDate: new Date(),
-            _owner: ""
+            _createdDate: new Date()
         }
 
-        if (enableOwnerId === true) {
-            defaultValues._owner = await getOwnerId();
-        }
+        // Get owner ID
+        defaultValues["_owner"] = await getOwnerId(enableVisitorId);
 
         const modifiedItem = merge(defaultValues, item);
 

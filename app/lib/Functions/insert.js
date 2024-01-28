@@ -10,15 +10,12 @@ async function insert(collectionId, item, options) {
         if (!collectionId || !item) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
         const defaultValues = {
             _updatedDate: new Date(),
-            _createdDate: new Date(),
-            _owner: ""
+            _createdDate: new Date()
         };
-        if (enableOwnerId === true) {
-            defaultValues._owner = await (0, member_id_helpers_1.getOwnerId)();
-        }
+        defaultValues["_owner"] = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         const modifiedItem = (0, lodash_1.merge)(defaultValues, item);
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { insertedId, acknowledged } = await collection.insertOne({

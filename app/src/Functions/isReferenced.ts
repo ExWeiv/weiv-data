@@ -1,6 +1,14 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
-import _ from 'lodash';
+import { isArray } from 'lodash';
+import NodeCache from "node-cache";
+
+const cache = new NodeCache({
+    stdTTL: 30,
+    checkperiod: 5,
+    useClones: true,
+    deleteOnExpire: true
+})
 
 /**
  * @description Checks if a reference to the referenced item exists in the specified property of the referring item.
@@ -17,9 +25,16 @@ export async function isReferenced(collectionId: string, propertyName: string, r
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
 
-        if (_.isArray(referencedItem)) {
+        if (isArray(referencedItem)) {
             throw Error(`WeivData - Wrong item type for referencedItem, it shouldn't be an array`);
         }
+
+        const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
+        const cachedItem = cache.get(cacheKey);
+        if (cachedItem) {
+            return cachedItem;
+        }
+
 
         const { suppressAuth, cleanupAfter, consistentRead } = options || { suppressAuth: false, cleanupAfter: false, consistentRead: false };
         const references = getReferences(referencedItem);
@@ -33,8 +48,10 @@ export async function isReferenced(collectionId: string, propertyName: string, r
         }
 
         if (totalCount > 0) {
+            cache.set(cacheKey, true);
             return true;
         } else {
+            cache.set(cacheKey, false);
             return false;
         }
     } catch (err) {

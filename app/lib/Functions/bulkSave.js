@@ -9,11 +9,8 @@ async function bulkSave(collectionId, items, options) {
         if (!collectionId || !items || items.length <= 0) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        let ownerId = "";
-        if (enableOwnerId === true) {
-            ownerId = await (0, member_id_helpers_1.getOwnerId)();
-        }
+        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         const newItems = items.map((item) => {
             if (item._id) {
                 item._id = (0, item_helpers_1.convertStringId)(item._id);
@@ -51,7 +48,7 @@ async function bulkSave(collectionId, items, options) {
             await cleanup();
         }
         return {
-            insertedItemIds: (0, item_helpers_1.resultIdConverter)(insertedIds),
+            insertedItemIds: insertedIds,
             inserted: insertedCount,
             updated: modifiedCount,
             savedItems: newItems

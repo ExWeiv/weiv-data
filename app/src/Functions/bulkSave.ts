@@ -1,6 +1,6 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { getOwnerId } from '../Helpers/member_id_helpers';
-import { convertStringId, resultIdConverter } from '../Helpers/item_helpers';
+import { convertStringId } from '../Helpers/item_helpers';
 
 /**
  * @description Inserts or updates a number of items in a collection.
@@ -15,13 +15,9 @@ export async function bulkSave(collectionId: string, items: DataItemValues[], op
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
 
-        let ownerId = "";
-        if (enableOwnerId === true) {
-            ownerId = await getOwnerId();
-        }
-
+        let ownerId = await getOwnerId(enableVisitorId);
         const newItems = items.map((item) => {
             // Convert ID to ObjectId if exist
             if (item._id) {
@@ -76,7 +72,7 @@ export async function bulkSave(collectionId: string, items: DataItemValues[], op
         // }
 
         return {
-            insertedItemIds: resultIdConverter(insertedIds),
+            insertedItemIds: insertedIds,
             inserted: insertedCount,
             updated: modifiedCount,
             savedItems: newItems

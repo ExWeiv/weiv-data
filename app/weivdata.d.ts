@@ -148,7 +148,7 @@ declare global {
         suppressHooks?: boolean,
         consistentRead?: boolean,
         cleanupAfter?: boolean,
-        enableOwnerId?: boolean
+        enableVisitorId?: boolean
     }
 
     type DataItemValues = { _id?: ObjectId | string, [key: string]: any; };

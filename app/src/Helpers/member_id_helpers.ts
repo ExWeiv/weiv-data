@@ -1,17 +1,17 @@
 import wixData from 'wix-data';
-import { currentMember } from 'wix-members-backend';
 import { currentUser } from 'wix-users-backend';
 
-export async function getOwnerId(): Promise<string> {
+export async function getOwnerId(enableVisitorId = false): Promise<string | null> {
     try {
         if (currentUser.loggedIn) {
-            // Check if member is already logged-in and get the memberId directly.
-            const { _id } = await currentMember.getMember({ fieldsets: ['PUBLIC'] });
-            return _id;
-        } else {
+            return currentUser.id;
+        } else if (enableVisitorId === true) {
             // If member not logged-in create temp data and get the visitor_id from _owner field of created item.
-            const { _owner } = await wixData.insert("WeivOwnerID", {});
+            const { _owner, _id } = await wixData.insert("WeivOwnerID", {});
+            wixData.remove("WeivOwnerID", _id, { suppressAuth: true });
             return _owner;
+        } else {
+            return null;
         }
     } catch (err) {
         throw Error(`WeivData - Error when checking user id: (Possible Velo API BUG) ${err}`);

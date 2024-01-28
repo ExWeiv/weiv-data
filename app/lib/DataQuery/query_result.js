@@ -1,8 +1,18 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeivDataQueryResult = void 0;
 const connection_provider_1 = require("../Connection/connection_provider");
 const lodash_1 = require("lodash");
+const node_cache_1 = __importDefault(require("node-cache"));
+const cache = new node_cache_1.default({
+    stdTTL: 30,
+    checkperiod: 5,
+    useClones: true,
+    deleteOnExpire: true
+});
 class DataQueryResult {
     constructor(options) {
         this.suppressAuth = false;
@@ -123,6 +133,13 @@ class DataQueryResult {
     }
     async getResult() {
         try {
+            const cacheKey = this.generateCacheKey();
+            const cachedResult = cache.get(cacheKey);
+            console.log(cacheKey, cachedResult);
+            if (cachedResult) {
+                console.log("Cached Result Returned");
+                return cachedResult;
+            }
             if (!this.collection) {
                 const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
                 this.collection = collection;
@@ -131,7 +148,7 @@ class DataQueryResult {
             const { skip } = this.queryOptions;
             const items = await this.getItems();
             const totalCount = await this.getTotalCount();
-            return {
+            const result = {
                 currentPage: this.currentPage,
                 items,
                 length: items.length,
@@ -168,6 +185,8 @@ class DataQueryResult {
                     return this.getResult();
                 }
             };
+            cache.set(cacheKey, result);
+            return result;
         }
         catch (err) {
             throw Error(`WeivData - Error when using query: ${err}`);
@@ -188,6 +207,9 @@ class DataQueryResult {
         catch (err) {
             throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }
+    }
+    generateCacheKey() {
+        return `${this.dbName}-${this.collectionName}-${this.currentPage}-${JSON.stringify(this.queryOptions)}`;
     }
 }
 function WeivDataQueryResult(options) {

@@ -37,7 +37,6 @@ export async function bulkUpdate(collectionId: string, items: DataItemValuesUpda
                 }
             }
         })
-        console.log(editedItems, bulkOperations);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
         const { matchedCount } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" })

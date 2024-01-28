@@ -29,7 +29,6 @@ async function bulkUpdate(collectionId, items, options) {
                 }
             };
         });
-        console.log(editedItems, bulkOperations);
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { matchedCount } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {

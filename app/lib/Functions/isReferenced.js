@@ -6,14 +6,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isReferenced = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const reference_helpers_1 = require("../Helpers/reference_helpers");
-const lodash_1 = __importDefault(require("lodash"));
+const lodash_1 = require("lodash");
+const node_cache_1 = __importDefault(require("node-cache"));
+const cache = new node_cache_1.default({
+    stdTTL: 30,
+    checkperiod: 5,
+    useClones: true,
+    deleteOnExpire: true
+});
 async function isReferenced(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
         if (!collectionId || !propertyName || !referringItem || !referencedItem) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
-        if (lodash_1.default.isArray(referencedItem)) {
+        if ((0, lodash_1.isArray)(referencedItem)) {
             throw Error(`WeivData - Wrong item type for referencedItem, it shouldn't be an array`);
+        }
+        const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
+        const cachedItem = cache.get(cacheKey);
+        if (cachedItem) {
+            return cachedItem;
         }
         const { suppressAuth, cleanupAfter, consistentRead } = options || { suppressAuth: false, cleanupAfter: false, consistentRead: false };
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
@@ -24,9 +36,11 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
             await cleanup();
         }
         if (totalCount > 0) {
+            cache.set(cacheKey, true);
             return true;
         }
         else {
+            cache.set(cacheKey, false);
             return false;
         }
     }
