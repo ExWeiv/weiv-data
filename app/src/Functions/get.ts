@@ -26,6 +26,7 @@ export async function get(collectionId: string, itemId: ObjectId | string, optio
         const cacheKey = `${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`;
         const cachedItem = cache.get(cacheKey);
         if (cachedItem) {
+            console.log("Cached Item Returned");
             return cachedItem;
         }
 

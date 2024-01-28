@@ -32,6 +32,7 @@ export async function isReferenced(collectionId: string, propertyName: string, r
         const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
         const cachedItem = cache.get(cacheKey);
         if (cachedItem) {
+            console.log("Cached Item Returned")
             return cachedItem;
         }
 
