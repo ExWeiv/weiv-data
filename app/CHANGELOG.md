@@ -59,6 +59,11 @@ In this file you can find what's changed in each version.
 - Performance upgrade to getOwnerId function now you can also enable visitorId. Defaults to false. (MemberIDs always saved but visitor ids will be saved if it's set to true)
 - Caching implemented to get, isReferenced and query
 
+### 1.4.3
+- Tested more function in Wix env.
+- insert BUG fixes
+- save BUG fixes
+
 ---
 
 *When a new version is released you can see the update notes here.*

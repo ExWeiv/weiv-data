@@ -1,7 +1,6 @@
 import { merge } from 'lodash';
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers'
 
 /**
  * @description Adds an item to a collection.
@@ -16,22 +15,18 @@ export async function insert(collectionId: string, item: DataItemValuesInsert, o
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, consistentRead: false };
         const defaultValues: { [key: string]: any } = {
             _updatedDate: new Date(),
-            _createdDate: new Date()
+            _createdDate: new Date(),
         }
 
         // Get owner ID
         defaultValues["_owner"] = await getOwnerId(enableVisitorId);
-
         const modifiedItem = merge(defaultValues, item);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedId, acknowledged } = await collection.insertOne({
-            ...modifiedItem,
-            _id: typeof modifiedItem._id === "string" ? convertStringId(modifiedItem._id) : modifiedItem._id
-        });
+        const { insertedId, acknowledged } = await collection.insertOne(modifiedItem, { readConcern: consistentRead === true ? "majority" : "local" });
 
         if (cleanupAfter === true) {
             await cleanup();

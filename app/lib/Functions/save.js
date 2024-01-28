@@ -12,7 +12,6 @@ async function save(collectionId, item, options) {
         let itemId;
         if (item._id && typeof item._id === "string") {
             itemId = (0, item_helpers_1.convertStringId)(item._id);
-            delete item._id;
         }
         if (!item._createdDate) {
             item._createdDate = new Date();

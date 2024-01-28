@@ -20,7 +20,6 @@ export async function save(collectionId: string, item: DataItemValues, options?:
         let itemId;
         if (item._id && typeof item._id === "string") {
             itemId = convertStringId(item._id);
-            delete item._id;
         }
 
         // Add _createdDate if there is not one
