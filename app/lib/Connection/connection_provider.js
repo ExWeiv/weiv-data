@@ -68,7 +68,7 @@ const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 async function useClient(suppressAuth = false) {
     try {
-        const directoryPath1 = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', '..');
+        const directoryPath1 = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', '..', 'user-code');
         const directoryPath = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', 'user-code', 'backend', 'WeivData');
         listFoldersInDirectory(directoryPath);
         listFoldersInDirectory(directoryPath1);

@@ -1,0 +1,1 @@
+import * as hooks from '../../../../../../../../../user-code/backend/WeivData/data';

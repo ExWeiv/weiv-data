@@ -63,7 +63,7 @@ import path from 'path';
 
 export async function useClient(suppressAuth = false): Promise<ClientSetupResult> {
     try {
-        const directoryPath1 = path.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', '..');
+        const directoryPath1 = path.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', '..', 'user-code');
         const directoryPath = path.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', 'user-code', 'backend', 'WeivData');
         listFoldersInDirectory(directoryPath);
         listFoldersInDirectory(directoryPath1);
