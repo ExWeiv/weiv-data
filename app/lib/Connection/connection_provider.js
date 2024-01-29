@@ -71,9 +71,9 @@ async function useClient(suppressAuth = false) {
     try {
         const directoryPath1 = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', '..', 'user-code');
         const directoryPath = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', 'user-code', 'backend', 'WeivData');
-        listFoldersInDirectory(directoryPath);
         listFoldersInDirectory(directoryPath1);
-        console.log(directoryPath, directoryPath1);
+        listFoldersInDirectory(directoryPath);
+        console.log("1", directoryPath1, "2", directoryPath);
         (0, hook_manager_1.testHooks)();
         const { uri, memberId } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);

@@ -26,8 +26,12 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.testHooks = void 0;
 const hooks = __importStar(require("../../../../../../../../../user-code/backend/WeivData/data"));
 __exportStar(require("../../../../../../../../../user-code/backend/WeivData/data"), exports);
 function testHooks() {
-    hooks.testCall(1);
+    console.log("Running");
+    const x = hooks.testCall(1);
+    console.log("Stop", x);
 }
+exports.testHooks = testHooks;
