@@ -4,7 +4,6 @@ exports.cleanupClientConnections = exports.useClient = void 0;
 const mongodb_1 = require("mongodb");
 const permission_helpers_1 = require("./permission_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const hook_manager_1 = require("../Hooks/hook_manager");
 const cachedMongoClient = {};
 async function setupClient(uri) {
     try {
@@ -64,7 +63,6 @@ const connectClient = async (client, uri) => {
 };
 async function useClient(suppressAuth = false) {
     try {
-        (0, hook_manager_1.testHooks)();
         const { uri, memberId } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);
         return { pool: connection, cleanup, memberId };

@@ -2,6 +2,8 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { ObjectId } from 'mongodb/mongodb';
 import NodeCache from "node-cache";
+import { runDataHook } from '../Hooks/hook_manager';
+import { prepareHookContext } from '../Helpers/hook_helpers';
 
 const cache = new NodeCache({
     stdTTL: 30,
@@ -23,14 +25,28 @@ export async function get(collectionId: string, itemId: ObjectId | string, optio
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
 
-        const cacheKey = `${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`;
-        const cachedItem = cache.get(cacheKey);
-        if (cachedItem) {
-            return cachedItem;
+        const context = prepareHookContext(collectionId);
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+
+        let editedItemId;
+        if (suppressHooks != true) {
+            editedItemId = await runDataHook<'beforeGet'>(collectionId, "beforeGet", [itemId, context]).catch((err) => {
+                throw Error(`WeivData - Hook Failure ${err}`);
+            });
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
-        const newItemId = convertStringId(itemId);
+        let newItemId;
+        if (editedItemId) {
+            newItemId = convertStringId(editedItemId);
+        } else {
+            newItemId = convertStringId(itemId);
+        }
+
+        const cacheKey = `${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`;
+        const cachedItem = cache.get(cacheKey);
+        if (cachedItem && !editedItemId) {
+            return cachedItem;
+        }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
@@ -40,6 +56,16 @@ export async function get(collectionId: string, itemId: ObjectId | string, optio
         }
 
         if (item) {
+            if (suppressHooks != true) {
+                let editedItem = await runDataHook<'afterGet'>(collectionId, 'afterGet', [item, context]).catch((err) => {
+                    throw Error(`WeivData - Hook Failure ${err}`);
+                });
+
+                if (editedItem) {
+                    return editedItem;
+                }
+            }
+
             cache.set(`${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`, item);
             return item;
         } else {

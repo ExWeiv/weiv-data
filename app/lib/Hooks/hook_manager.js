@@ -23,9 +23,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testHooks = void 0;
-const hooks = __importStar(require("../../../../../../../../../user-code/backend/WeivData/data"));
-function testHooks() {
-    console.log(hooks);
+exports.runDataHook = void 0;
+const data_hooks = __importStar(require("../../../../../../../../../user-code/backend/WeivData/data"));
+const name_helpers_1 = require("../Helpers/name_helpers");
+function hookExist(collectionId, hookName) {
+    const { collectionName, dbName } = (0, name_helpers_1.splitCollectionId)(collectionId);
+    const hook = data_hooks[`${dbName.toLowerCase()}_${collectionName.toLowerCase()}_${hookName}`];
+    console.log(hook);
+    console.log(typeof hook);
+    if (hook) {
+        return hook;
+    }
+    else {
+        return undefined;
+    }
 }
-exports.testHooks = testHooks;
+async function runDataHook(collectionId, hookName, args) {
+    try {
+        const hookFunction = hookExist(collectionId, hookName);
+        if (hookFunction) {
+            const item = await hookFunction(...args);
+            return item;
+        }
+        else {
+            return undefined;
+        }
+    }
+    catch (err) {
+        throw Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
+    }
+}
+exports.runDataHook = runDataHook;

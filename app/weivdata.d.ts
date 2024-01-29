@@ -178,4 +178,11 @@ declare global {
     type CachedMongoClients = {
         [key: string]: MongoClient
     }
+
+    type HookContext = { collectionName: string, userId: string | null, userRoles: object[] }
+    type HookArgs = [item: object | string, context: HookContext];
+    type FailureHookArgs = [error: Error, context: HookContext];
+
+    type HookName = 'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' | 'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate';
+    type HookReturnType<HookName> = HookName extends 'beforeGet' ? string | ObjectId | undefined : object | undefined;
 }

@@ -1,5 +1,29 @@
-import * as hooks from '../../../../../../../../../user-code/backend/WeivData/data';
+import * as data_hooks from '../../../../../../../../../user-code/backend/WeivData/data';
+import { splitCollectionId } from '../Helpers/name_helpers';
 
-export function testHooks() {
-    console.log(hooks);
+function hookExist(collectionId: string, hookName: string): Function | undefined {
+    const { collectionName, dbName } = splitCollectionId(collectionId);
+    const hook = data_hooks[`${dbName.toLowerCase()}_${collectionName.toLowerCase()}_${hookName}`];
+    console.log(hook);
+    console.log(typeof hook);
+    if (hook) {
+        return hook;
+    } else {
+        return undefined;
+    }
+}
+
+export async function runDataHook<T>(collectionId: string, hookName: HookName, args: HookArgs): Promise<HookReturnType<T>> {
+    try {
+        const hookFunction = hookExist(collectionId, hookName);
+
+        if (hookFunction) {
+            const item = await hookFunction(...args);
+            return item;
+        } else {
+            return undefined;
+        }
+    } catch (err) {
+        throw Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
+    }
 }

@@ -76,6 +76,9 @@ In this file you can find what's changed in each version.
 ### 1.4.7
 - README updated
 
+### 1.4.80-dev.X
+- Data hooks testings
+
 ---
 
 *When a new version is released you can see the update notes here.*

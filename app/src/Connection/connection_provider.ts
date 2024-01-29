@@ -1,7 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { getMongoURI } from './permission_helpers';
 import { loadConnectionOptions } from '../Helpers/connection_helpers';
-import { testHooks } from '../Hooks/hook_manager'
 
 const cachedMongoClient: CachedMongoClients = {};
 
@@ -61,7 +60,6 @@ const connectClient = async (client: MongoClient, uri: string): Promise<{ connec
 
 export async function useClient(suppressAuth = false): Promise<ClientSetupResult> {
     try {
-        testHooks();
         const { uri, memberId } = await getMongoURI(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);
         return { pool: connection, cleanup, memberId };
