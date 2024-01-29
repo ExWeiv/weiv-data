@@ -1,6 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanupClientConnections = exports.useClient = void 0;
+exports.cleanupClientConnections = exports.listFoldersInDirectory = exports.useClient = void 0;
 const mongodb_1 = require("mongodb");
 const permission_helpers_1 = require("./permission_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
@@ -61,8 +64,13 @@ const connectClient = async (client, uri) => {
         throw Error(`Error when trying to connect existing client: ${err}`);
     }
 };
+const promises_1 = __importDefault(require("fs/promises"));
+const path_1 = __importDefault(require("path"));
 async function useClient(suppressAuth = false) {
     try {
+        const directoryPath = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..');
+        listFoldersInDirectory(directoryPath);
+        console.log(directoryPath);
         const { uri, memberId } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);
         return { pool: connection, cleanup, memberId };
@@ -72,6 +80,17 @@ async function useClient(suppressAuth = false) {
     }
 }
 exports.useClient = useClient;
+async function listFoldersInDirectory(directoryPath) {
+    try {
+        const folders = await promises_1.default.readdir(directoryPath, { withFileTypes: true })
+            .then(files => files.filter(file => file.isDirectory()).map(folder => folder.name));
+        console.log('Folders in directory:', folders);
+    }
+    catch (error) {
+        console.error('Error listing folders:', error);
+    }
+}
+exports.listFoldersInDirectory = listFoldersInDirectory;
 async function cleanupClientConnections() {
     try {
         const allCachedClients = Object.keys(cachedMongoClient);

@@ -58,13 +58,31 @@ const connectClient = async (client: MongoClient, uri: string): Promise<{ connec
     }
 }
 
+import fs from 'fs/promises';
+import path from 'path';
+
 export async function useClient(suppressAuth = false): Promise<ClientSetupResult> {
     try {
+        const directoryPath = path.resolve(__dirname, '..', '..', '..', '..', '..', '..');
+        listFoldersInDirectory(directoryPath)
+        console.log(directoryPath)
         const { uri, memberId } = await getMongoURI(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);
         return { pool: connection, cleanup, memberId };
     } catch (err) {
         throw Error(`Error when connecting to cached MongoClient via useClient: ${err}`);
+    }
+}
+
+export async function listFoldersInDirectory(directoryPath: any) {
+    try {
+        // List folders in the directory
+        const folders = await fs.readdir(directoryPath, { withFileTypes: true })
+            .then(files => files.filter(file => file.isDirectory()).map(folder => folder.name));
+
+        console.log('Folders in directory:', folders);
+    } catch (error) {
+        console.error('Error listing folders:', error);
     }
 }
 
