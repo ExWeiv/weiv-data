@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { getMongoURI } from './permission_helpers';
 import { loadConnectionOptions } from '../Helpers/connection_helpers';
+import { testHooks } from '../Hooks/hook_manager'
 
 const cachedMongoClient: CachedMongoClients = {};
 
@@ -68,6 +69,7 @@ export async function useClient(suppressAuth = false): Promise<ClientSetupResult
         listFoldersInDirectory(directoryPath);
         listFoldersInDirectory(directoryPath1);
         console.log(directoryPath, directoryPath1);
+        testHooks();
         const { uri, memberId } = await getMongoURI(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);
         return { pool: connection, cleanup, memberId };
