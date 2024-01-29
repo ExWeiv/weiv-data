@@ -69,12 +69,10 @@ const path_1 = __importDefault(require("path"));
 async function useClient(suppressAuth = false) {
     try {
         const directoryPath1 = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', '..');
-        const directoryPath = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..');
-        const directoryPath2 = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..');
+        const directoryPath = path_1.default.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', 'user-code', 'backend', 'WeivData');
         listFoldersInDirectory(directoryPath);
-        listFoldersInDirectory(directoryPath2);
         listFoldersInDirectory(directoryPath1);
-        console.log(directoryPath, directoryPath2, directoryPath1);
+        console.log(directoryPath, directoryPath1);
         const { uri, memberId } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);
         return { pool: connection, cleanup, memberId };
