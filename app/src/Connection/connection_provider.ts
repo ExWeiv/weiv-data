@@ -63,11 +63,13 @@ import path from 'path';
 
 export async function useClient(suppressAuth = false): Promise<ClientSetupResult> {
     try {
-        const directoryPath = path.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..');
+        const directoryPath1 = path.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..', '..');
+        const directoryPath = path.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', '..');
         const directoryPath2 = path.resolve(__dirname, '..', '..', '..', '..', '..', '..', '..');
         listFoldersInDirectory(directoryPath)
         listFoldersInDirectory(directoryPath2)
-        console.log(directoryPath)
+        listFoldersInDirectory(directoryPath1)
+        console.log(directoryPath, directoryPath2, directoryPath1)
         const { uri, memberId } = await getMongoURI(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);
         return { pool: connection, cleanup, memberId };
