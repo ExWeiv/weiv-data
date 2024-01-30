@@ -212,4 +212,13 @@ declare global {
         CustomObject;
 
     type QueryReferencedOptions = { pageSize?: number };
+
+    type WeivDaaQueryReferencedResult = {
+        items: Document[],
+        totalCount: number,
+        hasNext(): boolean,
+        hasPrev(): boolean,
+        next(cleanupAfter?: boolean): Promise<WeivDaaQueryReferencedResult>,
+        prev(cleanupAfter?: boolean): Promise<WeivDaaQueryReferencedResult>
+    }
 }

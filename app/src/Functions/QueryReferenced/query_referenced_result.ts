@@ -52,7 +52,7 @@ export class QueryReferencedResult {
         }
     }
 
-    async getResult() {
+    async getResult(): Promise<WeivDaaQueryReferencedResult> {
         try {
             const { suppressAuth } = this.options;
             if (!this.collection) {

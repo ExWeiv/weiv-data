@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Custom API Library built top of MongoDB to use with Wix/Velo websites. Clone of wix-data APIs with better features and removed limits.",
   "main": "./lib/app.js",
   "scripts": {

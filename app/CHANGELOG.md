@@ -96,6 +96,9 @@ In this file you can find what's changed in each version.
 - queryReferenced is ready for test and may contain BUG/s.
 - we are testing queryReferenced to see if it's working as expected.
 
+### 1.5.3
+- TS Updates
+
 ---
 
 *When a new version is released you can see the update notes here.*
