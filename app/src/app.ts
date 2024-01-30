@@ -16,6 +16,7 @@ import { bulkInsert } from './Functions/bulkInsert';
 import { bulkRemove } from './Functions/bulkRemove';
 import { bulkSave } from './Functions/bulkSave';
 import { bulkUpdate } from './Functions/bulkUpdate';
+import { queryReferenced } from './Functions/QueryReferenced/queryReferenced';
 
 type weivData = {
     aggregate: typeof ExWeivDataAggregate
@@ -27,7 +28,7 @@ type weivData = {
     insert: typeof insert,
     insertReference: typeof insertReference,
     isReferenced: typeof isReferenced,
-    // queryReferenced: Function,
+    queryReferenced: typeof queryReferenced,
     remove: typeof remove,
     removeReference: typeof removeReference,
     replaceReferences: typeof replaceReferences,
@@ -57,7 +58,8 @@ const weivData: weivData = {
     bulkInsert: bulkInsert,
     bulkRemove: bulkRemove,
     bulkSave: bulkSave,
-    bulkUpdate: bulkUpdate
+    bulkUpdate: bulkUpdate,
+    queryReferenced: queryReferenced
 };
 
 export = weivData;

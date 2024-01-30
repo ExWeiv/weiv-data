@@ -185,7 +185,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
             throw Error(`WeivData - Property name required!`);
         }
 
-        for (const { fieldName, collectionName, foreignField, as, type = "mixed", maxItems, countItems } of propertyName) {
+        for (const { fieldName, collectionName, foreignField, as, maxItems, countItems } of propertyName) {
             if (countItems === true) {
                 this.referenceLenght = merge(this.referenceLenght, {
                     [`${fieldName}Length`]: {
@@ -207,12 +207,6 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
                     pipeline: [{ $limit: maxItems || 50 }]
                 }
             })
-
-            if (type === "single") {
-                this.includeValues.push({
-                    $unwind: `$${fieldName}`
-                })
-            }
         }
 
         return this;

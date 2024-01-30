@@ -5,7 +5,6 @@ import { DataAggregateInterface } from "../Interfaces/interfaces";
 import { WeivDataAggregateResult } from "./aggregate_result";
 import { useClient } from '../Connection/connection_provider';
 import { splitCollectionId } from '../Helpers/name_helpers';
-import { size } from "lodash";
 
 export class DataAggregate implements DataAggregateInterface {
     private collectionName: string;
@@ -380,15 +379,7 @@ export class DataAggregate implements DataAggregateInterface {
     ): Promise<AggregateResult> {
         // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
         const { suppressAuth, consistentRead, cleanupAfter } = options;
-        const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
-
-        // Check if suppressAuth false and if there is a memberId
-        // if (memberId && suppressAuth != true) {
-        //     // Add a _owner field filter to query to only get member's items (do this before sorting the pipeline)
-        //     this.pipeline.push({
-        //         _owner: memberId,
-        //     });
-        // }
+        const { collection, cleanup } = await this.connectionHandler(suppressAuth);
 
         if (this.sorting) {
             this.pipeline = checkPipelineArray(this.pipeline);

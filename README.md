@@ -109,7 +109,7 @@ You can also compare which is available in weivData and wixData. (We will publis
 - insert (available)
 - insertReference (available)
 - isReferenced (available)
-- queryReferenced _(working on it...)_
+- queryReferenced (available)
 - remove (available)
 - removeReference (available)
 - replaceReferences (available)
@@ -126,7 +126,7 @@ You can also compare which is available in weivData and wixData. (We will publis
 ### Features We're Working On
 
 - wixData.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.) ⏰
-- queryReferenced function. ⏰
+- queryReferenced function. ✅
 - Multilanguage Support (read and write data in multilanguage) ⏰
 - Documentation page. ⏰
 
@@ -164,7 +164,7 @@ We were also able to see that when we lower the timing of calls to 100ms wixData
 - weivData.insert ✅ (Should be Fully Working)
 - weivData.insertReference ✅ (Should be Fully Working)
 - weivData.isReferenced ✅ (Should be Fully Working)
-- weivData.queryReferenced ❌
+- weivData.queryReferenced ⏰
 - weivData.remove ✅ (Should be Fully Working)
 - weivData.removeReference ✅ (Should be Fully Working)
 - weivData.replaceReferences ✅ (Should be Fully Working)

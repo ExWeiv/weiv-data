@@ -127,7 +127,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
-        for (const { fieldName, collectionName, foreignField, as, type = "mixed", maxItems, countItems } of propertyName) {
+        for (const { fieldName, collectionName, foreignField, as, maxItems, countItems } of propertyName) {
             if (countItems === true) {
                 this.referenceLenght = (0, lodash_1.merge)(this.referenceLenght, {
                     [`${fieldName}Length`]: {
@@ -148,11 +148,6 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
                     pipeline: [{ $limit: maxItems || 50 }]
                 }
             });
-            if (type === "single") {
-                this.includeValues.push({
-                    $unwind: `$${fieldName}`
-                });
-            }
         }
         return this;
     }

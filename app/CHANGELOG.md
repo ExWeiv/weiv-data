@@ -92,6 +92,10 @@ In this file you can find what's changed in each version.
 - README updated.
 - Started to workf for queryReferenced and documentation for library.
 
+### 1.5.2
+- queryReferenced is ready for test and may contain BUG/s.
+- we are testing queryReferenced to see if it's working as expected.
+
 ---
 
 *When a new version is released you can see the update notes here.*

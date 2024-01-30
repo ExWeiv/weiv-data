@@ -144,11 +144,11 @@ declare global {
     }
 
     type WeivDataOptions = {
-        suppressAuth?: boolean,
-        suppressHooks?: boolean,
-        consistentRead?: boolean,
-        cleanupAfter?: boolean,
-        enableVisitorId?: boolean
+        suppressAuth?: boolean | undefined,
+        suppressHooks?: boolean | undefined,
+        consistentRead?: boolean | undefined,
+        cleanupAfter?: boolean | undefined,
+        enableVisitorId?: boolean | undefined
     }
 
     type DataItemValues = { _id?: ObjectId | string, [key: string]: any; };
@@ -210,4 +210,6 @@ declare global {
         HookName extends 'beforeRemove' ? string | ObjectId :
         HookName extends 'afterUpdate' ? CustomObject :
         CustomObject;
+
+    type QueryReferencedOptions = { pageSize?: number };
 }
