@@ -57,31 +57,36 @@ In this file you can find what's changed in each version.
 
 ### 1.4.2
 - Performance upgrade to getOwnerId function now you can also enable visitorId. Defaults to false. (MemberIDs always saved but visitor ids will be saved if it's set to true)
-- Caching implemented to get, isReferenced and query
+- Caching implemented to get, isReferenced and query.
 
 ### 1.4.3
 - Tested more function in Wix env.
-- insert BUG fixes
-- save BUG fixes
+- insert BUG fixes.
+- save BUG fixes.
 
 ### 1.4.4
-- General BUG Fixes and readme update
+- General BUG Fixes and readme update.
 
 ### 1.4.5
-- Readme Update
+- Readme Update.
 
 ### 1.4.6
 - Performance upgrades and tests.
 
 ### 1.4.7-8
-- README updated
+- README updated.
 
 ### 1.4.80-dev.X
-- Data hooks testings
+- Data hooks testings.
 
 ### 1.4.9
 - Data Hooks are ready to use with get operation. beforeGet and afterGet hooks are ready.
 - Working for other hooks.
+
+### 1.5.0
+- All data hooks are available to use and now data hooks are implemented into weivData.
+- onFailure hook is still not available.
+- We have started to test data hooks if they are working as expected.
 
 ---
 

@@ -40,7 +40,6 @@ export interface DataFilterInterface {
     startsWith(propertyName: string, string: string): DataFilter;
 }
 
-// Filters for query()
 export interface DataQueryFilterInterface {
     and(query: DataQueryFilter): DataQueryFilter;
     between(propertyName: string, rangeStart: string | number | Date, rangeEnd: string | number | Date): DataQuery;

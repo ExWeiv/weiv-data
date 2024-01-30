@@ -117,19 +117,19 @@ You can also compare which is available in weivData and wixData. (We will publis
 - truncate (available)
 - update (available)
 
-### About wixData.v2 features in weivData
+### About wixData.v2 Features in weivData
 
-- Indexes (not available yet but will be available soon)
-- Collections (not available yet but will be available soon)
-- Events (not available yet but will be available soon)
+- Indexes (not available yet but will be available soon) ⏰
+- Collections (not available yet but will be available soon) ⏰
+- Events (not available yet but will be available soon) ⏰
 
-### Features We're Work On
+### Features We're Working On
 
-- wixData.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.)
-- queryReferenced function.
-- Data Hooks (afterInsert, beforeInsert, afterUpdate etc.)
-- Multilanguage Support (read and write data in multilanguage)
-- Returning string _id but using ObjectId internally
+- wixData.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.) ⏰
+- queryReferenced function. ⏰
+- Data Hooks (afterInsert, beforeInsert, afterUpdate etc.) ✅
+- Multilanguage Support (read and write data in multilanguage) ⏰
+- Documentation page. ⏰
 
 ---
 
@@ -172,6 +172,21 @@ We were also able to see that when we lower the timing of calls to 100ms wixData
 - weivData.save ✅ (Should be Fully Working)
 - weivData.truncate ✅ (Should be Fully Working)
 - weivData.update ✅ (Should be Fully Working)
+
+**Hooks:**
+- afterCount ✅
+- afterGet ✅
+- afterInsert ✅
+- afterQuery ✅
+- afterRemove ✅
+- afterUpdate ✅
+- beforeCount ✅
+- beforeGet ✅
+- beforeInsert ✅
+- beforeQuery ✅
+- beforeRemove ✅
+- beforeUpdate ✅
+- onFailure ❌
 
 > After we test if the functions even run at all we will check if they running correctly with expected results. Right now we are only fixing general BUGs that's blocking function to run. After we complete the first test stage we will start testing if the functions returns expected results. All tests are made in Wix env.
 

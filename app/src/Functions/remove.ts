@@ -1,6 +1,8 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { ObjectId } from 'mongodb/mongodb';
+import { runDataHook } from '../Hooks/hook_manager';
+import { prepareHookContext } from '../Helpers/hook_helpers';
 
 /**
  * @description Removes an item from a collection.
@@ -15,12 +17,26 @@ export async function remove(collectionId: string, itemId: ObjectId | string, op
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false};
-        const newItemId = convertStringId(itemId);
+        const context = prepareHookContext(collectionId);
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+
+        let editedItemId;
+        if (suppressHooks != true) {
+            editedItemId = await runDataHook<'beforeRemove'>(collectionId, "beforeRemove", [itemId, context]).catch((err) => {
+                throw Error(`WeivData - beforeRemove Hook Failure ${err}`);
+            });
+        }
+
+        let newItemId;
+        if (editedItemId) {
+            newItemId = convertStringId(editedItemId);
+        } else {
+            newItemId = convertStringId(itemId);
+        }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOne({ _id: newItemId });
-        const { acknowledged, deletedCount } = await collection.deleteOne({ _id: newItemId });
+        const { acknowledged, deletedCount } = await collection.deleteOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
 
         if (cleanupAfter === true) {
             await cleanup();
@@ -28,6 +44,16 @@ export async function remove(collectionId: string, itemId: ObjectId | string, op
 
         if (acknowledged) {
             if (deletedCount === 1) {
+                if (suppressHooks != true) {
+                    let editedItem = await runDataHook<'afterRemove'>(collectionId, 'afterRemove', [item, context]).catch((err) => {
+                        throw Error(`WeivData - afterRemove Hook Failure ${err}`);
+                    });
+
+                    if (editedItem) {
+                        return editedItem;
+                    }
+                }
+
                 return item;
             } else {
                 return null;

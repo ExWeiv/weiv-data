@@ -6,6 +6,8 @@ const lodash_1 = require("lodash");
 const connection_provider_1 = require("../Connection/connection_provider");
 const query_result_1 = require("./query_result");
 const name_helpers_1 = require("../Helpers/name_helpers");
+const hook_manager_1 = require("../Hooks/hook_manager");
+const hook_helpers_1 = require("../Helpers/hook_helpers");
 class DataQuery extends data_query_filters_1.DataQueryFilter {
     constructor(collectionId) {
         super();
@@ -17,6 +19,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         if (!collectionId) {
             throw Error(`WeivData - Collection name required`);
         }
+        this.collectionId = collectionId;
         this.setDataQuery(this);
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
@@ -39,18 +42,44 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         cleanupAfter: false,
         suppressHooks: false
     }) {
-        const { suppressAuth, consistentRead, cleanupAfter } = options;
-        const { collection, memberId, cleanup } = await this.connectionHandler(suppressAuth);
-        this.filtersHandler();
-        let countOptions = {};
-        if (consistentRead === true) {
-            countOptions = (0, lodash_1.merge)(countOptions, { readConcern: 'majority' });
+        try {
+            const { suppressAuth, consistentRead, cleanupAfter, suppressHooks } = options;
+            const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+            this.filtersHandler();
+            let countOptions = {};
+            if (consistentRead === true) {
+                countOptions = (0, lodash_1.merge)(countOptions, { readConcern: 'majority' });
+            }
+            const context = (0, hook_helpers_1.prepareHookContext)(this.collectionId);
+            let editedQurey;
+            if (suppressHooks != true) {
+                editedQurey = await (0, hook_manager_1.runDataHook)(this.collectionId, "beforeCount", [this, context]).catch((err) => {
+                    throw Error(`WeivData - beforeCount Hook Failure ${err}`);
+                });
+            }
+            let totalCount;
+            if (editedQurey) {
+                totalCount = await collection.countDocuments(editedQurey.query, countOptions);
+            }
+            else {
+                totalCount = await collection.countDocuments(this.query, countOptions);
+            }
+            if (cleanupAfter === true) {
+                await cleanup();
+            }
+            if (suppressHooks != true) {
+                let editedCount = await (0, hook_manager_1.runDataHook)(this.collectionId, "afterCount", [totalCount, context]).catch((err) => {
+                    throw Error(`WeivData - afterCount Hook Failure ${err}`);
+                });
+                if (editedCount) {
+                    return editedCount;
+                }
+            }
+            return totalCount;
         }
-        const totalCount = await collection.countDocuments(this.query, countOptions);
-        if (cleanupAfter === true) {
-            await cleanup();
+        catch (err) {
+            throw Error(`WeivData - Error when using count with weivData.query: ${err}`);
         }
-        return totalCount;
     }
     descending(...propertyName) {
         if (!propertyName) {
@@ -146,36 +175,62 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     async runQuery(options) {
         try {
             const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
-            const { cleanup, memberId, collection } = await this.connectionHandler(suppressAuth);
+            const { cleanup, collection } = await this.connectionHandler(suppressAuth);
+            const context = (0, hook_helpers_1.prepareHookContext)(this.collectionId);
+            let editedQurey;
+            if (suppressHooks != true) {
+                editedQurey = await (0, hook_manager_1.runDataHook)(this.collectionId, "beforeQuery", [this, context]).catch((err) => {
+                    throw Error(`WeivData - beforeQuery Hook Failure ${err}`);
+                });
+            }
+            let classInUse = !editedQurey ? this : editedQurey;
             const query = {
-                filters: this.filters,
-                dbName: this.dbName,
-                includeValues: this.includeValues,
-                limit: this.limitNumber,
-                collectionName: this.collectionName
+                filters: classInUse.filters,
+                dbName: classInUse.dbName,
+                includeValues: classInUse.includeValues,
+                limit: classInUse.limitNumber,
+                collectionName: classInUse.collectionName
             };
-            this.filtersHandler();
+            classInUse.filtersHandler();
             const result = await (0, query_result_1.WeivDataQueryResult)({
                 suppressAuth,
                 suppressHooks,
                 consistentRead,
                 collection,
-                pageSize: this.limitNumber,
-                dbName: this.dbName,
-                collectionName: this.collectionName,
+                pageSize: classInUse.limitNumber,
+                dbName: classInUse.dbName,
+                collectionName: classInUse.collectionName,
                 queryClass: query,
                 queryOptions: {
-                    query: this.query,
-                    distinctProperty: this.distinctValue,
-                    skip: this.skipNumber,
-                    sort: this.sorting,
-                    fields: this.queryFields,
-                    includes: this.includeValues,
-                    addFields: this.referenceLenght
+                    query: classInUse.query,
+                    distinctProperty: classInUse.distinctValue,
+                    skip: classInUse.skipNumber,
+                    sort: classInUse.sorting,
+                    fields: classInUse.queryFields,
+                    includes: classInUse.includeValues,
+                    addFields: classInUse.referenceLenght
                 }
             }).getResult();
             if (cleanupAfter === true) {
                 await cleanup();
+            }
+            if (suppressHooks != true) {
+                const hookedItems = await result.items.map(async (item, index) => {
+                    const editedItem = await (0, hook_manager_1.runDataHook)(classInUse.collectionId, "afterQuery", [item, context]).catch((err) => {
+                        console.error(`WeivData - afterQuery Hook Failure ${err} Item Index: ${index}`);
+                    });
+                    if (editedItem) {
+                        return editedItem;
+                    }
+                    else {
+                        return item;
+                    }
+                });
+                const fulfilledItems = await Promise.all(hookedItems);
+                return {
+                    ...result,
+                    items: fulfilledItems
+                };
             }
             return result;
         }

@@ -11,7 +11,7 @@ function hookExist(collectionId: string, hookName: string): Function | undefined
     }
 }
 
-export async function runDataHook<T>(collectionId: string, hookName: HookName, args: HookArgs): Promise<HookReturnType<T>> {
+export async function runDataHook<R>(collectionId: string, hookName: HookName, args: HookArgs<R>): Promise<HookReturnType<R> | undefined> {
     try {
         const hookFunction = hookExist(collectionId, hookName);
         if (hookFunction) {

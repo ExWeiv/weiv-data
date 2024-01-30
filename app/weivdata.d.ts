@@ -1,5 +1,5 @@
 import { MongoClient, Collection, ObjectId } from 'mongodb/mongodb';
-import { DataQuery } from './src/DataQuery/data_query'
+import { DataQuery } from './src/DataQuery/data_query';
 
 declare global {
     type PermissionsReturn = {
@@ -153,7 +153,7 @@ declare global {
 
     type DataItemValues = { _id?: ObjectId | string, [key: string]: any; };
     type DataItemValuesUpdate = { _id: ObjectId | string, [key: string]: any; };
-    type DataItemValuesInsert = { [key: string]: any; };
+    type DataItemValuesInsert = { [key: string]: any };
 
     type AggregateResultOptions = {
         pageSize: number,
@@ -180,9 +180,34 @@ declare global {
     }
 
     type HookContext = { collectionName: string, userId: string | null, userRoles: object[] }
-    type HookArgs = [item: object | string, context: HookContext];
     type FailureHookArgs = [error: Error, context: HookContext];
 
+    type CustomObject = { [key: string]: any };
     type HookName = 'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' | 'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate';
-    type HookReturnType<HookName> = HookName extends 'beforeGet' ? string | ObjectId | undefined : object | undefined;
+
+    type HookArgs<HookName> =
+        HookName extends 'beforeGet' ? [item: string | ObjectId, context: HookContext] :
+        HookName extends 'afterGet' ? [item: CustomObject, context: HookContext] :
+        HookName extends 'beforeCount' ? [item: DataQuery, context: HookContext] :
+        HookName extends 'afterCount' ? [item: number, context: HookContext] :
+        HookName extends 'beforeInsert' ? [item: CustomObject, context: HookContext] :
+        HookName extends 'afterInsert' ? [item: CustomObject, context: HookContext] :
+        HookName extends 'beforeQuery' ? [item: DataQuery, context: HookContext] :
+        HookName extends 'afterQuery' ? [item: CustomObject, context: HookContext] :
+        HookName extends 'beforeRemove' ? [item: string | ObjectId, context: HookContext] :
+        HookName extends 'beforeUpdate' ? [item: CustomObject, context: HookContext] :
+        HookName extends 'afterUpdate' ? [item: CustomObject, context: HookContext] :
+        [item: any, context: HookContext];
+
+    type HookReturnType<HookName> =
+        HookName extends 'beforeGet' ? string | ObjectId :
+        HookName extends 'afterGet' ? CustomObject :
+        HookName extends 'beforeCount' ? DataQuery :
+        HookName extends 'afterCount' ? number :
+        HookName extends 'beforeInsert' ? CustomObject :
+        HookName extends 'beforeQuery' ? DataQuery :
+        HookName extends 'afterQuery' ? CustomObject :
+        HookName extends 'beforeRemove' ? string | ObjectId :
+        HookName extends 'afterUpdate' ? CustomObject :
+        CustomObject;
 }

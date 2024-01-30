@@ -174,18 +174,18 @@ We were also able to see that when we lower the timing of calls to 100ms wixData
 - weivData.update ✅ (Should be Fully Working)
 
 **Hooks:**
-- afterCount ⏰
+- afterCount ✅
 - afterGet ✅
-- afterInsert ⏰
-- afterQuery ⏰
-- afterRemove ⏰
-- afterUpdate ⏰
-- beforeCount ⏰
+- afterInsert ✅
+- afterQuery ✅
+- afterRemove ✅
+- afterUpdate ✅
+- beforeCount ✅
 - beforeGet ✅
-- beforeInsert ⏰
-- beforeQuery ⏰
-- beforeRemove ⏰
-- beforeUpdate ⏰
+- beforeInsert ✅
+- beforeQuery ✅
+- beforeRemove ✅
+- beforeUpdate ✅
 - onFailure ❌
 
 > After we test if the functions even run at all we will check if they running correctly with expected results. Right now we are only fixing general BUGs that's blocking function to run. After we complete the first test stage we will start testing if the functions returns expected results. All tests are made in Wix env.
