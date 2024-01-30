@@ -73,11 +73,15 @@ In this file you can find what's changed in each version.
 ### 1.4.6
 - Performance upgrades and tests.
 
-### 1.4.7
+### 1.4.7-8
 - README updated
 
 ### 1.4.80-dev.X
 - Data hooks testings
+
+### 1.4.9
+- Data Hooks are ready to use with get operation. beforeGet and afterGet hooks are ready.
+- Working for other hooks.
 
 ---
 

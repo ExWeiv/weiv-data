@@ -4,8 +4,6 @@ import { splitCollectionId } from '../Helpers/name_helpers';
 function hookExist(collectionId: string, hookName: string): Function | undefined {
     const { collectionName, dbName } = splitCollectionId(collectionId);
     const hook = data_hooks[`${dbName.toLowerCase()}_${collectionName.toLowerCase()}_${hookName}`];
-    console.log(hook);
-    console.log(typeof hook);
     if (hook) {
         return hook;
     } else {
@@ -16,7 +14,6 @@ function hookExist(collectionId: string, hookName: string): Function | undefined
 export async function runDataHook<T>(collectionId: string, hookName: HookName, args: HookArgs): Promise<HookReturnType<T>> {
     try {
         const hookFunction = hookExist(collectionId, hookName);
-
         if (hookFunction) {
             const item = await hookFunction(...args);
             return item;

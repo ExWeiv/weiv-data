@@ -29,8 +29,6 @@ const name_helpers_1 = require("../Helpers/name_helpers");
 function hookExist(collectionId, hookName) {
     const { collectionName, dbName } = (0, name_helpers_1.splitCollectionId)(collectionId);
     const hook = data_hooks[`${dbName.toLowerCase()}_${collectionName.toLowerCase()}_${hookName}`];
-    console.log(hook);
-    console.log(typeof hook);
     if (hook) {
         return hook;
     }
