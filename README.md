@@ -97,7 +97,7 @@ You can play with library to see how it works. As we said you should see autocom
 
 You can also compare which is available in weivData and wixData. (We will publish a real docs asap for each function and feature)
 
-- Data Hooks _(not available yet but will be available soon)_
+- Data Hooks (available)
 - Aggregate (available)
 - Query (available)
 - bulkInsert (available)
@@ -109,7 +109,7 @@ You can also compare which is available in weivData and wixData. (We will publis
 - insert (available)
 - insertReference (available)
 - isReferenced (available)
-- queryReferenced _(not available)_
+- queryReferenced _(working on it...)_
 - remove (available)
 - removeReference (available)
 - replaceReferences (available)
@@ -127,7 +127,6 @@ You can also compare which is available in weivData and wixData. (We will publis
 
 - wixData.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.) ⏰
 - queryReferenced function. ⏰
-- Data Hooks (afterInsert, beforeInsert, afterUpdate etc.) ✅
 - Multilanguage Support (read and write data in multilanguage) ⏰
 - Documentation page. ⏰
 

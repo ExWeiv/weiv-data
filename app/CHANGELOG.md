@@ -88,6 +88,10 @@ In this file you can find what's changed in each version.
 - onFailure hook is still not available.
 - We have started to test data hooks if they are working as expected.
 
+### 1.5.1
+- README updated.
+- Started to workf for queryReferenced and documentation for library.
+
 ---
 
 *When a new version is released you can see the update notes here.*
