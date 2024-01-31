@@ -104,7 +104,7 @@ In this file you can find what's changed in each version.
 - BUG fixes.
 - Order option added to queryReferenced function. (defaults to ascending)
 
-### 1.5.41
+### 1.5.41, 1.5.42
 - README update.
 
 ---

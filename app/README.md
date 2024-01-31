@@ -127,9 +127,7 @@ We have done few tests using the Wix's backend testing tool. We have run get, in
 - **327ms avg for weivData**
 - **946ms avg for wixData**
 
-wixData is much better for cold starts and more consistent (wixData always completed in 900-1050ms) over weivData but slower after cold start. You may see up to 3000+ms in weivData for cold starts but this would never happen in wixData but as you use weivData (after cold start) it will respond much faster. (weivData completed it's first few calls arround 2000ms then it was more consistent and stayed arround 300ms) You can test it and see yourself.
-
-We were also able to see that when we lower the timing of calls to 100ms wixData was still stable at 1200ms average but weivData were performing much worse and was completing the job arround 2700ms average. And that was the result when we made 100 calls in each 100ms.
+wixData is much better for cold starts and more consistent (wixData always completed in 900-1050ms) over weivData. But it satyed slower than weivData after cold start of weivData. You may see up to 3000+ms in weivData for cold starts but this would never happen in wixData, as you use weivData (after cold start) it will respond much faster. (weivData completed it's first few calls (1-10 calls in general depends on how fast you are making the calls) arround 2000ms then it was more consistent and stayed arround 300ms) You can test it and see yourself.
 
 > Tests are made in backend testing tool in a free Wix Studio website. And weivData library was also using free shared clusters of MongoDB.
 
