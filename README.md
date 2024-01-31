@@ -133,7 +133,7 @@ wixData is much better for cold starts and more consistent (wixData always compl
 
 ## Tested Functions in Wix Env
 
-*If main function tested only there is a possiblity of BUG/s but if most of the features tested (Should be Fully Working) then it should be working fine but still there might be BUG/s.*
+*If main function tested only there is a possibility of BUG/s but if most of the features tested (Should be Fully Working) then it should be working fine but still there might be BUG/s.*
 
 - weivData.aggreagete ✅ (Main Function Tested)
 - weivData.query ✅ (Main Function Tested)
@@ -170,6 +170,30 @@ wixData is much better for cold starts and more consistent (wixData always compl
 - onFailure ❌
 
 > After we test if the functions even run at all we will check if they running correctly with expected results. Right now we are only fixing general BUGs that's blocking function to run. After we complete the first test stage we will start testing if the functions returns expected results. All tests are made in Wix env.
+
+## How to Use Hooks?
+Using hooks in weivData and wixData has similar way. We are currently not providing a hook for errors. But rest of the hooks are available like in wixData. To create a hook you need to create a folder in your backend named `WeivData` and then you also need to create a .js file (.js file now .jsw or .web.js) inside of that folder.
+
+-> backend/WeivData/data.js
+
+Then you will create your hooks as functions like in wixData. Here is an example for afterGet hook:
+
+```js
+// In backend/WeivData/data.js file
+
+export async function dbname_collectionname_afterGet(item, context) {
+  if (item.number > 5) {
+    return true;
+  } else {
+    return false;
+  }
+}
+```
+
+You need to name your functions correctly to let hooks work. The syntax is like that:
+`<database-name>_<collection-name>_<hook-name>`
+
+> Both database name and collection name should be all lowercase.
 
 ---
 
