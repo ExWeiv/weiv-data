@@ -42,25 +42,10 @@ First of all go ahead and create a MongoDB account and a database in your accoun
    1. Create a secret named as AdminURI (this is case sensitive) and paste the URI for admin.
    2. Do the same for MemberURI and VisitorURI.
 7. Then create another secret for connection options named "WeivDataConnectionOptions" if you don't want to set custom options paste empty object as value. If you want to add custom options when connecting to MongoDB Clusters add your custom object into value. [Connection Options](https://www.mongodb.com/docs/manual/administration/connection-pool-overview/) (Do not paste object as strings Wix will stringify it otherwise you will see errors when connecting).
-8. Lastly go to your Wix collections (CMS) and create a collection named as "WeivOwnerID" you don't need to add any data. Just create the collection with the same exact name and leave it as it is. This collection help library to get visitors ID. Since Wix doesn't provide a way to get visitors temporary ID we use a collection to create a data and get the \_owner field value from that data. (Find a ready to paste code to clear that collection per hour or do it manually - check below)
+8. Lastly go to your Wix collections (CMS) and create a collection named as "WeivOwnerID" you don't need to add any data. Just create the collection with the same exact name and leave it as it is. This collection help library to get visitors ID (only when you enable it). Since Wix doesn't provide a way to get visitors temporary ID we use a collection to create a data and get the _owner field value from that data.
 9. And you should be ready to go.
 
-```js
-//Paste this code into any .js or .web.js file (.jsw)
-
-import wixData from 'wix-data';
-
-export async function clearWeivDataTempFiles() {
-    try {
-        await wixData.truncate("WeivOwnerID", { consistentRead: true, suppressAuth: true, suppressHooks: true });
-        return null;
-    } catch(err) {
-        console.error(err);
-    }
-}
-
-//Use this function with your scheduled jobs to clear collection per hour.
-```
+> Any data created in WeivOwnerID will be removed just after it's used so it won't waste your storage and it will be only used when you enable the visitorId collecting option.
 
 **Note:**
 Use indexes to faster your queries. We are also working on other APIs that will allow you to create collections with custom options. Also we don't use mongoose in our library for better performance.
@@ -126,7 +111,6 @@ You can also compare which is available in weivData and wixData. (We will publis
 ### Features We're Working On
 
 - wixData.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.) ⏰
-- queryReferenced function. ✅
 - Multilanguage Support (read and write data in multilanguage) ⏰
 - Documentation page. ⏰
 
@@ -164,7 +148,7 @@ We were also able to see that when we lower the timing of calls to 100ms wixData
 - weivData.insert ✅ (Should be Fully Working)
 - weivData.insertReference ✅ (Should be Fully Working)
 - weivData.isReferenced ✅ (Should be Fully Working)
-- weivData.queryReferenced ⏰
+- weivData.queryReferenced ✅ (Main Function Tested)
 - weivData.remove ✅ (Should be Fully Working)
 - weivData.removeReference ✅ (Should be Fully Working)
 - weivData.replaceReferences ✅ (Should be Fully Working)
