@@ -12,7 +12,7 @@ import { QueryReferencedResult } from './query_referenced_result';
  * @param options An object containing options to use when processing this operation.
  * @returns Fulfilled - The referenced items. Rejected - The error that caused the rejection.
  */
-export async function queryReferenced(collectionId: string, targetCollectionId: string, itemId: string | ObjectId, propertyName: string, queryOptions: QueryReferencedOptions, options?: WeivDataOptions): Promise<WeivDaaQueryReferencedResult> {
+export async function queryReferenced(collectionId: string, targetCollectionId: string, itemId: string | ObjectId, propertyName: string, queryOptions: QueryReferencedOptions, options?: WeivDataOptions): Promise<WeivDataQueryReferencedResult> {
     try {
         if (!collectionId || !itemId || !targetCollectionId || !propertyName) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName or itemId`);

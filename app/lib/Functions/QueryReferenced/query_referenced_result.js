@@ -19,11 +19,13 @@ class QueryReferencedResult {
         this.propertyName = propertyName;
         this.options = options;
         this.pageSize = queryOptions.pageSize || 50;
+        this.order = queryOptions.order;
     }
     getPipelineOptions() {
         return {
             pageSize: this.pageSize,
-            skip: this.pageSize * this.currentPage
+            skip: this.pageSize * this.currentPage,
+            order: this.order
         };
     }
     async getItems() {

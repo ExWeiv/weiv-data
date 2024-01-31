@@ -36,9 +36,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .ascending("population")
      * .run()
      * .then((result) => {
@@ -65,9 +65,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .avg("population", "averagePopulation")
      * .run()
      * .then((result) => {
@@ -97,9 +97,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .group(["population", "year"])
      * .count()
      * .run()
@@ -120,9 +120,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A WeivDataAggregate object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .descending("population")
      * .run()
      * .then((result) => {
@@ -148,9 +148,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .descending("population")
      * .filter(weivData.filter().gt("population", 1000000))
      * .run()
@@ -179,9 +179,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A WeivDataAggregate object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .group(["population", "year"]) //or a single string without an array or with an array
      * .run()
      * .then((result) => {
@@ -224,9 +224,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .group(["population", "year"])
      * .having(weivData.filter().gt("population", 1000000))
      * .run()
@@ -254,9 +254,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .limit(100)
      * .run()
      * .then((result) => {
@@ -284,9 +284,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .group(["population", "year"])
      * .max("population", "maximumPopulation")
      * .run()
@@ -319,9 +319,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .group(["population", "year"])
      * .min("population", "minimumPopulation")
      * .run()
@@ -353,14 +353,14 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
      * let options = {
      *  suppressAuth: true,
      *  consistentRead: true
      * }
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .group(["population", "year"])
      * .min("population", "minimumPopulation")
      * .run(options)
@@ -480,9 +480,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .skip(5)
      * .run()
      * .then((result) => {
@@ -507,9 +507,9 @@ export class DataAggregate implements DataAggregateInterface {
      * @returns A `WeivDataAggregate` object representing the refined aggregation.
      * @example
      * ```js
-     * import weivData from '@exweiv/weivdata';
+     * import weivData from '@exweiv/weiv-data';
      *
-     * weivData.aggregate("PopulationData")
+     * weivData.aggregate("Database/PopulationData")
      * .sum("population", "sumPopulation")
      * .run()
      * .then((result) => {

@@ -1,0 +1,23 @@
+{
+    "out": "docs",
+    "theme": "default",
+    "exclude": [
+        "node_modules/**/*",
+        "lib/**/*",
+        "src/Connection/**/*",
+        "src/Helpers/**/*",
+        "src/Hooks/**/*",
+        "src/Interfaces/**/*",
+        "src/app.ts",
+    ],
+    "name": "WeivData APIs",
+    "readme": "README.md",
+    "entryPoints": [
+        "src/**/*"
+    ],
+    "skipErrorChecking": true,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "excludeInternal": true
+}

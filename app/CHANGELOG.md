@@ -98,6 +98,11 @@ In this file you can find what's changed in each version.
 
 ### 1.5.3
 - TS Updates
+- We have started working for a Discord Server and documentation page built with weivData.
+
+### 1.5.4
+- BUG fixes.
+- Order option added to queryReferenced function. (defaults to ascending)
 
 ---
 

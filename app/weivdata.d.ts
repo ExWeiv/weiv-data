@@ -211,9 +211,9 @@ declare global {
         HookName extends 'afterUpdate' ? CustomObject :
         CustomObject;
 
-    type QueryReferencedOptions = { pageSize?: number };
+    type QueryReferencedOptions = { pageSize: number, order: 'asc' | 'desc' };
 
-    type WeivDaaQueryReferencedResult = {
+    type WeivDataQueryReferencedResult = {
         items: Document[],
         totalCount: number,
         hasNext(): boolean,

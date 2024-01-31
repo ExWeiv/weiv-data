@@ -6,12 +6,24 @@ export class DataFilter implements DataFilterInterface {
     filters = {};
     constructor() { }
 
+    /**
+     * @description Adds an `and` condition to the query or filter.
+     * @param query A query to add to the initial query as an `and` condition.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     and(query: DataFilter): DataFilter {
         this.filters = merge(this.filters, query.filters)
         return this;
     }
 
     private memoizedBetween!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value is within a specified range.
+     * @param propertyName The property whose value will be compared with `rangeStart` and `rangeEnd`.
+     * @param rangeStart The beginning value of the range to match against.
+     * @param rangeEnd The ending value of the range to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     between(propertyName: string, rangeStart: string | number | Date, rangeEnd: string | number | Date): DataFilter {
         if (!this.memoizedBetween) {
             this.memoizedBetween = memoize((propertyName, rangeStart, rangeEnd) => {
@@ -29,6 +41,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedContains!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value contains a specified string.
+     * @param propertyName The property whose value will be compared with the string.
+     * @param string The string to look for inside the specified property value.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     contains(propertyName: string, string: string): DataFilter {
         if (!this.memoizedContains) {
             this.memoizedContains = memoize((propertyName, string) => {
@@ -46,6 +64,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedEndsWith!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value ends with a specified string.
+     * @param propertyName The property whose value will be compared with the string.
+     * @param string The string to look for at the end of the specified property value.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     endsWith(propertyName: string, string: string): DataFilter {
         if (!this.memoizedEndsWith) {
             this.memoizedEndsWith = memoize((propertyName, string) => {
@@ -63,6 +87,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedEq!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value equals the specified value.
+     * @param propertyName The property whose value will be compared with `value`.
+     * @param value The value to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     eq(propertyName: string, value: unknown): DataFilter {
         if (!this.memoizedEq) {
             this.memoizedEq = memoize((propertyName, value) => {
@@ -83,6 +113,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedGe!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value is greater than or equal to the specified value.
+     * @param propertyName The property whose value will be compared with `value`.
+     * @param value The value to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     ge(propertyName: string, value: string | number | Date): DataFilter {
         if (!this.memoizedGe) {
             this.memoizedGe = memoize((propertyName, value) => {
@@ -99,6 +135,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedGt!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value is greater than the specified value.
+     * @param propertyName The property whose value will be compared with `value`.
+     * @param value The value to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     gt(propertyName: string, value: string | number | Date): DataFilter {
         if (!this.memoizedGt) {
             this.memoizedGt = memoize((propertyName, value) => {
@@ -115,6 +157,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedHasAll!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property values equals all of the specified `value` parameters.
+     * @param propertyName The property whose value will be compared with `value`.
+     * @param value The values to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     hasAll(propertyName: string, value: string | number | Date | [unknown]): DataFilter {
         if (!Array.isArray(value)) {
             value = [value];
@@ -135,6 +183,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedHasSome!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value equals any of the specified `value` parameters.
+     * @param propertyName The property whose value will be compared with `value`.
+     * @param value The values to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     hasSome(propertyName: string, value: string | number | Date | [unknown]): DataFilter {
         if (!Array.isArray(value)) {
             value = [value];
@@ -155,6 +209,11 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedIsEmpty!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property does not exist or does not have any value.
+     * @param propertyName The the property in which to check for a value.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     isEmpty(propertyName: string): DataFilter {
         if (!this.memoizedIsEmpty) {
             this.memoizedIsEmpty = memoize((propertyName) => {
@@ -171,6 +230,11 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedIsNotEmpty!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property has any value.
+     * @param propertyName The property in which to check for a value.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     isNotEmpty(propertyName: string): DataFilter {
         if (!this.memoizedIsNotEmpty) {
             this.memoizedIsNotEmpty = memoize((propertyName) => {
@@ -187,6 +251,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedLe!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value is less than or equal to the specified value.
+     * @param propertyName The property whose value will be compared with `value`.
+     * @param value The value to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     le(propertyName: string, value: string | number | Date): DataFilter {
         if (!this.memoizedLe) {
             this.memoizedLe = memoize((propertyName, value) => {
@@ -203,6 +273,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedLt!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value is less than the specified value.
+     * @param propertyName The property whose value will be compared with `value`.
+     * @param value The value to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     lt(propertyName: string, value: string | number | Date): DataFilter {
         if (!this.memoizedLt) {
             this.memoizedLt = memoize((propertyName, value) => {
@@ -219,6 +295,12 @@ export class DataFilter implements DataFilterInterface {
     }
 
     private memoizedNe!: Function;
+    /**
+     * @description Refines a query or filter to match items whose specified property value does not equal the specified value.
+     * @param propertyName The property whose value will be compared with `value`.
+     * @param value The value to match against.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     ne(propertyName: string, value: unknown): DataFilter {
         if (!this.memoizedNe) {
             this.memoizedNe = memoize((propertyName, value) => {
@@ -234,6 +316,11 @@ export class DataFilter implements DataFilterInterface {
         return this;
     }
 
+    /**
+     * @description Adds a `not` condition to the query or filter.
+     * @param query A query to add to the initial query as a `not` condition.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     not(query: DataFilter): DataFilter {
         this.filters = {
             ...this.filters,
@@ -242,6 +329,11 @@ export class DataFilter implements DataFilterInterface {
         return this;
     }
 
+    /**
+     * @description Adds an `or` condition to the query or filter.
+     * @param query A query to add to the initial query as an `or` condition.
+     * @returns A `WeivDataQuery` object representing the refined query.
+     */
     or(query: DataFilter): DataFilter {
         this.filters = {
             ...this.filters,

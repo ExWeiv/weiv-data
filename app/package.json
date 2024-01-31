@@ -1,7 +1,7 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "1.5.3",
-  "description": "Custom API Library built top of MongoDB to use with Wix/Velo websites. Clone of wix-data APIs with better features and removed limits.",
+  "version": "1.5.4",
+  "description": "Custom API Library built top of MongoDB to use with Wix/Velo websites. Clone of wix-data APIs with removed limits and faster.",
   "main": "./lib/app.js",
   "scripts": {
     "test": "nodemon ./lib/testing.js"
@@ -29,7 +29,8 @@
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.11.0",
     "@types/uuid": "^9.0.7",
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "typedoc": "^0.25.7"
   },
   "publishConfig": {
     "access": "public"

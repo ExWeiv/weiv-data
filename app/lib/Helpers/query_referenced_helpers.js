@@ -11,6 +11,11 @@ function getPipeline(itemId, targetCollectionId, propertyName, pipelineOptions) 
             },
         },
         {
+            $sort: {
+                [propertyName]: pipelineOptions.order === 'asc' ? 1 : -1
+            }
+        },
+        {
             $lookup: {
                 from: collectionName,
                 localField: propertyName,

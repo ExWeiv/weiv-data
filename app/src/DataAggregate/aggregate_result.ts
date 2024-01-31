@@ -46,6 +46,10 @@ class DataAggregateResult {
         return items;
     }
 
+    /**
+     * @description The `run()` function returns a Promise that resolves to the results found by the aggregation and some information about the results.
+     * @returns Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
+     */
     async getResult(): Promise<AggregateResult> {
         // Setup a connection from the pool
         const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);

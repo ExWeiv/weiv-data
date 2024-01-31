@@ -10,6 +10,7 @@ export class QueryReferencedResult {
     private options: WeivDataOptions;
     private currentPage = 0;
     private pageSize = 50;
+    private order: 'asc' | 'desc';
 
     private collectionName: string;
     private dbName: string;
@@ -31,13 +32,15 @@ export class QueryReferencedResult {
         this.propertyName = propertyName;
         this.options = options;
         this.pageSize = queryOptions.pageSize || 50;
+        this.order = queryOptions.order;
     }
 
 
     private getPipelineOptions() {
         return {
             pageSize: this.pageSize,
-            skip: this.pageSize * this.currentPage
+            skip: this.pageSize * this.currentPage,
+            order: this.order
         }
     }
 
@@ -52,7 +55,7 @@ export class QueryReferencedResult {
         }
     }
 
-    async getResult(): Promise<WeivDaaQueryReferencedResult> {
+    async getResult(): Promise<WeivDataQueryReferencedResult> {
         try {
             const { suppressAuth } = this.options;
             if (!this.collection) {

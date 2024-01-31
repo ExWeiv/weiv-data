@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb/mongodb';
 import { splitCollectionId } from './name_helpers'
 
-export function getPipeline(itemId: ObjectId, targetCollectionId: string, propertyName: string, pipelineOptions: { pageSize: number, skip: number }) {
+export function getPipeline(itemId: ObjectId, targetCollectionId: string, propertyName: string, pipelineOptions: { pageSize: number, skip: number, order: 'asc' | 'desc' }) {
     const { collectionName } = splitCollectionId(targetCollectionId);
 
     return [
@@ -9,6 +9,11 @@ export function getPipeline(itemId: ObjectId, targetCollectionId: string, proper
             $match: {
                 _id: itemId,
             },
+        },
+        {
+            $sort: {
+                [propertyName]: pipelineOptions.order === 'asc' ? 1 : -1
+            }
         },
         {
             $lookup: {
