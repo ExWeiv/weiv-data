@@ -1,4 +1,8 @@
+// This is the location of Wix websites backends. This might change in the future so be aware of this. Use fs to check where is the backend folder from current location in case of this get's broken.
+
+//@ts-ignore
 import * as data_hooks from '../../../../../../../../../user-code/backend/WeivData/data';
+import { HookName, HookArgs, HooksReturns } from '../../weiv-data';
 import { splitCollectionId } from '../Helpers/name_helpers';
 
 function hookExist(collectionId: string, hookName: string): Function | undefined {
@@ -11,7 +15,7 @@ function hookExist(collectionId: string, hookName: string): Function | undefined
     }
 }
 
-export async function runDataHook<R>(collectionId: string, hookName: HookName, args: HookArgs<R>): Promise<HookReturnType<R> | undefined> {
+export async function runDataHook<R>(collectionId: string, hookName: HookName, args: HookArgs<R>): Promise<HooksReturns<R> | undefined> {
     try {
         const hookFunction = hookExist(collectionId, hookName);
         if (hookFunction) {

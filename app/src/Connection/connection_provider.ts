@@ -1,16 +1,29 @@
 import { MongoClient } from 'mongodb';
 import { getMongoURI } from './permission_helpers';
 import { loadConnectionOptions } from '../Helpers/connection_helpers';
+import { CachedMongoClients, ClientFunctionsReturns, SuppressAuth, UseClientReturns } from '../../weiv-data';
 
+/*
+This is a global variable which will hold the cached (saved) clients that's already created before using same URI.
+This will remove the cold start and make the process much more faster after first few calls.
+*/
 const cachedMongoClient: CachedMongoClients = {};
 
-async function setupClient(uri: string): Promise<{ connection: MongoClient, cleanup: ConnectionCleanUp }> {
+/**
+ * @function
+ * @description Function to setup a MongoDB client or use one from cache. Cached clients are removed when the container closed in the Wix side.
+ * 
+ * @param uri URI to use when connecting to MongoDB Cluster
+ * @returns {ClientFunctionsReturns}
+ */
+async function setupClient(uri: string): Promise<ClientFunctionsReturns> {
     try {
         if (cachedMongoClient[uri]) {
             const { connection, cleanup } = await connectClient(cachedMongoClient[uri], uri);
             if (connection) {
                 return { connection, cleanup };
             } else {
+                // If first attempt fails try to create the client again and use new connection
                 console.warn("Failed to connect/create MongoClient in first attempt!");
                 const newMongoClient = new MongoClient(uri, await loadConnectionOptions());
                 cachedMongoClient[uri] = newMongoClient;
@@ -23,6 +36,7 @@ async function setupClient(uri: string): Promise<{ connection: MongoClient, clea
                 }
             }
         } else {
+            // If there are no clients in cache create new one and return
             return createNewClient(uri);
         }
     } catch (err) {
@@ -30,10 +44,20 @@ async function setupClient(uri: string): Promise<{ connection: MongoClient, clea
     }
 }
 
-const createNewClient = async (uri: string) => {
+/**
+ * @function
+ * @description Function to create a new client if there are no clients in cache.
+ * 
+ * @param uri URI to use when connecting to MongoDB Cluster
+ * @returns {ClientFunctionsReturns}
+ */
+const createNewClient = async (uri: string): Promise<ClientFunctionsReturns> => {
     try {
+        // Create a client and save it to cache
         const newMongoClient = new MongoClient(uri, await loadConnectionOptions());
         cachedMongoClient[uri] = newMongoClient;
+
+        // Use connect function to connect to cluster using newly created client 
         const { cleanup, connection } = await connectClient(newMongoClient, uri);
 
         if (connection) {
@@ -46,8 +70,17 @@ const createNewClient = async (uri: string) => {
     }
 }
 
-const connectClient = async (client: MongoClient, uri: string): Promise<{ connection: MongoClient, cleanup: ConnectionCleanUp }> => {
+/**
+ * @function
+ * @description A function to connect cluster server via created MongoDB client. Returns connection and cleanup function.
+ * 
+ * @param client MongoDB Client
+ * @param uri URI to use when connecting to MongoDB Cluster
+ * @returns {ClientFunctionsReturns}
+ */
+const connectClient = async (client: MongoClient, uri: string): Promise<ClientFunctionsReturns> => {
     try {
+        // Connect and return connection
         const connectedClient = await client.connect();
         return {
             connection: connectedClient,
@@ -58,7 +91,14 @@ const connectClient = async (client: MongoClient, uri: string): Promise<{ connec
     }
 }
 
-export async function useClient(suppressAuth = false): Promise<ClientSetupResult> {
+/**
+ * @function
+ * @description Function to use a cached client or a new client connection. This function is used before an operation made in Cluster.
+ * 
+ * @param suppressAuth 
+ * @returns 
+ */
+export async function useClient(suppressAuth: SuppressAuth = false): Promise<UseClientReturns> {
     try {
         const { uri, memberId } = await getMongoURI(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);
@@ -68,6 +108,10 @@ export async function useClient(suppressAuth = false): Promise<ClientSetupResult
     }
 }
 
+/**
+ * @function
+ * @description Function to cleanup all existing connections using a for loop.
+ */
 export async function cleanupClientConnections(): Promise<void> {
     try {
         const allCachedClients = Object.keys(cachedMongoClient);

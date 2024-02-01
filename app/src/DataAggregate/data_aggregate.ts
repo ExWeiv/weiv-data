@@ -1,16 +1,10 @@
-import { Db, Document } from "mongodb/mongodb";
+import { Document } from "mongodb/mongodb";
 import { checkPipelineArray, sortAggregationPipeline, } from "../Helpers/pipeline_helpers";
 import { DataFilter } from "../DataFilter/data_filter";
-import { DataAggregateInterface } from "../Interfaces/interfaces";
-import { WeivDataAggregateResult } from "./aggregate_result";
-import { useClient } from '../Connection/connection_provider';
-import { splitCollectionId } from '../Helpers/name_helpers';
+import { DataAggregateResult } from './aggregate_result';
+import { AggregateResult, RunOptions } from "../../weiv-data";
 
-export class DataAggregate implements DataAggregateInterface {
-    private collectionName: string;
-    private dbName = "exweiv";
-    private db!: Db;
-    private pipeline!: PipelineArray;
+export class DataAggregate extends DataAggregateResult {
     private limitNumber!: number;
     private skipNumber!: number;
     private currentGroup!: PipelineGroupObject<string | object>;
@@ -24,10 +18,7 @@ export class DataAggregate implements DataAggregateInterface {
             throw Error(`WeivData - Database and Collection name required`);
         }
 
-        const { dbName, collectionName } = splitCollectionId(collectionId);
-
-        this.collectionName = collectionName;
-        this.dbName = dbName;
+        super(collectionId);
     }
 
     /**
@@ -370,13 +361,7 @@ export class DataAggregate implements DataAggregateInterface {
      * })
      * ```
      */
-    async run(
-        options: AggregateRunOptions = {
-            suppressAuth: false,
-            consistentRead: false,
-            cleanupAfter: false
-        }
-    ): Promise<AggregateResult> {
+    async run(options: RunOptions): Promise<AggregateResult> {
         // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
         const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, cleanup } = await this.connectionHandler(suppressAuth);
@@ -444,7 +429,7 @@ export class DataAggregate implements DataAggregateInterface {
         }
 
         // Make the call to the MongoDB and convert it to an array via result function
-        const aggregateResult = await WeivDataAggregateResult({ pageSize: this.limitNumber, pipeline: this.pipeline, databaseName: this.dbName, collectionName: this.collectionName, suppressAuth }).getResult();
+        const aggregateResult = await this.getResult(suppressAuth);
 
         // Modify result of call
         let modifiedItems = aggregateResult.items.map((document: Document) => {
@@ -535,19 +520,6 @@ export class DataAggregate implements DataAggregateInterface {
         return this;
     }
 
-    private async connectionHandler(suppressAuth = false): Promise<ConnectionResult> {
-        const { pool, cleanup, memberId } = await useClient(suppressAuth);
-
-        if (this.dbName) {
-            this.db = pool.db(this.dbName);
-        } else {
-            this.db = pool.db("exweiv");
-        }
-
-        const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
-    }
-
     private setCurrentGroup() {
         this.pipeline = checkPipelineArray(this.pipeline);  //@ts-ignore
         this.currentGroup = this.pipeline.find(stage => stage["$group"]);
@@ -598,8 +570,4 @@ export class DataAggregate implements DataAggregateInterface {
             this.pipeline.push({ $group: this.currentGroup["$group"] });
         }
     }
-}
-
-export function ExWeivDataAggregate(dynamicName: string) {
-    return new DataAggregate(dynamicName);
 }

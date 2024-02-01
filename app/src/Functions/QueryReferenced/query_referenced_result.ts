@@ -2,6 +2,7 @@ import { Document, ObjectId, Db, Collection } from 'mongodb/mongodb';
 import { getPipeline } from '../../Helpers/query_referenced_helpers';
 import { useClient } from '../../Connection/connection_provider';
 import { splitCollectionId } from '../../Helpers/name_helpers';
+import { ConnectionCleanup, ConnectionHandlerReturns } from '../../../weiv-data';
 
 export class QueryReferencedResult {
     private targetCollectionId: string;
@@ -16,7 +17,7 @@ export class QueryReferencedResult {
     private dbName: string;
     private db!: Db;
     private collection!: Collection;
-    private cleanup!: ConnectionCleanUp;
+    private cleanup!: ConnectionCleanup;
 
     constructor(collectionId: string, targetCollectionId: string, itemId: ObjectId, propertyName: string, queryOptions: QueryReferencedOptions, options: WeivDataOptions) {
         if (!collectionId || !targetCollectionId || !itemId || !propertyName || !queryOptions || !options) {
@@ -105,7 +106,7 @@ export class QueryReferencedResult {
         }
     }
 
-    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionResult> {
+    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerReturns> {
         try {
             const { pool, cleanup, memberId } = await useClient(suppressAuth);
 

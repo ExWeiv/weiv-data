@@ -2,6 +2,7 @@ import { Db, Document, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/connection_provider';
 import { size } from 'lodash';
 import NodeCache from "node-cache";
+import { ConnectionCleanup, ConnectionHandlerReturns, DataQueryResultOptions, QueryResult, QueryResultQueryOptions } from "../../weiv-data";
 
 const cache = new NodeCache({
     stdTTL: 30,
@@ -22,9 +23,9 @@ class DataQueryResult {
     private queryOptions!: QueryResultQueryOptions;
     private db!: Db;
     private collection!: Collection;
-    private cleanup!: ConnectionCleanUp;
+    private cleanup!: ConnectionCleanup;
 
-    constructor(options: QueryResultOptions) {
+    constructor(options: DataQueryResultOptions) {
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, suppressHooks } = options;
 
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
@@ -223,7 +224,7 @@ class DataQueryResult {
         }
     }
 
-    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionResult> {
+    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerReturns> {
         try {
             const { pool, cleanup, memberId } = await useClient(suppressAuth);
 
@@ -245,7 +246,7 @@ class DataQueryResult {
     }
 }
 
-export function WeivDataQueryResult(options: QueryResultOptions) {
+export function WeivDataQueryResult(options: DataQueryResultOptions): DataQueryResult {
     try {
         return new DataQueryResult(options);
     } catch (err) {

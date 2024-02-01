@@ -1,19 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExWeivDataAggregate = exports.DataAggregate = void 0;
+exports.DataAggregate = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const aggregate_result_1 = require("./aggregate_result");
-const connection_provider_1 = require("../Connection/connection_provider");
-const name_helpers_1 = require("../Helpers/name_helpers");
-class DataAggregate {
+class DataAggregate extends aggregate_result_1.DataAggregateResult {
     constructor(collectionId) {
-        this.dbName = "exweiv";
         if (!collectionId) {
             throw Error(`WeivData - Database and Collection name required`);
         }
-        const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
-        this.collectionName = collectionName;
-        this.dbName = dbName;
+        super(collectionId);
     }
     ascending(propertyName) {
         if (!propertyName) {
@@ -129,11 +124,7 @@ class DataAggregate {
         });
         return this;
     }
-    async run(options = {
-        suppressAuth: false,
-        consistentRead: false,
-        cleanupAfter: false
-    }) {
+    async run(options) {
         const { suppressAuth, consistentRead, cleanupAfter } = options;
         const { collection, cleanup } = await this.connectionHandler(suppressAuth);
         if (this.sorting) {
@@ -180,7 +171,7 @@ class DataAggregate {
         if (consistentRead === true) {
             aggregation.readConcern("majority");
         }
-        const aggregateResult = await (0, aggregate_result_1.WeivDataAggregateResult)({ pageSize: this.limitNumber, pipeline: this.pipeline, databaseName: this.dbName, collectionName: this.collectionName, suppressAuth }).getResult();
+        const aggregateResult = await this.getResult(suppressAuth);
         let modifiedItems = aggregateResult.items.map((document) => {
             if (document._exweivDocument) {
                 const _exweivDocumentExtracted = document._exweivDocument;
@@ -221,17 +212,6 @@ class DataAggregate {
             },
         });
         return this;
-    }
-    async connectionHandler(suppressAuth = false) {
-        const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
-        if (this.dbName) {
-            this.db = pool.db(this.dbName);
-        }
-        else {
-            this.db = pool.db("exweiv");
-        }
-        const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
     }
     setCurrentGroup() {
         this.pipeline = (0, pipeline_helpers_1.checkPipelineArray)(this.pipeline);
@@ -282,7 +262,3 @@ class DataAggregate {
     }
 }
 exports.DataAggregate = DataAggregate;
-function ExWeivDataAggregate(dynamicName) {
-    return new DataAggregate(dynamicName);
-}
-exports.ExWeivDataAggregate = ExWeivDataAggregate;

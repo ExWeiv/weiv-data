@@ -364,7 +364,3 @@ export class DataFilter implements DataFilterInterface {
         return this.filters;
     }
 }
-
-export function ExWeivDataFilter() {
-    return new DataFilter();
-}

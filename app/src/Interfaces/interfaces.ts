@@ -1,3 +1,5 @@
+import { AggregateResult, RunOptions } from "../../weiv-data";
+
 import { DataAggregate } from "../DataAggregate/data_aggregate";
 import { DataFilter } from "../DataFilter/data_filter";
 import { DataQuery } from '../DataQuery/data_query';
@@ -14,7 +16,7 @@ export interface DataAggregateInterface {
     limit(limit: number): DataAggregate;
     max(propertyName: string, projectedName?: string): DataAggregate;
     min(propertyName: string, projectedName: string): DataAggregate;
-    run(options: AggregateRunOptions): Promise<AggregateResult>;
+    run(options: RunOptions): Promise<AggregateResult>;
     skip(skip: number): DataAggregate;
     sum(propertyName: string, projectedName: string): DataAggregate;
 }
@@ -58,8 +60,4 @@ export interface DataQueryFilterInterface {
     not(query: DataQueryFilter): DataQueryFilter;
     or(query: DataQueryFilter): DataQueryFilter;
     startsWith(propertyName: string, string: string): DataQuery;
-}
-
-export interface DataQueryInterface {
-    ascending(...propertyName: string[]): DataQuery;
 }

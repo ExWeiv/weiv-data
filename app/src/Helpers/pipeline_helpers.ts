@@ -1,4 +1,5 @@
 import { sortBy, filter, defaultTo } from 'lodash';
+import { PipelineArray } from '../../weiv-data';
 
 const customPipelineSortOrder = {
     _owner: 1,

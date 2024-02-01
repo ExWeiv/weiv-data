@@ -1,5 +1,4 @@
 import { Db, CountOptions } from 'mongodb/mongodb';
-import { DataQueryInterface } from '../Interfaces/interfaces';
 import { DataQueryFilter } from './data_query_filters';
 import { merge, size } from 'lodash';
 import { useClient } from '../Connection/connection_provider';
@@ -7,15 +6,16 @@ import { WeivDataQueryResult } from './query_result';
 import { splitCollectionId } from '../Helpers/name_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import { ConnectionHandlerReturns, DataQueryFields, DataQueryFilters, DataQueryOptions, QueryResult, DataQuerySort, LookupObject, ReferenceLenghtObject } from '../../weiv-data';
 
-export class DataQuery extends DataQueryFilter implements DataQueryInterface {
+export class DataQuery extends DataQueryFilter {
     private collectionId: string;
     private collectionName: string;
     private dbName = "exweiv";
     private db!: Db;
-    private query: QueryFilters = {};
-    private sorting!: QuerySort;
-    private queryFields!: QueryFields;
+    private query: DataQueryFilters = {};
+    private sorting!: DataQuerySort;
+    private queryFields!: DataQueryFields;
     private distinctValue!: string;
     private includeValues: { $lookup?: LookupObject, $unwind?: string }[] = [];
     private skipNumber!: number;
@@ -60,12 +60,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The number of items that match the query. Rejected - The errors that caused the rejection.
      */
-    async count(options: QueryOptions = {
-        suppressAuth: false,
-        consistentRead: false,
-        cleanupAfter: false,
-        suppressHooks: false
-    }): Promise<number> {
+    async count(options: DataQueryOptions): Promise<number> {
         try {
             const { suppressAuth, consistentRead, cleanupAfter, suppressHooks } = options;
             const { collection, cleanup } = await this.connectionHandler(suppressAuth);
@@ -134,12 +129,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         return this;
     }
 
-    async distinct(propertyName: string, options: QueryOptions = {
-        suppressAuth: false,
-        suppressHooks: false,
-        cleanupAfter: false,
-        consistentRead: false
-    }): Promise<QueryResult> {
+    async distinct(propertyName: string, options: DataQueryOptions): Promise<QueryResult> {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -166,12 +156,13 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         return this;
     }
 
-    async find(options: QueryOptions = {
-        suppressAuth: false,
-        suppressHooks: false,
-        cleanupAfter: false,
-        consistentRead: false
-    }): Promise<QueryResult> {
+    /**
+     * Returns the items that match the query.
+     * 
+     * @param options An object containing options to use when processing this operation.
+     * @returns Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
+     */
+    async find(options: DataQueryOptions): Promise<QueryResult> {
         return this.runQuery(options);
     }
 
@@ -243,7 +234,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 
     // HELPER FUNCTIONS IN CLASS
-    private async runQuery(options: QueryOptions): Promise<QueryResult> {
+    private async runQuery(options: DataQueryOptions): Promise<QueryResult> {
         try {
             const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
             const { cleanup, collection } = await this.connectionHandler(suppressAuth);
@@ -326,7 +317,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         }
     }
 
-    private async connectionHandler(suppressAuth = false): Promise<ConnectionResult> {
+    private async connectionHandler(suppressAuth = false): Promise<ConnectionHandlerReturns> {
         const { pool, cleanup, memberId } = await useClient(suppressAuth);
 
         if (this.dbName) {
@@ -337,13 +328,5 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
 
         const collection = this.db.collection(this.collectionName);
         return { collection, cleanup, memberId };
-    }
-}
-
-export function ExWeivDataQuery(dynamicName: string) {
-    try {
-        return new DataQuery(dynamicName);
-    } catch (err) {
-        throw Error(`WeivData - Error when returning query class: ${err}`);
     }
 }

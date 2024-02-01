@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExWeivDataQuery = exports.DataQuery = void 0;
+exports.DataQuery = void 0;
 const data_query_filters_1 = require("./data_query_filters");
 const lodash_1 = require("lodash");
 const connection_provider_1 = require("../Connection/connection_provider");
@@ -36,12 +36,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         }
         return this;
     }
-    async count(options = {
-        suppressAuth: false,
-        consistentRead: false,
-        cleanupAfter: false,
-        suppressHooks: false
-    }) {
+    async count(options) {
         try {
             const { suppressAuth, consistentRead, cleanupAfter, suppressHooks } = options;
             const { collection, cleanup } = await this.connectionHandler(suppressAuth);
@@ -92,12 +87,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         }
         return this;
     }
-    async distinct(propertyName, options = {
-        suppressAuth: false,
-        suppressHooks: false,
-        cleanupAfter: false,
-        consistentRead: false
-    }) {
+    async distinct(propertyName, options) {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -115,12 +105,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         }
         return this;
     }
-    async find(options = {
-        suppressAuth: false,
-        suppressHooks: false,
-        cleanupAfter: false,
-        consistentRead: false
-    }) {
+    async find(options) {
         return this.runQuery(options);
     }
     include(...propertyName) {
@@ -251,12 +236,3 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
 }
 exports.DataQuery = DataQuery;
-function ExWeivDataQuery(dynamicName) {
-    try {
-        return new DataQuery(dynamicName);
-    }
-    catch (err) {
-        throw Error(`WeivData - Error when returning query class: ${err}`);
-    }
-}
-exports.ExWeivDataQuery = ExWeivDataQuery;

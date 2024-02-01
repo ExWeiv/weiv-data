@@ -1,23 +1,23 @@
 {
-    "out": "docs",
+    "out": "../docs",
     "theme": "default",
     "exclude": [
         "node_modules/**/*",
         "lib/**/*",
-        "src/Connection/**/*",
-        "src/Helpers/**/*",
-        "src/Hooks/**/*",
-        "src/Interfaces/**/*",
-        "src/app.ts",
     ],
-    "name": "WeivData APIs",
+    "name": "WeivData APIs - Built for Velo",
     "readme": "README.md",
     "entryPoints": [
-        "src/**/*"
+        "src/DataAggregate/**/*",
+        "src/DataFılter/**/*",
+        "src/DataQuery/**/*",
+        "src/Functions/**/*",
+        "weiv-data.d.ts",
+        "node_modules/mongodb/mongodb.ts",
+        "src/app.ts"
     ],
     "skipErrorChecking": true,
     "excludePrivate": true,
     "excludeProtected": true,
-    "excludeExternals": true,
-    "excludeInternal": true
+    "excludeInternal": true,
 }

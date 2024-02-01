@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExWeivDataFilter = exports.DataFilter = void 0;
+exports.DataFilter = void 0;
 const lodash_1 = require("lodash");
 const item_helpers_1 = require("../Helpers/item_helpers");
 class DataFilter {
@@ -226,7 +226,3 @@ class DataFilter {
     }
 }
 exports.DataFilter = DataFilter;
-function ExWeivDataFilter() {
-    return new DataFilter();
-}
-exports.ExWeivDataFilter = ExWeivDataFilter;

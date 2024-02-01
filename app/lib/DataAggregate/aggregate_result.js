@@ -1,23 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WeivDataAggregateResult = void 0;
+exports.DataAggregateResult = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const connection_provider_1 = require("../Connection/connection_provider");
+const name_helpers_1 = require("../Helpers/name_helpers");
 class DataAggregateResult {
-    constructor(options) {
+    constructor(collectionId) {
         this.pageSize = 50;
         this.currentPage = 1;
-        this.suppressAuth = false;
-        const { pageSize, pipeline, databaseName, collectionName, suppressAuth } = options;
-        if (!pipeline || !databaseName || !collectionName) {
-            throw Error(`WeivData - Required Parameters Missing (Internal API Error) - please report this BUG`);
-        }
-        this.pageSize = pageSize;
-        this.currentPage = 1;
+        const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
-        this.databaseName = databaseName;
-        this.pipeline = pipeline;
-        this.suppressAuth = suppressAuth || false;
+        this.dbName = dbName;
     }
     async getItems() {
         const currentSkip = this.pipeline.find((stage) => "$skip" in stage);
@@ -36,28 +29,27 @@ class DataAggregateResult {
         const items = await this.collection.aggregate(this.pipeline).toArray();
         return items;
     }
-    async getResult() {
-        const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
+    async getResult(suppressAuth) {
+        const { collection, cleanup } = await this.connectionHandler(suppressAuth);
         this.collection = collection;
         const items = await this.getItems();
-        return {
-            items,
-            length: items.length,
-            hasNext: () => this.currentPage * this.pageSize < length,
-            next: async (cleanupAfter = false) => {
-                this.currentPage++;
-                if (cleanupAfter === true) {
-                    await cleanup();
-                }
-                return this.getResult();
-            },
+        this.items = items;
+        this.length = items.length;
+        this.hasNext = () => this.currentPage * this.pageSize < length;
+        this.next = async (cleanupAfter) => {
+            this.currentPage++;
+            if (cleanupAfter === true) {
+                await cleanup();
+            }
+            return this.getResult(suppressAuth);
         };
+        return this;
     }
     async connectionHandler(suppressAuth) {
         try {
             const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
-            if (this.databaseName) {
-                this.db = pool.db(this.databaseName);
+            if (this.dbName) {
+                this.db = pool.db(this.dbName);
             }
             else {
                 this.db = pool.db("exweiv");
@@ -70,7 +62,4 @@ class DataAggregateResult {
         }
     }
 }
-function WeivDataAggregateResult(options) {
-    return new DataAggregateResult(options);
-}
-exports.WeivDataAggregateResult = WeivDataAggregateResult;
+exports.DataAggregateResult = DataAggregateResult;
