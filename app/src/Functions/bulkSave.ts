@@ -1,21 +1,23 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
+import { CollectionID, Items, WeivDataOptions } from '../../weivdata';
 
 /**
- * @description Inserts or updates a number of items in a collection.
+ * Inserts or updates a number of items in a collection.
+ * 
  * @param collectionId The ID of the collection to save the items to.
  * @param items The items to insert or update.
  * @param options An object containing options to use when processing this operation.
- * @returns Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
+ * @returns {Promise<object | void>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
  */
-export async function bulkSave(collectionId: string, items: DataItemValues[], options?: WeivDataOptions): Promise<object | void> {
+export async function bulkSave(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<object | void> {
     try {
         if (!collectionId || !items || items.length <= 0) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || {};
 
         let ownerId = await getOwnerId(enableVisitorId);
         const newItems = items.map((item) => {

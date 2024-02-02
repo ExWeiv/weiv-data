@@ -1,21 +1,23 @@
+import { CollectionID, WeivDataOptions } from '../../weivdata';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { ObjectId } from 'mongodb/mongodb';
 
 /**
- * @description Removes a number of items from a collection.
+ * Removes a number of items from a collection.
+ * 
  * @param collectionId The ID of the collection to remove the items from.
  * @param itemIds IDs of the items to remove.
  * @param options An object containing options to use when processing this operation.
- * @returns Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
+ * @returns {WeivDataOptions} Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
  */
-export async function bulkRemove(collectionId: string, itemIds: ObjectId[] | string[], options?: WeivDataOptions): Promise<object | null> {
+export async function bulkRemove(collectionId: CollectionID, itemIds: ObjectId[] | string[], options?: WeivDataOptions): Promise<object | null> {
     try {
         if (!collectionId || !itemIds) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemIds`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
         const newItemIds = itemIds.map((itemId) => {
             return convertStringId(itemId);
         })

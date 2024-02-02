@@ -1,8 +1,8 @@
-import { Db, Document, Collection } from "mongodb/mongodb";
+import { Db, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/connection_provider';
 import { size } from 'lodash';
 import NodeCache from "node-cache";
-import { ConnectionCleanup, ConnectionHandlerReturns, DataQueryResultOptions, QueryResult, QueryResultQueryOptions } from "../../weiv-data";
+import { ConnectionCleanup, ConnectionHandlerResult, DataQueryResultOptions, Items, QueryResultQueryOptions, WeivDataQueryResultI } from "../../weivdata";
 
 const cache = new NodeCache({
     stdTTL: 30,
@@ -11,11 +11,10 @@ const cache = new NodeCache({
     deleteOnExpire: true
 })
 
-class DataQueryResult {
+export class WeivDataQueryResult {
     private dataQueryClass!: { [key: string]: any };
     private suppressAuth = false;
     private consistentRead = false;
-    private suppressHooks = false;
     private pageSize: number = 50;
     private dbName!: string;
     private collectionName!: string;
@@ -26,7 +25,7 @@ class DataQueryResult {
     private cleanup!: ConnectionCleanup;
 
     constructor(options: DataQueryResultOptions) {
-        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, suppressHooks } = options;
+        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection } = options;
 
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
             throw Error(`WeivData - Required Param/s Missing`);
@@ -34,7 +33,6 @@ class DataQueryResult {
 
         this.collection = collection;
         this.consistentRead = consistentRead || false;
-        this.suppressHooks = suppressHooks || false;
         this.suppressAuth = suppressAuth || false;
         this.dataQueryClass = queryClass;
         this.pageSize = pageSize;
@@ -43,7 +41,7 @@ class DataQueryResult {
         this.collectionName = collectionName;
     }
 
-    private async getItems(): Promise<Document[]> {
+    private async getItems(): Promise<Items> {
         try {
             const { query, distinctProperty, skip, sort, fields, includes, addFields } = this.queryOptions;
 
@@ -160,10 +158,10 @@ class DataQueryResult {
         }
     }
 
-    async getResult(): Promise<QueryResult> {
+    async getResult(): Promise<WeivDataQueryResultI> {
         try {
             const cacheKey = this.generateCacheKey();
-            const cachedResult = cache.get(cacheKey) as QueryResult | undefined;
+            const cachedResult = cache.get(cacheKey) as WeivDataQueryResultI | undefined;
 
             if (cachedResult) {
                 return cachedResult;
@@ -224,7 +222,7 @@ class DataQueryResult {
         }
     }
 
-    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerReturns> {
+    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult> {
         try {
             const { pool, cleanup, memberId } = await useClient(suppressAuth);
 
@@ -243,13 +241,5 @@ class DataQueryResult {
 
     private generateCacheKey(): string {
         return `${this.dbName}-${this.collectionName}-${this.currentPage}-${JSON.stringify(this.queryOptions)}`;
-    }
-}
-
-export function WeivDataQueryResult(options: DataQueryResultOptions): DataQueryResult {
-    try {
-        return new DataQueryResult(options);
-    } catch (err) {
-        throw Error(`WeivData - Error when returning query result class: ${err}`);
     }
 }

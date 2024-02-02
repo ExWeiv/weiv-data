@@ -1,4 +1,5 @@
-import { Collection, MongoClient, ObjectId, Document } from 'mongodb/mongodb';
+import { Collection, MongoClient, ObjectId, Document, InferIdType } from 'mongodb/mongodb';
+import { WeivDataQuery } from './src/DataQuery/data_query';
 
 /**
  * Dynamic Collection ID <database_name>/<collection_name>. Our system will split both names and use them when needed.
@@ -12,7 +13,7 @@ export declare type CollectionID = string;
  * 
  * @public
  */
-export declare type Item = { _id: ObjectId | string, [key: string]: any; };
+export declare type Item = Document;
 
 /**
  * Item id can be string or ObjectID, inside the library it's in ObjectId type in most cases but in your code it can be one of them.
@@ -86,10 +87,11 @@ export declare type EnableVisitorID = boolean;
  * @public
  */
 export declare type WeivDataOptions = {
-    suppressAuth: SuppressAuth,
-    suppressHooks: SuppressHooks,
-    consistentRead: ConsistentRead,
-    cleanupAfter: CleanupAfter
+    suppressAuth?: SuppressAuth,
+    suppressHooks: ?SuppressHooks,
+    consistentRead?: ConsistentRead,
+    cleanupAfter?: CleanupAfter,
+    enableVisitorId?: EnableVisitorID
 }
 
 /**
@@ -113,113 +115,113 @@ export declare type ReferencedItem = Item | ItemID | Items | ItemIDs;
  * 
  * @public
  */
-export declare interface WeivDataAggregate {
+export declare interface WeivDataAggregateI {
     /**
      * Adds a sort to an aggregation, sorting by the items or groups by the specified properties in ascending order.
      * 
      * @param propertyName The properties used in the sort.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation.
      */
-    ascending(propertyName: string): WeivDataAggregate;
+    ascending(propertyName: string): WeivDataAggregateI;
 
     /**
-     * Refines a `WeivDataAggregate` to only contain the average value from each aggregation group.
+     * Refines a `WeivDataAggregateI` to only contain the average value from each aggregation group.
      * 
      * @param propertyName The property in which to find the average valu
      * @param projectedName The name of the property in the aggregation results containing the average value.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation.
      */
-    avg(propertyName: string, projectedName?: string): WeivDataAggregate;
+    avg(propertyName: string, projectedName?: string): WeivDataAggregateI;
 
     /**
-     * Refines a `WeivDataAggregate` to contain the item count of each group in the aggregation.
+     * Refines a `WeivDataAggregateI` to contain the item count of each group in the aggregation.
      * 
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation.
      */
-    count(): WeivDataAggregate;
+    count(): WeivDataAggregateI;
 
     /**
      * Adds a sort to an aggregation, sorting by the items or groups by the specified properties in descending order.
      * 
      * @param propertyName The properties used in the sort.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation.
      */
-    descending(propertyName: string): WeivDataAggregate;
+    descending(propertyName: string): WeivDataAggregateI;
 
     /**
      * Filters out items from being used in an aggregation.
      * 
      * @param filter The filter to use to filter out items from being used in the aggregation.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation.
      */
-    filter(filter: WeivDataFilter): WeivDataAggregate;
+    filter(filter: WeivDataFilterI): WeivDataAggregateI;
 
     /**
      * Groups items together in an aggregation.
      * 
      * @param propertyName The property or properties to group on.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation.
      */
-    group(propertyName: string): WeivDataAggregate;
+    group(propertyName: string): WeivDataAggregateI;
 
     /**
      * Filters out groups from being returned from an aggregation.
      * 
      * @param filter The filter to use to filter out groups from being returned from the aggregation.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation.
      */
-    having(filter: WeivDataFilter): WeivDataAggregate;
+    having(filter: WeivDataFilterI): WeivDataAggregateI;
 
     /**
      * Limits the number of items or groups the aggregation returns.
      * 
      * @param limit The number of items or groups to return.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation.
      */
-    limit(limit: number): WeivDataAggregate;
+    limit(limit: number): WeivDataAggregateI;
 
     /**
-     * Refines a `WeivDataAggregate` to only contain the maximum value from each aggregation group.
+     * Refines a `WeivDataAggregateI` to only contain the maximum value from each aggregation group.
      * 
      * @param propertyName The property in which to find the maximum value.
      * @param projectedName The name of the property in the aggregation results containing the maximum value.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation. 
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation. 
      */
-    max(propertyName: string, projectedName?: string): WeivDataAggregate;
+    max(propertyName: string, projectedName?: string): WeivDataAggregateI;
 
     /**
-     * Refines a `WeivDataAggregate` to only contain the minimum value from each aggregation group.
+     * Refines a `WeivDataAggregateI` to only contain the minimum value from each aggregation group.
      * 
      * @param propertyName The property in which to find the minimum value.
      * @param projectedName The name of the property in the aggregation results containing the minimum value.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation. 
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation. 
      */
-    min(propertyName: string, projectedName?: string): WeivDataAggregate;
+    min(propertyName: string, projectedName?: string): WeivDataAggregateI;
 
     /**
      * Sets the number of items or groups to skip before returning aggregation results.
      * 
      * @param skip The number of items or groups to skip in the aggregation results before returning the results.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation. 
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation. 
      */
-    skip(skip: number): WeivDataAggregate;
+    skip(skip: number): WeivDataAggregateI;
 
     /**
-     * Refines a `WeivDataAggregate` to contain the sum from each aggregation group.
+     * Refines a `WeivDataAggregateI` to contain the sum from each aggregation group.
      * 
      * @param propertyName The property in which to find the sum.
      * @param projectedName The name of the property in the aggregation results containing the sum.
-     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation. 
+     * @returns {WeivDataAggregateI} A `WeivDataAggregateI` object representing the refined aggregation. 
      */
-    sum(propertyName: string, projectedName?: string): WeivDataAggregate;
+    sum(propertyName: string, projectedName?: string): WeivDataAggregateI;
 
     /**
      * Runs the aggregation and returns the results.
      * 
      * @param options Options to use when running an aggregation.
-     * @returns {WeivDataAggregateResult} Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
+     * @returns {WeivDataAggregateResultI} Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
      */
-    run(options: { suppressAuth?: SuppressAuth, suppressHooks?: SuppressHooks }): WeivDataAggregateResult;
+    run(options?: AggregateRunOptions): WeivDataAggregateResultI;
 }
 
 /**
@@ -227,7 +229,7 @@ export declare interface WeivDataAggregate {
  * 
  * @public
  */
-export declare interface WeivDataAggregateResult {
+export declare interface WeivDataAggregateResultI {
     /**
      * Gets the aggregated values.
      * 
@@ -251,9 +253,9 @@ export declare interface WeivDataAggregateResult {
      * Retrieves the next page of aggregate results.
      * 
      * @param cleanupAfter Set connection cleaning. (Defaults to false.)
-     * @returns {WeivDataAggregateResult} Fulfilled - An aggregate object with the next page of aggregate results. Rejected - The errors that caused the rejection.
+     * @returns {WeivDataAggregateResultI} Fulfilled - An aggregate object with the next page of aggregate results. Rejected - The errors that caused the rejection.
      */
-    next(cleanupAfter?: CleanupAfter): Promise<WeivDataAggregateResult>;
+    next(cleanupAfter?: CleanupAfter): Promise<WeivDataAggregateResultI>;
 }
 
 /**
@@ -261,14 +263,14 @@ export declare interface WeivDataAggregateResult {
  * 
  * @public
  */
-export declare interface WeivDataFilter {
+export declare interface WeivDataFilterI {
     /**
      * Adds an `and` condition to the query or filter.
      * 
      * @param query A query to add to the initial query as an `and` condition.
-     * @return {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @return {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    and(query: WeivDataQuery): WeivDataQuery;
+    and(query: WeivDataQueryI): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value is within a specified range.
@@ -276,140 +278,140 @@ export declare interface WeivDataFilter {
      * @param propertyName The property whose value will be compared with `rangeStart` and `rangeEnd`.
      * @param rangeStart The beginning value of the range to match against.
      * @param rangeEnd The ending value of the range to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    between(propertyName: string, rangeStart: string | number | Date, rangeEnd: string | number | Date): WeivDataQuery;
+    between(propertyName: string, rangeStart: string | number | Date, rangeEnd: string | number | Date): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value contains a specified string.
      * 
      * @param propertyName 
      * @param string 
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    contains(propertyName: string, string: string): WeivDataQuery;
+    contains(propertyName: string, string: string): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value ends with a specified string.
      * 
      * @param propertyName The property whose value will be compared with the string.
      * @param string The string to look for at the end of the specified property value.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    endsWith(propertyName: string, string: string): WeivDataQuery;
+    endsWith(propertyName: string, string: string): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value equals the specified value.
      * 
      * @param propertyName The property whose value will be compared with `value`.
      * @param value The value to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    eq(propertyName: string, value: any): WeivDataQuery;
+    eq(propertyName: string, value: any): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value is greater than or equal to the specified value.
      * 
      * @param propertyName The property whose value will be compared with `value`.
      * @param value The value to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    ge(propertyName: string, value: string | number | Date): WeivDataQuery;
+    ge(propertyName: string, value: string | number | Date): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value is greater than the specified value.
      * 
      * @param propertyName The property whose value will be compared with `value`.
      * @param value The value to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    gt(propertyName: string, value: string | number | Date): WeivDataQuery;
+    gt(propertyName: string, value: string | number | Date): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property values equals all of the specified `value` parameters.
      * 
      * @param propertyName The property whose value will be compared with `value`.
      * @param value The values to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    hasAll(propertyName: string, value: string | number | Date | Array<any>): WeivDataQuery;
+    hasAll(propertyName: string, value: string | number | Date | Array<any>): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value equals any of the specified `value` parameters.
      * 
      * @param propertyName The property whose value will be compared with `value`.
      * @param value The values to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    hasSome(propertyName: string, value: string | number | Date | Array<any>): WeivDataQuery;
+    hasSome(propertyName: string, value: string | number | Date | Array<any>): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property does not exist or does not have any value.
      * 
      * @param propertyName The the property in which to check for a value.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    isEmpty(propertyName: string): WeivDataQuery;
+    isEmpty(propertyName: string): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property has any value.
      * 
      * @param propertyName The property in which to check for a value.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    isNotEmpty(propertyName: string): WeivDataQuery;
+    isNotEmpty(propertyName: string): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value is less than or equal to the specified value.
      * 
      * @param propertyName The property whose value will be compared with `value`.
      * @param value The value to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    le(propertyName: string, value: string | number | Date): WeivDataQuery;
+    le(propertyName: string, value: string | number | Date): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value is less than the specified value.
      * 
      * @param propertyName The property whose value will be compared with `value`.
      * @param value The value to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    lt(propertyName: string, value: string | number | Date): WeivDataQuery;
+    lt(propertyName: string, value: string | number | Date): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value does not equal the specified value.
      * 
      * @param propertyName The property whose value will be compared with `value`.
      * @param value The value to match against.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    ne(propertyName: string, value: any): WeivDataQuery;
+    ne(propertyName: string, value: any): WeivDataQueryI;
 
     /**
      * Adds a `not` condition to the query or filter.
      * 
      * @param query A query to add to the initial query as a `not` condition.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    not(query: WeivDataQuery): WeivDataQuery;
+    not(query: WeivDataQueryI): WeivDataQueryI;
 
     /**
      * Adds an `or` condition to the query or filter.
      * 
      * @param query A query to add to the initial query as an `or` condition.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    or(query: WeivDataQuery): WeivDataQuery;
+    or(query: WeivDataQueryI): WeivDataQueryI;
 
     /**
      * Refines a query or filter to match items whose specified property value starts with a specified string.
      * 
      * @param propertyName The property whose value will be compared with the string.
      * @param string The string to look for at the beginning of the specified property value.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    startsWith(propertyName: string, string: string): WeivDataQuery;
+    startsWith(propertyName: string, string: string): WeivDataQueryI;
 }
 
 /**
@@ -417,14 +419,14 @@ export declare interface WeivDataFilter {
  * 
  * @public
  */
-export declare interface WeivDataQuery extends WeivDataFilter {
+export declare interface WeivDataQueryI extends WeivDataFilterI {
     /**
      * Adds a sort to a query or sort, sorting by the specified properties in ascending order.
      * 
      * @param propertyName The properties used in the sort.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    ascending(propertyName: string): WeivDataQuery;
+    ascending(propertyName: string): WeivDataQueryI;
 
     /**
      * Returns the number of items that match the query.
@@ -438,58 +440,58 @@ export declare interface WeivDataQuery extends WeivDataFilter {
      * Adds a sort to a query or sort, sorting by the specified properties in descending order.
      * 
      * @param propertyName The properties used in the sort.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    descending(propertyName: string): WeivDataQuery;
+    descending(propertyName: string): WeivDataQueryI;
 
     /**
      * Returns the distinct values that match the query, without duplicates.
      * 
      * @param propertyName The property whose value will be compared for distinct values.
      * @param options An object containing options to use when processing this operation.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    distinct(propertyName: string, options?: WeivDataOptions): WeivDataQuery;
+    distinct(propertyName: string, options?: WeivDataOptions): WeivDataQueryI;
 
     /**
      * Lists the fields to return in a query's results.
      * 
      * @param propertyName Properties to return. To return multiple properties, pass properties as additional arguments.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    fields(...propertyName: string[]): WeivDataQuery;
+    fields(...propertyName: string[]): WeivDataQueryI;
 
     /**
      * Returns the items that match the query.
      * 
      * @param options An object containing options to use when processing this operation.
-     * @returns {Promise<WeivDataQueryResult>} Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
+     * @returns {Promise<WeivDataQueryResultI>} Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
      */
-    find(options: WeivDataOptions): Promise<WeivDataQueryResult>;
+    find(options: WeivDataOptions): Promise<WeivDataQueryResultI>;
 
     /**
      * Includes referenced items for the specified properties in a query's results.
      * 
      * @param propertyName The properties for which to include referenced items.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    include(...propertyName: string[]): WeivDataQuery;
+    include(...propertyName: string[]): WeivDataQueryI;
 
     /**
      * Limits the number of items the query returns.
      * 
      * @param limit The number of items to return, which is also the `pageSize` of the results object.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    limit(limit: number): WeivDataQuery;
+    limit(limit: number): WeivDataQueryI;
 
     /**
      * Sets the number of items to skip before returning query results.
      * 
      * @param skip The number of items to skip in the query results before returning the results.
-     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQueryI} A `WeivDataQueryI` object representing the refined query.
      */
-    skip(skip: number): WeivDataQuery;
+    skip(skip: number): WeivDataQueryI;
 }
 
 /**
@@ -497,7 +499,7 @@ export declare interface WeivDataQuery extends WeivDataFilter {
  * 
  * @public
  */
-export declare interface WeivDataQueryReferencedResult {
+export declare interface WeivDataQueryReferencedResultI {
     /**
      * Returns the items that match the reference query.
      * @readonly
@@ -524,17 +526,17 @@ export declare interface WeivDataQueryReferencedResult {
      * Retrieves the next page of reference query results.
      * 
      * @param cleanupAfter Set connection cleaning. (Defaults to false.)
-     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A reference query result object with the next page of query results. Rejected - The errors that caused the rejection.
+     * @returns {Promise<WeivDataQueryReferencedResultI>} Fulfilled - A reference query result object with the next page of query results. Rejected - The errors that caused the rejection.
      */
-    next(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryReferencedResult>;
+    next(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryReferencedResultI>;
 
     /**
      * Retrieves the previous page of reference query results.
      * 
      * @param cleanupAfter Set connection cleaning. (Defaults to false.)
-     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
+     * @returns {Promise<WeivDataQueryReferencedResultI>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
      */
-    prev(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryReferencedResult>;
+    prev(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryReferencedResultI>;
 }
 
 /**
@@ -542,7 +544,7 @@ export declare interface WeivDataQueryReferencedResult {
  * 
  * @public
  */
-export declare interface WeivDataQueryResult {
+export declare interface WeivDataQueryResultI {
     /**
      * Returns the index of the current results page number.
      * @readonly
@@ -595,17 +597,41 @@ export declare interface WeivDataQueryResult {
      * Retrieves the next page of query results.
      * 
      * @param cleanupAfter Set connection cleaning. (Defaults to false.)
-     * @returns {Promise<WeivDataQueryResult>} Fulfilled - A query result object with the next page of query results. Rejected - The errors that caused the rejection.
+     * @returns {Promise<WeivDataQueryResultI>} Fulfilled - A query result object with the next page of query results. Rejected - The errors that caused the rejection.
      */
-    next(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryResult>;
+    next(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryResultI>;
 
     /**
      * Retrieves the previous page of query results.
      * 
      * @param cleanupAfter Set connection cleaning. (Defaults to false.)
-     * @returns {Promise<WeivDataQueryResult>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
+     * @returns {Promise<WeivDataQueryResultI>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
      */
-    prev(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryResult>;
+    prev(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryResultI>;
+}
+
+/**
+ * Options to use when running an aggregation.
+ * 
+ * @public
+ */
+export declare type AggregateRunOptions = {
+    suppressAuth?: SuppressAuth,
+    consistentRead?: ConsistentRead,
+    cleanupAfter?: CleanupAfter
+}
+
+/**
+ * Adds a number of items to a collection.
+ * 
+ * @public
+ */
+export declare type BulkInsertResult = {
+    insertedItems: DataItemValues[],
+    insertedItemIds: {
+        [key: number]: ObjectId;
+    },
+    inserted: number
 }
 
 //---------------------------------------------//
@@ -703,3 +729,92 @@ export declare type HookContextResult = {
 
 /** @internal */
 export declare type PipelineArray = Document[];
+
+/** @internal */
+export declare type PipelineGroupObject<T> = {
+    _id?: T;
+    [key?: string]: any;
+    $group?: object;
+};
+
+/** @internal */
+export declare type SortingObject = {
+    propertyName: string;
+    type: 1 | -1;
+}
+/** @internal */
+export declare type HavingFilter = {
+    $match: object;
+};
+
+/** @internal */
+export declare type QueryFilters = {
+    [key: string]: object | string | number
+}
+
+/** @internal */
+export declare type QuerySort = {
+    [key: string]: 1 | -1;
+}
+
+/** @internal */
+export declare type QueryFields = {
+    [key: string]: 1
+}
+
+/** @internal */
+export declare type LookupObject = {
+    from: string,
+    localField: string,
+    foreignField: string,
+    as: string,
+    pipeline: { $limit: number }[]
+}
+
+/** @internal */
+export declare type ReferenceLenghtObject = {
+    [key: string]: {
+        $cond: {
+            if: { $isArray: string },
+            then: { $size: string },
+            else: 0
+        }
+    }
+}
+
+/** @internal */
+export declare type QueryResultQueryOptions = {
+    query: DataQueryFilters,
+    distinctProperty?: string,
+    skip?: number,
+    sort?: DataQuerySort,
+    fields?: DataQueryFields,
+    includes: { $lookup?: LookupObject, $unwind?: string }[],
+    addFields: ReferenceLenghtObject
+}
+
+/** @internal */
+export declare type DataQueryResultOptions = {
+    suppressAuth?: SuppressAuth,
+    consistentRead?: ConsistentRead,
+    pageSize: number,
+    dbName: DbName,
+    collectionName: CollectionName,
+    queryClass: GeneralObject,
+    queryOptions: QueryResultQueryOptions,
+    collection: Collection
+}
+
+/** @internal */
+export declare type IncludeObject = {
+    collectionName: string,
+    fieldName: string,
+    foreignField?: string,
+    as?: string
+    type?: "single" | "multi" | "mixed",
+    maxItems?: number,
+    countItems?: boolean
+}
+
+/** @internal */
+export declare type WeivDataQueryReferencedOptions = { pageSize: number, order: 'asc' | 'desc' };

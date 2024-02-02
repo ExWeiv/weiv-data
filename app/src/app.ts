@@ -1,7 +1,7 @@
-import { DataAggregate } from "./DataAggregate/data_aggregate";
-import { DataFilter } from "./DataFilter/data_filter";
+import { WeivDataAggregate } from "./DataAggregate/data_aggregate";
+import { WeivDataFilter } from "./DataFilter/data_filter";
 import { cleanupClientConnections } from './Connection/connection_provider';
-import { DataQuery } from './DataQuery/data_query';
+import { WeivDataQuery } from './DataQuery/data_query';
 import { insert } from './Functions/insert';
 import { update } from './Functions/update';
 import { get } from './Functions/get';
@@ -22,10 +22,10 @@ import { queryReferenced } from './Functions/QueryReferenced/queryReferenced';
 import { CollectionID } from "../weivdata";
 
 export = {
-    aggregate: (collectionId: CollectionID) => new DataAggregate(collectionId),
-    filter: () => new DataFilter(),
+    aggregate: (collectionId: CollectionID) => new WeivDataAggregate(collectionId),
+    filter: () => new WeivDataFilter(),
     cleanup: cleanupClientConnections,
-    query: (collectionId: CollectionID) => new DataQuery(collectionId),
+    query: (collectionId: CollectionID) => new WeivDataQuery(collectionId),
     insert: insert,
     update: update,
     get: get,

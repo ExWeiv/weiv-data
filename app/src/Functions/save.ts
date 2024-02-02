@@ -1,20 +1,22 @@
+import { CollectionID, Item, WeivDataOptions } from '../../weivdata';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 
 /**
- * @description Inserts or updates an item in a collection.
+ * Inserts or updates an item in a collection.
+ * 
  * @param collectionId The ID of the collection to save the item to.
  * @param item The item to insert or update.
  * @param options An object containing options to use when processing this operation.
- * @returns Fulfilled - The item that was either inserted or updated, depending on whether it previously existed in the collection. Rejected - The error that caused the rejection.
+ * @returns {Promise<object>} Fulfilled - The item that was either inserted or updated, depending on whether it previously existed in the collection. Rejected - The error that caused the rejection.
  */
-export async function save(collectionId: string, item: DataItemValues, options?: WeivDataOptions): Promise<object> {
+export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<object> {
     try {
         if (!collectionId || !item) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
 
         // Convert ID to ObjectId if exist
         let itemId;

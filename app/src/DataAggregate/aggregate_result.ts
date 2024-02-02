@@ -1,17 +1,14 @@
-import { Collection, Db, Document } from "mongodb/mongodb";
+import { Collection, Db } from "mongodb/mongodb";
 import { sortAggregationPipeline } from "../Helpers/pipeline_helpers";
 import { useClient } from '../Connection/connection_provider';
 import { splitCollectionId } from "../Helpers/name_helpers";
-import { AggregateResult, CleanupAfter, CollectionID, ConnectionHandlerReturns, PipelineArray, SuppressAuth } from "../../weiv-data";
+import { CleanupAfter, CollectionID, ConnectionHandlerResult, PipelineArray, SuppressAuth, Items } from "../../weivdata";
 
-interface DataAggregateResultInterface {
-    items: Document[],
-    length: number,
-    hasNext: () => boolean,
-    next: (cleanupAfter?: CleanupAfter) => Promise<AggregateResult>
-}
-
-export class DataAggregateResult implements DataAggregateResultInterface {
+/**
+ * The results of an aggregation, containing the aggregated values.
+ * @public
+ */
+export class WeivDataAggregateResult {
     protected pageSize: number = 50;
     protected currentPage = 1;
     protected pipeline!: PipelineArray;
@@ -20,12 +17,34 @@ export class DataAggregateResult implements DataAggregateResultInterface {
     protected dbName: string;
     protected collection!: Collection;
 
-    // Public Keys
-    items!: Document[];
-    length!: number;
-    hasNext!: () => boolean;
-    next!: (cleanupAfter?: CleanupAfter) => Promise<AggregateResult>;
+    /**
+     * Gets the aggregated values.
+     * @readonly
+     */
+    items!: Items;
 
+    /**
+     * Returns the number of values in the aggregate results.
+     * @readonly
+     */
+    length!: number;
+
+    /**
+     * Indicates if the aggregation has more results.
+     */
+    hasNext!: () => boolean;
+
+    /**
+     * Retrieves the next page of aggregate results.
+     * 
+     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
+     * @returns {WeivDataAggregateResult} Fulfilled - An aggregate object with the next page of aggregate results. Rejected - The errors that caused the rejection.
+     */
+    next!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataAggregateResult>;
+
+    /**
+     * @internal
+     */
     constructor(collectionId: CollectionID) {
         const { dbName, collectionName } = splitCollectionId(collectionId);
 
@@ -33,7 +52,7 @@ export class DataAggregateResult implements DataAggregateResultInterface {
         this.dbName = dbName;
     }
 
-    private async getItems(): Promise<Document[]> {
+    private async getItems(): Promise<Items> {
         const currentSkip = this.pipeline.find((stage) => "$skip" in stage);
 
         if (currentSkip) {
@@ -52,11 +71,7 @@ export class DataAggregateResult implements DataAggregateResultInterface {
         return items;
     }
 
-    /**
-     * @description The `run()` function returns a Promise that resolves to the results found by the aggregation and some information about the results.
-     * @returns {AggregateResult} Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
-     */
-    protected async getResult(suppressAuth: SuppressAuth): Promise<AggregateResult> {
+    protected async getResult(suppressAuth?: SuppressAuth): Promise<WeivDataAggregateResult> {
         // Setup a connection from the pool
         const { collection, cleanup } = await this.connectionHandler(suppressAuth);
         this.collection = collection;
@@ -66,10 +81,9 @@ export class DataAggregateResult implements DataAggregateResultInterface {
         this.items = items;
         this.length = items.length;
         this.hasNext = () => this.currentPage * this.pageSize < length;
-        this.next = async (cleanupAfter: CleanupAfter) => {
+        this.next = async (cleanupAfter?: CleanupAfter) => {
             this.currentPage++;
             if (cleanupAfter === true) {
-                // Close the connection after job completed (if cleanupAfter === true)
                 await cleanup();
             }
             return this.getResult(suppressAuth);
@@ -78,7 +92,7 @@ export class DataAggregateResult implements DataAggregateResultInterface {
         return this;
     }
 
-    protected async connectionHandler(suppressAuth: SuppressAuth): Promise<ConnectionHandlerReturns> {
+    protected async connectionHandler(suppressAuth?: SuppressAuth): Promise<ConnectionHandlerResult> {
         try {
             const { pool, cleanup, memberId } = await useClient(suppressAuth);
 
