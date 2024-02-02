@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { getMongoURI } from './permission_helpers';
 import { loadConnectionOptions } from '../Helpers/connection_helpers';
-import { CachedMongoClients, ClientFunctionsReturns, SuppressAuth, UseClientReturns } from '../../weiv-data';
+import { CachedMongoClients, SetupClientResult, SuppressAuth, UseClientResult } from '../../weivdata';
 
 /*
 This is a global variable which will hold the cached (saved) clients that's already created before using same URI.
@@ -14,9 +14,9 @@ const cachedMongoClient: CachedMongoClients = {};
  * @description Function to setup a MongoDB client or use one from cache. Cached clients are removed when the container closed in the Wix side.
  * 
  * @param uri URI to use when connecting to MongoDB Cluster
- * @returns {ClientFunctionsReturns}
+ * @returns {SetupClientResult}
  */
-async function setupClient(uri: string): Promise<ClientFunctionsReturns> {
+async function setupClient(uri: string): Promise<SetupClientResult> {
     try {
         if (cachedMongoClient[uri]) {
             const { connection, cleanup } = await connectClient(cachedMongoClient[uri], uri);
@@ -49,9 +49,9 @@ async function setupClient(uri: string): Promise<ClientFunctionsReturns> {
  * @description Function to create a new client if there are no clients in cache.
  * 
  * @param uri URI to use when connecting to MongoDB Cluster
- * @returns {ClientFunctionsReturns}
+ * @returns {SetupClientResult}
  */
-const createNewClient = async (uri: string): Promise<ClientFunctionsReturns> => {
+const createNewClient = async (uri: string): Promise<SetupClientResult> => {
     try {
         // Create a client and save it to cache
         const newMongoClient = new MongoClient(uri, await loadConnectionOptions());
@@ -76,9 +76,9 @@ const createNewClient = async (uri: string): Promise<ClientFunctionsReturns> => 
  * 
  * @param client MongoDB Client
  * @param uri URI to use when connecting to MongoDB Cluster
- * @returns {ClientFunctionsReturns}
+ * @returns {SetupClientResult}
  */
-const connectClient = async (client: MongoClient, uri: string): Promise<ClientFunctionsReturns> => {
+const connectClient = async (client: MongoClient, uri: string): Promise<SetupClientResult> => {
     try {
         // Connect and return connection
         const connectedClient = await client.connect();
@@ -98,7 +98,7 @@ const connectClient = async (client: MongoClient, uri: string): Promise<ClientFu
  * @param suppressAuth 
  * @returns 
  */
-export async function useClient(suppressAuth: SuppressAuth = false): Promise<UseClientReturns> {
+export async function useClient(suppressAuth: SuppressAuth = false): Promise<UseClientResult> {
     try {
         const { uri, memberId } = await getMongoURI(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);

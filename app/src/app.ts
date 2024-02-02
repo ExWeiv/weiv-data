@@ -19,7 +19,7 @@ import { bulkUpdate } from './Functions/bulkUpdate';
 import { queryReferenced } from './Functions/QueryReferenced/queryReferenced';
 
 // Types
-import { CollectionID } from "../weiv-data";
+import { CollectionID } from "../weivdata";
 
 export = {
     aggregate: (collectionId: CollectionID) => new DataAggregate(collectionId),

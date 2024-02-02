@@ -1,5 +1,5 @@
 import { memoize } from 'lodash';
-import { CollectionID, CollectionName, DbName } from '../../weiv-data';
+import { CollectionID, CollectionName, DbName } from '../../weivdata';
 
 /**
  * @description Get database and collection name from single string

@@ -2,7 +2,7 @@
 import { currentUser } from "wix-users-backend";
 import { getCachedSecret } from './secret_helpers';
 import NodeCache from 'node-cache';
-import { CachedRole, CachedURI, MongoURIReturns, SuppressAuth } from "../../weiv-data";
+import { SuppressAuth, GetMongoURIResult, CachedURI, CachedRole } from "../../weivdata";
 
 /*
 This is a global cache for this file which is used to cache data in it.
@@ -14,7 +14,7 @@ const cache = new NodeCache();
  * @param suppressAuth Bypass permissions or use existing member/visitor permissions
  * @returns An object with the MongoClient connection `URI` and if possible `memberId`
  */
-export async function getMongoURI(suppressAuth: SuppressAuth = false): Promise<MongoURIReturns> {
+export async function getMongoURI(suppressAuth: SuppressAuth = false): Promise<GetMongoURIResult> {
     try {
         if (suppressAuth != true) {
             if (currentUser.loggedIn === true) {
@@ -39,7 +39,7 @@ export async function getMongoURI(suppressAuth: SuppressAuth = false): Promise<M
  * 
  * @returns 
  */
-const getVisitorURI = async (): Promise<MongoURIReturns> => {
+const getVisitorURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Visitor (not logged in)
         const cachedVisitorURI: CachedURI = cache.get("VisitorMongoDB_URI");
@@ -61,7 +61,7 @@ const getVisitorURI = async (): Promise<MongoURIReturns> => {
  * 
  * @returns 
  */
-const getAdminURI = async (): Promise<MongoURIReturns> => {
+const getAdminURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Admin (permission is bypassed)
         const cachedAdminURI: CachedURI = cache.get("AdminMongoDB_URI");
@@ -89,7 +89,7 @@ const getAdminURI = async (): Promise<MongoURIReturns> => {
  * 
  * @returns 
  */
-const getMemberURI = async (): Promise<MongoURIReturns> => {
+const getMemberURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Member (logged in)
         const cachedMemberURI: CachedURI = cache.get(`MemberMongoDB_URI${currentUser.id}`);

@@ -2,10 +2,10 @@
 
 //@ts-ignore
 import * as data_hooks from '../../../../../../../../../user-code/backend/WeivData/data';
-import { HookName, HookArgs, HooksReturns } from '../../weiv-data';
+import { HookArgs, HookName, HooksResult, CollectionID } from '../../weivdata';
 import { splitCollectionId } from '../Helpers/name_helpers';
 
-function hookExist(collectionId: string, hookName: string): Function | undefined {
+function hookExist(collectionId: CollectionID, hookName: HookName): Function | undefined {
     const { collectionName, dbName } = splitCollectionId(collectionId);
     const hook = data_hooks[`${dbName.toLowerCase()}_${collectionName.toLowerCase()}_${hookName}`];
     if (hook) {
@@ -15,7 +15,7 @@ function hookExist(collectionId: string, hookName: string): Function | undefined
     }
 }
 
-export async function runDataHook<R>(collectionId: string, hookName: HookName, args: HookArgs<R>): Promise<HooksReturns<R> | undefined> {
+export async function runDataHook<R>(collectionId: CollectionID, hookName: HookName, args: HookArgs<R>): Promise<HooksResult<R> | undefined> {
     try {
         const hookFunction = hookExist(collectionId, hookName);
         if (hookFunction) {

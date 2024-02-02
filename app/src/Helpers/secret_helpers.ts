@@ -23,5 +23,6 @@ export async function getCachedSecret(secretName: string): Promise<string | unde
         return secret;
     } catch (err) {
         console.error(`WeivData - Error on general cached secret helpers: ${err}`);
+        return undefined;
     }
 }

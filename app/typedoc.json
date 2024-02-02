@@ -12,7 +12,7 @@
         "src/DataFılter/**/*",
         "src/DataQuery/**/*",
         "src/Functions/**/*",
-        "weiv-data.d.ts",
+        "weivdata.d.ts",
         "node_modules/mongodb/mongodb.ts",
         "src/app.ts"
     ],

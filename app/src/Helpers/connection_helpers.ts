@@ -3,7 +3,7 @@ import { splitCollectionId } from './name_helpers';
 import { Db, MongoClientOptions } from 'mongodb/mongodb';
 import { getCachedSecret } from './secret_helpers';
 import { defaultsDeep } from 'lodash';
-import { CollectionID, ConnectionHandlerReturns, SuppressAuth } from '../../weiv-data';
+import { CollectionID, ConnectionHandlerResult, SuppressAuth } from '../../weivdata';
 
 const defaultOptions: MongoClientOptions = {
     maxPoolSize: 45,
@@ -11,7 +11,7 @@ const defaultOptions: MongoClientOptions = {
     maxIdleTimeMS: 40000
 }
 
-export async function connectionHandler(collectionId: CollectionID, suppressAuth: SuppressAuth = false): Promise<ConnectionHandlerReturns> {
+export async function connectionHandler(collectionId: CollectionID, suppressAuth: SuppressAuth = false): Promise<ConnectionHandlerResult> {
     try {
         let db: Db | undefined;
         const { dbName, collectionName } = splitCollectionId(collectionId);
