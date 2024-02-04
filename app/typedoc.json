@@ -6,7 +6,7 @@
         "lib/**/*",
     ],
     "name": "WeivData APIs - Built for Velo",
-    "readme": "README.md",
+    "readme": "DOCS.md",
     "entryPoints": [
         "src/DataAggregate/**/*",
         "src/DataFılter/**/*",
@@ -20,4 +20,5 @@
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeInternal": true,
+    "excludeExternals": true,
 }
