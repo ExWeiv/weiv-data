@@ -139,6 +139,7 @@ In this file you can find what's changed in each version.
 - BUG fixes and small updates.
 - Documentation generated and now it's ready for use. (Will be improved with codes over time it's not best we know)
 - Some functions may not work after this update so please test and report. ([Discord](https://discord.gg/pVYJjPKRm6) or Email)
+- Hooks are now also support bulk operations and save function. Works *almost* same as in wix-data.
 
 ---
 

@@ -1,6 +1,9 @@
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { BulkInsertResult, CollectionID, Items, WeivDataOptions } from '../../weivdata';
+import { runDataHook } from '../Hooks/hook_manager';
+import { prepareHookContext } from '../Helpers/hook_helpers';
+import { Document } from 'mongodb/mongodb';
 
 /**
  * Adds a number of items to a collection.
@@ -16,17 +19,34 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
 
+        const context = prepareHookContext(collectionId);
         const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || {};
 
         let ownerId = await getOwnerId(enableVisitorId);
-        for (const item of items) {
+        let editedItems: Document[] | Promise<Document>[] = items.map(async (item) => {
             item._updatedDate = new Date();
             item._createdDate = new Date();
             item._owner = ownerId;
-        }
+
+            if (suppressHooks != true) {
+                let editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [item, context]).catch((err) => {
+                    throw Error(`WeivData - beforeInsert (bulkInsert) Hook Failure ${err}`);
+                });
+
+                if (editedItem) {
+                    return editedItem;
+                } else {
+                    return item;
+                }
+            } else {
+                return item;
+            }
+        })
+
+        editedItems = await Promise.all(editedItems);
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(items, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(editedItems, { readConcern: consistentRead === true ? "majority" : "local" });
 
         const insertedItemIds = Object.keys(insertedIds).map((key: any) => {
             return insertedIds[key];
@@ -37,7 +57,23 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
         }
 
         if (acknowledged === true) {
-            return { insertedItems: items, insertedItemIds, inserted: insertedCount };
+            if (suppressHooks != true) {
+                editedItems = editedItems.map(async (item) => {
+                    const editedInsertItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
+                        throw Error(`WeivData - afterInsert (bulkInsert) Hook Failure ${err}`);
+                    });
+
+                    if (editedInsertItem) {
+                        return editedInsertItem;
+                    } else {
+                        return item;
+                    }
+                })
+
+                editedItems = await Promise.all(editedItems);
+            }
+
+            return { insertedItems: editedItems, insertedItemIds, inserted: insertedCount };
         } else {
             throw Error(`WeivData - Error when inserting items using bulkInsert, acknowledged: ${acknowledged}, insertedCount: ${insertedCount}`);
         }

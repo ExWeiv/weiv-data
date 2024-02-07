@@ -1,6 +1,8 @@
 import { CollectionID, Item, WeivDataOptions } from '../../weivdata';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
+import { runDataHook } from '../Hooks/hook_manager';
+import { prepareHookContext } from '../Helpers/hook_helpers';
 
 /**
  * Inserts or updates an item in a collection.
@@ -16,13 +18,8 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
 
+        const context = prepareHookContext(collectionId);
         const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
-
-        // Convert ID to ObjectId if exist
-        let itemId;
-        if (item._id && typeof item._id === "string") {
-            itemId = convertStringId(item._id);
-        }
 
         // Add _createdDate if there is not one
         if (!item._createdDate) {
@@ -32,26 +29,63 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         // Update _updatedDate value
         item._updatedDate = new Date();
 
+        // Convert ID to ObjectId if exist
+        let editedItem;
+        if (item._id && typeof item._id === "string") {
+            item._id = convertStringId(item._id);
+
+            if (suppressHooks != true) {
+                editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [item, context]).catch((err) => {
+                    throw Error(`WeivData - beforeUpdate (save) Hook Failure ${err}`);
+                });
+            }
+        } else {
+            if (suppressHooks != true) {
+                editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [item, context]).catch((err) => {
+                    throw Error(`WeivData - beforeInsert (save) Hook Failure ${err}`);
+                });
+            }
+        }
+
+        editedItem = {
+            ...item,
+            ...editedItem
+        }
+
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const filter = itemId ? { _id: itemId } : {};
-        const { upsertedId, acknowledged } = await collection.updateOne(filter, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
+        const filter = editedItem._id ? { _id: editedItem._id } : {};
+        const { upsertedId, acknowledged } = await collection.updateOne(filter, { $set: editedItem }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
-        const returnedItem = { ...item, _id: itemId }
+        const returnedItem = { ...editedItem, _id: editedItem._id }
 
         if (acknowledged) {
             // Hooks handling
             if (upsertedId) {
                 // Item Inserted
+                const editedResult = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [returnedItem, context]).catch((err) => {
+                    throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                });
 
-                return { item: returnedItem, upsertedId };
+                if (editedResult) {
+                    return { item: editedResult, upsertedId };
+                } else {
+                    return { item: returnedItem, upsertedId };
+                }
             } else {
                 // Item Updated
+                const editedResult = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [returnedItem, context]).catch((err) => {
+                    throw Error(`WeivData - afterUpdate Hook Failure ${err}`);
+                });
 
-                return { item: returnedItem };
+                if (editedResult) {
+                    return { item: editedResult };
+                } else {
+                    return { item: returnedItem };
+                }
             }
         } else {
             throw Error(`WeivData - Error when saving an item to collection, acknowledged: ${acknowledged}`);
