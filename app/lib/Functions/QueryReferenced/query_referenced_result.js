@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryReferencedResult = void 0;
+exports.WeivDataQueryReferencedResult = void 0;
 const query_referenced_helpers_1 = require("../../Helpers/query_referenced_helpers");
 const connection_provider_1 = require("../../Connection/connection_provider");
 const name_helpers_1 = require("../../Helpers/name_helpers");
-class QueryReferencedResult {
+class WeivDataQueryReferencedResult {
     constructor(collectionId, targetCollectionId, itemId, propertyName, queryOptions, options) {
         this.currentPage = 0;
         this.pageSize = 50;
@@ -49,39 +49,37 @@ class QueryReferencedResult {
             const { skip } = this.getPipelineOptions();
             const items = await this.getItems();
             const { referencedItems, totalItems } = items[0];
-            const result = {
-                items: referencedItems,
-                totalCount: totalItems,
-                hasNext: () => this.currentPage * this.pageSize < totalItems,
-                hasPrev: () => {
-                    if (skip) {
-                        if (skip > 0 && skip >= this.pageSize) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
+            this.items = referencedItems;
+            this.totalCount = totalItems;
+            this.hasNext = () => this.currentPage * this.pageSize < totalItems;
+            this.hasPrev = () => {
+                if (skip) {
+                    if (skip > 0 && skip >= this.pageSize) {
+                        return true;
                     }
                     else {
-                        return this.currentPage > 0;
+                        return false;
                     }
-                },
-                next: async (cleanupAfter) => {
-                    this.currentPage++;
-                    if (cleanupAfter === true) {
-                        await this.cleanup();
-                    }
-                    return this.getResult();
-                },
-                prev: async (cleanupAfter) => {
-                    this.currentPage--;
-                    if (cleanupAfter === true) {
-                        await this.cleanup();
-                    }
-                    return this.getResult();
+                }
+                else {
+                    return this.currentPage > 0;
                 }
             };
-            return result;
+            this.next = async (cleanupAfter) => {
+                this.currentPage++;
+                if (cleanupAfter === true) {
+                    await this.cleanup();
+                }
+                return this.getResult();
+            };
+            this.prev = async (cleanupAfter) => {
+                this.currentPage--;
+                if (cleanupAfter === true) {
+                    await this.cleanup();
+                }
+                return this.getResult();
+            };
+            return this;
         }
         catch (err) {
             throw Error(`WeivData - Error when running queryReferenced function: ${err}`);
@@ -104,4 +102,4 @@ class QueryReferencedResult {
         }
     }
 }
-exports.QueryReferencedResult = QueryReferencedResult;
+exports.WeivDataQueryReferencedResult = WeivDataQueryReferencedResult;

@@ -1,9 +1,10 @@
-import { Document, ObjectId, Db, Collection } from 'mongodb/mongodb';
+import { ObjectId, Db, Collection } from 'mongodb/mongodb';
 import { getPipeline } from '../../Helpers/query_referenced_helpers';
 import { useClient } from '../../Connection/connection_provider';
 import { splitCollectionId } from '../../Helpers/name_helpers';
+import { CleanupAfter, CollectionID, ConnectionCleanup, ConnectionHandlerResult, Items, WeivDataOptions, WeivDataQueryReferencedOptions, WeivDataQueryReferencedResultI } from '../../../weivdata';
 
-export class QueryReferencedResult {
+export class WeivDataQueryReferencedResult {
     private targetCollectionId: string;
     private itemId: ObjectId;
     private propertyName: string;
@@ -16,9 +17,49 @@ export class QueryReferencedResult {
     private dbName: string;
     private db!: Db;
     private collection!: Collection;
-    private cleanup!: ConnectionCleanUp;
+    private cleanup!: ConnectionCleanup;
 
-    constructor(collectionId: string, targetCollectionId: string, itemId: ObjectId, propertyName: string, queryOptions: QueryReferencedOptions, options: WeivDataOptions) {
+    /**
+     * Returns the items that match the reference query.
+     * @readonly
+     */
+    items!: Items;
+
+    /**
+     * Returns the total number of items that match the reference query.
+     * @readonly
+     */
+    totalCount!: number;
+
+    /**
+     * Indicates if the reference query has more results.
+     */
+    hasNext!: () => boolean;
+
+    /**
+    * Indicates if the reference query has previous results.
+    */
+    hasPrev!: () => boolean;
+
+    /**
+     * Retrieves the next page of reference query results.
+     * 
+     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
+     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A reference query result object with the next page of query results. Rejected - The errors that caused the rejection.
+     */
+    next!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataQueryReferencedResultI>;
+
+    /**
+     * Retrieves the previous page of reference query results.
+     * 
+     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
+     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
+     */
+    prev!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataQueryReferencedResultI>;
+
+
+    /**@internal */
+    constructor(collectionId: CollectionID, targetCollectionId: string, itemId: ObjectId, propertyName: string, queryOptions: WeivDataQueryReferencedOptions, options: WeivDataOptions) {
         if (!collectionId || !targetCollectionId || !itemId || !propertyName || !queryOptions || !options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName, queryOptions, options, itemId`);
         }
@@ -35,7 +76,7 @@ export class QueryReferencedResult {
         this.order = queryOptions.order;
     }
 
-
+    /**@internal */
     private getPipelineOptions() {
         return {
             pageSize: this.pageSize,
@@ -44,7 +85,8 @@ export class QueryReferencedResult {
         }
     }
 
-    private async getItems(): Promise<Document[]> {
+    /**@internal */
+    private async getItems(): Promise<Items> {
         try {
             const { consistentRead } = this.options;
             const items = await this.collection.aggregate(getPipeline(this.itemId, this.targetCollectionId, this.propertyName, this.getPipelineOptions()),
@@ -55,7 +97,8 @@ export class QueryReferencedResult {
         }
     }
 
-    async getResult(): Promise<WeivDataQueryReferencedResult> {
+    /**@internal */
+    async getResult(): Promise<WeivDataQueryReferencedResultI> {
         try {
             const { suppressAuth } = this.options;
             if (!this.collection) {
@@ -68,44 +111,43 @@ export class QueryReferencedResult {
             const items = await this.getItems();
             const { referencedItems, totalItems } = items[0];
 
-            const result = {
-                items: referencedItems,
-                totalCount: totalItems,
-                hasNext: () => this.currentPage * this.pageSize < totalItems,
-                hasPrev: () => {
-                    if (skip) {
-                        if (skip > 0 && skip >= this.pageSize) {
-                            return true;
-                        } else {
-                            return false;
-                        }
+            this.items = referencedItems;
+            this.totalCount = totalItems;
+            this.hasNext = () => this.currentPage * this.pageSize < totalItems;
+            this.hasPrev = () => {
+                if (skip) {
+                    if (skip > 0 && skip >= this.pageSize) {
+                        return true;
                     } else {
-                        return this.currentPage > 0;
+                        return false;
                     }
-                },
-                next: async (cleanupAfter?: boolean) => {
-                    this.currentPage++;
-                    if (cleanupAfter === true) {
-                        await this.cleanup();
-                    }
-                    return this.getResult();
-                },
-                prev: async (cleanupAfter?: boolean) => {
-                    this.currentPage--;
-                    if (cleanupAfter === true) {
-                        await this.cleanup();
-                    }
-                    return this.getResult();
+                } else {
+                    return this.currentPage > 0;
                 }
             }
+            this.next = async (cleanupAfter?: CleanupAfter) => {
+                this.currentPage++;
+                if (cleanupAfter === true) {
+                    await this.cleanup();
+                }
+                return this.getResult();
+            }
+            this.prev = async (cleanupAfter?: CleanupAfter) => {
+                this.currentPage--;
+                if (cleanupAfter === true) {
+                    await this.cleanup();
+                }
+                return this.getResult();
+            }
 
-            return result;
+            return this;
         } catch (err) {
             throw Error(`WeivData - Error when running queryReferenced function: ${err}`);
         }
     }
 
-    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionResult> {
+    /**@internal */
+    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult> {
         try {
             const { pool, cleanup, memberId } = await useClient(suppressAuth);
 

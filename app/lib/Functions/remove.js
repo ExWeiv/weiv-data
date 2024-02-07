@@ -11,7 +11,7 @@ async function remove(collectionId, itemId, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
         let editedItemId;
         if (suppressHooks != true) {
             editedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeRemove", [itemId, context]).catch((err) => {

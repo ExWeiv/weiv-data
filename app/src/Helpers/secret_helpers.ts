@@ -1,4 +1,5 @@
-import { secrets } from "wix-secrets-backend.v2";
+//@ts-ignore
+import { secrets } from "wix-secrets-backend.v2"; //@ts-ignore
 import * as wixAuth from 'wix-auth';
 import NodeCache from 'node-cache';
 
@@ -22,5 +23,6 @@ export async function getCachedSecret(secretName: string): Promise<string | unde
         return secret;
     } catch (err) {
         console.error(`WeivData - Error on general cached secret helpers: ${err}`);
+        return undefined;
     }
 }

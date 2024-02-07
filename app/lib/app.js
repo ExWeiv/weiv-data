@@ -18,11 +18,11 @@ const bulkRemove_1 = require("./Functions/bulkRemove");
 const bulkSave_1 = require("./Functions/bulkSave");
 const bulkUpdate_1 = require("./Functions/bulkUpdate");
 const queryReferenced_1 = require("./Functions/QueryReferenced/queryReferenced");
-const weivData = {
-    aggregate: data_aggregate_1.ExWeivDataAggregate,
-    filter: data_filter_1.ExWeivDataFilter,
+module.exports = {
+    aggregate: (collectionId) => new data_aggregate_1.WeivDataAggregate(collectionId),
+    filter: () => new data_filter_1.WeivDataFilter(),
     cleanup: connection_provider_1.cleanupClientConnections,
-    query: data_query_1.ExWeivDataQuery,
+    query: (collectionId) => new data_query_1.WeivDataQuery(collectionId),
     insert: insert_1.insert,
     update: update_1.update,
     get: get_1.get,
@@ -39,4 +39,3 @@ const weivData = {
     bulkUpdate: bulkUpdate_1.bulkUpdate,
     queryReferenced: queryReferenced_1.queryReferenced
 };
-module.exports = weivData;

@@ -1,7 +1,7 @@
-import { ExWeivDataAggregate } from "./DataAggregate/data_aggregate";
-import { ExWeivDataFilter } from "./DataFilter/data_filter";
+import { WeivDataAggregate } from "./DataAggregate/data_aggregate";
+import { WeivDataFilter } from "./DataFilter/data_filter";
 import { cleanupClientConnections } from './Connection/connection_provider';
-import { ExWeivDataQuery } from './DataQuery/data_query';
+import { WeivDataQuery } from './DataQuery/data_query';
 import { insert } from './Functions/insert';
 import { update } from './Functions/update';
 import { get } from './Functions/get';
@@ -18,33 +18,14 @@ import { bulkSave } from './Functions/bulkSave';
 import { bulkUpdate } from './Functions/bulkUpdate';
 import { queryReferenced } from './Functions/QueryReferenced/queryReferenced';
 
-type weivData = {
-    aggregate: typeof ExWeivDataAggregate
-    bulkInsert: typeof bulkInsert,
-    bulkRemove: typeof bulkRemove,
-    bulkSave: typeof bulkSave,
-    bulkUpdate: typeof bulkUpdate,
-    get: typeof get,
-    insert: typeof insert,
-    insertReference: typeof insertReference,
-    isReferenced: typeof isReferenced,
-    queryReferenced: typeof queryReferenced,
-    remove: typeof remove,
-    removeReference: typeof removeReference,
-    replaceReferences: typeof replaceReferences,
-    save: typeof save,
-    truncate: typeof truncate,
-    update: typeof update,
-    filter: typeof ExWeivDataFilter
-    cleanup: typeof cleanupClientConnections
-    query: typeof ExWeivDataQuery
-}
+// Types
+import { CollectionID } from "../weivdata";
 
-const weivData: weivData = {
-    aggregate: ExWeivDataAggregate,
-    filter: ExWeivDataFilter,
+export = {
+    aggregate: (collectionId: CollectionID) => new WeivDataAggregate(collectionId),
+    filter: () => new WeivDataFilter(),
     cleanup: cleanupClientConnections,
-    query: ExWeivDataQuery,
+    query: (collectionId: CollectionID) => new WeivDataQuery(collectionId),
     insert: insert,
     update: update,
     get: get,
@@ -61,5 +42,3 @@ const weivData: weivData = {
     bulkUpdate: bulkUpdate,
     queryReferenced: queryReferenced
 };
-
-export = weivData;

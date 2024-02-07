@@ -1,7 +1,9 @@
-import wixData from 'wix-data';
+//@ts-ignore
+import wixData from 'wix-data'; //@ts-ignore
 import { currentUser } from 'wix-users-backend';
+import { EnableVisitorID } from '../../weivdata';
 
-export async function getOwnerId(enableVisitorId = false): Promise<string | null> {
+export async function getOwnerId(enableVisitorId: EnableVisitorID = false): Promise<string | null> {
     try {
         if (currentUser.loggedIn) {
             return currentUser.id;

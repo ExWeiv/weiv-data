@@ -1,16 +1,10 @@
-import { Db, Document } from "mongodb/mongodb";
+import { Document } from "mongodb/mongodb";
 import { checkPipelineArray, sortAggregationPipeline, } from "../Helpers/pipeline_helpers";
-import { DataFilter } from "../DataFilter/data_filter";
-import { DataAggregateInterface } from "../Interfaces/interfaces";
-import { WeivDataAggregateResult } from "./aggregate_result";
-import { useClient } from '../Connection/connection_provider';
-import { splitCollectionId } from '../Helpers/name_helpers';
+import { WeivDataFilter } from "../DataFilter/data_filter";
+import { WeivDataAggregateResult } from './aggregate_result';
+import { PipelineGroupObject, SortingObject, HavingFilter, AggregateRunOptions, WeivDataAggregateResultI } from "../../weivdata";
 
-export class DataAggregate implements DataAggregateInterface {
-    private collectionName: string;
-    private dbName = "exweiv";
-    private db!: Db;
-    private pipeline!: PipelineArray;
+export class WeivDataAggregate extends WeivDataAggregateResult {
     private limitNumber!: number;
     private skipNumber!: number;
     private currentGroup!: PipelineGroupObject<string | object>;
@@ -19,35 +13,22 @@ export class DataAggregate implements DataAggregateInterface {
     private countCalled!: boolean;
     private havingFilter!: HavingFilter;
 
+    /** @internal */
     constructor(collectionId: string) {
         if (!collectionId) {
             throw Error(`WeivData - Database and Collection name required`);
         }
 
-        const { dbName, collectionName } = splitCollectionId(collectionId);
-
-        this.collectionName = collectionName;
-        this.dbName = dbName;
+        super(collectionId);
     }
 
     /**
-     * @description Adds a sort to an aggregation, sorting by the items or groups by the specified properties in ascending order.
-     * @param propertyName The property used in the sort.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .ascending("population")
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * Adds a sort to an aggregation, sorting by the items or groups by the specified properties in ascending order.
+     * 
+     * @param propertyName The properties used in the sort.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
      */
-    ascending(propertyName: string): DataAggregate {
+    ascending(propertyName: string): WeivDataAggregate {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -59,27 +40,13 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Refines a `WeivDataAggregate` to only contain the average value from each aggregation group.
-     * @param propertyName The property in which to find the average value.
+     * Refines a `WeivDataAggregate` to only contain the average value from each aggregation group.
+     * 
+     * @param propertyName The property in which to find the average valu
      * @param projectedName The name of the property in the aggregation results containing the average value.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .avg("population", "averagePopulation")
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
      */
-    avg(
-        propertyName: string,
-        projectedName = `${propertyName}Avg`
-    ): DataAggregate {
+    avg(propertyName: string, projectedName = `${propertyName}Avg`): WeivDataAggregate {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
         }
@@ -93,45 +60,22 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Refines a WixDataAggregate to contain the item count of each group in the aggregation.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .group(["population", "year"])
-     * .count()
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * Refines a `WeivDataAggregate` to contain the item count of each group in the aggregation.
+     * 
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
      */
-    count(): DataAggregate {
+    count(): WeivDataAggregate {
         this.countCalled = true;
         return this;
     }
 
     /**
-     * @description Adds a sort to an aggregation, sorting by the items or groups by the specified properties in descending order.
-     * @param propertyName The property used in the sort.
-     * @returns A WeivDataAggregate object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .descending("population")
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * Adds a sort to an aggregation, sorting by the items or groups by the specified properties in descending order.
+     * 
+     * @param propertyName The properties used in the sort.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
      */
-    descending(propertyName: string): DataAggregate {
+    descending(propertyName: string): WeivDataAggregate {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
         }
@@ -143,24 +87,12 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Filters out items from being used in an aggregation.
+     * Filters out items from being used in an aggregation.
+     * 
      * @param filter The filter to use to filter out items from being used in the aggregation.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .descending("population")
-     * .filter(weivData.filter().gt("population", 1000000))
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
      */
-    filter(filter: DataFilter): DataAggregate {
+    filter(filter: WeivDataFilter): WeivDataAggregate {
         if (!filter) {
             throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
@@ -174,23 +106,12 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Groups items together in an aggregation.
+     * Groups items together in an aggregation.
+     * 
      * @param propertyName The property or properties to group on.
-     * @returns A WeivDataAggregate object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .group(["population", "year"]) //or a single string without an array or with an array
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
      */
-    group(propertyName: string | string[]): DataAggregate {
+    group(...propertyName: string[]): WeivDataAggregate {
         if (!propertyName) {
             throw Error(`WeivData - Property or properties are required!`);
         }
@@ -219,24 +140,12 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Filters out groups from being returned from an aggregation.
+     * Filters out groups from being returned from an aggregation.
+     * 
      * @param filter The filter to use to filter out groups from being returned from the aggregation.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .group(["population", "year"])
-     * .having(weivData.filter().gt("population", 1000000))
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
      */
-    having(filter: DataFilter): DataAggregate {
+    having(filter: WeivDataFilter): WeivDataAggregate {
         if (!filter) {
             throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
@@ -249,23 +158,12 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Limits the number of items or groups the aggregation returns.
+     * Limits the number of items or groups the aggregation returns.
+     * 
      * @param limit The number of items or groups to return.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .limit(100)
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
      */
-    limit(limit: number): DataAggregate {
+    limit(limit: number): WeivDataAggregate {
         if (!limit && limit != 0) {
             throw Error(`WeivData - Limit number is required please specify a limit amount`);
         }
@@ -278,28 +176,13 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Refines a `WeivDataAggregate` to only contain the maximum value from each aggregation group.
-     * @param propertyName The property in which to find the maximum value.
-     * @param projectedName The name of the property in the aggregation results containing the maximum value.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .group(["population", "year"])
-     * .max("population", "maximumPopulation")
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
-     */
-    max(
-        propertyName: string,
-        projectedName = `${propertyName}Max`
-    ): DataAggregate {
+    * Refines a `WeivDataAggregate` to only contain the maximum value from each aggregation group.
+    * 
+    * @param propertyName The property in which to find the maximum value.
+    * @param projectedName The name of the property in the aggregation results containing the maximum value.
+    * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation. 
+    */
+    max(propertyName: string, projectedName = `${propertyName}Max`): WeivDataAggregate {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
         }
@@ -313,28 +196,13 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Refines a `WeivDataAggregate` to only contain the minimum value from each aggregation group.
-     * @param propertyName The property in which to find the minimum value.
-     * @param projectedName The name of the property in the aggregation results containing the minimum value.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .group(["population", "year"])
-     * .min("population", "minimumPopulation")
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
-     */
-    min(
-        propertyName: string,
-        projectedName = `${propertyName}Min`
-    ): DataAggregate {
+    * Refines a `WeivDataAggregate` to only contain the minimum value from each aggregation group.
+    * 
+    * @param propertyName The property in which to find the minimum value.
+    * @param projectedName The name of the property in the aggregation results containing the minimum value.
+    * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation. 
+    */
+    min(propertyName: string, projectedName = `${propertyName}Min`): WeivDataAggregate {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
         }
@@ -348,37 +216,14 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Runs the aggregation and returns the results.
+     * Runs the aggregation and returns the results.
+     * 
      * @param options Options to use when running an aggregation.
-     * @returns Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * let options = {
-     *  suppressAuth: true,
-     *  consistentRead: true
-     * }
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .group(["population", "year"])
-     * .min("population", "minimumPopulation")
-     * .run(options)
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * @returns {WeivDataAggregateResult} Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
      */
-    async run(
-        options: AggregateRunOptions = {
-            suppressAuth: false,
-            consistentRead: false,
-            cleanupAfter: false
-        }
-    ): Promise<AggregateResult> {
+    async run(options?: AggregateRunOptions): Promise<WeivDataAggregateResultI> {
         // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
-        const { suppressAuth, consistentRead, cleanupAfter } = options;
+        const { suppressAuth, consistentRead, cleanupAfter } = options || { suppressAuth: false, consistentRead: false, cleanupAfter: false };
         const { collection, cleanup } = await this.connectionHandler(suppressAuth);
 
         if (this.sorting) {
@@ -444,7 +289,7 @@ export class DataAggregate implements DataAggregateInterface {
         }
 
         // Make the call to the MongoDB and convert it to an array via result function
-        const aggregateResult = await WeivDataAggregateResult({ pageSize: this.limitNumber, pipeline: this.pipeline, databaseName: this.dbName, collectionName: this.collectionName, suppressAuth }).getResult();
+        const aggregateResult = await this.getResult(suppressAuth);
 
         // Modify result of call
         let modifiedItems = aggregateResult.items.map((document: Document) => {
@@ -475,23 +320,12 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Sets the number of items or groups to skip before returning aggregation results.
+     * Sets the number of items or groups to skip before returning aggregation results.
+     * 
      * @param skip The number of items or groups to skip in the aggregation results before returning the results.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .skip(5)
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation. 
      */
-    skip(skip: number): DataAggregate {
+    skip(skip: number): WeivDataAggregate {
         if (!skip && skip != 0) {
             throw Error(`WeivData - Skip number is required please specify a skip number`);
         }
@@ -501,27 +335,13 @@ export class DataAggregate implements DataAggregateInterface {
     }
 
     /**
-     * @description Refines a `WeivDataAggregate` to contain the sum from each aggregation group.
+     * Refines a `WeivDataAggregate` to contain the sum from each aggregation group.
+     * 
      * @param propertyName The property in which to find the sum.
      * @param projectedName The name of the property in the aggregation results containing the sum.
-     * @returns A `WeivDataAggregate` object representing the refined aggregation.
-     * @example
-     * ```js
-     * import weivData from '@exweiv/weiv-data';
-     *
-     * weivData.aggregate("Database/PopulationData")
-     * .sum("population", "sumPopulation")
-     * .run()
-     * .then((result) => {
-     *   let items = result.items;
-     *   console.log(items);
-     * })
-     * ```
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation. 
      */
-    sum(
-        propertyName: string,
-        projectedName = `${propertyName}Sum`
-    ): DataAggregate {
+    sum(propertyName: string, projectedName = `${propertyName}Sum`): WeivDataAggregate {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`)
         }
@@ -535,19 +355,7 @@ export class DataAggregate implements DataAggregateInterface {
         return this;
     }
 
-    private async connectionHandler(suppressAuth = false): Promise<ConnectionResult> {
-        const { pool, cleanup, memberId } = await useClient(suppressAuth);
-
-        if (this.dbName) {
-            this.db = pool.db(this.dbName);
-        } else {
-            this.db = pool.db("exweiv");
-        }
-
-        const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
-    }
-
+    /**@internal */
     private setCurrentGroup() {
         this.pipeline = checkPipelineArray(this.pipeline);  //@ts-ignore
         this.currentGroup = this.pipeline.find(stage => stage["$group"]);
@@ -559,10 +367,8 @@ export class DataAggregate implements DataAggregateInterface {
         }
     }
 
-    private addGroup(
-        groupObject: PipelineGroupObject<string | object>,
-        isGroup?: boolean
-    ) {
+    /**@internal */
+    private addGroup(groupObject: PipelineGroupObject<string | object>, isGroup?: boolean) {
         const currentGroup = this.setCurrentGroup(); //@ts-ignore
         this.pipeline = this.pipeline.filter((stage) => !stage["$group"]);
 
@@ -598,8 +404,4 @@ export class DataAggregate implements DataAggregateInterface {
             this.pipeline.push({ $group: this.currentGroup["$group"] });
         }
     }
-}
-
-export function ExWeivDataAggregate(dynamicName: string) {
-    return new DataAggregate(dynamicName);
 }

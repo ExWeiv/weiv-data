@@ -1,33 +1,58 @@
-import { Collection, Db, Document } from "mongodb/mongodb";
+import { Collection, Db } from "mongodb/mongodb";
 import { sortAggregationPipeline } from "../Helpers/pipeline_helpers";
 import { useClient } from '../Connection/connection_provider';
+import { splitCollectionId } from "../Helpers/name_helpers";
+import { CleanupAfter, CollectionID, ConnectionHandlerResult, PipelineArray, SuppressAuth, Items } from "../../weivdata";
 
-class DataAggregateResult {
-    private pageSize: number = 50;
-    private currentPage = 1;
-    private pipeline: object[];
-    private db!: Db;
-    private databaseName: string;
-    private collectionName: string;
-    private suppressAuth = false
-    private collection!: Collection;
+/**
+ * The results of an aggregation, containing the aggregated values.
+ * @public
+ */
+export class WeivDataAggregateResult {
+    protected pageSize: number = 50;
+    protected currentPage = 1;
+    protected pipeline!: PipelineArray;
+    protected db!: Db;
+    protected collectionName: string;
+    protected dbName: string;
+    protected collection!: Collection;
 
-    constructor(options: AggregateResultOptions) {
-        const { pageSize, pipeline, databaseName, collectionName, suppressAuth } = options;
+    /**
+     * Gets the aggregated values.
+     * @readonly
+     */
+    items!: Items;
 
-        if (!pipeline || !databaseName || !collectionName) {
-            throw Error(`WeivData - Required Parameters Missing (Internal API Error) - please report this BUG`);
-        }
+    /**
+     * Returns the number of values in the aggregate results.
+     * @readonly
+     */
+    length!: number;
 
-        this.pageSize = pageSize;
-        this.currentPage = 1;
+    /**
+     * Indicates if the aggregation has more results.
+     */
+    hasNext!: () => boolean;
+
+    /**
+     * Retrieves the next page of aggregate results.
+     * 
+     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
+     * @returns {WeivDataAggregateResult} Fulfilled - An aggregate object with the next page of aggregate results. Rejected - The errors that caused the rejection.
+     */
+    next!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataAggregateResult>;
+
+    /**
+     * @internal
+     */
+    constructor(collectionId: CollectionID) {
+        const { dbName, collectionName } = splitCollectionId(collectionId);
+
         this.collectionName = collectionName;
-        this.databaseName = databaseName;
-        this.pipeline = pipeline;
-        this.suppressAuth = suppressAuth || false;
+        this.dbName = dbName;
     }
 
-    private async getItems(): Promise<Document[]> {
+    private async getItems(): Promise<Items> {
         const currentSkip = this.pipeline.find((stage) => "$skip" in stage);
 
         if (currentSkip) {
@@ -46,38 +71,33 @@ class DataAggregateResult {
         return items;
     }
 
-    /**
-     * @description The `run()` function returns a Promise that resolves to the results found by the aggregation and some information about the results.
-     * @returns Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
-     */
-    async getResult(): Promise<AggregateResult> {
+    protected async getResult(suppressAuth?: SuppressAuth): Promise<WeivDataAggregateResult> {
         // Setup a connection from the pool
-        const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
+        const { collection, cleanup } = await this.connectionHandler(suppressAuth);
         this.collection = collection;
 
         const items = await this.getItems();
 
-        return {
-            items,
-            length: items.length,
-            hasNext: () => this.currentPage * this.pageSize < length,
-            next: async (cleanupAfter: boolean = false) => {
-                this.currentPage++;
-                if (cleanupAfter === true) {
-                    // Close the connection after job completed (if cleanupAfter === true)
-                    await cleanup();
-                }
-                return this.getResult();
-            },
-        };
+        this.items = items;
+        this.length = items.length;
+        this.hasNext = () => this.currentPage * this.pageSize < length;
+        this.next = async (cleanupAfter?: CleanupAfter) => {
+            this.currentPage++;
+            if (cleanupAfter === true) {
+                await cleanup();
+            }
+            return this.getResult(suppressAuth);
+        }
+
+        return this;
     }
 
-    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionResult> {
+    protected async connectionHandler(suppressAuth?: SuppressAuth): Promise<ConnectionHandlerResult> {
         try {
             const { pool, cleanup, memberId } = await useClient(suppressAuth);
 
-            if (this.databaseName) {
-                this.db = pool.db(this.databaseName);
+            if (this.dbName) {
+                this.db = pool.db(this.dbName);
             } else {
                 this.db = pool.db("exweiv");
             }
@@ -88,8 +108,4 @@ class DataAggregateResult {
             throw Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
         }
     }
-}
-
-export function WeivDataAggregateResult(options: AggregateResultOptions) {
-    return new DataAggregateResult(options);
 }

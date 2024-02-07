@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExWeivDataQuery = exports.DataQuery = void 0;
+exports.WeivDataQuery = void 0;
 const data_query_filters_1 = require("./data_query_filters");
 const lodash_1 = require("lodash");
 const connection_provider_1 = require("../Connection/connection_provider");
@@ -8,7 +8,7 @@ const query_result_1 = require("./query_result");
 const name_helpers_1 = require("../Helpers/name_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
-class DataQuery extends data_query_filters_1.DataQueryFilter {
+class WeivDataQuery extends data_query_filters_1.WeivDataQueryFilter {
     constructor(collectionId) {
         super();
         this.dbName = "exweiv";
@@ -36,12 +36,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         }
         return this;
     }
-    async count(options = {
-        suppressAuth: false,
-        consistentRead: false,
-        cleanupAfter: false,
-        suppressHooks: false
-    }) {
+    async count(options) {
         try {
             const { suppressAuth, consistentRead, cleanupAfter, suppressHooks } = options;
             const { collection, cleanup } = await this.connectionHandler(suppressAuth);
@@ -92,12 +87,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         }
         return this;
     }
-    async distinct(propertyName, options = {
-        suppressAuth: false,
-        suppressHooks: false,
-        cleanupAfter: false,
-        consistentRead: false
-    }) {
+    async distinct(propertyName, options) {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -115,12 +105,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         }
         return this;
     }
-    async find(options = {
-        suppressAuth: false,
-        suppressHooks: false,
-        cleanupAfter: false,
-        consistentRead: false
-    }) {
+    async find(options) {
         return this.runQuery(options);
     }
     include(...propertyName) {
@@ -169,7 +154,7 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
     }
     async runQuery(options) {
         try {
-            const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
+            const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
             const { cleanup, collection } = await this.connectionHandler(suppressAuth);
             const context = (0, hook_helpers_1.prepareHookContext)(this.collectionId);
             let editedQurey;
@@ -187,9 +172,8 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
                 collectionName: classInUse.collectionName
             };
             classInUse.filtersHandler();
-            const result = await (0, query_result_1.WeivDataQueryResult)({
+            const result = await new query_result_1.WeivDataQueryResult({
                 suppressAuth,
-                suppressHooks,
                 consistentRead,
                 collection,
                 pageSize: classInUse.limitNumber,
@@ -250,13 +234,4 @@ class DataQuery extends data_query_filters_1.DataQueryFilter {
         return { collection, cleanup, memberId };
     }
 }
-exports.DataQuery = DataQuery;
-function ExWeivDataQuery(dynamicName) {
-    try {
-        return new DataQuery(dynamicName);
-    }
-    catch (err) {
-        throw Error(`WeivData - Error when returning query class: ${err}`);
-    }
-}
-exports.ExWeivDataQuery = ExWeivDataQuery;
+exports.WeivDataQuery = WeivDataQuery;

@@ -1,24 +1,25 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
-import { ObjectId } from 'mongodb/mongodb';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import { CollectionID, ItemID, WeivDataOptions } from '../../weivdata';
 
 /**
- * @description Removes an item from a collection.
+ * Removes an item from a collection.
+ * 
  * @param collectionId The ID of the collection to remove the item from.
  * @param itemId The ID of the item to remove.
  * @param options An object containing options to use when processing this operation.
- * @returns Fulfilled - The removed item, or null if the item was not found. Rejected - The error that caused the rejection.
+ * @returns {Promise<object | null>} Fulfilled - The removed item, or null if the item was not found. Rejected - The error that caused the rejection.
  */
-export async function remove(collectionId: string, itemId: ObjectId | string, options?: WeivDataOptions): Promise<object | null> {
+export async function remove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<object | null> {
     try {
         if (!collectionId || !itemId) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
 
         let editedItemId;
         if (suppressHooks != true) {

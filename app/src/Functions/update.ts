@@ -3,15 +3,17 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import { CollectionID, Item, WeivDataOptions } from '../../weivdata';
 
 /**
- * @description Updates an item in a collection.
+ * Updates an item in a collection.
+ * 
  * @param collectionId The ID of the collection that contains the item to update.
  * @param item The item to update.
  * @param options An object containing options to use when processing this operation.
- * @returns Fulfilled - The object that was updated. Rejected - The error that caused the rejection.
+ * @returns {Promise<object>} Fulfilled - The object that was updated. Rejected - The error that caused the rejection.
  */
-export async function update(collectionId: string, item: DataItemValuesUpdate, options?: WeivDataOptions): Promise<object> {
+export async function update(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<object> {
     try {
         if (!collectionId || !item._id) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item._id`);

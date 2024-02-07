@@ -13,20 +13,18 @@ const cache = new node_cache_1.default({
     useClones: true,
     deleteOnExpire: true
 });
-class DataQueryResult {
+class WeivDataQueryResult {
     constructor(options) {
         this.suppressAuth = false;
         this.consistentRead = false;
-        this.suppressHooks = false;
         this.pageSize = 50;
         this.currentPage = 1;
-        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, suppressHooks } = options;
+        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection } = options;
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
             throw Error(`WeivData - Required Param/s Missing`);
         }
         this.collection = collection;
         this.consistentRead = consistentRead || false;
-        this.suppressHooks = suppressHooks || false;
         this.suppressAuth = suppressAuth || false;
         this.dataQueryClass = queryClass;
         this.pageSize = pageSize;
@@ -208,14 +206,6 @@ class DataQueryResult {
     }
     generateCacheKey() {
         return `${this.dbName}-${this.collectionName}-${this.currentPage}-${JSON.stringify(this.queryOptions)}`;
-    }
-}
-function WeivDataQueryResult(options) {
-    try {
-        return new DataQueryResult(options);
-    }
-    catch (err) {
-        throw Error(`WeivData - Error when returning query result class: ${err}`);
     }
 }
 exports.WeivDataQueryResult = WeivDataQueryResult;

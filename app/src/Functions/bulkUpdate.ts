@@ -1,14 +1,18 @@
+import { CollectionID, Items, WeivDataOptions } from '../../weivdata';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
+import { runDataHook } from '../Hooks/hook_manager';
+import { prepareHookContext } from '../Helpers/hook_helpers';
 
 /**
- * @description Updates a number of items in a collection.
+ * Updates a number of items in a collection.
+ * 
  * @param collectionId The ID of the collection that contains the item to update.
  * @param item The items to update.
  * @param options An object containing options to use when processing this operation.
- * @returns Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
+ * @returns {Promise<object>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
  */
-export async function bulkUpdate(collectionId: string, items: DataItemValuesUpdate[], options?: WeivDataOptions): Promise<object> {
+export async function bulkUpdate(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<object> {
     try {
         if (!collectionId || !items) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
@@ -20,14 +24,37 @@ export async function bulkUpdate(collectionId: string, items: DataItemValuesUpda
             }
         }
 
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
-        const editedItems = items.map((item) => {
+        const context = prepareHookContext(collectionId);
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
+
+        let editedItems: Items | Promise<Items>[] = items.map(async (item) => {
             item._id = convertStringId(item._id);
-            return {
-                ...item,
-                _updatedDate: new Date()
+
+            if (suppressHooks != true) {
+                const editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [item, context]).catch((err) => {
+                    throw Error(`WeivData - beforeUpdate (bulkUpdate) Hook Failure ${err}`);
+                });
+
+                if (editedItem) {
+                    return {
+                        ...editedItem,
+                        _updatedDate: new Date()
+                    }
+                } else {
+                    return {
+                        ...item,
+                        _updatedDate: new Date()
+                    }
+                }
+            } else {
+                return {
+                    ...item,
+                    _updatedDate: new Date()
+                }
             }
         })
+
+        editedItems = await Promise.all(editedItems);
 
         const bulkOperations = editedItems.map((item) => {
             return {
@@ -43,6 +70,22 @@ export async function bulkUpdate(collectionId: string, items: DataItemValuesUpda
 
         if (cleanupAfter === true) {
             await cleanup();
+        }
+
+        if (suppressHooks != true) {
+            editedItems = editedItems.map(async (item) => {
+                const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
+                    throw Error(`WeivData - afterUpdate (bulkUpdate) Hook Failure ${err}`);
+                });
+
+                if (editedItem) {
+                    return editedItem;
+                } else {
+                    return item;
+                }
+            })
+
+            editedItems = await Promise.all(editedItems);
         }
 
         return {

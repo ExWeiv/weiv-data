@@ -8,7 +8,7 @@ async function removeReference(collectionId, propertyName, referringItem, refere
         if (!collectionId || !propertyName || !referringItem || !referencedItem) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
-        const { suppressAuth, cleanupAfter, consistentRead } = options || { suppressAuth: false, cleanupAfter: false, consistentRead: false };
+        const { suppressAuth, cleanupAfter, consistentRead } = options || {};
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);

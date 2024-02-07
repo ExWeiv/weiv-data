@@ -1,14 +1,14 @@
 import { Db, CountOptions } from 'mongodb/mongodb';
-import { DataQueryInterface } from '../Interfaces/interfaces';
-import { DataQueryFilter } from './data_query_filters';
+import { WeivDataQueryFilter } from './data_query_filters';
 import { merge, size } from 'lodash';
 import { useClient } from '../Connection/connection_provider';
 import { WeivDataQueryResult } from './query_result';
 import { splitCollectionId } from '../Helpers/name_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import { ConnectionHandlerResult, IncludeObject, LookupObject, QueryFields, QueryFilters, QuerySort, ReferenceLenghtObject, WeivDataOptions, WeivDataQueryResultI } from '../../weivdata';
 
-export class DataQuery extends DataQueryFilter implements DataQueryInterface {
+export class WeivDataQuery extends WeivDataQueryFilter {
     private collectionId: string;
     private collectionName: string;
     private dbName = "exweiv";
@@ -22,6 +22,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     private limitNumber = 50;
     private referenceLenght: ReferenceLenghtObject = {};
 
+    /** @internal */
     constructor(collectionId: string) {
         super();
         if (!collectionId) {
@@ -37,11 +38,12 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 
     /**
-     * @description Adds a sort to a query or sort, sorting by the specified properties in ascending order.
+     * Adds a sort to a query or sort, sorting by the specified properties in ascending order.
+     * 
      * @param propertyName The properties used in the sort.
-     * @returns A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    ascending(...propertyName: string[]): DataQuery {
+    ascending(...propertyName: string[]): WeivDataQuery {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -56,16 +58,12 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 
     /**
-     * @description Returns the number of items that match the query.
-     * @param options An object containing options to use when processing this operation.
-     * @returns Fulfilled - The number of items that match the query. Rejected - The errors that caused the rejection.
-     */
-    async count(options: QueryOptions = {
-        suppressAuth: false,
-        consistentRead: false,
-        cleanupAfter: false,
-        suppressHooks: false
-    }): Promise<number> {
+    * Returns the number of items that match the query.
+    * 
+    * @param options An object containing options to use when processing this operation.
+    * @returns {Promise<number>} Fulfilled - The number of items that match the query. Rejected - The errors that caused the rejection.
+    */
+    async count(options: WeivDataOptions): Promise<number> {
         try {
             const { suppressAuth, consistentRead, cleanupAfter, suppressHooks } = options;
             const { collection, cleanup } = await this.connectionHandler(suppressAuth);
@@ -116,11 +114,12 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 
     /**
-     * @description Adds a sort to a query or sort, sorting by the specified properties in descending order.
-     * @param propertyName The properties used in the sort.
-     * @returns A `WeivDataQuery` object representing the refined query.
-     */
-    descending(...propertyName: string[]): DataQuery {
+    * Adds a sort to a query or sort, sorting by the specified properties in descending order.
+    * 
+    * @param propertyName The properties used in the sort.
+    * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
+    */
+    descending(...propertyName: string[]): WeivDataQuery {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -134,12 +133,14 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         return this;
     }
 
-    async distinct(propertyName: string, options: QueryOptions = {
-        suppressAuth: false,
-        suppressHooks: false,
-        cleanupAfter: false,
-        consistentRead: false
-    }): Promise<QueryResult> {
+    /**
+     * Returns the distinct values that match the query, without duplicates.
+     * 
+     * @param propertyName The property whose value will be compared for distinct values.
+     * @param options An object containing options to use when processing this operation.
+     * @returns {Promise<WeivDataQueryResult>} A `WeivDataQuery` object representing the refined query.
+     */
+    async distinct(propertyName: string, options: WeivDataOptions): Promise<WeivDataQueryResultI> {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -148,11 +149,12 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 
     /**
-     * @description Lists the fields to return in a query's results.
+     * Lists the fields to return in a query's results.
+     * 
      * @param propertyName Properties to return. To return multiple properties, pass properties as additional arguments.
-     * @returns A `WeivDataQuery` object representing the query.
+     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    fields(...propertyName: string[]): DataQuery {
+    fields(...propertyName: string[]): WeivDataQuery {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -166,21 +168,23 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         return this;
     }
 
-    async find(options: QueryOptions = {
-        suppressAuth: false,
-        suppressHooks: false,
-        cleanupAfter: false,
-        consistentRead: false
-    }): Promise<QueryResult> {
+    /**
+     * Returns the items that match the query.
+     * 
+     * @param options An object containing options to use when processing this operation.
+     * @returns {Promise<WeivDataQueryResult>} Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
+     */
+    async find(options: WeivDataOptions): Promise<WeivDataQueryResultI> {
         return this.runQuery(options);
     }
 
     /**
-     * @description Includes referenced items for the specified properties in a query's results.
+     * Includes referenced items for the specified properties in a query's results.
+     * 
      * @param propertyName The properties for which to include referenced items.
-     * @returns A `WeivDataQuery` object representing the query.
+     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    include(...propertyName: IncludeObject[]): DataQuery {
+    include(...propertyName: IncludeObject[]): WeivDataQuery {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
         }
@@ -213,11 +217,12 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 
     /**
-     * @description Limits the number of items the query returns.
+     * Limits the number of items the query returns.
+     * 
      * @param limit The number of items to return, which is also the `pageSize` of the results object.
-     * @returns A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    limit(limit: number): DataQuery {
+    limit(limit: number): WeivDataQuery {
         if (!limit && limit != 0) {
             throw Error(`WeivData - Limit number is required!`);
         }
@@ -230,11 +235,12 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 
     /**
-     * @description Sets the number of items to skip before returning query results.
+     * Sets the number of items to skip before returning query results.
+     * 
      * @param skip The number of items to skip in the query results before returning the results.
-     * @returns A `WeivDataQuery` object representing the refined query.
+     * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    skip(skip: number): DataQuery {
+    skip(skip: number): WeivDataQuery {
         if (!skip && skip != 0) {
             throw Error(`WeivData - Skip number is required!`);
         }
@@ -243,9 +249,10 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
     }
 
     // HELPER FUNCTIONS IN CLASS
-    private async runQuery(options: QueryOptions): Promise<QueryResult> {
+    /** @internal */
+    private async runQuery(options?: WeivDataOptions): Promise<WeivDataQueryResultI> {
         try {
-            const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options;
+            const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
             const { cleanup, collection } = await this.connectionHandler(suppressAuth);
 
             const context = prepareHookContext(this.collectionId);
@@ -269,9 +276,8 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
 
             // Add filters to query
             classInUse.filtersHandler();
-            const result = await WeivDataQueryResult({
+            const result = await new WeivDataQueryResult({
                 suppressAuth,
-                suppressHooks,
                 consistentRead,
                 collection,
                 pageSize: classInUse.limitNumber,
@@ -319,6 +325,7 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         }
     }
 
+    /** @internal */
     private filtersHandler(): void {
         // Check if there is any filters
         if (size(this.filters) > 0) {
@@ -326,7 +333,8 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
         }
     }
 
-    private async connectionHandler(suppressAuth = false): Promise<ConnectionResult> {
+    /** @internal */
+    private async connectionHandler(suppressAuth = false): Promise<ConnectionHandlerResult> {
         const { pool, cleanup, memberId } = await useClient(suppressAuth);
 
         if (this.dbName) {
@@ -337,13 +345,5 @@ export class DataQuery extends DataQueryFilter implements DataQueryInterface {
 
         const collection = this.db.collection(this.collectionName);
         return { collection, cleanup, memberId };
-    }
-}
-
-export function ExWeivDataQuery(dynamicName: string) {
-    try {
-        return new DataQuery(dynamicName);
-    } catch (err) {
-        throw Error(`WeivData - Error when returning query class: ${err}`);
     }
 }

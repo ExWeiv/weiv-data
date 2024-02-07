@@ -12,7 +12,7 @@ async function insert(collectionId, item, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, consistentRead: false };
+        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || {};
         const defaultValues = {
             _updatedDate: new Date(),
             _createdDate: new Date(),

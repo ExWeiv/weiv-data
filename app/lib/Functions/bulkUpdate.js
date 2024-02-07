@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.bulkUpdate = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
+const hook_manager_1 = require("../Hooks/hook_manager");
+const hook_helpers_1 = require("../Helpers/hook_helpers");
 async function bulkUpdate(collectionId, items, options) {
     try {
         if (!collectionId || !items) {
@@ -13,14 +15,35 @@ async function bulkUpdate(collectionId, items, options) {
                 throw Error(`WeivData - Item (_id) ID is required for each item when bulk updating ID is missing for one or more item in your array!`);
             }
         }
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
-        const editedItems = items.map((item) => {
+        const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
+        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
+        let editedItems = items.map(async (item) => {
             item._id = (0, item_helpers_1.convertStringId)(item._id);
-            return {
-                ...item,
-                _updatedDate: new Date()
-            };
+            if (suppressHooks != true) {
+                const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
+                    throw Error(`WeivData - beforeUpdate (bulkUpdate) Hook Failure ${err}`);
+                });
+                if (editedItem) {
+                    return {
+                        ...editedItem,
+                        _updatedDate: new Date()
+                    };
+                }
+                else {
+                    return {
+                        ...item,
+                        _updatedDate: new Date()
+                    };
+                }
+            }
+            else {
+                return {
+                    ...item,
+                    _updatedDate: new Date()
+                };
+            }
         });
+        editedItems = await Promise.all(editedItems);
         const bulkOperations = editedItems.map((item) => {
             return {
                 updateOne: {
@@ -33,6 +56,20 @@ async function bulkUpdate(collectionId, items, options) {
         const { matchedCount } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();
+        }
+        if (suppressHooks != true) {
+            editedItems = editedItems.map(async (item) => {
+                const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
+                    throw Error(`WeivData - afterUpdate (bulkUpdate) Hook Failure ${err}`);
+                });
+                if (editedItem) {
+                    return editedItem;
+                }
+                else {
+                    return item;
+                }
+            });
+            editedItems = await Promise.all(editedItems);
         }
         return {
             updated: matchedCount,
