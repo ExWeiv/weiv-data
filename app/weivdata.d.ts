@@ -88,7 +88,7 @@ export declare type EnableVisitorID = boolean;
  */
 export declare type WeivDataOptions = {
     suppressAuth?: SuppressAuth,
-    suppressHooks: ?SuppressHooks,
+    suppressHooks?: SuppressHooks,
     consistentRead?: ConsistentRead,
     cleanupAfter?: CleanupAfter,
     enableVisitorId?: EnableVisitorID

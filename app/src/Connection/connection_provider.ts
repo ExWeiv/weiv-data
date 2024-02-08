@@ -8,6 +8,7 @@ This is a global variable which will hold the cached (saved) clients that's alre
 This will remove the cold start and make the process much more faster after first few calls.
 */
 const cachedMongoClient: CachedMongoClients = {};
+const cachedConnectionStatus: { [key: string]: boolean } = {};
 
 /**
  * @function
@@ -24,13 +25,13 @@ async function setupClient(uri: string): Promise<SetupClientResult> {
                 return { connection, cleanup };
             } else {
                 // If first attempt fails try to create the client again and use new connection
-                console.warn("Failed to connect/create MongoClient in first attempt!");
+                console.warn("WeivData - Failed to connect/create MongoClient in first attempt!");
                 const newMongoClient = new MongoClient(uri, await loadConnectionOptions());
                 cachedMongoClient[uri] = newMongoClient;
                 const secondAttempt = await connectClient(newMongoClient, uri);
 
                 if (!secondAttempt.connection) {
-                    throw Error("Failed both two attempts to connect to a MongoClient");
+                    throw Error("WeivData - Failed both two attempts to connect to a MongoClient");
                 } else {
                     return { connection: secondAttempt.connection, cleanup: secondAttempt.cleanup };
                 }
@@ -40,7 +41,7 @@ async function setupClient(uri: string): Promise<SetupClientResult> {
             return createNewClient(uri);
         }
     } catch (err) {
-        throw Error(`Error when connecting to MongoDB Client via setupClient: ${err}`);
+        throw Error(`WeivData - Error when connecting to MongoDB Client via setupClient: ${err}`);
     }
 }
 
@@ -63,10 +64,10 @@ const createNewClient = async (uri: string): Promise<SetupClientResult> => {
         if (connection) {
             return { cleanup, connection };
         } else {
-            throw Error(`Failed to connect to a MongoClient: connection: ${connection} and cleanup: ${cleanup}`);
+            throw Error(`WeivData - Failed to connect to a MongoClient: connection: ${connection} and cleanup: ${cleanup}`);
         }
     } catch (err) {
-        throw Error(`Error when creating a new MongoDB client: ${err}`);
+        throw Error(`WeivData - Error when creating a new MongoDB client: ${err}`);
     }
 }
 
@@ -80,14 +81,35 @@ const createNewClient = async (uri: string): Promise<SetupClientResult> => {
  */
 const connectClient = async (client: MongoClient, uri: string): Promise<SetupClientResult> => {
     try {
+        if (cachedConnectionStatus[uri] === true) {
+            return {
+                connection: cachedMongoClient[uri],
+                cleanup: () => { cachedMongoClient[uri]?.close(); }
+            }
+        }
+
+        let connectedClient: MongoClient;
+
+        // Set listeners for connection status updating
+        client.on("open", () => {
+            cachedMongoClient[uri] = connectedClient;
+            cachedConnectionStatus[uri] = true;
+        })
+
+        client.on("close", () => {
+            cachedMongoClient[uri].removeAllListeners();
+            delete cachedMongoClient[uri];
+            cachedConnectionStatus[uri] = false;
+        })
+
         // Connect and return connection
-        const connectedClient = await client.connect();
+        connectedClient = await client.connect();
         return {
             connection: connectedClient,
             cleanup: () => { cachedMongoClient[uri]?.close(); }
         }
     } catch (err) {
-        throw Error(`Error when trying to connect existing client: ${err}`);
+        throw Error(`WeivData - Error when trying to connect existing client: ${err}`);
     }
 }
 
@@ -104,7 +126,7 @@ export async function useClient(suppressAuth: SuppressAuth = false): Promise<Use
         const { connection, cleanup } = await setupClient(uri);
         return { pool: connection, cleanup, memberId };
     } catch (err) {
-        throw Error(`Error when connecting to cached MongoClient via useClient: ${err}`);
+        throw Error(`WeivData - Error when connecting to cached MongoClient via useClient: ${err}`);
     }
 }
 
@@ -122,6 +144,6 @@ export async function cleanupClientConnections(): Promise<void> {
 
         console.info("All MongoDB Cached Connections Closed and Cleared - Cached Clients Removed");
     } catch (err) {
-        throw Error(`Erroe when cleaning all existing client connections ${err}`);
+        throw Error(`WeivData - Error when cleaning all existing client connections ${err}`);
     }
 }

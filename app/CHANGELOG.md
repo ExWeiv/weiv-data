@@ -141,6 +141,10 @@ In this file you can find what's changed in each version.
 - Some functions may not work after this update so please test and report. ([Discord](https://discord.gg/pVYJjPKRm6) or Email)
 - Hooks are now also support bulk operations and save function. Works *almost* same as in wix-data.
 
+### 2.1.0
+
+- Updates to connection system for performance upgrade and resource saving.
+
 ---
 
 _When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_
