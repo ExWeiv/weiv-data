@@ -1,17 +1,41 @@
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { BulkInsertResult, CollectionID, Items, WeivDataOptions } from '../../weivdata';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import { Document } from 'mongodb/mongodb';
+import { Document, ObjectId } from 'mongodb/mongodb';
+import type { CollectionID, Items, WeivDataOptions } from '../Helpers/collection';
 
 /**
  * Adds a number of items to a collection.
  * 
+ * @public
+ */
+export interface BulkInsertResult {
+    insertedItems: Items,
+    insertedItemIds: {
+        [key: number]: ObjectId;
+    },
+    inserted: number
+}
+
+/**
+ * Adds a number of items to a collection.
+ * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Items that will be bulk inserted
+ * const itemsToInsert = [{...}, {...}, {...}]
+ * 
+ * const result = await weivData.bulkInsert("Clusters/Odunpazari", itemsToInsert)
+ * console.log(result);
+ * ```
+ * 
  * @param collectionId The ID of the collection to add the items to.
  * @param items The items to add.
  * @param options An object containing options to use when processing this operation.
- * @returns {BulkInsertResult} Fulfilled - The results of the bulk insert. Rejected - The error that caused the rejection.
+ * @returns {Promise<BulkInsertResult>} Fulfilled - The results of the bulk insert. Rejected - The error that caused the rejection.
  */
 export async function bulkInsert(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<BulkInsertResult> {
     try {

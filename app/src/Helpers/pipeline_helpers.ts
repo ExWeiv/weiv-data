@@ -1,5 +1,8 @@
 import { sortBy, filter, defaultTo } from 'lodash';
-import { PipelineArray } from '../../weivdata';
+import { Document } from 'mongodb/mongodb'
+
+/** @internal */
+export type PipelineArray = Document[];
 
 const customPipelineSortOrder = {
     _owner: 1,

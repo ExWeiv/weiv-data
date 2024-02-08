@@ -1,5 +1,5 @@
 import { memoize } from 'lodash';
-import { CollectionID, CollectionName, DbName } from '../../weivdata';
+import type { CollectionID } from './collection'
 
 /**
  * @description Get database and collection name from single string
@@ -8,7 +8,7 @@ import { CollectionID, CollectionName, DbName } from '../../weivdata';
  */
 export const splitCollectionId = memoize(splitCollectionIdMain);
 
-function splitCollectionIdMain(collectionId: CollectionID): { dbName: DbName, collectionName: CollectionName } {
+function splitCollectionIdMain(collectionId: CollectionID): { dbName: string, collectionName: string } {
     if (!collectionId) {
         throw Error(`WeivData - CollectionID is Required with this syntax: <database>/<collection>`);
     }

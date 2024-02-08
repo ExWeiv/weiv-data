@@ -1,8 +1,16 @@
-import { CollectionID, WeivDataOptions } from '../../weivdata';
+import { CollectionID, WeivDataOptions } from '../Helpers/collection';
 import { connectionHandler } from '../Helpers/connection_helpers';
 
 /**
  * Removes all items from a collection.
+ * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * const result = await weivData.truncate("Clusters/Uskudar");
+ * console.log(result);
+ * ```
  * 
  * @param collectionId The ID of the collection to remove items from.
  * @param options An object containing options you can use when calling this function.

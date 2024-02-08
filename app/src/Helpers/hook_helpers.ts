@@ -1,7 +1,15 @@
 //@ts-ignore
 import { currentUser } from 'wix-users-backend';
 import { splitCollectionId } from './name_helpers';
-import { CollectionID, HookContextResult } from '../../weivdata';
+import type { CollectionID } from './collection';
+
+/** @internal */
+export type HookContextResult = {
+    dbName: string;
+    collectionName: string;
+    userId?: string;
+    userRoles: [];
+}
 
 export function prepareHookContext(collectionId: CollectionID): HookContextResult {
     const roles = currentUser.getRoles();
@@ -18,7 +26,6 @@ export function prepareHookContext(collectionId: CollectionID): HookContextResul
         return {
             dbName,
             collectionName,
-            userId: null,
             userRoles: roles
         }
     }

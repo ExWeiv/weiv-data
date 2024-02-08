@@ -8,16 +8,11 @@
     "name": "WeivData APIs - Built for Velo",
     "readme": "DOCS.md",
     "entryPoints": [
-        "src/DataAggregate/**/*",
-        "src/DataFılter/**/*",
-        "src/DataQuery/**/*",
-        "src/Functions/**/*",
-        "weivdata.d.ts",
         "src/app.ts"
     ],
     "skipErrorChecking": true,
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeInternal": true,
-    "excludeExternals": true,
+    "excludeExternals": true
 }

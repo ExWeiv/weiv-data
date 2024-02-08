@@ -3,7 +3,7 @@ import { convertStringId } from '../Helpers/item_helpers';
 import NodeCache from "node-cache";
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import { CollectionID, ItemID, WeivDataOptions } from '../../weivdata';
+import { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/collection';
 
 const cache = new NodeCache({
     stdTTL: 30,
@@ -15,12 +15,23 @@ const cache = new NodeCache({
 /**
  * Retrieves an item from a collection.
  * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Item ID
+ * const itemId = "..."
+ * 
+ * const result = await weivData.get("Clusters/All", itemId)
+ * console.log(result);
+ * ```
+ * 
  * @param collectionId The ID of the collection to retrieve the item from.
  * @param itemId The ID of the item to retrieve.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<object | undefined>} Fulfilled - The retrieved item or null if not found. Rejected - The error that caused the rejection.
+ * @returns {Promise<Item | undefined>} Fulfilled - The retrieved item or null if not found. Rejected - The error that caused the rejection.
  */
-export async function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<object | undefined> {
+export async function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | undefined> {
     try {
         if (!collectionId || !itemId) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);

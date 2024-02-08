@@ -1,18 +1,49 @@
-import { CollectionID, Item, WeivDataOptions } from '../../weivdata';
+import type { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/collection';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 
 /**
+ * Object returned for save function.
+ * @public
+ */
+export interface WeivDataSaveResult {
+    /**
+     * Saved item.
+     */
+    item: Item;
+
+    /**
+     * Inserted item id. (Returned if item is inserted)
+     */
+    upsertedId?: ItemID;
+}
+
+/**
  * Inserts or updates an item in a collection.
+ * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // An item/object for save operation
+ * const item = {
+ *  location: "Riva 7",
+ *  _id: "...", // Item id (optional)
+ *  availableCPUs: ["M1", "A7", "R1"]
+ * }
+ * 
+ * const result = await weivData.save("Clusters/Riva", itemData)
+ * console.log(result);
+ * ```
  * 
  * @param collectionId The ID of the collection to save the item to.
  * @param item The item to insert or update.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<object>} Fulfilled - The item that was either inserted or updated, depending on whether it previously existed in the collection. Rejected - The error that caused the rejection.
+ * @returns {Promise<WeivDataSaveResult>} Fulfilled - The item that was either inserted or updated, depending on whether it previously existed in the collection. Rejected - The error that caused the rejection.
  */
-export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<object> {
+export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<WeivDataSaveResult> {
     try {
         if (!collectionId || !item) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);

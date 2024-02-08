@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getReferences = exports.getCurrentItemId = void 0;
 const item_helpers_1 = require("./item_helpers");
-const mongodb_1 = require("mongodb");
 const getCurrentItemId = (referringItem) => {
     if (typeof referringItem === 'object' && referringItem !== null && referringItem._id !== undefined && referringItem._id) {
         const id = referringItem._id;
@@ -11,7 +10,7 @@ const getCurrentItemId = (referringItem) => {
     else if (typeof referringItem === 'string') {
         return (0, item_helpers_1.convertStringId)(referringItem);
     }
-    else if (mongodb_1.ObjectId.isValid(referringItem)) {
+    else if (ObjectId.isValid(referringItem)) {
         return referringItem;
     }
     else {

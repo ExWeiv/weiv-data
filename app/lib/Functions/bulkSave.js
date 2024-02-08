@@ -107,8 +107,11 @@ async function bulkSave(collectionId, items, options) {
             });
             editedItems = await Promise.all(editedItems);
         }
+        const editedInsertedIds = Object.keys(insertedIds).map((key) => {
+            return (0, item_helpers_1.convertStringId)(insertedIds[key]);
+        });
         return {
-            insertedItemIds: insertedIds,
+            insertedItemIds: editedInsertedIds,
             inserted: insertedCount,
             updated: modifiedCount,
             savedItems: editedItems

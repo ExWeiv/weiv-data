@@ -1,14 +1,24 @@
 import { MongoClient } from 'mongodb';
 import { getMongoURI } from './permission_helpers';
 import { loadConnectionOptions } from '../Helpers/connection_helpers';
-import { CachedMongoClients, SetupClientResult, SuppressAuth, UseClientResult } from '../../weivdata';
 
 /*
 This is a global variable which will hold the cached (saved) clients that's already created before using same URI.
 This will remove the cold start and make the process much more faster after first few calls.
 */
-const cachedMongoClient: CachedMongoClients = {};
+const cachedMongoClient: { [uri: string]: MongoClient } = {};
 const cachedConnectionStatus: { [key: string]: boolean } = {};
+
+/**@internal */
+export type ConnectionCleanup = () => Promise<void> | void;
+/**@internal */
+export type SetupClientResult = { connection: MongoClient, cleanup: ConnectionCleanup }
+/**@internal */
+export type UseClientResult = {
+    pool: MongoClient,
+    cleanup: ConnectionCleanup,
+    memberId?: string
+}
 
 /**
  * @function
@@ -120,7 +130,7 @@ const connectClient = async (client: MongoClient, uri: string): Promise<SetupCli
  * @param suppressAuth 
  * @returns 
  */
-export async function useClient(suppressAuth: SuppressAuth = false): Promise<UseClientResult> {
+export async function useClient(suppressAuth: boolean = false): Promise<UseClientResult> {
     try {
         const { uri, memberId } = await getMongoURI(suppressAuth);
         const { connection, cleanup } = await setupClient(uri);

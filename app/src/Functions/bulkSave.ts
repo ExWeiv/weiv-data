@@ -1,19 +1,56 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
-import { CollectionID, Items, WeivDataOptions } from '../../weivdata';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import type { CollectionID, ItemIDs, Items, WeivDataOptions } from '../Helpers/collection';
+
+/**
+ * Object returned for bulkSave function.
+ * @public
+ */
+export interface WeivDataBulkSaveResult {
+    /**
+     * Number of inserted items.
+     */
+    inserted: number;
+
+    /**
+     * Number of updated items.
+     */
+    updated: number;
+
+    /**
+     * Saved items.
+     */
+    savedItems: Items;
+
+    /**
+     * Inserted item ids.
+     */
+    insertedItemIds: ItemIDs
+}
 
 /**
  * Inserts or updates a number of items in a collection.
  * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Items that will be bulk saved
+ * const itemsToSave = [{...}, {...}, {...}]
+ * 
+ * const result = await weivData.bulkSave("Clusters/Odunpazari", itemsToSave)
+ * console.log(result);
+ * ```
+ * 
  * @param collectionId The ID of the collection to save the items to.
  * @param items The items to insert or update.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<object | void>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
+ * @returns {Promise<WeivDataBulkSaveResult | void>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
  */
-export async function bulkSave(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<object | void> {
+export async function bulkSave(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<WeivDataBulkSaveResult | void> {
     try {
         if (!collectionId || !items || items.length <= 0) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
@@ -128,8 +165,12 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
             editedItems = await Promise.all(editedItems);
         }
 
+        const editedInsertedIds = Object.keys(insertedIds).map((key: any) => {
+            return convertStringId(insertedIds[key]);
+        })
+
         return {
-            insertedItemIds: insertedIds,
+            insertedItemIds: editedInsertedIds,
             inserted: insertedCount,
             updated: modifiedCount,
             savedItems: editedItems
