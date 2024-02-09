@@ -23,8 +23,6 @@ This is the official documentation page for weiv-data APIs powered by **ExWeiv A
 | Visual Dashboard                    | Yes (Not Integrated to Wix)          | Yes (Also Integrated with Wix) |
 | Datasets (Connecting Data Visually) | Not Available                        | Available                      |
 | Pricing                             | Free, Monthly, Hourly                | Monthly (Starting from 12€/m)  |
-| Bandwidth                           | 100MB/hour                           | ?                              |
-| Concurrent Connection               | 1                                    | ?                              |
 | Multicloud                          | No (Available in Dedicated Clusters) | Yes                            |
 
 > We have compared the limits and other things based on the lowest leves. M0 Cluster for MongoDB (Free) and Basic Plan for Wix Studio (12€/m).
