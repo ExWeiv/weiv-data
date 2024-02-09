@@ -81,7 +81,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
             cache.set(`${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`, item);
             return item;
         } else {
-            throw Error(`WeivData - Error when trying to get item from the collectin by itemId, itemId: ${newItemId}`);
+            return undefined;
         }
     } catch (err) {
         throw Error(`WeivData - Error when trying to get item from the collectin by itemId: ${err}`);

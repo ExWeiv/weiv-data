@@ -145,11 +145,13 @@ In this file you can find what's changed in each version.
 
 - Updates to connection system for performance upgrade and resource saving.
 
-### 2.1.1
+### 2.2.0
 
 - Updates to documentation page. (Much better now and much easier to understand)
 - Updates to general code and TS features.
 - Some file and function names changed internally.
+- Include function fixes and TS/docs support in weivData.query function.
+- get function BUG fixes.
 
 ---
 
