@@ -8,13 +8,36 @@ import { prepareHookContext } from '../Helpers/hook_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { ConnectionHandlerResult, WeivDataOptions } from '../Helpers/collection';
 
-/** @internal */
-type IncludeObject = {
+/**@public */
+export interface IncludeObject {
+    /**
+     * Collection of referenced item/s (only collection name)
+     */
     collectionName: string,
+
+    /**
+     * Property/field name of referenced items in the current item.
+     */
     fieldName: string,
+
+    /**
+     * Foreign field name. Defaults to _id.
+     */
     foreignField?: string,
+
+    /**
+     * Custom return name for included items. Defaults to `fieldName`.
+     */
     as?: string
+
+    /**
+     * Maximum number of items to include. Defaults to 50.
+     */
     maxItems?: number,
+
+    /**
+     * Enable counting total items or not. Defaults to `false`.
+     */
     countItems?: boolean
 }
 
@@ -666,15 +689,15 @@ export class WeivDataQuery {
      * console.log(queryResult);
      * ```
      * 
-     * @param propertyName The properties for which to include referenced items.
+     * @param includes Array of objects that you want to include with details
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    include(...propertyName: IncludeObject[]): WeivDataQuery {
-        if (!propertyName) {
+    include(...includes: IncludeObject[]): WeivDataQuery {
+        if (!includes) {
             throw Error(`WeivData - Property name required!`);
         }
 
-        for (const { fieldName, collectionName, foreignField, as, maxItems, countItems } of propertyName) {
+        for (const { fieldName, collectionName, foreignField, as, maxItems, countItems } of includes) {
             if (countItems === true) {
                 this.referenceLenght = merge(this.referenceLenght, {
                     [`${fieldName}Length`]: {

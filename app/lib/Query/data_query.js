@@ -320,11 +320,11 @@ class WeivDataQuery {
     async find(options) {
         return this.runQuery(options);
     }
-    include(...propertyName) {
-        if (!propertyName) {
+    include(...includes) {
+        if (!includes) {
             throw Error(`WeivData - Property name required!`);
         }
-        for (const { fieldName, collectionName, foreignField, as, maxItems, countItems } of propertyName) {
+        for (const { fieldName, collectionName, foreignField, as, maxItems, countItems } of includes) {
             if (countItems === true) {
                 this.referenceLenght = (0, lodash_1.merge)(this.referenceLenght, {
                     [`${fieldName}Length`]: {

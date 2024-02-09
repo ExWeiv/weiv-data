@@ -107,3 +107,6 @@ export { WeivDataBulkUpdateResult } from './Functions/bulkUpdate';
 
 /**@public */
 export { WeivDataSaveResult } from './Functions/save';
+
+/**@public */
+export { IncludeObject } from './Query/data_query';
