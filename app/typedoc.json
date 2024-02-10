@@ -5,7 +5,7 @@
         "node_modules/**/*",
         "lib/**/*",
     ],
-    "name": "WeivData APIs - Built for Velo",
+    "name": "weiv-data Library Documentation - ExWeiv Apps",
     "readme": "DOCS.md",
     "entryPoints": [
         "src/app.ts"

@@ -25,7 +25,7 @@ This is the official documentation page for weiv-data APIs powered by **ExWeiv A
 | RAM                                 | Shared RAM                  | 400MB (1 Micro Container)      |
 | CPU                                 | Shared vCPU                 | 1vCPU (1 Micro Container)      |
 
-> We have compared the limits and other things based on the lowest leves. M0 Cluster for MongoDB (Free) and Basic Plan for Wix Studio (12€/m).
+**We have compared the limits and other things based on the lowest leves. M0 Cluster for MongoDB (Free) and Basic Plan for Wix Studio (12€/m).**
 
 ### Summary
 
@@ -202,9 +202,16 @@ This is the path to your Wix backend. Yes it's different than what you have in y
 
 > You can probably also access to other folders like public, pages etc. Just let you know not needed for our library.
 
+<br>
+
 ---
 
 Ask for help, give feedback or anything else? Here is our new Discord server: [https://discord.gg/pVYJjPKRm6](https://discord.gg/pVYJjPKRm6) or info@apps.exweiv.com
+
+- [Join Discord](https://discord.gg/pVYJjPKRm6) 👈
+- [Docs](https://weiv-data.web.app/)
+- [Install - NPM](https://www.npmjs.com/package/@exweiv/weiv-data)
+- [Updates / Changelog](https://github.com/ExWeiv/weiv-data/blob/main/app/CHANGELOG.md)
 
 ---
 
