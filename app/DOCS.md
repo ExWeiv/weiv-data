@@ -91,11 +91,11 @@ Let's start by setting up our environment for weiv-data and make things ready. F
 
 **Click to connect button in your cluster.**
 
-<img src="../Images/connection-uri.png" height="400px" alt="Connect Button in MongoDB Databases Page">
+<img src="https://static.wixstatic.com/media/510eca_04dddb376fd348079791a884d06f18e4~mv2.png" height="400px" alt="Connect Button in MongoDB Databases Page">
 
 **Then you will see an example of connection uri/string.**
 
-<img src="../Images/connection-uri-2.png" height="400px" alt="Connection URI/String">
+<img src="https://static.wixstatic.com/media/510eca_053a1b7c7ec74c6599f9ff7c6fcde265~mv2.png" height="400px" alt="Connection URI/String">
 
 ```js
 const username = "Admin";
