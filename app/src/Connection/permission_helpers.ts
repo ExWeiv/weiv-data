@@ -2,10 +2,12 @@
 import { currentUser } from "wix-users-backend";
 import { getCachedSecret } from './secret_helpers';
 import NodeCache from 'node-cache';
+import type { CustomOptionsRole } from '../Helpers/connection_helpers';
 
 export type GetMongoURIResult = {
     uri: string,
-    memberId?: string
+    memberId?: string,
+    role: CustomOptionsRole
 }
 
 /*
@@ -48,12 +50,12 @@ const getVisitorURI = async (): Promise<GetMongoURIResult> => {
         //Direct Visitor (not logged in)
         const cachedVisitorURI: string | undefined = cache.get("VisitorMongoDB_URI");
         if (cachedVisitorURI) {
-            return { uri: cachedVisitorURI };
+            return { uri: cachedVisitorURI, role: "visitorClientOptions" };
         }
 
         const secret = await getCachedSecret("VisitorURI");
         cache.set("VisitorMongoDB_URI", secret.toString(), 3600 * 2);
-        return { uri: secret }
+        return { uri: secret, role: "visitorClientOptions" }
     } catch (err) {
         throw Error(`Error when getting VisitorURI: ${err}`);
     }
@@ -72,7 +74,8 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
         if (cachedAdminURI) {
             return {
                 uri: cachedAdminURI,
-                memberId: currentUser.id
+                memberId: currentUser.id,
+                role: "adminClientOptions"
             };
         }
 
@@ -80,7 +83,8 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
         cache.set("AdminMongoDB_URI", secret.toString(), 3600);
         return {
             uri: secret,
-            memberId: currentUser.id
+            memberId: currentUser.id,
+            role: "adminClientOptions"
         }
     } catch (err) {
         throw Error(`Error when getting AdminURI: ${err}`);
@@ -100,7 +104,8 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
         if (cachedMemberURI) {
             return {
                 uri: cachedMemberURI,
-                memberId: currentUser.id
+                memberId: currentUser.id,
+                role: "memberClientOptions"
             }
         }
 
@@ -126,7 +131,8 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
 
         return {
             uri: secret,
-            memberId: currentUser.id
+            memberId: currentUser.id,
+            role: "memberClientOptions"
         }
     } catch (err) {
         throw Error(`Error when getting MemberURI: ${err}`);

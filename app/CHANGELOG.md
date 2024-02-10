@@ -152,6 +152,7 @@ In this file you can find what's changed in each version.
 - Some file and function names changed internally.
 - Include function fixes and TS/docs support in weivData.query function.
 - get function BUG fixes.
+- X.509 method is now allowed and should be working as expected.
 
 ---
 

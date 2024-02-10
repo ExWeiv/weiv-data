@@ -31,11 +31,11 @@ const getVisitorURI = async () => {
     try {
         const cachedVisitorURI = cache.get("VisitorMongoDB_URI");
         if (cachedVisitorURI) {
-            return { uri: cachedVisitorURI };
+            return { uri: cachedVisitorURI, role: "visitorClientOptions" };
         }
         const secret = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
         cache.set("VisitorMongoDB_URI", secret.toString(), 3600 * 2);
-        return { uri: secret };
+        return { uri: secret, role: "visitorClientOptions" };
     }
     catch (err) {
         throw Error(`Error when getting VisitorURI: ${err}`);
@@ -47,14 +47,16 @@ const getAdminURI = async () => {
         if (cachedAdminURI) {
             return {
                 uri: cachedAdminURI,
-                memberId: wix_users_backend_1.currentUser.id
+                memberId: wix_users_backend_1.currentUser.id,
+                role: "adminClientOptions"
             };
         }
         const secret = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
         cache.set("AdminMongoDB_URI", secret.toString(), 3600);
         return {
             uri: secret,
-            memberId: wix_users_backend_1.currentUser.id
+            memberId: wix_users_backend_1.currentUser.id,
+            role: "adminClientOptions"
         };
     }
     catch (err) {
@@ -67,7 +69,8 @@ const getMemberURI = async () => {
         if (cachedMemberURI) {
             return {
                 uri: cachedMemberURI,
-                memberId: wix_users_backend_1.currentUser.id
+                memberId: wix_users_backend_1.currentUser.id,
+                role: "memberClientOptions"
             };
         }
         const cachedRole = cache.get(`MemberRoles${wix_users_backend_1.currentUser.id}`);
@@ -90,7 +93,8 @@ const getMemberURI = async () => {
         cache.set(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`, secret, 3600);
         return {
             uri: secret,
-            memberId: wix_users_backend_1.currentUser.id
+            memberId: wix_users_backend_1.currentUser.id,
+            role: "memberClientOptions"
         };
     }
     catch (err) {
