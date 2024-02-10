@@ -4,7 +4,7 @@
 
 The official [weivData APIs](https://www.npmjs.com/package/@exweiv/weiv-data) for Node.js to build web applications using MongoDB inside Wix with Velo. Only limited by MongoDB and your pocket. Not limited by wixData APIs since you won't use them.
 
-[Official Docs](https://weiv-data.web.app/)
+**[Official Docs](https://weiv-data.web.app/)**
 
 ### When and Why to Use?
 
@@ -44,7 +44,7 @@ First of all go ahead and create a MongoDB account and a database in your accoun
    1. Create a secret named as AdminURI (this is case sensitive) and paste the URI for admin.
    2. Do the same for MemberURI and VisitorURI.
 7. Then create another secret for connection options named "WeivDataConnectionOptions" if you don't want to set custom options paste empty object as value. If you want to add custom options when connecting to MongoDB Clusters add your custom object into value. [Connection Options](https://www.mongodb.com/docs/manual/administration/connection-pool-overview/) (Do not paste object as strings Wix will stringify it otherwise you will see errors when connecting).
-8. Lastly go to your Wix collections (CMS) and create a collection named as "WeivOwnerID" you don't need to add any data. Just create the collection with the same exact name and leave it as it is. This collection help library to get visitors ID (only when you enable it). Since Wix doesn't provide a way to get visitors temporary ID we use a collection to create a data and get the _owner field value from that data.
+8. Lastly go to your Wix collections (CMS) and create a collection named as "WeivOwnerID" you don't need to add any data. Just create the collection with the same exact name and leave it as it is. This collection help library to get visitors ID (only when you enable it). Since Wix doesn't provide a way to get visitors temporary ID we use a collection to create a data and get the \_owner field value from that data.
 9. And you should be ready to go.
 
 > Any data created in WeivOwnerID will be removed just after it's used so it won't waste your storage and it will be only used when you enable the visitorId collecting option.
@@ -114,11 +114,11 @@ You can also compare which is available in weivData and wixData. (We will publis
 
 - wixData.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.) ⏰
 - Multilanguage Support (read and write data in multilanguage) ⏰
-- Documentation page. ⏰
 
 ---
 
 ### Performance
+
 We can't test it with high traffic right now but what we can say is it's MongoDB and basically you are using MongoDB which is wixData is also using but generally weivData is a bit faster (**2x faster in general** sometimes more somtimes less depends on the function and call) and you can upgrade your MongoDB Cluster to upgrade the performance (MongoDB has a free version too and we have tested everything on that free version which is shared clusters).
 
 Soon we will add more details and some examples about performance difference. To let you also know **get, isReferenced and query** functions are comes with caching feature (will be improved later on).
@@ -135,7 +135,7 @@ wixData is much better for cold starts and more consistent (wixData always compl
 
 ## Tested Functions in Wix Env
 
-*If main function tested only there is a possibility of BUG/s but if most of the features tested (Should be Fully Working) then it should be working fine but still there might be BUG/s.*
+_If main function tested only there is a possibility of BUG/s but if most of the features tested (Should be Fully Working) then it should be working fine but still there might be BUG/s._
 
 - weivData.aggreagete ✅ (Main Function Tested)
 - weivData.query ✅ (Main Function Tested)
@@ -157,6 +157,7 @@ wixData is much better for cold starts and more consistent (wixData always compl
 - weivData.update ✅ (Should be Fully Working)
 
 **Hooks:**
+
 - afterCount ✅
 - afterGet ✅
 - afterInsert ✅
@@ -174,6 +175,7 @@ wixData is much better for cold starts and more consistent (wixData always compl
 > After we test if the functions even run at all we will check if they running correctly with expected results. Right now we are only fixing general BUGs that's blocking function to run. After we complete the first test stage we will start testing if the functions returns expected results. All tests are made in Wix env.
 
 ## How to Use Hooks?
+
 Using hooks in weivData and wixData has similar way. We are currently not providing a hook for errors. But rest of the hooks are available like in wixData. To create a hook you need to create a folder in your backend named `WeivData` and then you also need to create a .js file (.js file now .jsw or .web.js) inside of that folder.
 
 -> backend/WeivData/data.js
@@ -199,4 +201,4 @@ You need to name your functions correctly to let hooks work. The syntax is like 
 
 ---
 
-Please report BUGs and leave your feedbacks. info@apps.exweiv.com or you can create an issue in [GitHub repo](https://github.com/ExWeiv/weiv-data/issues)
+Please report BUGs and leave your feedbacks. info@apps.exweiv.com or you can create an issue in [GitHub repo](https://github.com/ExWeiv/weiv-data/issues) or you can join [Discord](https://discord.gg/pVYJjPKRm6)!

@@ -1,4 +1,4 @@
-# CHANGELOG of weivData
+# CHANGELOG of weiv-data
 
 In this file you can find what's changed in each version.
 
@@ -154,6 +154,8 @@ In this file you can find what's changed in each version.
 - get function BUG fixes.
 - X.509 method is now allowed and should be working as expected.
 - idConvreter function added to library
+- Started working to fix few BUG/s and test more functions.
+- Discord server created and READMEs updated with new informations.
 
 ---
 

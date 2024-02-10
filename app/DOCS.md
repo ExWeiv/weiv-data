@@ -202,6 +202,31 @@ This is the path to your Wix backend. Yes it's different than what you have in y
 
 > You can probably also access to other folders like public, pages etc. Just let you know not needed for our library.
 
+### How to Create Hooks
+
+Using hooks in weiv-data and wix-data has similar way. We are currently not providing a hook for errors. But rest of the hooks are available like in wixData. To create a hook you need to create a folder in your backend named `WeivData` and then you also need to create a .js file (.js file now .jsw or .web.js) inside of that folder.
+
+-> backend/WeivData/data.js
+
+Then you will create your hooks as functions like in wixData. Here is an example for afterGet hook:
+
+```js
+// In backend/WeivData/data.js file
+
+export async function dbname_collectionname_afterGet(item, context) {
+  if (item.number > 5) {
+    return true;
+  } else {
+    return false;
+  }
+}
+```
+
+You need to name your functions correctly to let hooks work. The syntax is like that:
+`<database-name>_<collection-name>_<hook-name>`
+
+> Both database name and collection name should be all lowercase.
+
 <br>
 
 ---
