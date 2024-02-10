@@ -1,6 +1,6 @@
-import { CollectionID, ReferencedItem, ReferringItem, WeivDataOptions } from '../../weivdata';
+import type { CollectionID, WeivDataOptions } from '../Helpers/collection';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
+import { type ReferencedItem, type ReferringItem, getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
 import { isArray } from 'lodash';
 import NodeCache from "node-cache";
 
@@ -13,6 +13,20 @@ const cache = new NodeCache({
 
 /**
  * Checks if a reference to the referenced item exists in the specified property of the referring item.
+ * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Item id
+ * const itemId = "..."
+ * 
+ * // References to be checked if exists. `ItemId[]`
+ * const cpus = ["cpuId1"]
+ * 
+ * const result = await weivData.isReferenced("Clusters/Ortakoy", "availableCPUs", itemId, cpus);
+ * console.log(result);
+ * ```
  * 
  * @param collectionId The ID of the collection that contains the referring item.
  * @param propertyName The property that possibly contains the references to the referenced item.

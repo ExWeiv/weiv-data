@@ -1,4 +1,4 @@
-# CHANGELOG of weivData
+# CHANGELOG of weiv-data
 
 In this file you can find what's changed in each version.
 
@@ -144,6 +144,18 @@ In this file you can find what's changed in each version.
 ### 2.1.0
 
 - Updates to connection system for performance upgrade and resource saving.
+
+### 2.2.0
+
+- Updates to documentation page. (Much better now and much easier to understand)
+- Updates to general code and TS features.
+- Some file and function names changed internally.
+- Include function fixes and TS/docs support in weivData.query function.
+- get function BUG fixes.
+- X.509 method is now allowed and should be working as expected.
+- idConvreter function added to library
+- Started working to fix few BUG/s and test more functions.
+- Discord server created and READMEs updated with new informations.
 
 ---
 

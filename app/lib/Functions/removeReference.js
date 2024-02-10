@@ -19,9 +19,6 @@ async function removeReference(collectionId, propertyName, referringItem, refere
         if (!acknowledged || modifiedCount === 0) {
             throw Error(`WeivData - Error when removing references, acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }
-        else {
-            return { result: true, updatedCount: modifiedCount };
-        }
     }
     catch (err) {
         throw Error(`WeivData - Error when removing references: ${err}`);

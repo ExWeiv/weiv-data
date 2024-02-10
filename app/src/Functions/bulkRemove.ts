@@ -1,19 +1,46 @@
-import { CollectionID, ItemIDs, WeivDataOptions } from '../../weivdata';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { ObjectId } from 'mongodb/mongodb';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import type { CollectionID, ItemIDs, WeivDataOptions } from '../Helpers/collection';
+
+/**
+ * Object returned for bulkRemove function.
+ * @public
+ */
+export interface WeivDataBulkRemoveResult {
+    /**
+     * Number of removed items.
+     */
+    removed: number;
+
+    /**
+     * Removed item ids.
+     */
+    removedItemIds: ItemIDs
+}
 
 /**
  * Removes a number of items from a collection.
  * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Item IDs that will be bulk removed
+ * const itemsToRemove = ["...", "...", "..."]
+ * 
+ * const result = await weivData.bulkRemove("Clusters/Odunpazari", itemsToRemove)
+ * console.log(result);
+ * ```
+ * 
  * @param collectionId The ID of the collection to remove the items from.
  * @param itemIds IDs of the items to remove.
  * @param options An object containing options to use when processing this operation.
- * @returns {WeivDataOptions} Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
+ * @returns {Promise<WeivDataBulkRemoveResult | null>} Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
  */
-export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, options?: WeivDataOptions): Promise<object | null> {
+export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, options?: WeivDataOptions): Promise<WeivDataBulkRemoveResult | null> {
     try {
         if (!collectionId || !itemIds) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemIds`);
@@ -48,10 +75,6 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, o
         }
 
         if (acknowledged === true) {
-            // if (suppressHooks != true) {
-            //     // 
-            // }
-
             return {
                 removed: deletedCount,
                 removedItemIds: editedItemIds

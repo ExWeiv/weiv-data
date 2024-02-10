@@ -1,14 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadConnectionOptions = exports.connectionHandler = void 0;
+const customConnectionOptions = __importStar(require("../../../../../../../../../user-code/backend/WeivData/connection-options"));
 const connection_provider_1 = require("../Connection/connection_provider");
 const name_helpers_1 = require("./name_helpers");
-const secret_helpers_1 = require("./secret_helpers");
-const lodash_1 = require("lodash");
 const defaultOptions = {
-    maxPoolSize: 45,
+    maxPoolSize: 50,
     minPoolSize: 5,
-    maxIdleTimeMS: 40000
+    maxIdleTimeMS: 30000,
+    tls: true
 };
 async function connectionHandler(collectionId, suppressAuth = false) {
     try {
@@ -29,20 +52,11 @@ async function connectionHandler(collectionId, suppressAuth = false) {
     }
 }
 exports.connectionHandler = connectionHandler;
-async function loadConnectionOptions() {
+async function loadConnectionOptions(role) {
     try {
-        const optionsSecret = await (0, secret_helpers_1.getCachedSecret)("WeivDataConnectionOptions");
-        if (optionsSecret) {
-            let customOptions = optionsSecret;
-            if (customOptions) {
-                if (typeof customOptions === "string") {
-                    customOptions = await JSON.parse(customOptions);
-                }
-                return (0, lodash_1.defaultsDeep)(defaultOptions, customOptions);
-            }
-            else {
-                return defaultOptions;
-            }
+        const customOptions = customConnectionOptions[role];
+        if (customOptions) {
+            return customOptions;
         }
         else {
             return defaultOptions;

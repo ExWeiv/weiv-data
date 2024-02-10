@@ -1,9 +1,23 @@
-import { ReferringItem, ReferencedItem, WeivDataOptions, CollectionID } from '../../weivdata';
-import { getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
+import type { CollectionID, WeivDataOptions } from '../Helpers/collection';
+import { type ReferencedItem, type ReferringItem, getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
 import { update } from './update';
 
 /**
  * Replaces current references with references in the specified property.
+ * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Item id
+ * const itemId = "..."
+ * 
+ * // New references
+ * const cpus = ["cpuId1", "cpuId2", "cpuId3", ...]
+ * 
+ * const result = await weivData.replaceReferences("Clusters/Ortakoy", "availableCPUs", itemId, cpus, {suppressAuth: true})
+ * console.log(result);
+ * ```
  * 
  * @param collectionId The ID of the collection that contains the referring item.
  * @param propertyName The property to replaces the references in.

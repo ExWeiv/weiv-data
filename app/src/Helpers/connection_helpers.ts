@@ -1,17 +1,18 @@
+//@ts-ignore
+import * as customConnectionOptions from '../../../../../../../../../user-code/backend/WeivData/connection-options';
 import { useClient } from '../Connection/connection_provider';
 import { splitCollectionId } from './name_helpers';
 import { Db, MongoClientOptions } from 'mongodb/mongodb';
-import { getCachedSecret } from './secret_helpers';
-import { defaultsDeep } from 'lodash';
-import { CollectionID, ConnectionHandlerResult, SuppressAuth } from '../../weivdata';
+import { type CollectionID, type ConnectionHandlerResult } from './collection';
 
 const defaultOptions: MongoClientOptions = {
-    maxPoolSize: 45,
+    maxPoolSize: 50,
     minPoolSize: 5,
-    maxIdleTimeMS: 40000
+    maxIdleTimeMS: 30000,
+    tls: true
 }
 
-export async function connectionHandler(collectionId: CollectionID, suppressAuth: SuppressAuth = false): Promise<ConnectionHandlerResult> {
+export async function connectionHandler(collectionId: CollectionID, suppressAuth: boolean = false): Promise<ConnectionHandlerResult> {
     try {
         let db: Db | undefined;
         const { dbName, collectionName } = splitCollectionId(collectionId);
@@ -30,20 +31,12 @@ export async function connectionHandler(collectionId: CollectionID, suppressAuth
     }
 }
 
-export async function loadConnectionOptions(): Promise<MongoClientOptions> {
+export type CustomOptionsRole = "adminClientOptions" | "memberClientOptions" | "visitorClientOptions";
+export async function loadConnectionOptions(role: CustomOptionsRole): Promise<MongoClientOptions> {
     try {
-        const optionsSecret = await getCachedSecret("WeivDataConnectionOptions");
-        if (optionsSecret) {
-            let customOptions = optionsSecret;
-
-            if (customOptions) {
-                if (typeof customOptions === "string") {
-                    customOptions = await JSON.parse(customOptions);
-                }
-                return defaultsDeep(defaultOptions, customOptions);
-            } else {
-                return defaultOptions;
-            }
+        const customOptions: MongoClientOptions | undefined = customConnectionOptions[role];
+        if (customOptions) {
+            return customOptions;
         } else {
             return defaultOptions;
         }

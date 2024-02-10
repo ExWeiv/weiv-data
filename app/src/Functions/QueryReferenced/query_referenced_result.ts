@@ -1,10 +1,55 @@
 import { ObjectId, Db, Collection } from 'mongodb/mongodb';
 import { getPipeline } from '../../Helpers/query_referenced_helpers';
-import { useClient } from '../../Connection/connection_provider';
+import { type ConnectionCleanup, useClient } from '../../Connection/connection_provider';
 import { splitCollectionId } from '../../Helpers/name_helpers';
-import { CleanupAfter, CollectionID, ConnectionCleanup, ConnectionHandlerResult, Items, WeivDataOptions, WeivDataQueryReferencedOptions, WeivDataQueryReferencedResultI } from '../../../weivdata';
+import type { CleanupAfter, CollectionID, ConnectionHandlerResult, Items, WeivDataOptions } from '../../Helpers/collection';
+import type { WeivDataQueryReferencedOptions } from './queryReferenced';
 
-export class WeivDataQueryReferencedResult {
+/**
+ * Result object of queryReferenced function.
+ * 
+ * @public */
+export interface WeivDataQueryReferencedResult {
+    /**
+     * Returns the items that match the reference query.
+     * @readonly
+     */
+    items: Items;
+
+    /**
+     * Returns the total number of items that match the reference query.
+     * @readonly
+     */
+    totalCount: number;
+
+    /**
+     * Indicates if the reference query has more results.
+     */
+    hasNext(): boolean;
+
+    /**
+     * Indicates if the reference query has previous results.
+     */
+    hasPrev(): boolean;
+
+    /**
+     * Retrieves the next page of reference query results.
+     * 
+     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
+     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A reference query result object with the next page of query results. Rejected - The errors that caused the rejection.
+     */
+    next(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryReferencedResult>;
+
+    /**
+     * Retrieves the previous page of reference query results.
+     * 
+     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
+     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
+     */
+    prev(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryReferencedResult>;
+}
+
+export class InternalWeivDataQueryReferencedResult {
     private targetCollectionId: string;
     private itemId: ObjectId;
     private propertyName: string;
@@ -19,43 +64,12 @@ export class WeivDataQueryReferencedResult {
     private collection!: Collection;
     private cleanup!: ConnectionCleanup;
 
-    /**
-     * Returns the items that match the reference query.
-     * @readonly
-     */
-    items!: Items;
-
-    /**
-     * Returns the total number of items that match the reference query.
-     * @readonly
-     */
-    totalCount!: number;
-
-    /**
-     * Indicates if the reference query has more results.
-     */
-    hasNext!: () => boolean;
-
-    /**
-    * Indicates if the reference query has previous results.
-    */
-    hasPrev!: () => boolean;
-
-    /**
-     * Retrieves the next page of reference query results.
-     * 
-     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
-     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A reference query result object with the next page of query results. Rejected - The errors that caused the rejection.
-     */
-    next!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataQueryReferencedResultI>;
-
-    /**
-     * Retrieves the previous page of reference query results.
-     * 
-     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
-     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
-     */
-    prev!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataQueryReferencedResultI>;
+    protected items!: Items;
+    protected totalCount!: number;
+    protected hasNext!: () => boolean;
+    protected hasPrev!: () => boolean;
+    protected next!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataQueryReferencedResult>;
+    protected prev!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataQueryReferencedResult>;
 
 
     /**@internal */
@@ -98,7 +112,7 @@ export class WeivDataQueryReferencedResult {
     }
 
     /**@internal */
-    async getResult(): Promise<WeivDataQueryReferencedResultI> {
+    async getResult(): Promise<WeivDataQueryReferencedResult> {
         try {
             const { suppressAuth } = this.options;
             if (!this.collection) {
@@ -125,14 +139,14 @@ export class WeivDataQueryReferencedResult {
                     return this.currentPage > 0;
                 }
             }
-            this.next = async (cleanupAfter?: CleanupAfter) => {
+            this.next = async (cleanupAfter?: boolean) => {
                 this.currentPage++;
                 if (cleanupAfter === true) {
                     await this.cleanup();
                 }
                 return this.getResult();
             }
-            this.prev = async (cleanupAfter?: CleanupAfter) => {
+            this.prev = async (cleanupAfter?: boolean) => {
                 this.currentPage--;
                 if (cleanupAfter === true) {
                     await this.cleanup();
@@ -140,7 +154,14 @@ export class WeivDataQueryReferencedResult {
                 return this.getResult();
             }
 
-            return this;
+            return {
+                items: this.items,
+                totalCount: this.totalCount,
+                hasNext: this.hasNext,
+                hasPrev: this.hasPrev,
+                next: this.next,
+                prev: this.prev
+            };
         } catch (err) {
             throw Error(`WeivData - Error when running queryReferenced function: ${err}`);
         }

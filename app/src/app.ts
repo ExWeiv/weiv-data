@@ -1,44 +1,115 @@
-import { WeivDataAggregate } from "./DataAggregate/data_aggregate";
-import { WeivDataFilter } from "./DataFilter/data_filter";
-import { cleanupClientConnections } from './Connection/connection_provider';
-import { WeivDataQuery } from './DataQuery/data_query';
-import { insert } from './Functions/insert';
-import { update } from './Functions/update';
-import { get } from './Functions/get';
-import { save } from './Functions/save';
-import { remove } from './Functions/remove';
-import { truncate } from './Functions/truncate';
-import { insertReference } from './Functions/insertReference';
-import { replaceReferences } from './Functions/replaceReferences';
-import { isReferenced } from './Functions/isReferenced';
-import { removeReference } from './Functions/removeReference';
-import { bulkInsert } from './Functions/bulkInsert';
-import { bulkRemove } from './Functions/bulkRemove';
-import { bulkSave } from './Functions/bulkSave';
-import { bulkUpdate } from './Functions/bulkUpdate';
-import { queryReferenced } from './Functions/QueryReferenced/queryReferenced';
+//---------------------------------------------//
+//                Classes                      //
+//---------------------------------------------//
 
-// Types
-import { CollectionID } from "../weivdata";
+/**@public */
+export { WeivDataAggregate } from "./Aggregate/data_aggregate";
 
-export = {
-    aggregate: (collectionId: CollectionID) => new WeivDataAggregate(collectionId),
-    filter: () => new WeivDataFilter(),
-    cleanup: cleanupClientConnections,
-    query: (collectionId: CollectionID) => new WeivDataQuery(collectionId),
-    insert: insert,
-    update: update,
-    get: get,
-    save: save,
-    remove: remove,
-    truncate: truncate,
-    insertReference: insertReference,
-    replaceReferences: replaceReferences,
-    isReferenced: isReferenced,
-    removeReference: removeReference,
-    bulkInsert: bulkInsert,
-    bulkRemove: bulkRemove,
-    bulkSave: bulkSave,
-    bulkUpdate: bulkUpdate,
-    queryReferenced: queryReferenced
-};
+/**@public */
+export { WeivDataFilter } from "./Filter/data_filter";
+
+/**@public */
+export { WeivDataQuery } from './Query/data_query';
+
+//---------------------------------------------//
+//                Functions                    //
+//---------------------------------------------//
+/**@public */
+export { queryReferenced } from './Functions/QueryReferenced/queryReferenced';
+
+/**@public */
+export { bulkInsert } from './Functions/bulkInsert';
+
+/**@public */
+export { bulkRemove } from './Functions/bulkRemove';
+
+/**@public */
+export { bulkSave } from './Functions/bulkSave';
+
+/**@public */
+export { bulkUpdate } from './Functions/bulkUpdate';
+
+/**@public */
+export { get } from './Functions/get';
+
+/**@public */
+export { insert } from './Functions/insert';
+
+/**@public */
+export { insertReference } from './Functions/insertReference';
+
+/**@public */
+export { isReferenced } from './Functions/isReferenced';
+
+/**@public */
+export { remove } from './Functions/remove';
+
+/**@public */
+export { removeReference } from './Functions/removeReference';
+
+/**@public */
+export { replaceReferences } from './Functions/replaceReferences';
+
+/**@public */
+export { save } from './Functions/save';
+
+/**@public */
+export { truncate } from './Functions/truncate';
+
+/**@public */
+export { update } from './Functions/update';
+
+/**@public */
+export { idConvreter } from './Functions/idConverter';
+
+//---------------------------------------------//
+//             Types + Interfaces              //
+//---------------------------------------------//
+
+/**@public */
+export { AggregateRunOptions } from './Aggregate/data_aggregate';
+
+/**@public */
+export { WeivDataAggregateResult } from "./Aggregate/data_aggregate_result";
+
+/**@public */
+export { WeivDataQueryResult } from './Query/data_query_result';
+
+/**@public */
+export { WeivDataQueryReferencedResult } from './Functions/QueryReferenced/query_referenced_result';
+
+/**@public */
+export { WeivDataQueryReferencedOptions } from './Functions/QueryReferenced/queryReferenced';
+
+/**@public */
+export type {
+    SuppressAuth,
+    SuppressHooks,
+    ConsistentRead,
+    EnableVisitorID,
+    CleanupAfter,
+    CollectionID,
+    Item,
+    ItemID,
+    Items,
+    ItemIDs,
+    WeivDataOptions
+} from './Helpers/collection';
+
+/**@public */
+export { BulkInsertResult } from './Functions/bulkInsert';
+
+/**@public */
+export { WeivDataBulkRemoveResult } from './Functions/bulkRemove';
+
+/**@public */
+export { WeivDataBulkSaveResult } from './Functions/bulkSave';
+
+/**@public */
+export { WeivDataBulkUpdateResult } from './Functions/bulkUpdate';
+
+/**@public */
+export { WeivDataSaveResult } from './Functions/save';
+
+/**@public */
+export { IncludeObject } from './Query/data_query';

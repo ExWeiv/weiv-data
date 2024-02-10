@@ -1,18 +1,45 @@
-import { CollectionID, Items, WeivDataOptions } from '../../weivdata';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import type { CollectionID, Items, WeivDataOptions } from '../Helpers/collection';
+
+/**
+ * Object returned for bulkUpdate function.
+ * @public
+ */
+export interface WeivDataBulkUpdateResult {
+    /**
+     * Number of updated items.
+     */
+    updated: number;
+
+    /**
+     * Updated items.
+     */
+    updatedItems: Items;
+}
 
 /**
  * Updates a number of items in a collection.
  * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Items that will be bulk updated
+ * const itemsToUpdate = [{...}, {...}, {...}]
+ * 
+ * const result = await weivData.bulkUpdate("Clusters/Odunpazari", itemsToUpdate)
+ * console.log(result);
+ * ```
+ * 
  * @param collectionId The ID of the collection that contains the item to update.
  * @param item The items to update.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<object>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
+ * @returns {Promise<WeivDataBulkUpdateResult>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
  */
-export async function bulkUpdate(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<object> {
+export async function bulkUpdate(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<WeivDataBulkUpdateResult> {
     try {
         if (!collectionId || !items) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);

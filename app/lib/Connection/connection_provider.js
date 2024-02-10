@@ -6,7 +6,7 @@ const permission_helpers_1 = require("./permission_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const cachedMongoClient = {};
 const cachedConnectionStatus = {};
-async function setupClient(uri) {
+async function setupClient(uri, role) {
     try {
         if (cachedMongoClient[uri]) {
             const { connection, cleanup } = await connectClient(cachedMongoClient[uri], uri);
@@ -15,7 +15,7 @@ async function setupClient(uri) {
             }
             else {
                 console.warn("WeivData - Failed to connect/create MongoClient in first attempt!");
-                const newMongoClient = new mongodb_1.MongoClient(uri, await (0, connection_helpers_1.loadConnectionOptions)());
+                const newMongoClient = new mongodb_1.MongoClient(uri, await (0, connection_helpers_1.loadConnectionOptions)(role));
                 cachedMongoClient[uri] = newMongoClient;
                 const secondAttempt = await connectClient(newMongoClient, uri);
                 if (!secondAttempt.connection) {
@@ -27,16 +27,16 @@ async function setupClient(uri) {
             }
         }
         else {
-            return createNewClient(uri);
+            return createNewClient(uri, role);
         }
     }
     catch (err) {
         throw Error(`WeivData - Error when connecting to MongoDB Client via setupClient: ${err}`);
     }
 }
-const createNewClient = async (uri) => {
+const createNewClient = async (uri, role) => {
     try {
-        const newMongoClient = new mongodb_1.MongoClient(uri, await (0, connection_helpers_1.loadConnectionOptions)());
+        const newMongoClient = new mongodb_1.MongoClient(uri, await (0, connection_helpers_1.loadConnectionOptions)(role));
         cachedMongoClient[uri] = newMongoClient;
         const { cleanup, connection } = await connectClient(newMongoClient, uri);
         if (connection) {
@@ -80,8 +80,8 @@ const connectClient = async (client, uri) => {
 };
 async function useClient(suppressAuth = false) {
     try {
-        const { uri, memberId } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
-        const { connection, cleanup } = await setupClient(uri);
+        const { uri, memberId, role } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
+        const { connection, cleanup } = await setupClient(uri, role);
         return { pool: connection, cleanup, memberId };
     }
     catch (err) {

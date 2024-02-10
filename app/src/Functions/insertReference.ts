@@ -1,9 +1,23 @@
-import { ReferringItem, ReferencedItem, WeivDataOptions, CollectionID } from '../../weivdata';
+import { WeivDataOptions, CollectionID } from '../Helpers/collection';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
+import { type ReferencedItem, type ReferringItem, getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
 
 /**
  * Inserts a reference in the specified property.
+ * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Item id
+ * const itemId = "..."
+ * 
+ * // References to be inserted. `ItemId[]`
+ * const cpus = ["cpuId2", "cpuId4"]
+ * 
+ * const result = await weivData.insertReference("Clusters/Ortakoy", "availableCPUs", itemId, cpus)
+ * console.log(result);
+ * ```
  * 
  * @param collectionId The ID of the collection that contains the referring item.
  * @param propertyName The property to insert the reference into.

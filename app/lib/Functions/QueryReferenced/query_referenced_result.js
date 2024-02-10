@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WeivDataQueryReferencedResult = void 0;
+exports.InternalWeivDataQueryReferencedResult = void 0;
 const query_referenced_helpers_1 = require("../../Helpers/query_referenced_helpers");
 const connection_provider_1 = require("../../Connection/connection_provider");
 const name_helpers_1 = require("../../Helpers/name_helpers");
-class WeivDataQueryReferencedResult {
+class InternalWeivDataQueryReferencedResult {
     constructor(collectionId, targetCollectionId, itemId, propertyName, queryOptions, options) {
         this.currentPage = 0;
         this.pageSize = 50;
@@ -79,7 +79,14 @@ class WeivDataQueryReferencedResult {
                 }
                 return this.getResult();
             };
-            return this;
+            return {
+                items: this.items,
+                totalCount: this.totalCount,
+                hasNext: this.hasNext,
+                hasPrev: this.hasPrev,
+                next: this.next,
+                prev: this.prev
+            };
         }
         catch (err) {
             throw Error(`WeivData - Error when running queryReferenced function: ${err}`);
@@ -102,4 +109,4 @@ class WeivDataQueryReferencedResult {
         }
     }
 }
-exports.WeivDataQueryReferencedResult = WeivDataQueryReferencedResult;
+exports.InternalWeivDataQueryReferencedResult = InternalWeivDataQueryReferencedResult;

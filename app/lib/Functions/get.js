@@ -58,7 +58,7 @@ async function get(collectionId, itemId, options) {
             return item;
         }
         else {
-            throw Error(`WeivData - Error when trying to get item from the collectin by itemId, itemId: ${newItemId}`);
+            return undefined;
         }
     }
     catch (err) {

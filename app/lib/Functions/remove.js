@@ -26,29 +26,24 @@ async function remove(collectionId, itemId, options) {
             newItemId = (0, item_helpers_1.convertStringId)(itemId);
         }
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: newItemId });
-        const { acknowledged, deletedCount } = await collection.deleteOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { ok, value } = await collection.findOneAndDelete({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
         if (cleanupAfter === true) {
             await cleanup();
         }
-        if (acknowledged) {
-            if (deletedCount === 1) {
-                if (suppressHooks != true) {
-                    let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterRemove', [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterRemove Hook Failure ${err}`);
-                    });
-                    if (editedItem) {
-                        return editedItem;
-                    }
+        if (ok === 1) {
+            if (suppressHooks != true) {
+                let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterRemove', [value, context]).catch((err) => {
+                    throw Error(`WeivData - afterRemove Hook Failure ${err}`);
+                });
+                if (editedItem) {
+                    return editedItem;
                 }
-                return item;
             }
-            else {
-                return null;
-            }
+            return value;
         }
         else {
-            throw Error(`WeivData - Error when removing an item from collection, acknowledged: ${acknowledged}`);
+            console.error(`WeivData - Error when removing an item from collection, ok: ${ok}`);
+            return null;
         }
     }
     catch (err) {

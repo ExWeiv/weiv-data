@@ -2,17 +2,28 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import { CollectionID, ItemID, WeivDataOptions } from '../../weivdata';
+import type { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/collection';
 
 /**
  * Removes an item from a collection.
  * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // ID of item that will be removed
+ * const itemId = "..."
+ * 
+ * const result = await weivData.remove("Clusters/Riva", itemId)
+ * console.log(result);
+ * ```
+ * 
  * @param collectionId The ID of the collection to remove the item from.
  * @param itemId The ID of the item to remove.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<object | null>} Fulfilled - The removed item, or null if the item was not found. Rejected - The error that caused the rejection.
+ * @returns {Promise<Item | null>} Fulfilled - The removed item, or null if the item was not found. Rejected - The error that caused the rejection.
  */
-export async function remove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<object | null> {
+export async function remove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | null> {
     try {
         if (!collectionId || !itemId) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
@@ -36,31 +47,27 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
         }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: newItemId });
-        const { acknowledged, deletedCount } = await collection.deleteOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { ok, value } = await collection.findOneAndDelete({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
 
         if (cleanupAfter === true) {
             await cleanup();
         }
 
-        if (acknowledged) {
-            if (deletedCount === 1) {
-                if (suppressHooks != true) {
-                    let editedItem = await runDataHook<'afterRemove'>(collectionId, 'afterRemove', [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterRemove Hook Failure ${err}`);
-                    });
+        if (ok === 1) {
+            if (suppressHooks != true) {
+                let editedItem = await runDataHook<'afterRemove'>(collectionId, 'afterRemove', [value, context]).catch((err) => {
+                    throw Error(`WeivData - afterRemove Hook Failure ${err}`);
+                });
 
-                    if (editedItem) {
-                        return editedItem;
-                    }
+                if (editedItem) {
+                    return editedItem;
                 }
-
-                return item;
-            } else {
-                return null;
             }
+
+            return value;
         } else {
-            throw Error(`WeivData - Error when removing an item from collection, acknowledged: ${acknowledged}`);
+            console.error(`WeivData - Error when removing an item from collection, ok: ${ok}`);
+            return null;
         }
     } catch (err) {
         throw Error(`WeivData - Error when removing an item from collection: ${err}`);

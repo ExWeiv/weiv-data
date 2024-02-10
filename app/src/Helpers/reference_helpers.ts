@@ -1,7 +1,23 @@
 //@ts-nocheck
+import type { Item, ItemID, Items, ItemIDs } from './collection';
 import { convertStringId } from './item_helpers';
-import { ObjectId } from 'mongodb';
-import { ReferringItem, ReferencedItem } from '../../weivdata';
+import type { ObjectId } from 'mongodb';
+
+/**
+ * Referring item can be the item itself that contains the _id key or directly the item id.
+ * 
+ * @public
+ */
+export type ReferringItem = Item | ItemID;
+
+/**
+ * Referenced item can be the item itself that contains the _id key or directly the item id.
+ * There can be more than one referenced item and if so you can put the values we defined above in an array.
+ * So it can also be Array<Item> or Array<ItemID>
+ * 
+ * @public
+ */
+export type ReferencedItem = Item | ItemID | Items | ItemIDs;
 
 export const getCurrentItemId = (referringItem: ReferringItem): ObjectId => {
     if (typeof referringItem === 'object' && referringItem !== null && referringItem._id !== undefined && referringItem._id) {

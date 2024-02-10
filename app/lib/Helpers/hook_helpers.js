@@ -18,7 +18,6 @@ function prepareHookContext(collectionId) {
         return {
             dbName,
             collectionName,
-            userId: null,
             userRoles: roles
         };
     }

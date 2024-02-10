@@ -2,7 +2,13 @@
 import { currentUser } from "wix-users-backend";
 import { getCachedSecret } from './secret_helpers';
 import NodeCache from 'node-cache';
-import { SuppressAuth, GetMongoURIResult, CachedURI, CachedRole } from "../../weivdata";
+import type { CustomOptionsRole } from '../Helpers/connection_helpers';
+
+export type GetMongoURIResult = {
+    uri: string,
+    memberId?: string,
+    role: CustomOptionsRole
+}
 
 /*
 This is a global cache for this file which is used to cache data in it.
@@ -14,7 +20,7 @@ const cache = new NodeCache();
  * @param suppressAuth Bypass permissions or use existing member/visitor permissions
  * @returns An object with the MongoClient connection `URI` and if possible `memberId`
  */
-export async function getMongoURI(suppressAuth: SuppressAuth = false): Promise<GetMongoURIResult> {
+export async function getMongoURI(suppressAuth: boolean = false): Promise<GetMongoURIResult> {
     try {
         if (suppressAuth != true) {
             if (currentUser.loggedIn === true) {
@@ -42,14 +48,14 @@ export async function getMongoURI(suppressAuth: SuppressAuth = false): Promise<G
 const getVisitorURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Visitor (not logged in)
-        const cachedVisitorURI: CachedURI = cache.get("VisitorMongoDB_URI");
+        const cachedVisitorURI: string | undefined = cache.get("VisitorMongoDB_URI");
         if (cachedVisitorURI) {
-            return { uri: cachedVisitorURI };
+            return { uri: cachedVisitorURI, role: "visitorClientOptions" };
         }
 
         const secret = await getCachedSecret("VisitorURI");
         cache.set("VisitorMongoDB_URI", secret.toString(), 3600 * 2);
-        return { uri: secret }
+        return { uri: secret, role: "visitorClientOptions" }
     } catch (err) {
         throw Error(`Error when getting VisitorURI: ${err}`);
     }
@@ -64,11 +70,12 @@ const getVisitorURI = async (): Promise<GetMongoURIResult> => {
 const getAdminURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Admin (permission is bypassed)
-        const cachedAdminURI: CachedURI = cache.get("AdminMongoDB_URI");
+        const cachedAdminURI: string | undefined = cache.get("AdminMongoDB_URI");
         if (cachedAdminURI) {
             return {
                 uri: cachedAdminURI,
-                memberId: currentUser.id
+                memberId: currentUser.id,
+                role: "adminClientOptions"
             };
         }
 
@@ -76,7 +83,8 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
         cache.set("AdminMongoDB_URI", secret.toString(), 3600);
         return {
             uri: secret,
-            memberId: currentUser.id
+            memberId: currentUser.id,
+            role: "adminClientOptions"
         }
     } catch (err) {
         throw Error(`Error when getting AdminURI: ${err}`);
@@ -92,15 +100,16 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
 const getMemberURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Member (logged in)
-        const cachedMemberURI: CachedURI = cache.get(`MemberMongoDB_URI${currentUser.id}`);
+        const cachedMemberURI: string | undefined = cache.get(`MemberMongoDB_URI${currentUser.id}`);
         if (cachedMemberURI) {
             return {
                 uri: cachedMemberURI,
-                memberId: currentUser.id
+                memberId: currentUser.id,
+                role: "memberClientOptions"
             }
         }
 
-        const cachedRole: CachedRole = cache.get(`MemberRoles${currentUser.id}`);
+        const cachedRole: string | undefined = cache.get(`MemberRoles${currentUser.id}`);
         if (cachedRole) {
             if (cachedRole === "Admin") {
                 return getAdminURI();
@@ -122,7 +131,8 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
 
         return {
             uri: secret,
-            memberId: currentUser.id
+            memberId: currentUser.id,
+            role: "memberClientOptions"
         }
     } catch (err) {
         throw Error(`Error when getting MemberURI: ${err}`);
