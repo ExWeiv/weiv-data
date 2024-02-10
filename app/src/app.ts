@@ -59,6 +59,9 @@ export { truncate } from './Functions/truncate';
 /**@public */
 export { update } from './Functions/update';
 
+/**@public */
+export { idConvreter } from './Functions/idConverter';
+
 //---------------------------------------------//
 //             Types + Interfaces              //
 //---------------------------------------------//
