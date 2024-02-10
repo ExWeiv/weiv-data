@@ -20,7 +20,7 @@ export type SuppressHooks = boolean;
 export type ConsistentRead = boolean;
 
 /**
- * When you want to get not just only members or admins id (member id in Wix) also visitors id enable this and system will create a data using wixData and then it will use the _owner field to get the current user temp id.
+ * When you want to get not just only members or admins id (member id in Wix) also visitors id enable this and system will create a data using wix-data and then it will use the _owner field to get the current user temp id.
  * Note: This will slow down the operation and not recommended always so do not use it when you don't need it. Carefully design your database systems/models and your apps workflows because you shouldn't need this in most cases.
  * @public
  */

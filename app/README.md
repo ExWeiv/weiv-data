@@ -1,30 +1,30 @@
-# weivData Node.js APIs
+# weiv-data Node.js APIs
 
 [![Build for Velo by Wix](https://img.shields.io/badge/Built%20for-Velo%20by%20Wix-3638f4)](https://wix.com/velo)
 
-The official [weivData APIs](https://www.npmjs.com/package/@exweiv/weiv-data) for Node.js to build web applications using MongoDB inside Wix with Velo. Only limited by MongoDB and your pocket. Not limited by wixData APIs since you won't use them.
+The official [weiv-data APIs](https://www.npmjs.com/package/@exweiv/weiv-data) for Node.js to build web applications using MongoDB inside Wix with Velo. Only limited by MongoDB and your pocket. Not limited by wix-data APIs since you won't use them.
 
 **[Official Docs](https://weiv-data.web.app/)**
 
 ### When and Why to Use?
 
-If you are building a large application using Wix you may want to use something better than wixData since it's limited differently than Wix's backend limits. And maybe you are looking for better performance. Than you are in the right place.
+If you are building a large application using Wix you may want to use something better than wix-data since it's limited differently than Wix's backend limits. And maybe you are looking for better performance. Than you are in the right place.
 
 > This library is not for small projects it's built for large features/projects/apps and you will need advanced JS and general MongoDB knowledge to work with this package.
 
 ### Things to Know
 
-- weivData is not using string based item IDs it's using ObjectId based item IDs. (Important when you switch to this library)
+- weiv-data is not using string based item IDs it's using ObjectId based item IDs. (Important when you switch to this library)
 - You won't have the visual dashboard in Wix's dashboard. (There is a way to have this btw, we'll show later on)
-- APIs are very similar in most cases same with wixData and most features are same or similar.
+- APIs are very similar in most cases same with wix-data and most features are same or similar.
 - You will need to setup your MongoDB env to get started with this API library.
 - You can use "mongodb" or "mongoose" NPM package when you can't find the needed feature in this library.
-- This package is built to let you switch from wixData easier and in some cases you may want to switch to "mongodb" NPM package slowly. (You'll need advanced knowledge of that library)
-- You won't be able to use some specific types that you had in wixData such as Rich Content, but you can always build these by yourself too. (We are working on this too)
+- This package is built to let you switch from wix-data easier and in some cases you may want to switch to "mongodb" NPM package slowly. (You'll need advanced knowledge of that library)
+- You won't be able to use some specific types that you had in wix-data such as Rich Content, but you can always build these by yourself too. (We are working on this too)
 
 > You can always leave your feedbacks/bug reports in our [GitHub repo](https://github.com/ExWeiv/weiv-data/issues) by creating issues.
 
-Soon we will create a YouTube video to show how you can setup your MongoDB env and start using this library and things to consider/know when using this library or switching from wixData.
+Soon we will create a YouTube video to show how you can setup your MongoDB env and start using this library and things to consider/know when using this library or switching from wix-data.
 
 ---
 
@@ -56,9 +56,9 @@ Use indexes to faster your queries. We are also working on other APIs that will 
 
 Currently we don't have a documentation we are working on one to create so you can see all functions but we have TS included in our library so you should be able to use autocomplete and even see some examples for some of the functions. But here are some examples and the logic of this library.
 
-First of all this library is designed to make switch from wixData easy so most of the functions are same with wixData which means you can use wixData API docs to understand the syntax or APIs. But everything is not same even if they are similar.
+First of all this library is designed to make switch from wix-data easy so most of the functions are same with wix-data which means you can use wix-data API docs to understand the syntax or APIs. But everything is not same even if they are similar.
 
-Since we add some extra features or we use different style for our library it's different than wixData in some cases.
+Since we add some extra features or we use different style for our library it's different than wix-data in some cases.
 
 ```js
 import weivData from "@exweiv/weiv-data";
@@ -66,10 +66,10 @@ import weivData from "@exweiv/weiv-data";
 export async function testFunction() {
   try {
     const item = await weivData.get("<databaseName>/<collectionName>", itemId, options);
-    /* You can access to collections in different databases same as how you access Wix App collections using wixData. */
+    /* You can access to collections in different databases same as how you access Wix App collections using wix-data. */
 
     const updated = await weivData.update("<databaseName>/<collectionName>", item, options);
-    /* Same syntax with wixData when you use update function. */
+    /* Same syntax with wix-data when you use update function. */
 
     return { item, updated };
   } catch (err) {
@@ -82,7 +82,7 @@ You can play with library to see how it works. As we said you should see autocom
 
 ## Functions
 
-You can also compare which is available in weivData and wixData. (We will publish a real docs asap for each function and feature)
+You can also compare which is available in weivData and wix-data. (We will publish a real docs asap for each function and feature)
 
 - Data Hooks (available)
 - Aggregate (available)
@@ -104,7 +104,7 @@ You can also compare which is available in weivData and wixData. (We will publis
 - truncate (available)
 - update (available)
 
-### About wixData.v2 Features in weivData
+### About wix-data.v2 Features in weivData
 
 - Indexes (not available yet but will be available soon) ⏰
 - Collections (not available yet but will be available soon) ⏰
@@ -112,24 +112,24 @@ You can also compare which is available in weivData and wixData. (We will publis
 
 ### Features We're Working On
 
-- wixData.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.) ⏰
+- wix-data.v2 features in weivData (Create, Drop and List Indexes, Create and Manage Collections etc.) ⏰
 - Multilanguage Support (read and write data in multilanguage) ⏰
 
 ---
 
 ### Performance
 
-We can't test it with high traffic right now but what we can say is it's MongoDB and basically you are using MongoDB which is wixData is also using but generally weivData is a bit faster (**2x faster in general** sometimes more somtimes less depends on the function and call) and you can upgrade your MongoDB Cluster to upgrade the performance (MongoDB has a free version too and we have tested everything on that free version which is shared clusters).
+We can't test it with high traffic right now but what we can say is it's MongoDB and basically you are using MongoDB which is wix-data is also using but generally weivData is a bit faster (**2x faster in general** sometimes more somtimes less depends on the function and call) and you can upgrade your MongoDB Cluster to upgrade the performance (MongoDB has a free version too and we have tested everything on that free version which is shared clusters).
 
 Soon we will add more details and some examples about performance difference. To let you also know **get, isReferenced and query** functions are comes with caching feature (will be improved later on).
 
 **Basic Test Results:**
-We have done few tests using the Wix's backend testing tool. We have run get, insert and update function in each 150ms for 100 times and here is the result for weivData and wixData:
+We have done few tests using the Wix's backend testing tool. We have run get, insert and update function in each 150ms for 100 times and here is the result for weivData and wix-data:
 
 - **327ms avg for weivData**
-- **946ms avg for wixData**
+- **946ms avg for wix-data**
 
-wixData is much better for cold starts and more consistent (wixData always completed in 900-1050ms) over weivData. But it satyed slower than weivData after cold start of weivData. You may see up to 3000+ms in weivData for cold starts but this would never happen in wixData, as you use weivData (after cold start) it will respond much faster. (weivData completed it's first few calls (1-10 calls in general depends on how fast you are making the calls) arround 2000ms then it was more consistent and stayed arround 300ms) You can test it and see yourself.
+wix-data is much better for cold starts and more consistent (wix-data always completed in 900-1050ms) over weivData. But it satyed slower than weivData after cold start of weivData. You may see up to 3000+ms in weivData for cold starts but this would never happen in wix-data, as you use weivData (after cold start) it will respond much faster. (weivData completed it's first few calls (1-10 calls in general depends on how fast you are making the calls) arround 2000ms then it was more consistent and stayed arround 300ms) You can test it and see yourself.
 
 > Tests are made in backend testing tool in a free Wix Studio website. And weivData library was also using free shared clusters of MongoDB.
 
@@ -176,11 +176,11 @@ _If main function tested only there is a possibility of BUG/s but if most of the
 
 ## How to Use Hooks?
 
-Using hooks in weivData and wixData has similar way. We are currently not providing a hook for errors. But rest of the hooks are available like in wixData. To create a hook you need to create a folder in your backend named `WeivData` and then you also need to create a .js file (.js file now .jsw or .web.js) inside of that folder.
+Using hooks in weiv-data and wix-data has similar way. We are currently not providing a hook for errors. But rest of the hooks are available like in wix-data. To create a hook you need to create a folder in your backend named `WeivData` and then you also need to create a .js file (.js file now .jsw or .web.js) inside of that folder.
 
 -> backend/WeivData/data.js
 
-Then you will create your hooks as functions like in wixData. Here is an example for afterGet hook:
+Then you will create your hooks as functions like in wix-data. Here is an example for afterGet hook:
 
 ```js
 // In backend/WeivData/data.js file
