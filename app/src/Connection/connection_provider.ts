@@ -150,10 +150,17 @@ export async function cleanupClientConnections(): Promise<void> {
 
         for (const uri of allCachedClients) {
             cachedMongoClient[uri]?.close();
+            cachedConnectionStatus[uri] = false;
+            delete cachedMongoClient[uri];
         }
 
         console.info("All MongoDB Cached Connections Closed and Cleared - Cached Clients Removed");
     } catch (err) {
         throw Error(`WeivData - Error when cleaning all existing client connections ${err}`);
     }
+}
+
+/**@internal */
+export function getConnectionClientsCache() {
+    return "ConnectionClients";
 }

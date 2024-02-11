@@ -17,6 +17,7 @@ import { save } from './Functions/save';
 import { truncate } from './Functions/truncate';
 import { update } from './Functions/update';
 import { idConvreter } from './Functions/idConverter';
+import { flushCache } from './Functions/flushCache';
 
 /**@internal */
 import { CollectionID } from "./Helpers/collection";
@@ -41,4 +42,5 @@ export = {
     truncate,
     update,
     idConvreter,
+    flushCache
 }

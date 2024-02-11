@@ -75,3 +75,8 @@ export async function isReferenced(collectionId: CollectionID, propertyName: str
         throw Error(`WeivData - Error when checking if item is referenced: ${err}`);
     }
 }
+
+/**@internal */
+export function getIsReferencedCache() {
+    return cache;
+}

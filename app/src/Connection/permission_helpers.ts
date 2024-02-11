@@ -138,3 +138,8 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
         throw Error(`Error when getting MemberURI: ${err}`);
     }
 }
+
+/**@internal */
+export function getPermissionsCache() {
+    return cache;
+}

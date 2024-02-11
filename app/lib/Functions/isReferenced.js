@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isReferenced = void 0;
+exports.getIsReferencedCache = exports.isReferenced = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const reference_helpers_1 = require("../Helpers/reference_helpers");
 const lodash_1 = require("lodash");
@@ -49,3 +49,7 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
     }
 }
 exports.isReferenced = isReferenced;
+function getIsReferencedCache() {
+    return cache;
+}
+exports.getIsReferencedCache = getIsReferencedCache;

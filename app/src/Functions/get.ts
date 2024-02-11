@@ -87,3 +87,8 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
         throw Error(`WeivData - Error when trying to get item from the collectin by itemId: ${err}`);
     }
 }
+
+/**@internal */
+export function getGetCache() {
+    return cache;
+}

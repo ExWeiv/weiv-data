@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMongoURI = void 0;
+exports.getPermissionsCache = exports.getMongoURI = void 0;
 const wix_users_backend_1 = require("wix-users-backend");
 const secret_helpers_1 = require("./secret_helpers");
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -101,3 +101,7 @@ const getMemberURI = async () => {
         throw Error(`Error when getting MemberURI: ${err}`);
     }
 };
+function getPermissionsCache() {
+    return cache;
+}
+exports.getPermissionsCache = getPermissionsCache;

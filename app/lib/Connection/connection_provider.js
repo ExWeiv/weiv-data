@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanupClientConnections = exports.useClient = void 0;
+exports.getConnectionClientsCache = exports.cleanupClientConnections = exports.useClient = void 0;
 const mongodb_1 = require("mongodb");
 const permission_helpers_1 = require("./permission_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
@@ -94,6 +94,8 @@ async function cleanupClientConnections() {
         const allCachedClients = Object.keys(cachedMongoClient);
         for (const uri of allCachedClients) {
             cachedMongoClient[uri]?.close();
+            cachedConnectionStatus[uri] = false;
+            delete cachedMongoClient[uri];
         }
         console.info("All MongoDB Cached Connections Closed and Cleared - Cached Clients Removed");
     }
@@ -102,3 +104,7 @@ async function cleanupClientConnections() {
     }
 }
 exports.cleanupClientConnections = cleanupClientConnections;
+function getConnectionClientsCache() {
+    return "ConnectionClients";
+}
+exports.getConnectionClientsCache = getConnectionClientsCache;

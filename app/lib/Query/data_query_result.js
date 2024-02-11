@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InternalWeivDataQueryResult = void 0;
+exports.getQueryCache = exports.InternalWeivDataQueryResult = void 0;
 const connection_provider_1 = require("../Connection/connection_provider");
 const lodash_1 = require("lodash");
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -209,3 +209,7 @@ class InternalWeivDataQueryResult {
     }
 }
 exports.InternalWeivDataQueryResult = InternalWeivDataQueryResult;
+function getQueryCache() {
+    return cache;
+}
+exports.getQueryCache = getQueryCache;

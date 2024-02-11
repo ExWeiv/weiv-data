@@ -28,3 +28,8 @@ export async function getCachedSecret(secretName: string): Promise<string> {
         throw Error(`Error on getting cached secret for URIs: ${err}`);
     }
 }
+
+/**@internal */
+export function getConnectionSecretsCache() {
+    return cache;
+}

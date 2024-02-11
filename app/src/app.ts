@@ -62,6 +62,9 @@ export { update } from './Functions/update';
 /**@public */
 export { idConvreter } from './Functions/idConverter';
 
+/**@public */
+export { flushCache } from './Functions/flushCache';
+
 //---------------------------------------------//
 //             Types + Interfaces              //
 //---------------------------------------------//
@@ -113,3 +116,6 @@ export { WeivDataSaveResult } from './Functions/save';
 
 /**@public */
 export { IncludeObject } from './Query/data_query';
+
+/**@public */
+export { CacheSelections } from './Functions/flushCache';

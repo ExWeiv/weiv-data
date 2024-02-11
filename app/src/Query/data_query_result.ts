@@ -334,3 +334,8 @@ export class InternalWeivDataQueryResult {
         return `${this.dbName}-${this.collectionName}-${this.currentPage}-${JSON.stringify(this.queryOptions)}`;
     }
 }
+
+/**@internal */
+export function getQueryCache() {
+    return cache;
+}

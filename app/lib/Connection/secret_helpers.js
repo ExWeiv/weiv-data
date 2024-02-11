@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCachedSecret = void 0;
+exports.getConnectionSecretsCache = exports.getCachedSecret = void 0;
 const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
 const wixAuth = __importStar(require("wix-auth"));
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -47,3 +47,7 @@ async function getCachedSecret(secretName) {
     }
 }
 exports.getCachedSecret = getCachedSecret;
+function getConnectionSecretsCache() {
+    return cache;
+}
+exports.getConnectionSecretsCache = getConnectionSecretsCache;

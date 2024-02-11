@@ -153,9 +153,16 @@ In this file you can find what's changed in each version.
 - Include function fixes and TS/docs support in weivData.query function.
 - get function BUG fixes.
 - X.509 method is now allowed and should be working as expected.
-- idConvreter function added to library
+- `idConvreter` function added to library
 - Started working to fix few BUG/s and test more functions.
 - Discord server created and READMEs updated with new informations.
+
+### 2.2.3
+
+- README updated
+- import BUG fixes now you can import without any problem
+- BUG fixes
+- New function added `flushCache`
 
 ---
 

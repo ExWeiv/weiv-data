@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get = void 0;
+exports.getGetCache = exports.get = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -66,3 +66,7 @@ async function get(collectionId, itemId, options) {
     }
 }
 exports.get = get;
+function getGetCache() {
+    return cache;
+}
+exports.getGetCache = getGetCache;

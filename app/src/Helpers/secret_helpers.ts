@@ -26,3 +26,8 @@ export async function getCachedSecret(secretName: string): Promise<string | unde
         return undefined;
     }
 }
+
+/**@internal */
+export function getHelperSecretsCache() {
+    return cache;
+}

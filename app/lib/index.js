@@ -18,6 +18,7 @@ const save_1 = require("./Functions/save");
 const truncate_1 = require("./Functions/truncate");
 const update_1 = require("./Functions/update");
 const idConverter_1 = require("./Functions/idConverter");
+const flushCache_1 = require("./Functions/flushCache");
 module.exports = {
     aggregate: (collectionId) => new data_aggregate_1.WeivDataAggregate(collectionId),
     filter: () => new data_filter_1.WeivDataFilter(),
@@ -38,4 +39,5 @@ module.exports = {
     truncate: truncate_1.truncate,
     update: update_1.update,
     idConvreter: idConverter_1.idConvreter,
+    flushCache: flushCache_1.flushCache
 };
