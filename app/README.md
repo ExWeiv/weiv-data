@@ -4,81 +4,15 @@
 
 The official [weiv-data APIs](https://www.npmjs.com/package/@exweiv/weiv-data) for Node.js to build web applications using MongoDB inside Wix with Velo. Only limited by MongoDB and your pocket. Not limited by wix-data APIs since you won't use them.
 
-**[Official Docs](https://weiv-data.web.app/)**
-
 ### When and Why to Use?
 
 If you are building a large application using Wix you may want to use something better than wix-data since it's limited differently than Wix's backend limits. And maybe you are looking for better performance. Than you are in the right place.
 
 > This library is not for small projects it's built for large features/projects/apps and you will need advanced JS and general MongoDB knowledge to work with this package.
 
-### Things to Know
+### Documentation
 
-- weiv-data is not using string based item IDs it's using ObjectId based item IDs. (Important when you switch to this library)
-- You won't have the visual dashboard in Wix's dashboard. (There is a way to have this btw, we'll show later on)
-- APIs are very similar in most cases same with wix-data and most features are same or similar.
-- You will need to setup your MongoDB env to get started with this API library.
-- You can use "mongodb" or "mongoose" NPM package when you can't find the needed feature in this library.
-- This package is built to let you switch from wix-data easier and in some cases you may want to switch to "mongodb" NPM package slowly. (You'll need advanced knowledge of that library)
-- You won't be able to use some specific types that you had in wix-data such as Rich Content, but you can always build these by yourself too. (We are working on this too)
-
-> You can always leave your feedbacks/bug reports in our [GitHub repo](https://github.com/ExWeiv/weiv-data/issues) by creating issues.
-
-Soon we will create a YouTube video to show how you can setup your MongoDB env and start using this library and things to consider/know when using this library or switching from wix-data.
-
----
-
-### Setup MongoDB and Wix
-
-First of all go ahead and create a MongoDB account and a database in your account. You can find many tutorials on YouTube about this. Then come back here, if you already own a MongoDB acount then create a new cluster and do the following steps:
-
-1. Go to Database Access and create 3 different user each user will have different roles/permissions.
-   1. Create one for Admin and give it needed permissions for Admin (you can use built-in roles too or create custom roles)
-   2. Create one for Member and give it needed permissions that you want to give to site members.
-   3. Create one for Visitor and give it needed permissions that you want to give to site visitors.
-2. Every time you create a new user you will also create a password save these passwords because we will need them in the nex step.
-3. After creating 3 different roles you will need the "connection URI" this will be used to connect your MongoDB clusters.
-4. Go to "Database" section in MongoDB dashboard and click "Connect" button select "drivers" you will see an example connection string/uri. Copy this and change the username and password for each user we've created before (Admin, Member, Visitor).
-5. After you prepared your connection strings/uris go to your Wix dashboard and open "Secrets Manager"
-6. In secret manager create three different secret:
-   1. Create a secret named as AdminURI (this is case sensitive) and paste the URI for admin.
-   2. Do the same for MemberURI and VisitorURI.
-7. Then create another secret for connection options named "WeivDataConnectionOptions" if you don't want to set custom options paste empty object as value. If you want to add custom options when connecting to MongoDB Clusters add your custom object into value. [Connection Options](https://www.mongodb.com/docs/manual/administration/connection-pool-overview/) (Do not paste object as strings Wix will stringify it otherwise you will see errors when connecting).
-8. Lastly go to your Wix collections (CMS) and create a collection named as "WeivOwnerID" you don't need to add any data. Just create the collection with the same exact name and leave it as it is. This collection help library to get visitors ID (only when you enable it). Since Wix doesn't provide a way to get visitors temporary ID we use a collection to create a data and get the \_owner field value from that data.
-9. And you should be ready to go.
-
-> Any data created in WeivOwnerID will be removed just after it's used so it won't waste your storage and it will be only used when you enable the visitorId collecting option.
-
-**Note:**
-Use indexes to faster your queries. We are also working on other APIs that will allow you to create collections with custom options. Also we don't use mongoose in our library for better performance.
-
-## APIs and Examples
-
-Currently we don't have a documentation we are working on one to create so you can see all functions but we have TS included in our library so you should be able to use autocomplete and even see some examples for some of the functions. But here are some examples and the logic of this library.
-
-First of all this library is designed to make switch from wix-data easy so most of the functions are same with wix-data which means you can use wix-data API docs to understand the syntax or APIs. But everything is not same even if they are similar.
-
-Since we add some extra features or we use different style for our library it's different than wix-data in some cases.
-
-```js
-import weivData from "@exweiv/weiv-data";
-
-export async function testFunction() {
-  try {
-    const item = await weivData.get("<databaseName>/<collectionName>", itemId, options);
-    /* You can access to collections in different databases same as how you access Wix App collections using wix-data. */
-
-    const updated = await weivData.update("<databaseName>/<collectionName>", item, options);
-    /* Same syntax with wix-data when you use update function. */
-
-    return { item, updated };
-  } catch (err) {
-    console.error(err);
-  }
-}
-```
-
-You can play with library to see how it works. As we said you should see autocompletes and type checking enabled in most cases (%99). And here is all functions listed:
+You can find more info at our **[Official Docs](https://weiv-data.web.app/)**.
 
 ## Functions
 
