@@ -7,7 +7,9 @@ import { getQueryCache } from '../Query/data_query_result';
 import { getConnectionClientsCache, cleanupClientConnections } from '../Connection/connection_provider';
 import NodeCache from 'node-cache';
 
+/**@public */
 export type CacheSelections = "permissions" | "secrets" | "get" | "isreferenced" | "query" | "connectionsecrets" | "helpersecrets" | "connectionclients";
+
 type CacheSelectionsObject = {
     [Key in CacheSelections]: () => NodeCache | string | NodeCache[]; // Define the value type as a function returning any
 };

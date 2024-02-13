@@ -8,7 +8,7 @@ import { convertStringId } from "../Helpers/item_helpers";
  * @param stringMethod Optional converting method can be "base64" or "hex" defaults to "hex"
  * @returns ObjectId or string reverse of the input
  */
-export function idConvreter(id: string | ObjectId, stringMethod?: "base64" | "hex"): ObjectId | string {
+export function idConverter(id: string | ObjectId, stringMethod?: "base64" | "hex"): ObjectId | string {
     if (typeof id === "string") {
         return convertStringId(id);
     } else {

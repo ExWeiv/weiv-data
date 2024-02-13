@@ -164,6 +164,11 @@ In this file you can find what's changed in each version.
 - BUG fixes
 - New function added `flushCache`
 
+### 2.2.4
+
+- BUG fixed for idConverter function. (Imported func name was wrong)
+- Docs updated
+
 ---
 
 _When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_

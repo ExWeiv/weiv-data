@@ -60,7 +60,7 @@ export { truncate } from './Functions/truncate';
 export { update } from './Functions/update';
 
 /**@public */
-export { idConvreter } from './Functions/idConverter';
+export { idConverter } from './Functions/idConverter';
 
 /**@public */
 export { flushCache } from './Functions/flushCache';

@@ -85,6 +85,8 @@ Let's start by setting up our environment for weiv-data and make things ready. F
    3. _This will be required when you want to use X.509 method._
 9. You are ready!
 
+**Even if you won't setup any custom connection settings or data hooks create `WeivData` folder in your backend and create two .js files `data.js` and `connection-options.js`. This is important and must have to let library work.`**
+
 > We also explain how you use X.509 instead of username and password authentication method.
 
 ### Finding Connection URI/String in MongoDB:

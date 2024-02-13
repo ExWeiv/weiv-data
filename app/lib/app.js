@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.flushCache = exports.idConvreter = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.WeivDataQuery = exports.WeivDataFilter = exports.WeivDataAggregate = void 0;
+exports.flushCache = exports.idConverter = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.WeivDataQuery = exports.WeivDataFilter = exports.WeivDataAggregate = void 0;
 var data_aggregate_1 = require("./Aggregate/data_aggregate");
 Object.defineProperty(exports, "WeivDataAggregate", { enumerable: true, get: function () { return data_aggregate_1.WeivDataAggregate; } });
 var data_filter_1 = require("./Filter/data_filter");
@@ -38,6 +38,6 @@ Object.defineProperty(exports, "truncate", { enumerable: true, get: function () 
 var update_1 = require("./Functions/update");
 Object.defineProperty(exports, "update", { enumerable: true, get: function () { return update_1.update; } });
 var idConverter_1 = require("./Functions/idConverter");
-Object.defineProperty(exports, "idConvreter", { enumerable: true, get: function () { return idConverter_1.idConvreter; } });
+Object.defineProperty(exports, "idConverter", { enumerable: true, get: function () { return idConverter_1.idConverter; } });
 var flushCache_1 = require("./Functions/flushCache");
 Object.defineProperty(exports, "flushCache", { enumerable: true, get: function () { return flushCache_1.flushCache; } });

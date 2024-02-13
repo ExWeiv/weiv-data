@@ -38,6 +38,6 @@ module.exports = {
     save: save_1.save,
     truncate: truncate_1.truncate,
     update: update_1.update,
-    idConvreter: idConverter_1.idConvreter,
+    idConverter: idConverter_1.idConverter,
     flushCache: flushCache_1.flushCache
 };

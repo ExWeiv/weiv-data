@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.idConvreter = void 0;
+exports.idConverter = void 0;
 const item_helpers_1 = require("../Helpers/item_helpers");
-function idConvreter(id, stringMethod) {
+function idConverter(id, stringMethod) {
     if (typeof id === "string") {
         return (0, item_helpers_1.convertStringId)(id);
     }
@@ -10,4 +10,4 @@ function idConvreter(id, stringMethod) {
         return id.toString(stringMethod || "hex");
     }
 }
-exports.idConvreter = idConvreter;
+exports.idConverter = idConverter;

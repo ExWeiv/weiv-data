@@ -16,7 +16,7 @@ import { replaceReferences } from './Functions/replaceReferences';
 import { save } from './Functions/save';
 import { truncate } from './Functions/truncate';
 import { update } from './Functions/update';
-import { idConvreter } from './Functions/idConverter';
+import { idConverter } from './Functions/idConverter';
 import { flushCache } from './Functions/flushCache';
 
 /**@internal */
@@ -41,6 +41,6 @@ export = {
     save,
     truncate,
     update,
-    idConvreter,
+    idConverter,
     flushCache
 }
