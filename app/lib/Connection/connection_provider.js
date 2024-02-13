@@ -59,23 +59,32 @@ const connectClient = async (client, uri) => {
             };
         }
         let connectedClient;
-        client.on("open", () => {
+        const handleOpen = async () => {
             cachedMongoClient[uri] = connectedClient;
             cachedConnectionStatus[uri] = true;
-        });
-        client.on("close", () => {
+        };
+        const handleClose = async () => {
+            await cachedMongoClient[uri].close();
             cachedMongoClient[uri].removeAllListeners();
             delete cachedMongoClient[uri];
             cachedConnectionStatus[uri] = false;
-        });
+        };
+        const handleError = async () => {
+            await client.close();
+            client.removeAllListeners();
+            throw Error(`WeivData - Error when trying to connect client: ${uri}`);
+        };
+        client.on('open', handleOpen);
+        client.on('close', handleClose);
+        client.on('error', handleError);
         connectedClient = await client.connect();
         return {
             connection: connectedClient,
-            cleanup: () => { cachedMongoClient[uri]?.close(); }
+            cleanup: () => { connectedClient.close(); }
         };
     }
     catch (err) {
-        throw Error(`WeivData - Error when trying to connect existing client: ${err}`);
+        throw Error(`WeivData - Unexpected error: ${err}`);
     }
 };
 async function useClient(suppressAuth = false) {

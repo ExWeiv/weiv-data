@@ -35,7 +35,7 @@ export interface WeivDataBulkUpdateResult {
  * ```
  * 
  * @param collectionId The ID of the collection that contains the item to update.
- * @param item The items to update.
+ * @param items The items to update.
  * @param options An object containing options to use when processing this operation.
  * @returns {Promise<WeivDataBulkUpdateResult>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
  */

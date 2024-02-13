@@ -91,37 +91,51 @@ const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<Se
  */
 const connectClient = async (client: MongoClient, uri: string): Promise<SetupClientResult> => {
     try {
+        // Check if a connection for the given URI exists in the cache
         if (cachedConnectionStatus[uri] === true) {
             return {
                 connection: cachedMongoClient[uri],
                 cleanup: () => { cachedMongoClient[uri]?.close(); }
-            }
+            };
         }
 
+        // Create a new client if not cached
         let connectedClient: MongoClient;
 
-        // Set listeners for connection status updating
-        client.on("open", () => {
+        // Set up listeners for connection management (use named functions for clarity)
+        const handleOpen = async () => {
             cachedMongoClient[uri] = connectedClient;
             cachedConnectionStatus[uri] = true;
-        })
+        };
 
-        client.on("close", () => {
+        const handleClose = async () => {
+            await cachedMongoClient[uri].close();
             cachedMongoClient[uri].removeAllListeners();
             delete cachedMongoClient[uri];
             cachedConnectionStatus[uri] = false;
-        })
+        };
+
+        const handleError = async () => {
+            await client.close(); // Close client on error to avoid leaks
+            client.removeAllListeners();
+            throw Error(`WeivData - Error when trying to connect client: ${uri}`); // Rethrow with URI for context
+        };
+
+        client.on('open', handleOpen);
+        client.on('close', handleClose);
+        client.on('error', handleError);
 
         // Connect and return connection
         connectedClient = await client.connect();
+
         return {
             connection: connectedClient,
-            cleanup: () => { cachedMongoClient[uri]?.close(); }
-        }
+            cleanup: () => { connectedClient.close(); } // Close the specific client instance
+        };
     } catch (err) {
-        throw Error(`WeivData - Error when trying to connect existing client: ${err}`);
+        throw Error(`WeivData - Unexpected error: ${err}`); // Handle unexpected errors gracefully
     }
-}
+};
 
 /**
  * @function

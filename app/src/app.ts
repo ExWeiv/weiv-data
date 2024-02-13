@@ -119,3 +119,6 @@ export { IncludeObject } from './Query/data_query';
 
 /**@public */
 export { CacheSelections } from './Functions/flushCache';
+
+/**@public */
+export { ReferencedItem, ReferringItem } from './Helpers/reference_helpers';

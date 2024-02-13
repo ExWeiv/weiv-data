@@ -180,6 +180,11 @@ In this file you can find what's changed in each version.
 - Parallel execution is now available in query.
 - Speed and performance optimizations.
 
+### 2.3.0
+
+- BUG fixes + optimizations.
+- Docs updated.
+
 ---
 
 _When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_
