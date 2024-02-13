@@ -31,7 +31,9 @@ const defaultOptions = {
     maxPoolSize: 50,
     minPoolSize: 5,
     maxIdleTimeMS: 30000,
-    tls: true
+    socketTimeoutMS: 30000,
+    connectTimeoutMS: 30000,
+    tls: true,
 };
 async function connectionHandler(collectionId, suppressAuth = false) {
     try {

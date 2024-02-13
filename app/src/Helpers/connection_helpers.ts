@@ -9,7 +9,9 @@ const defaultOptions: MongoClientOptions = {
     maxPoolSize: 50,
     minPoolSize: 5,
     maxIdleTimeMS: 30000,
-    tls: true
+    socketTimeoutMS: 30000,
+    connectTimeoutMS: 30000,
+    tls: true,
 }
 
 export async function connectionHandler(collectionId: CollectionID, suppressAuth: boolean = false): Promise<ConnectionHandlerResult> {
