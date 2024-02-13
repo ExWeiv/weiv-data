@@ -132,18 +132,8 @@ const connectClient = async (client: MongoClient, uri: string): Promise<SetupCli
  */
 export async function useClient(suppressAuth: boolean = false): Promise<UseClientResult> {
     try {
-        const startTime = new Date();
-        const { uri, memberId, role } = await getMongoURI(suppressAuth); //@ts-ignore
-        const getUri = new Date() - startTime;
-
-        const startTime2 = new Date();
-        const { connection, cleanup } = await setupClient(uri, role); //@ts-ignore
-        const setupClientMs = new Date() - startTime2;
-
-        //@ts-ignore
-        console.log(`useClient Executed in: ${(new Date() - startTime).toFixed(2)}ms`);
-        console.log(`getMongoURI Executed in: ${(getUri).toFixed(2)}ms`);
-        console.log(`setupClient Executed in: ${(setupClientMs).toFixed(2)}ms`);
+        const { uri, memberId, role } = await getMongoURI(suppressAuth);
+        const { connection, cleanup } = await setupClient(uri, role);
         return { pool: connection, cleanup, memberId };
     } catch (err) {
         throw Error(`WeivData - Error when connecting to cached MongoClient via useClient: ${err}`);

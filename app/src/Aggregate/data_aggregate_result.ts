@@ -1,6 +1,6 @@
 import { Collection, Db } from "mongodb/mongodb";
 import { type PipelineArray, sortAggregationPipeline } from "../Helpers/pipeline_helpers";
-import { useClient } from '../Connection/connection_provider';
+import { ConnectionCleanup, useClient } from '../Connection/connection_provider';
 import { splitCollectionId } from "../Helpers/name_helpers";
 import type { CleanupAfter, CollectionID, ConnectionHandlerResult, Items, SuppressAuth } from "../Helpers/collection";
 
@@ -46,6 +46,7 @@ export class InternalWeivDataAggregateResult {
     protected collectionName: string;
     protected dbName: string;
     protected collection!: Collection;
+    private cleanup!: ConnectionCleanup;
 
     protected items!: Items;
     protected length!: number;
@@ -83,8 +84,11 @@ export class InternalWeivDataAggregateResult {
 
     protected async getResult(suppressAuth?: SuppressAuth): Promise<WeivDataAggregateResult> {
         // Setup a connection from the pool
-        const { collection, cleanup } = await this.connectionHandler(suppressAuth);
-        this.collection = collection;
+        if (!this.collection) {
+            const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+            this.collection = collection;
+            this.cleanup = cleanup;
+        }
 
         const items = await this.getItems();
 
@@ -94,7 +98,7 @@ export class InternalWeivDataAggregateResult {
         this.next = async (cleanupAfter?: CleanupAfter) => {
             this.currentPage++;
             if (cleanupAfter === true) {
-                await cleanup();
+                await this.cleanup();
             }
             return this.getResult(suppressAuth);
         }

@@ -174,6 +174,12 @@ In this file you can find what's changed in each version.
 - Function timings added to console.log for optimization.
 - New default connection options
 
+### 2.2.6
+
+- Function timings removed.
+- Parallel execution is now available in query.
+- Speed and performance optimizations.
+
 ---
 
 _When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_

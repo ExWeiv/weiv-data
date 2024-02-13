@@ -265,8 +265,7 @@ export class InternalWeivDataQueryResult {
             }
 
             const { skip } = this.queryOptions;
-            const items = await this.getItems();
-            const totalCount = await this.getTotalCount();
+            const [items, totalCount] = await Promise.all([this.getItems(), this.getTotalCount()]);
 
             const result = {
                 currentPage: this.currentPage,

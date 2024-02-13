@@ -30,8 +30,11 @@ class InternalWeivDataAggregateResult {
         return items;
     }
     async getResult(suppressAuth) {
-        const { collection, cleanup } = await this.connectionHandler(suppressAuth);
-        this.collection = collection;
+        if (!this.collection) {
+            const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+            this.collection = collection;
+            this.cleanup = cleanup;
+        }
         const items = await this.getItems();
         this.items = items;
         this.length = items.length;
@@ -39,7 +42,7 @@ class InternalWeivDataAggregateResult {
         this.next = async (cleanupAfter) => {
             this.currentPage++;
             if (cleanupAfter === true) {
-                await cleanup();
+                await this.cleanup();
             }
             return this.getResult(suppressAuth);
         };

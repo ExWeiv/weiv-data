@@ -80,15 +80,8 @@ const connectClient = async (client, uri) => {
 };
 async function useClient(suppressAuth = false) {
     try {
-        const startTime = new Date();
         const { uri, memberId, role } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
-        const getUri = new Date() - startTime;
-        const startTime2 = new Date();
         const { connection, cleanup } = await setupClient(uri, role);
-        const setupClientMs = new Date() - startTime2;
-        console.log(`useClient Executed in: ${(new Date() - startTime).toFixed(2)}ms`);
-        console.log(`getMongoURI Executed in: ${(getUri).toFixed(2)}ms`);
-        console.log(`setupClient Executed in: ${(setupClientMs).toFixed(2)}ms`);
         return { pool: connection, cleanup, memberId };
     }
     catch (err) {
