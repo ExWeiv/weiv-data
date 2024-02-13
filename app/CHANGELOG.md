@@ -169,6 +169,11 @@ In this file you can find what's changed in each version.
 - BUG fixed for idConverter function. (Imported func name was wrong)
 - Docs updated
 
+### 2.2.5
+
+- Function timings added to console.log for optimization.
+- New default connection options
+
 ---
 
 _When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_
