@@ -15,6 +15,25 @@ const cache = new node_cache_1.default({
     useClones: true,
     deleteOnExpire: true
 });
+/**
+ * Retrieves an item from a collection.
+ *
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ *
+ * // Item ID
+ * const itemId = "..."
+ *
+ * const result = await weivData.get("Clusters/All", itemId)
+ * console.log(result);
+ * ```
+ *
+ * @param collectionId The ID of the collection to retrieve the item from.
+ * @param itemId The ID of the item to retrieve.
+ * @param options An object containing options to use when processing this operation.
+ * @returns {Promise<Item | undefined>} Fulfilled - The retrieved item or null if not found. Rejected - The error that caused the rejection.
+ */
 async function get(collectionId, itemId, options) {
     try {
         if (!collectionId || !itemId) {
@@ -66,6 +85,7 @@ async function get(collectionId, itemId, options) {
     }
 }
 exports.get = get;
+/**@internal */
 function getGetCache() {
     return cache;
 }

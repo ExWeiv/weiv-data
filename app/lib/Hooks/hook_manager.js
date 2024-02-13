@@ -1,4 +1,5 @@
 "use strict";
+// This is the location of Wix websites backends. This might change in the future so be aware of this. Use fs to check where is the backend folder from current location in case of this get's broken.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -24,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.runDataHook = void 0;
+//@ts-ignore
 const data_hooks = __importStar(require("../../../../../../../../../user-code/backend/WeivData/data"));
 const name_helpers_1 = require("../Helpers/name_helpers");
 function hookExist(collectionId, hookName) {

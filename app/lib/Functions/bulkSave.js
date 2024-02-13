@@ -6,6 +6,25 @@ const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+/**
+ * Inserts or updates a number of items in a collection.
+ *
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ *
+ * // Items that will be bulk saved
+ * const itemsToSave = [{...}, {...}, {...}]
+ *
+ * const result = await weivData.bulkSave("Clusters/Odunpazari", itemsToSave)
+ * console.log(result);
+ * ```
+ *
+ * @param collectionId The ID of the collection to save the items to.
+ * @param items The items to insert or update.
+ * @param options An object containing options to use when processing this operation.
+ * @returns {Promise<WeivDataBulkSaveResult | void>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
+ */
 async function bulkSave(collectionId, items, options) {
     try {
         if (!collectionId || !items || items.length <= 0) {
@@ -15,14 +34,18 @@ async function bulkSave(collectionId, items, options) {
         const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || {};
         let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         let editedItems = items.map(async (item) => {
+            // Add _createdDate if there is not one
             if (!item._createdDate) {
                 item._createdDate = new Date();
             }
+            // Update _updatedDate value
             item._updatedDate = new Date();
             if (!item._owner) {
                 item._owner = ownerId;
             }
+            // Convert ID to ObjectId if exist
             if (item._id) {
+                // Run beforeUpdate hook for that item.
                 if (suppressHooks != true) {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
                         throw Error(`WeivData - beforeUpdate (bulkSave) Hook Failure ${err}`);
@@ -40,6 +63,7 @@ async function bulkSave(collectionId, items, options) {
                 }
             }
             else {
+                // Run beforeInsert hook for that item.
                 if (suppressHooks != true) {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [item, context]).catch((err) => {
                         throw Error(`WeivData - beforeInsert (bulkSave) Hook Failure ${err}`);
@@ -83,6 +107,7 @@ async function bulkSave(collectionId, items, options) {
         if (suppressHooks != true) {
             editedItems = editedItems.map(async (item) => {
                 if (item._id) {
+                    // Run afterUpdate hook for that item.
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
                         throw Error(`WeivData - afterUpdate (bulkSave) Hook Failure ${err}`);
                     });
@@ -94,6 +119,7 @@ async function bulkSave(collectionId, items, options) {
                     }
                 }
                 else {
+                    // Run afterInsert hook for that item.
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
                         throw Error(`WeivData - afterInsert Hook Failure ${err}`);
                     });

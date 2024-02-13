@@ -4,7 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getOwnerId = void 0;
-const wix_data_1 = __importDefault(require("wix-data"));
+//@ts-ignore
+const wix_data_1 = __importDefault(require("wix-data")); //@ts-ignore
 const wix_users_backend_1 = require("wix-users-backend");
 async function getOwnerId(enableVisitorId = false) {
     try {
@@ -12,6 +13,7 @@ async function getOwnerId(enableVisitorId = false) {
             return wix_users_backend_1.currentUser.id;
         }
         else if (enableVisitorId === true) {
+            // If member not logged-in create temp data and get the visitor_id from _owner field of created item.
             const { _owner, _id } = await wix_data_1.default.insert("WeivOwnerID", {});
             wix_data_1.default.remove("WeivOwnerID", _id, { suppressAuth: true });
             return _owner;

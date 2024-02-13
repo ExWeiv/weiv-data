@@ -185,6 +185,10 @@ In this file you can find what's changed in each version.
 - BUG fixes + optimizations.
 - Docs updated.
 
+### 2.3.1
+
+- Wix auto-complete feature testing. (JSDoc enabled)
+
 ---
 
 _When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_

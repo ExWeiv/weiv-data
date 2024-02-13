@@ -5,6 +5,25 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+/**
+ * Removes a number of items from a collection.
+ *
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ *
+ * // Item IDs that will be bulk removed
+ * const itemsToRemove = ["...", "...", "..."]
+ *
+ * const result = await weivData.bulkRemove("Clusters/Odunpazari", itemsToRemove)
+ * console.log(result);
+ * ```
+ *
+ * @param collectionId The ID of the collection to remove the items from.
+ * @param itemIds IDs of the items to remove.
+ * @param options An object containing options to use when processing this operation.
+ * @returns {Promise<WeivDataBulkRemoveResult | null>} Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
+ */
 async function bulkRemove(collectionId, itemIds, options) {
     try {
         if (!collectionId || !itemIds) {

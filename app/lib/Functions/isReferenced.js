@@ -14,6 +14,30 @@ const cache = new node_cache_1.default({
     useClones: true,
     deleteOnExpire: true
 });
+/**
+ * Checks if a reference to the referenced item exists in the specified property of the referring item.
+ *
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ *
+ * // Item id
+ * const itemId = "..."
+ *
+ * // References to be checked if exists. `ItemId[]`
+ * const cpus = ["cpuId1"]
+ *
+ * const result = await weivData.isReferenced("Clusters/Ortakoy", "availableCPUs", itemId, cpus);
+ * console.log(result);
+ * ```
+ *
+ * @param collectionId The ID of the collection that contains the referring item.
+ * @param propertyName The property that possibly contains the references to the referenced item.
+ * @param referringItem The referring item or referring item's ID.
+ * @param referencedItem The referenced item or referenced item's ID.
+ * @param options An object containing options to use when processing this operation.
+ * @returns {Promise<boolean>} Fulfilled - Whether the referring item contains a reference to the referenced item or not. Rejected - The error that caused the rejection.
+ */
 async function isReferenced(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
         if (!collectionId || !propertyName || !referringItem || !referencedItem) {
@@ -25,6 +49,7 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
         const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
         const cachedItem = cache.get(cacheKey);
         if (cachedItem) {
+            //@ts-ignore
             return cachedItem;
         }
         const { suppressAuth, cleanupAfter, consistentRead } = options || {};
@@ -49,6 +74,7 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
     }
 }
 exports.isReferenced = isReferenced;
+/**@internal */
 function getIsReferencedCache() {
     return cache;
 }

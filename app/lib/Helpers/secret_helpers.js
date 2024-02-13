@@ -27,16 +27,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getHelperSecretsCache = exports.getCachedSecret = void 0;
-const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
+//@ts-ignore
+const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2"); //@ts-ignore
 const wixAuth = __importStar(require("wix-auth"));
 const node_cache_1 = __importDefault(require("node-cache"));
+// Initialize a global cache instance
 const cache = new node_cache_1.default();
 const getSecretValue = wixAuth.elevate(wix_secrets_backend_v2_1.secrets.getSecretValue);
 async function getCachedSecret(secretName) {
     try {
+        // Try to get the secret from the cache
         let secret = cache.get(secretName);
         if (secret === undefined) {
+            // If not in cache, fetch from the API
             const { value } = await getSecretValue(secretName);
+            // Set the secret in the cache with a specific TTL (e.g., 1 hour)
             secret = value;
             cache.set(secretName, value, 3600);
         }
@@ -48,6 +53,7 @@ async function getCachedSecret(secretName) {
     }
 }
 exports.getCachedSecret = getCachedSecret;
+/**@internal */
 function getHelperSecretsCache() {
     return cache;
 }

@@ -20,6 +20,12 @@ const cacheSelections = {
         return [(0, secret_helpers_1.getConnectionSecretsCache)(), (0, secret_helpers_2.getHelperSecretsCache)()];
     }
 };
+/**
+ * Use when you want to flush the caches internally. You can choose caches to flush or pass empty array to flush all of them.
+ *
+ * @param filters Filter which cache to flush. Pass empty array to flush all of them.
+ * @public
+ */
 function flushCache(filters) {
     const cachesToFlush = [];
     if (filters.length > 0) {
@@ -37,7 +43,7 @@ function flushCache(filters) {
         }
     }
     else {
-        for (const key of Object.keys(cacheSelections)) {
+        for (const key of Object.keys(cacheSelections)) { //@ts-ignore
             const cacheValue = cacheSelections[key]();
             if (typeof cacheValue === "string") {
                 cachesToFlush.push(cacheValue);

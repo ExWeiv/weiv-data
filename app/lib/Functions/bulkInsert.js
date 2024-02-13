@@ -5,6 +5,25 @@ const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+/**
+ * Adds a number of items to a collection.
+ *
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ *
+ * // Items that will be bulk inserted
+ * const itemsToInsert = [{...}, {...}, {...}]
+ *
+ * const result = await weivData.bulkInsert("Clusters/Odunpazari", itemsToInsert)
+ * console.log(result);
+ * ```
+ *
+ * @param collectionId The ID of the collection to add the items to.
+ * @param items The items to add.
+ * @param options An object containing options to use when processing this operation.
+ * @returns {Promise<BulkInsertResult>} Fulfilled - The results of the bulk insert. Rejected - The error that caused the rejection.
+ */
 async function bulkInsert(collectionId, items, options) {
     try {
         if (!collectionId || !items || items.length <= 0) {

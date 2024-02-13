@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prepareHookContext = void 0;
+//@ts-ignore
 const wix_users_backend_1 = require("wix-users-backend");
 const name_helpers_1 = require("./name_helpers");
 function prepareHookContext(collectionId) {

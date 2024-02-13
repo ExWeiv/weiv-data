@@ -3,13 +3,43 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeivDataAggregate = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const data_aggregate_result_1 = require("./data_aggregate_result");
+/**
+ * Welcome to `weivData.aggregate` function of weiv-data library. This feature/function allows you to perform calculations on your database collections data.
+ * You can use aggregate with any collection! Read documentation to learn from examples.
+ *
+ * Features we are working on for this function:
+ *
+ * * **AI** (Calculate estimated results for a specific property such as estimated preparation time for a meal from an orders collection)
+ * * **Language Filters** (Filter aggregations based on a language)
+ * * *More!*
+ *
+ * @public
+ */
 class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregateResult {
+    /** @internal */
     constructor(collectionId) {
         if (!collectionId) {
             throw Error(`WeivData - Database and Collection name required`);
         }
         super(collectionId);
     }
+    /**
+     * Adds a sort to an aggregation, sorting by the items or groups by the specified properties in ascending order.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .ascending("modelType")
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param propertyName The properties used in the sort.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     ascending(propertyName) {
         if (!propertyName) {
             throw Error(`WeivData - Property name required!`);
@@ -20,6 +50,24 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         };
         return this;
     }
+    /**
+     * Refines a `WeivDataAggregate` to only contain the average value from each aggregation group.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .avg("trainedDataSize")
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param propertyName The property in which to find the average valu
+     * @param projectedName The name of the property in the aggregation results containing the average value.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     avg(propertyName, projectedName = `${propertyName}Avg`) {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
@@ -32,10 +80,44 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         });
         return this;
     }
+    /**
+     * Refines a `WeivDataAggregate` to contain the item count of each group in the aggregation.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .group("modelType", "trainedDataSize")
+     *  .count()
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     count() {
         this.countCalled = true;
         return this;
     }
+    /**
+     * Adds a sort to an aggregation, sorting by the items or groups by the specified properties in descending order.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .descending("modelType")
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param propertyName The properties used in the sort.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     descending(propertyName) {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
@@ -46,6 +128,25 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         };
         return this;
     }
+    /**
+     * Filters out items from being used in an aggregation.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * let filter = weivData.filter().eq("modelType", "S1");
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .filter(filter)
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param filter The filter to use to filter out items from being used in the aggregation.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     filter(filter) {
         if (!filter) {
             throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
@@ -58,6 +159,23 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         });
         return this;
     }
+    /**
+     * Groups items together in an aggregation.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .group("t2Members", "t1Members")
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param propertyName The property or properties to group on.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     group(...propertyName) {
         if (!propertyName) {
             throw Error(`WeivData - Property or properties are required!`);
@@ -80,6 +198,28 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         this.groupCreated = true;
         return this;
     }
+    /**
+     * Filters out groups from being returned from an aggregation.
+     *
+     * > Note: possible bug! This function may not work as you expect!
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * let having = weivData.filter().gt("trainedDataSize", 100000000)
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .having(having)
+     *  .max("trainedDataSize", "maxTrainedDataSize")
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param filter The filter to use to filter out groups from being returned from the aggregation.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     having(filter) {
         if (!filter) {
             throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
@@ -91,6 +231,27 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         };
         return this;
     }
+    /**
+     * Limits the number of items or groups the aggregation returns.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * let having = weivData.filter().gt("trainedDataSize", 100000000)
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .having(having)
+     *  .max("trainedDataSize", "maxTrainedDataSize")
+     *  .limit(150)
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param limit The number of items or groups to return.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     limit(limit) {
         if (!limit && limit != 0) {
             throw Error(`WeivData - Limit number is required please specify a limit amount`);
@@ -100,6 +261,27 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         }
         return this;
     }
+    /**
+    * Refines a `WeivDataAggregate` to only contain the maximum value from each aggregation group.
+    *
+    * @example
+    * ```js
+    * import weivData from '@exweiv/weiv-data';
+    *
+    * let having = weivData.filter().gt("trainedDataSize", 100000000)
+    *
+    * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+    *  .having(having)
+    *  .max("trainedDataSize", "maxTrainedDataSize")
+    *  .run(options)
+    *
+    * console.log(aggregateResult);
+    * ```
+    *
+    * @param propertyName The property in which to find the maximum value.
+    * @param projectedName The name of the property in the aggregation results containing the maximum value.
+    * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+    */
     max(propertyName, projectedName = `${propertyName}Max`) {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
@@ -112,6 +294,24 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         });
         return this;
     }
+    /**
+    * Refines a `WeivDataAggregate` to only contain the minimum value from each aggregation group.
+    *
+    * @example
+    * ```js
+    * import weivData from '@exweiv/weiv-data';
+    *
+    * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+    *  .min("trainedDataSize", "minTrainedDataSize")
+    *  .run(options)
+    *
+    * console.log(aggregateResult);
+    * ```
+    *
+    * @param propertyName The property in which to find the minimum value.
+    * @param projectedName The name of the property in the aggregation results containing the minimum value.
+    * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+    */
     min(propertyName, projectedName = `${propertyName}Min`) {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
@@ -124,7 +324,31 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         });
         return this;
     }
+    /**
+    * Runs the aggregation and returns the results.
+    *
+    * @example
+    * ```js
+    * import weivData from '@exweiv/weiv-data';
+    *
+    * const filter = weivData.filter().gt("trainedDataSize", 100000000);
+    *
+    * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+    *  .group("modelType", "trainedDataSize", "t1Members")
+    *  .filter(filter)
+    *  .descending("trainedDataSize")
+    *  .skip(5)
+    *  .limit(118)
+    *  .run({suppressAuth: true})
+    *
+    * console.log(aggregateResult);
+    * ```
+    *
+    * @param options Options to use when running an aggregation.
+    * @returns {WeivDataAggregateResult} Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
+    */
     async run(options) {
+        // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
         const { suppressAuth, consistentRead, cleanupAfter } = options || {};
         const { collection, cleanup } = await this.connectionHandler(suppressAuth);
         if (this.sorting) {
@@ -135,9 +359,11 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
                 }
             });
         }
+        // Sort pipeline based on priority order of pipeline.
         this.pipeline = (0, pipeline_helpers_1.sortAggregationPipeline)(this.pipeline);
+        // Fix the sorting if aggregation includes a group and sorting
         if (this.currentGroup && this.sorting) {
-            if (this.currentGroup["$group"]) {
+            if (this.currentGroup["$group"]) { //@ts-ignore
                 if (this.currentGroup["$group"]._exweivDocument) {
                     this.pipeline.push({
                         $sort: {
@@ -147,9 +373,10 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
                 }
             }
         }
+        // Enable total count calculator if count() is added to aggregation
         if (this.countCalled === true) {
             const keys = Object.keys(this.pipeline);
-            for (const key of keys) {
+            for (const key of keys) { //@ts-ignore
                 const data = this.pipeline[key];
                 if (data["$group"]) {
                     data["$group"].count = {
@@ -158,21 +385,29 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
                 }
             }
         }
+        // Add having filters to end of the pipeline to filter grouped results only
         if (this.havingFilter && this.currentGroup) {
             this.pipeline.push(this.havingFilter);
         }
+        // Create the aggregation on the current collection
         const aggregation = collection.aggregate(this.pipeline);
+        // Add skip if there is a skip set
         if (this.skipNumber) {
             aggregation.skip(this.skipNumber);
         }
+        // Add limit if there is a limit set
         if (this.limitNumber) {
             aggregation.limit(this.limitNumber);
         }
+        // Enable read consistency if consistentRead enabled via run options
         if (consistentRead === true) {
             aggregation.readConcern("majority");
         }
+        // Make the call to the MongoDB and convert it to an array via result function
         const aggregateResult = await this.getResult(suppressAuth);
+        // Modify result of call
         let modifiedItems = aggregateResult.items.map((document) => {
+            // Check if there is a field called _exweivDocument if so extract the fields in it (except _id) and add it to main array if there is not a field called _exweivDocument return the item
             if (document._exweivDocument) {
                 const _exweivDocumentExtracted = document._exweivDocument;
                 delete _exweivDocumentExtracted._id;
@@ -186,14 +421,34 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
                 return document;
             }
         });
+        // Close the connection to space up the connection pool in MongoDB (if cleanupAfter === true)
         if (cleanupAfter === true) {
             await cleanup();
         }
+        // Return the WeivDataAggregateResult
         return {
             ...aggregateResult,
             items: modifiedItems,
         };
     }
+    /**
+     * Sets the number of items or groups to skip before returning aggregation results.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .max("trainedDataSize", "maxTrainedDataSize")
+     *  .skip(18)
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param skip The number of items or groups to skip in the aggregation results before returning the results.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     skip(skip) {
         if (!skip && skip != 0) {
             throw Error(`WeivData - Skip number is required please specify a skip number`);
@@ -201,6 +456,24 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         this.skipNumber = skip;
         return this;
     }
+    /**
+     * Refines a `WeivDataAggregate` to contain the sum from each aggregation group.
+     *
+     * @example
+     * ```js
+     * import weivData from '@exweiv/weiv-data';
+     *
+     * const aggregateResult = await weivData.aggregate("Clusters/AiModels")
+     *  .sum("trainedDataSize")
+     *  .run(options)
+     *
+     * console.log(aggregateResult);
+     * ```
+     *
+     * @param propertyName The property in which to find the sum.
+     * @param projectedName The name of the property in the aggregation results containing the sum.
+     * @returns {WeivDataAggregate} A `WeivDataAggregate` object representing the refined aggregation.
+     */
     sum(propertyName, projectedName = `${propertyName}Sum`) {
         if (!propertyName) {
             throw Error(`WeivData - Property name is required!`);
@@ -213,8 +486,9 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         });
         return this;
     }
+    /**@internal */
     setCurrentGroup() {
-        this.pipeline = (0, pipeline_helpers_1.checkPipelineArray)(this.pipeline);
+        this.pipeline = (0, pipeline_helpers_1.checkPipelineArray)(this.pipeline); //@ts-ignore
         this.currentGroup = this.pipeline.find(stage => stage["$group"]);
         if (this.currentGroup) {
             return this.currentGroup;
@@ -224,8 +498,9 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
             return undefined;
         }
     }
+    /**@internal */
     addGroup(groupObject, isGroup) {
-        const currentGroup = this.setCurrentGroup();
+        const currentGroup = this.setCurrentGroup(); //@ts-ignore
         this.pipeline = this.pipeline.filter((stage) => !stage["$group"]);
         if (!currentGroup) {
             if (isGroup != true) {

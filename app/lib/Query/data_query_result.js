@@ -36,11 +36,14 @@ class InternalWeivDataQueryResult {
         try {
             const { query, distinctProperty, skip, sort, fields, includes, addFields } = this.queryOptions;
             if (distinctProperty) {
+                // Use distinct()
                 const distinctItems = await this.collection.distinct(distinctProperty, query);
                 return distinctItems;
             }
             else {
+                // Check if there is any included fields in this query to determine to use find() or aggregate()
                 if ((0, lodash_1.size)(includes) > 0) {
+                    // Use aggregate()
                     const pipeline = [];
                     if ((0, lodash_1.size)(query) > 0) {
                         pipeline.push({
@@ -89,6 +92,7 @@ class InternalWeivDataQueryResult {
                     return await aggregateCursor.toArray();
                 }
                 else {
+                    // Use find()
                     const findCursor = this.collection.find(query, {
                         sort,
                         projection: fields
@@ -164,10 +168,11 @@ class InternalWeivDataQueryResult {
                     else {
                         return this.currentPage > 1;
                     }
-                },
+                }, //todo
                 next: async (cleanupAfter) => {
                     this.currentPage++;
                     if (cleanupAfter === true) {
+                        // Close the connection
                         await this.cleanup();
                     }
                     return this.getResult();
@@ -175,6 +180,7 @@ class InternalWeivDataQueryResult {
                 prev: async (cleanupAfter) => {
                     this.currentPage--;
                     if (cleanupAfter === true) {
+                        // Close the connection
                         await this.cleanup();
                     }
                     return this.getResult();
@@ -208,6 +214,7 @@ class InternalWeivDataQueryResult {
     }
 }
 exports.InternalWeivDataQueryResult = InternalWeivDataQueryResult;
+/**@internal */
 function getQueryCache() {
     return cache;
 }

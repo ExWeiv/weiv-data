@@ -4,8 +4,19 @@ exports.getConnectionClientsCache = exports.cleanupClientConnections = exports.u
 const mongodb_1 = require("mongodb");
 const permission_helpers_1 = require("./permission_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
+/*
+This is a global variable which will hold the cached (saved) clients that's already created before using same URI.
+This will remove the cold start and make the process much more faster after first few calls.
+*/
 const cachedMongoClient = {};
 const cachedConnectionStatus = {};
+/**
+ * @function
+ * @description Function to setup a MongoDB client or use one from cache. Cached clients are removed when the container closed in the Wix side.
+ *
+ * @param uri URI to use when connecting to MongoDB Cluster
+ * @returns {SetupClientResult}
+ */
 async function setupClient(uri, role) {
     try {
         if (cachedMongoClient[uri]) {
@@ -14,6 +25,7 @@ async function setupClient(uri, role) {
                 return { connection, cleanup };
             }
             else {
+                // If first attempt fails try to create the client again and use new connection
                 console.warn("WeivData - Failed to connect/create MongoClient in first attempt!");
                 const newMongoClient = new mongodb_1.MongoClient(uri, await (0, connection_helpers_1.loadConnectionOptions)(role));
                 cachedMongoClient[uri] = newMongoClient;
@@ -27,6 +39,7 @@ async function setupClient(uri, role) {
             }
         }
         else {
+            // If there are no clients in cache create new one and return
             return createNewClient(uri, role);
         }
     }
@@ -34,10 +47,19 @@ async function setupClient(uri, role) {
         throw Error(`WeivData - Error when connecting to MongoDB Client via setupClient: ${err}`);
     }
 }
+/**
+ * @function
+ * @description Function to create a new client if there are no clients in cache.
+ *
+ * @param uri URI to use when connecting to MongoDB Cluster
+ * @returns {SetupClientResult}
+ */
 const createNewClient = async (uri, role) => {
     try {
+        // Create a client and save it to cache
         const newMongoClient = new mongodb_1.MongoClient(uri, await (0, connection_helpers_1.loadConnectionOptions)(role));
         cachedMongoClient[uri] = newMongoClient;
+        // Use connect function to connect to cluster using newly created client 
         const { cleanup, connection } = await connectClient(newMongoClient, uri);
         if (connection) {
             return { cleanup, connection };
@@ -50,15 +72,26 @@ const createNewClient = async (uri, role) => {
         throw Error(`WeivData - Error when creating a new MongoDB client: ${err}`);
     }
 };
+/**
+ * @function
+ * @description A function to connect cluster server via created MongoDB client. Returns connection and cleanup function.
+ *
+ * @param client MongoDB Client
+ * @param uri URI to use when connecting to MongoDB Cluster
+ * @returns {SetupClientResult}
+ */
 const connectClient = async (client, uri) => {
     try {
+        // Check if a connection for the given URI exists in the cache
         if (cachedConnectionStatus[uri] === true) {
             return {
                 connection: cachedMongoClient[uri],
                 cleanup: () => { cachedMongoClient[uri]?.close(); }
             };
         }
+        // Create a new client if not cached
         let connectedClient;
+        // Set up listeners for connection management (use named functions for clarity)
         const handleOpen = async () => {
             cachedMongoClient[uri] = connectedClient;
             cachedConnectionStatus[uri] = true;
@@ -70,23 +103,31 @@ const connectClient = async (client, uri) => {
             cachedConnectionStatus[uri] = false;
         };
         const handleError = async () => {
-            await client.close();
+            await client.close(); // Close client on error to avoid leaks
             client.removeAllListeners();
-            throw Error(`WeivData - Error when trying to connect client: ${uri}`);
+            throw Error(`WeivData - Error when trying to connect client: ${uri}`); // Rethrow with URI for context
         };
         client.on('open', handleOpen);
         client.on('close', handleClose);
         client.on('error', handleError);
+        // Connect and return connection
         connectedClient = await client.connect();
         return {
             connection: connectedClient,
-            cleanup: () => { connectedClient.close(); }
+            cleanup: () => { connectedClient.close(); } // Close the specific client instance
         };
     }
     catch (err) {
-        throw Error(`WeivData - Unexpected error: ${err}`);
+        throw Error(`WeivData - Unexpected error: ${err}`); // Handle unexpected errors gracefully
     }
 };
+/**
+ * @function
+ * @description Function to use a cached client or a new client connection. This function is used before an operation made in Cluster.
+ *
+ * @param suppressAuth
+ * @returns
+ */
 async function useClient(suppressAuth = false) {
     try {
         const { uri, memberId, role } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
@@ -98,6 +139,10 @@ async function useClient(suppressAuth = false) {
     }
 }
 exports.useClient = useClient;
+/**
+ * @function
+ * @description Function to cleanup all existing connections using a for loop.
+ */
 async function cleanupClientConnections() {
     try {
         const allCachedClients = Object.keys(cachedMongoClient);
@@ -113,6 +158,7 @@ async function cleanupClientConnections() {
     }
 }
 exports.cleanupClientConnections = cleanupClientConnections;
+/**@internal */
 function getConnectionClientsCache() {
     return "ConnectionClients";
 }

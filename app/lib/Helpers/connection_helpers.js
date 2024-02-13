@@ -24,6 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadConnectionOptions = exports.connectionHandler = void 0;
+//@ts-ignore
 const customConnectionOptions = __importStar(require("../../../../../../../../../user-code/backend/WeivData/connection-options"));
 const connection_provider_1 = require("../Connection/connection_provider");
 const name_helpers_1 = require("./name_helpers");

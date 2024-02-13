@@ -5,6 +5,25 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+/**
+ * Removes an item from a collection.
+ *
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ *
+ * // ID of item that will be removed
+ * const itemId = "..."
+ *
+ * const result = await weivData.remove("Clusters/Riva", itemId)
+ * console.log(result);
+ * ```
+ *
+ * @param collectionId The ID of the collection to remove the item from.
+ * @param itemId The ID of the item to remove.
+ * @param options An object containing options to use when processing this operation.
+ * @returns {Promise<Item | null>} Fulfilled - The removed item, or null if the item was not found. Rejected - The error that caused the rejection.
+ */
 async function remove(collectionId, itemId, options) {
     try {
         if (!collectionId || !itemId) {

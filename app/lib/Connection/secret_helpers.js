@@ -27,11 +27,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getConnectionSecretsCache = exports.getCachedSecret = void 0;
-const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
+//@ts-ignore
+const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2"); //@ts-ignore
 const wixAuth = __importStar(require("wix-auth"));
 const node_cache_1 = __importDefault(require("node-cache"));
+// Initialize a global cache instance
 const cache = new node_cache_1.default();
 const getSecretValue = wixAuth.elevate(wix_secrets_backend_v2_1.secrets.getSecretValue);
+/**
+ * @function
+ * @description Get's the secret data (connection URI) and caches it using node-cache.
+ * @param secretName Secret's name
+ * @returns The secret/URI for the given secret name.
+ */
 async function getCachedSecret(secretName) {
     try {
         let secret = cache.get(secretName);
@@ -47,6 +55,7 @@ async function getCachedSecret(secretName) {
     }
 }
 exports.getCachedSecret = getCachedSecret;
+/**@internal */
 function getConnectionSecretsCache() {
     return cache;
 }

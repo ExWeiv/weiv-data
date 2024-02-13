@@ -6,6 +6,27 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+/**
+ * Updates an item in a collection.
+ *
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ *
+ * // An item with an id
+ * const updatedVersion = {...}
+ * // Options for the operation
+ * const options = {suppressHooks: true};
+ *
+ * const result = await weivData.update("Clusters/IST12", updatedVersion, options)
+ * console.log(result);
+ * ```
+ *
+ * @param collectionId The ID of the collection that contains the item to update.
+ * @param item The item to update.
+ * @param options An object containing options to use when processing this operation.
+ * @returns {Promise<Item>} Fulfilled - The object that was updated. Rejected - The error that caused the rejection.
+ */
 async function update(collectionId, item, options) {
     try {
         if (!collectionId || !item._id) {

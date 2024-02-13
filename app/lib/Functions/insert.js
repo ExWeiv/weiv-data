@@ -6,6 +6,25 @@ const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+/**
+ * Adds an item to a collection.
+ *
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ *
+ * // Item that will be inserted
+ * const item = {...}
+ *
+ * const result = await weivData.insert("Clusters/All", item)
+ * console.log(result);
+ * ```
+ *
+ * @param collectionId The ID of the collection to add the item to.
+ * @param item The item to add.
+ * @param options An object containing options to use when processing this operation.
+ * @returns {Promise<Item>} Fulfilled - The item that was added. Rejected - The error that caused the rejection.
+ */
 async function insert(collectionId, item, options) {
     try {
         if (!collectionId || !item) {
@@ -17,6 +36,7 @@ async function insert(collectionId, item, options) {
             _updatedDate: new Date(),
             _createdDate: new Date(),
         };
+        // Get owner ID
         defaultValues["_owner"] = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         const modifiedItem = (0, lodash_1.merge)(defaultValues, item);
         let editedItem;
