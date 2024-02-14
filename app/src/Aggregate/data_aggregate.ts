@@ -468,7 +468,7 @@ export class WeivDataAggregate extends InternalWeivDataAggregateResult {
 
         // Enable read consistency if consistentRead enabled via run options
         if (consistentRead === true) {
-            (aggregation as any).readConcern("majority");
+            aggregation.withReadConcern("majority");
         }
 
         // Make the call to the MongoDB and convert it to an array via result function

@@ -189,6 +189,11 @@ In this file you can find what's changed in each version.
 
 - Wix auto-complete feature testing. (JSDoc enabled)
 
+### 2.3.2
+
+- Docs updated.
+- consistentRead BUG fixed for query and aggregation
+
 ---
 
 _When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_

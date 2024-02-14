@@ -87,7 +87,7 @@ class InternalWeivDataQueryResult {
                     });
                     const aggregateCursor = this.collection.aggregate(pipeline);
                     if (this.consistentRead === true) {
-                        aggregateCursor.readConcern('majority');
+                        aggregateCursor.withReadConcern('majority');
                     }
                     return await aggregateCursor.toArray();
                 }
@@ -100,7 +100,7 @@ class InternalWeivDataQueryResult {
                     findCursor.skip(skip || 0 + ((this.currentPage - 1) * this.pageSize));
                     findCursor.limit(this.pageSize);
                     if (this.consistentRead === true) {
-                        findCursor.readConcern('majority');
+                        findCursor.withReadConcern("majority");
                     }
                     return await findCursor.toArray();
                 }

@@ -197,7 +197,7 @@ export class InternalWeivDataQueryResult {
                     const aggregateCursor = this.collection.aggregate(pipeline);
 
                     if (this.consistentRead === true) {
-                        (aggregateCursor as any).readConcern('majority');
+                        aggregateCursor.withReadConcern('majority');
                     }
 
                     return await aggregateCursor.toArray();
@@ -212,7 +212,7 @@ export class InternalWeivDataQueryResult {
                     findCursor.limit(this.pageSize);
 
                     if (this.consistentRead === true) {
-                        (findCursor as any).readConcern('majority');
+                        findCursor.withReadConcern("majority")
                     }
 
                     return await findCursor.toArray();

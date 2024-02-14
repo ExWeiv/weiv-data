@@ -25,6 +25,8 @@ This is the official documentation page for weiv-data APIs powered by **ExWeiv A
 | RAM                                 | Shared RAM                  | 400MB (1 Micro Container)           |
 | CPU                                 | Shared vCPU                 | 1vCPU (1 Micro Container)           |
 
+> In MongoDB M0 Cluster you WON'T have 100/sec limit for each class of operation you have 100/sec for any class of operation. So read/write/update/delete... sahres the same limit of 100/sec which is 6000/min
+
 **We have compared the limits and other things based on the lowest leves. M0 Cluster for MongoDB (Free) and Basic Plan for Wix Studio (12€/m).**
 
 ### Summary

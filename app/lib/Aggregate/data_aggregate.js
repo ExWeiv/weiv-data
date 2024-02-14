@@ -401,7 +401,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         }
         // Enable read consistency if consistentRead enabled via run options
         if (consistentRead === true) {
-            aggregation.readConcern("majority");
+            aggregation.withReadConcern("majority");
         }
         // Make the call to the MongoDB and convert it to an array via result function
         const aggregateResult = await this.getResult(suppressAuth);
