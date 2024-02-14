@@ -65,6 +65,9 @@ export { idConverter } from './Functions/idConverter';
 /**@public */
 export { flushCache } from './Functions/flushCache';
 
+/**@public */
+export { native } from './Functions/native';
+
 //---------------------------------------------//
 //             Types + Interfaces              //
 //---------------------------------------------//

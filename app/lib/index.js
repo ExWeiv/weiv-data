@@ -19,6 +19,7 @@ const truncate_1 = require("./Functions/truncate");
 const update_1 = require("./Functions/update");
 const idConverter_1 = require("./Functions/idConverter");
 const flushCache_1 = require("./Functions/flushCache");
+const native_1 = require("./Functions/native");
 module.exports = {
     aggregate: (collectionId) => new data_aggregate_1.WeivDataAggregate(collectionId),
     filter: () => new data_filter_1.WeivDataFilter(),
@@ -39,5 +40,6 @@ module.exports = {
     truncate: truncate_1.truncate,
     update: update_1.update,
     idConverter: idConverter_1.idConverter,
-    flushCache: flushCache_1.flushCache
+    flushCache: flushCache_1.flushCache,
+    native: native_1.native
 };

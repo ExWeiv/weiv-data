@@ -194,6 +194,10 @@ In this file you can find what's changed in each version.
 - Docs updated.
 - consistentRead BUG fixed for query and aggregation
 
+### 2.4.0
+
+- New API/Function (native), enables you to use MongoDB native features.
+
 ---
 
 _When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_
