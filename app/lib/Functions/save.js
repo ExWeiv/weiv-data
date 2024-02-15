@@ -44,7 +44,7 @@ async function save(collectionId, item, options) {
         // Convert ID to ObjectId if exist
         let editedItem;
         if (item._id && typeof item._id === "string") {
-            item._id = (0, item_helpers_1.convertStringId)(item._id, true);
+            item._id = (0, item_helpers_1.convertStringId)(item._id);
             if (suppressHooks != true) {
                 editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
                     throw Error(`WeivData - beforeUpdate (save) Hook Failure ${err}`);
@@ -63,7 +63,8 @@ async function save(collectionId, item, options) {
             ...editedItem
         };
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { upsertedId, acknowledged } = await collection.updateOne({ _id: editedItem._id }, { $set: editedItem }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
+        const filter = editedItem._id ? { _id: editedItem._id } : { _id: { $exist: false } };
+        const { upsertedId, acknowledged } = await collection.updateOne(filter, { $set: editedItem }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
         if (cleanupAfter === true) {
             await cleanup();
         }

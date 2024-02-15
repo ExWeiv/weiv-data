@@ -63,7 +63,6 @@ async function bulkSave(collectionId, items, options) {
                 }
             }
             else {
-                item._id = (0, item_helpers_1.convertStringId)(undefined, true);
                 // Run beforeInsert hook for that item.
                 if (suppressHooks != true) {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [item, context]).catch((err) => {

@@ -204,6 +204,10 @@ In this file you can find what's changed in each version.
 - docs and readme updated.
 - internal changes and BUG fixes.
 
+### 2.4.2
+
+- BUG Fixes
+
 ---
 
 _When a new version is released you can see the update notes here._
