@@ -208,6 +208,10 @@ In this file you can find what's changed in each version.
 
 - BUG Fixes
 
+### 2.4.3
+
+- BUG Fix
+
 ---
 
 _When a new version is released you can see the update notes here._

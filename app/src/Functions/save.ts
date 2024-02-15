@@ -84,7 +84,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const filter = editedItem._id ? { _id: editedItem._id } : { _id: { $exist: false } };
+        const filter = editedItem._id ? { _id: editedItem._id } : { _id: { $exists: false } };
         const { upsertedId, acknowledged } = await collection.updateOne(filter, { $set: editedItem }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
 
         if (cleanupAfter === true) {
