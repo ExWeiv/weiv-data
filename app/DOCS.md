@@ -235,9 +235,8 @@ You need to name your functions correctly to let hooks work. The syntax is like 
 
 ---
 
-Ask for help, give feedback or anything else? Here is our new Discord server: [https://discord.gg/pVYJjPKRm6](https://discord.gg/pVYJjPKRm6) or info@apps.exweiv.com
+Ask for help, give feedback or anything else? info@apps.exweiv.com
 
-- [Join Discord](https://discord.gg/pVYJjPKRm6) 👈
 - [Docs](https://weiv-data.web.app/)
 - [Install - NPM](https://www.npmjs.com/package/@exweiv/weiv-data)
 - [Updates / Changelog](https://github.com/ExWeiv/weiv-data/blob/main/app/CHANGELOG.md)

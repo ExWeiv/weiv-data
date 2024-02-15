@@ -3,7 +3,7 @@
 //                Classes                      //
 //---------------------------------------------//
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.native = exports.flushCache = exports.idConverter = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.WeivDataQuery = exports.WeivDataFilter = exports.WeivDataAggregate = void 0;
+exports.replace = exports.native = exports.flushCache = exports.idConverter = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.WeivDataQuery = exports.WeivDataFilter = exports.WeivDataAggregate = void 0;
 /**@public */
 var data_aggregate_1 = require("./Aggregate/data_aggregate");
 Object.defineProperty(exports, "WeivDataAggregate", { enumerable: true, get: function () { return data_aggregate_1.WeivDataAggregate; } });
@@ -70,3 +70,6 @@ Object.defineProperty(exports, "flushCache", { enumerable: true, get: function (
 /**@public */
 var native_1 = require("./Functions/native");
 Object.defineProperty(exports, "native", { enumerable: true, get: function () { return native_1.native; } });
+/**@public */
+var replace_1 = require("./Functions/replace");
+Object.defineProperty(exports, "replace", { enumerable: true, get: function () { return replace_1.replace; } });

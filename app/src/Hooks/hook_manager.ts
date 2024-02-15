@@ -17,7 +17,7 @@ export type HookContext = {
 }
 
 /** @internal */
-export type HookName = 'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' | 'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate';
+export type HookName = 'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' | 'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate' | 'beforeReplace' | 'afterReplace';
 
 /** @internal */
 export type HookArgs<HookName> =
@@ -32,6 +32,8 @@ export type HookArgs<HookName> =
     HookName extends 'beforeRemove' ? [item: string | ObjectId, context: HookContext] :
     HookName extends 'beforeUpdate' ? [item: Item, context: HookContext] :
     HookName extends 'afterUpdate' ? [item: Item, context: HookContext] :
+    HookName extends 'beforeReplace' ? [item: Item, context: HookContext] :
+    HookName extends 'afterReplace' ? [item: Item, context: HookContext] :
     [item: any, context: HookContext];
 
 /** @internal */
@@ -45,6 +47,7 @@ export type HooksResult<HookName> =
     HookName extends 'afterQuery' ? Item :
     HookName extends 'beforeRemove' ? string | ObjectId :
     HookName extends 'afterUpdate' ? Item :
+    HookName extends 'afterReplace' ? Item :
     Item;
 
 

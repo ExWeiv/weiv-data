@@ -63,7 +63,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         // Convert ID to ObjectId if exist
         let editedItem;
         if (item._id && typeof item._id === "string") {
-            item._id = convertStringId(item._id);
+            item._id = convertStringId(item._id, true);
 
             if (suppressHooks != true) {
                 editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [item, context]).catch((err) => {
@@ -84,8 +84,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         }
 
         const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const filter = editedItem._id ? { _id: editedItem._id } : {};
-        const { upsertedId, acknowledged } = await collection.updateOne(filter, { $set: editedItem }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
+        const { upsertedId, acknowledged } = await collection.updateOne({ _id: editedItem._id }, { $set: editedItem }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
 
         if (cleanupAfter === true) {
             await cleanup();

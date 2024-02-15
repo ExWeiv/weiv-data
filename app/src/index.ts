@@ -19,6 +19,7 @@ import { update } from './Functions/update';
 import { idConverter } from './Functions/idConverter';
 import { flushCache } from './Functions/flushCache';
 import { native } from './Functions/native';
+import { replace } from './Functions/replace';
 
 /**@internal */
 import { CollectionID } from "./Helpers/collection";
@@ -44,5 +45,6 @@ export = {
     update,
     idConverter,
     flushCache,
-    native
+    native,
+    replace
 }

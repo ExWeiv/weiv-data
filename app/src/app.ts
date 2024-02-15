@@ -68,6 +68,9 @@ export { flushCache } from './Functions/flushCache';
 /**@public */
 export { native } from './Functions/native';
 
+/**@public */
+export { replace } from './Functions/replace';
+
 //---------------------------------------------//
 //             Types + Interfaces              //
 //---------------------------------------------//

@@ -1,17 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update = void 0;
+exports.replace = void 0;
 const lodash_1 = require("lodash");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+const mongodb_1 = require("mongodb");
 /**
- * Updates an item in a collection.
- * !! IMPORTANT: In weiv-data you don't need to pass the al data. It's enough to just pass the updated values in your document.
- * Anything that's not in the update object will be untouched and will stay how it was before.
- * In wix-data if you don't pass a field in your document it will be overwritten as undefined. This doesn't apply to weiv-data.
- * If you want this logic use `replace` function instead.
+ * Replaces and item in a collection. The item you passed with `item` param will take the place of existing data/document in your collection.
+ *
+ * This function has it's own hooks _beforeUpdate_ and _afterUpdate_ is not used here instead _beforeReplace_ and _afterReplace_ is used.
  *
  * @example
  * ```
@@ -22,16 +21,16 @@ const hook_helpers_1 = require("../Helpers/hook_helpers");
  * // Options for the operation
  * const options = {suppressHooks: true};
  *
- * const result = await weivData.update("Clusters/IST12", updatedVersion, options)
+ * const result = await weivData.replace("Clusters/IST57", updatedVersion, options)
  * console.log(result);
  * ```
  *
- * @param collectionId The ID of the collection that contains the item to update.
- * @param item The item to update.
+ * @param collectionId The ID of the collection that contains the item to replace.
+ * @param item The item to replace.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item>} Fulfilled - The object that was updated. Rejected - The error that caused the rejection.
+ * @returns {Promise<Item>} Fulfilled - The object that was replaced. Rejected - The error that caused the rejection.
  */
-async function update(collectionId, item, options) {
+async function replace(collectionId, item, options) {
     try {
         if (!collectionId || !item._id) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item._id`);
@@ -43,22 +42,23 @@ async function update(collectionId, item, options) {
         };
         let editedItem;
         if (suppressHooks != true) {
-            editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
-                throw Error(`WeivData - beforeUpdate Hook Failure ${err}`);
+            editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeReplace", [item, context]).catch((err) => {
+                throw Error(`WeivData - beforeReplace Hook Failure ${err}`);
             });
         }
         const itemId = !editedItem ? (0, item_helpers_1.convertStringId)(item._id) : (0, item_helpers_1.convertStringId)(editedItem._id);
-        const updateItem = (0, lodash_1.merge)(!editedItem ? item : defaultValues, editedItem);
-        delete updateItem._id;
+        const replaceItem = (0, lodash_1.merge)(!editedItem ? item : defaultValues, editedItem);
+        const filter = !itemId ? { _id: new mongodb_1.ObjectId() } : { _id: itemId };
+        delete replaceItem._id;
         const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate({ _id: itemId }, { $set: updateItem }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
+        const { ok, value, lastErrorObject } = await collection.findOneAndReplace(filter, { $set: replaceItem }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
         if (cleanupAfter === true) {
             await cleanup();
         }
         if (ok === 1 && value) {
             if (suppressHooks != true) {
-                let editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [value, context]).catch((err) => {
-                    throw Error(`WeivData - afterUpdate Hook Failure ${err}`);
+                let editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterReplace", [value, context]).catch((err) => {
+                    throw Error(`WeivData - afterReplace Hook Failure ${err}`);
                 });
                 if (editedResult) {
                     return editedResult;
@@ -67,11 +67,11 @@ async function update(collectionId, item, options) {
             return value;
         }
         else {
-            throw Error(`WeivData - Error when updating an item, acknowledged: ${lastErrorObject}`);
+            throw Error(`WeivData - Error when replacing an item, acknowledged: ${lastErrorObject}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when updating an item: ${err}`);
+        throw Error(`WeivData - Error when replacing an item: ${err}`);
     }
 }
-exports.update = update;
+exports.replace = replace;

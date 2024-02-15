@@ -138,7 +138,7 @@ In this file you can find what's changed in each version.
 - README update.
 - BUG fixes and small updates.
 - Documentation generated and now it's ready for use. (Will be improved with codes over time it's not best we know)
-- Some functions may not work after this update so please test and report. ([Discord](https://discord.gg/pVYJjPKRm6) or Email)
+- Some functions may not work after this update so please test and report.
 - Hooks are now also support bulk operations and save function. Works *almost* same as in wix-data.
 
 ### 2.1.0
@@ -155,7 +155,6 @@ In this file you can find what's changed in each version.
 - X.509 method is now allowed and should be working as expected.
 - `idConvreter` function added to library
 - Started working to fix few BUG/s and test more functions.
-- Discord server created and READMEs updated with new informations.
 
 ### 2.2.3
 
@@ -196,10 +195,17 @@ In this file you can find what's changed in each version.
 
 ### 2.4.0
 
-- New API/Function (native), enables you to use MongoDB native features.
+- New API/Function (`native`), enables you to use MongoDB native features.
+
+### 2.4.1
+
+- `update` function docs updated and some BUG fixes to many functions with `upsert` feature enabled.
+- new `replace` function is added to replace the all document instead of updating specified fields.
+- docs and readme updated.
+- internal changes and BUG fixes.
 
 ---
 
-_When a new version is released you can see the update notes here. Or in our [Discord Server](https://discord.gg/pVYJjPKRm6)_
+_When a new version is released you can see the update notes here._
 
 ---
