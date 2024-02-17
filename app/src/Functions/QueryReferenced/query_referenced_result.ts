@@ -1,8 +1,8 @@
 import { ObjectId, Db, Collection } from 'mongodb/mongodb';
 import { getPipeline } from '../../Helpers/query_referenced_helpers';
-import { type ConnectionCleanup, useClient } from '../../Connection/connection_provider';
+import { useClient } from '../../Connection/automatic_connection_provider';
 import { splitCollectionId } from '../../Helpers/name_helpers';
-import type { CleanupAfter, CollectionID, ConnectionHandlerResult, Items, WeivDataOptions } from '../../Helpers/collection';
+import type { CollectionID, ConnectionHandlerResult, Items, WeivDataOptions } from '../../Helpers/collection';
 import type { WeivDataQueryReferencedOptions } from './queryReferenced';
 
 /**
@@ -35,18 +35,16 @@ export interface WeivDataQueryReferencedResult {
     /**
      * Retrieves the next page of reference query results.
      * 
-     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
      * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A reference query result object with the next page of query results. Rejected - The errors that caused the rejection.
      */
-    next(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryReferencedResult>;
+    next(): Promise<WeivDataQueryReferencedResult>;
 
     /**
      * Retrieves the previous page of reference query results.
      * 
-     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
      * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
      */
-    prev(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryReferencedResult>;
+    prev(): Promise<WeivDataQueryReferencedResult>;
 }
 
 export class InternalWeivDataQueryReferencedResult {
@@ -62,14 +60,13 @@ export class InternalWeivDataQueryReferencedResult {
     private dbName: string;
     private db!: Db;
     private collection!: Collection;
-    private cleanup!: ConnectionCleanup;
 
     protected items!: Items;
     protected totalCount!: number;
     protected hasNext!: () => boolean;
     protected hasPrev!: () => boolean;
-    protected next!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataQueryReferencedResult>;
-    protected prev!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataQueryReferencedResult>;
+    protected next!: () => Promise<WeivDataQueryReferencedResult>;
+    protected prev!: () => Promise<WeivDataQueryReferencedResult>;
 
 
     /**@internal */
@@ -116,9 +113,8 @@ export class InternalWeivDataQueryReferencedResult {
         try {
             const { suppressAuth } = this.options;
             if (!this.collection) {
-                const { collection, cleanup } = await this.connectionHandler(suppressAuth || false);
+                const { collection } = await this.connectionHandler(suppressAuth || false);
                 this.collection = collection;
-                this.cleanup = cleanup;
             }
 
             const { skip } = this.getPipelineOptions();
@@ -139,18 +135,12 @@ export class InternalWeivDataQueryReferencedResult {
                     return this.currentPage > 0;
                 }
             }
-            this.next = async (cleanupAfter?: boolean) => {
+            this.next = async () => {
                 this.currentPage++;
-                if (cleanupAfter === true) {
-                    await this.cleanup();
-                }
                 return this.getResult();
             }
-            this.prev = async (cleanupAfter?: boolean) => {
+            this.prev = async () => {
                 this.currentPage--;
-                if (cleanupAfter === true) {
-                    await this.cleanup();
-                }
                 return this.getResult();
             }
 
@@ -170,7 +160,7 @@ export class InternalWeivDataQueryReferencedResult {
     /**@internal */
     private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult> {
         try {
-            const { pool, cleanup, memberId } = await useClient(suppressAuth);
+            const { pool, memberId } = await useClient(suppressAuth);
 
             if (this.dbName) {
                 this.db = pool.db(this.dbName);
@@ -179,7 +169,7 @@ export class InternalWeivDataQueryReferencedResult {
             }
 
             const collection = this.db.collection(this.collectionName);
-            return { collection, cleanup, memberId };
+            return { collection, memberId };
         } catch (err) {
             throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }

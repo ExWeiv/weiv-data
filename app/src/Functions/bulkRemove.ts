@@ -47,7 +47,7 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, o
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, consistentRead } = options || {};
 
         let editedItemIds: ObjectId[] | Promise<ObjectId>[] = itemIds.map(async (itemId) => {
             if (suppressHooks != true) {
@@ -67,12 +67,8 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, o
 
         editedItemIds = await Promise.all(editedItemIds);
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { acknowledged, deletedCount } = await collection.deleteMany({ _id: { $in: editedItemIds } }, { readConcern: consistentRead === true ? "majority" : "local" });
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         if (acknowledged === true) {
             return {

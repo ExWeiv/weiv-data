@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InternalWeivDataQueryReferencedResult = void 0;
 const query_referenced_helpers_1 = require("../../Helpers/query_referenced_helpers");
-const connection_provider_1 = require("../../Connection/connection_provider");
+const automatic_connection_provider_1 = require("../../Connection/automatic_connection_provider");
 const name_helpers_1 = require("../../Helpers/name_helpers");
 class InternalWeivDataQueryReferencedResult {
     /**@internal */
@@ -46,9 +46,8 @@ class InternalWeivDataQueryReferencedResult {
         try {
             const { suppressAuth } = this.options;
             if (!this.collection) {
-                const { collection, cleanup } = await this.connectionHandler(suppressAuth || false);
+                const { collection } = await this.connectionHandler(suppressAuth || false);
                 this.collection = collection;
-                this.cleanup = cleanup;
             }
             const { skip } = this.getPipelineOptions();
             const items = await this.getItems();
@@ -69,18 +68,12 @@ class InternalWeivDataQueryReferencedResult {
                     return this.currentPage > 0;
                 }
             };
-            this.next = async (cleanupAfter) => {
+            this.next = async () => {
                 this.currentPage++;
-                if (cleanupAfter === true) {
-                    await this.cleanup();
-                }
                 return this.getResult();
             };
-            this.prev = async (cleanupAfter) => {
+            this.prev = async () => {
                 this.currentPage--;
-                if (cleanupAfter === true) {
-                    await this.cleanup();
-                }
                 return this.getResult();
             };
             return {
@@ -99,7 +92,7 @@ class InternalWeivDataQueryReferencedResult {
     /**@internal */
     async connectionHandler(suppressAuth) {
         try {
-            const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
+            const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);
             if (this.dbName) {
                 this.db = pool.db(this.dbName);
             }
@@ -107,7 +100,7 @@ class InternalWeivDataQueryReferencedResult {
                 this.db = pool.db("exweiv");
             }
             const collection = this.db.collection(this.collectionName);
-            return { collection, cleanup, memberId };
+            return { collection, memberId };
         }
         catch (err) {
             throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);

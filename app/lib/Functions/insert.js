@@ -31,7 +31,7 @@ async function insert(collectionId, item, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, consistentRead } = options || {};
         const defaultValues = {
             _updatedDate: new Date(),
             _createdDate: new Date(),
@@ -45,11 +45,8 @@ async function insert(collectionId, item, options) {
                 throw Error(`WeivData - beforeInsert Hook Failure ${err}`);
             });
         }
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { insertedId, acknowledged } = await collection.insertOne(!editedItem ? modifiedItem : editedItem, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
         if (acknowledged) {
             if (suppressHooks != true) {
                 const editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [{ ...!editedItem ? modifiedItem : editedItem, _id: insertedId }, context]).catch((err) => {

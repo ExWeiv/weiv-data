@@ -30,7 +30,7 @@ async function bulkInsert(collectionId, items, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, consistentRead } = options || {};
         let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         let editedItems = items.map(async (item) => {
             item._updatedDate = new Date();
@@ -52,14 +52,11 @@ async function bulkInsert(collectionId, items, options) {
             }
         });
         editedItems = await Promise.all(editedItems);
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(editedItems, { readConcern: consistentRead === true ? "majority" : "local" });
         const insertedItemIds = Object.keys(insertedIds).map((key) => {
             return insertedIds[key];
         });
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
         if (acknowledged === true) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {

@@ -44,7 +44,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, consistentRead } = options || {};
 
         let ownerId = await getOwnerId(enableVisitorId);
         let editedItems: Document[] | Promise<Document>[] = items.map(async (item) => {
@@ -69,16 +69,12 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
 
         editedItems = await Promise.all(editedItems);
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(editedItems, { readConcern: consistentRead === true ? "majority" : "local" });
 
         const insertedItemIds = Object.keys(insertedIds).map((key: any) => {
             return insertedIds[key];
         })
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         if (acknowledged === true) {
             if (suppressHooks != true) {

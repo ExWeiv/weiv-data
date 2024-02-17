@@ -33,20 +33,16 @@ export async function removeReference(collectionId: CollectionID, propertyName: 
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
 
-        const { suppressAuth, cleanupAfter, consistentRead } = options || {};
+        const { suppressAuth, consistentRead } = options || {};
         const references = getReferences(referencedItem);
         const itemId = getCurrentItemId(referringItem);
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { acknowledged, modifiedCount } = await collection.updateOne(
             { _id: itemId },
             { $pull: { [propertyName]: { $in: references } }, $set: { _updatedDate: new Date() } },
             { readConcern: consistentRead === true ? "majority" : "local" }
         );
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         if (!acknowledged || modifiedCount === 0) {
             throw Error(`WeivData - Error when removing references, acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`)

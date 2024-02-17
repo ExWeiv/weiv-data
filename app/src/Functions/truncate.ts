@@ -22,13 +22,9 @@ export async function truncate(collectionId: CollectionID, options?: WeivDataOpt
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
         }
 
-        const { suppressAuth, cleanupAfter } = options || {};
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const { suppressAuth } = options || {};
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { acknowledged } = await collection.deleteMany({});
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         if (acknowledged) {
             return null;

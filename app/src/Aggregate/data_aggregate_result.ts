@@ -1,8 +1,8 @@
 import { Collection, Db } from "mongodb/mongodb";
 import { type PipelineArray, sortAggregationPipeline } from "../Helpers/pipeline_helpers";
-import { ConnectionCleanup, useClient } from '../Connection/connection_provider';
+import { useClient } from '../Connection/automatic_connection_provider';
 import { splitCollectionId } from "../Helpers/name_helpers";
-import type { CleanupAfter, CollectionID, ConnectionHandlerResult, Items, SuppressAuth } from "../Helpers/collection";
+import type { CollectionID, ConnectionHandlerResult, Items, SuppressAuth } from "../Helpers/collection";
 
 /**@public */
 export interface WeivDataAggregateResult {
@@ -28,10 +28,9 @@ export interface WeivDataAggregateResult {
     /**
      * Retrieves the next page of aggregate results.
      * 
-     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
      * @returns {WeivDataAggregateResult} Fulfilled - An aggregate object with the next page of aggregate results. Rejected - The errors that caused the rejection.
      */
-    next(cleanupAfter?: CleanupAfter): Promise<WeivDataAggregateResult>;
+    next(): Promise<WeivDataAggregateResult>;
 }
 
 /**
@@ -46,12 +45,11 @@ export class InternalWeivDataAggregateResult {
     protected collectionName: string;
     protected dbName: string;
     protected collection!: Collection;
-    private cleanup!: ConnectionCleanup;
 
     protected items!: Items;
     protected length!: number;
     protected hasNext!: () => boolean;
-    protected next!: (cleanupAfter?: CleanupAfter) => Promise<WeivDataAggregateResult>;
+    protected next!: () => Promise<WeivDataAggregateResult>;
 
     /**
      * @internal
@@ -85,9 +83,8 @@ export class InternalWeivDataAggregateResult {
     protected async getResult(suppressAuth?: SuppressAuth): Promise<WeivDataAggregateResult> {
         // Setup a connection from the pool
         if (!this.collection) {
-            const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+            const { collection } = await this.connectionHandler(suppressAuth);
             this.collection = collection;
-            this.cleanup = cleanup;
         }
 
         const items = await this.getItems();
@@ -95,11 +92,8 @@ export class InternalWeivDataAggregateResult {
         this.items = items;
         this.length = items.length;
         this.hasNext = () => this.currentPage * this.pageSize < length;
-        this.next = async (cleanupAfter?: CleanupAfter) => {
+        this.next = async () => {
             this.currentPage++;
-            if (cleanupAfter === true) {
-                await this.cleanup();
-            }
             return this.getResult(suppressAuth);
         }
 
@@ -113,7 +107,7 @@ export class InternalWeivDataAggregateResult {
 
     protected async connectionHandler(suppressAuth?: SuppressAuth): Promise<ConnectionHandlerResult> {
         try {
-            const { pool, cleanup, memberId } = await useClient(suppressAuth);
+            const { pool, memberId } = await useClient(suppressAuth);
 
             if (this.dbName) {
                 this.db = pool.db(this.dbName);
@@ -122,7 +116,7 @@ export class InternalWeivDataAggregateResult {
             }
 
             const collection = this.db.collection(this.collectionName);
-            return { collection, cleanup, memberId };
+            return { collection, memberId };
         } catch (err) {
             throw Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
         }

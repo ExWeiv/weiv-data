@@ -1,4 +1,3 @@
-import { merge } from 'lodash';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
@@ -37,10 +36,7 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
-        const defaultValues = {
-            _updatedDate: new Date()
-        }
+        const { suppressAuth, suppressHooks, consistentRead } = options || { suppressAuth: false, suppressHooks: false };
 
         let editedItem;
         if (suppressHooks != true) {
@@ -50,15 +46,15 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         }
 
         const itemId = !editedItem ? convertStringId(item._id) : convertStringId(editedItem._id);
-        const updateItem = merge(!editedItem ? item : defaultValues, editedItem);
+        const updateItem = !editedItem ? item : editedItem;
         delete updateItem._id;
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate({ _id: itemId }, { $set: updateItem }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
+        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate(
+            { _id: itemId },
+            { $set: updateItem, $currentDate: { _updatedDate: new Date() } },
+            { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" }
+        );
 
         if (ok === 1 && value) {
             if (suppressHooks != true) {

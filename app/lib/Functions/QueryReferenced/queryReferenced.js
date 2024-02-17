@@ -37,7 +37,7 @@ async function queryReferenced(collectionId, targetCollectionId, itemId, propert
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName or itemId`);
         }
         const editedItemId = (0, item_helpers_1.convertStringId)(itemId);
-        const referencedClass = new query_referenced_result_1.InternalWeivDataQueryReferencedResult(collectionId, targetCollectionId, editedItemId, propertyName, queryOptions, options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, consistentRead: false });
+        const referencedClass = new query_referenced_result_1.InternalWeivDataQueryReferencedResult(collectionId, targetCollectionId, editedItemId, propertyName, queryOptions, options || { suppressAuth: false, suppressHooks: false, consistentRead: false });
         const result = await referencedClass.getResult();
         return result;
     }

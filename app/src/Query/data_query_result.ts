@@ -1,8 +1,8 @@
 import { Db, Collection } from "mongodb/mongodb";
-import { type ConnectionCleanup, useClient } from '../Connection/connection_provider';
-import { size } from 'lodash';
+import { useClient } from '../Connection/automatic_connection_provider';
+import { isEmpty, size } from 'lodash';
 import NodeCache from "node-cache";
-import type { CleanupAfter, ConnectionHandlerResult, Items } from "../Helpers/collection";
+import type { ConnectionHandlerResult, Items } from "../Helpers/collection";
 import type { LookupObject, ReferenceLenghtObject } from "./data_query";
 
 const cache = new NodeCache({
@@ -65,18 +65,16 @@ export interface WeivDataQueryResult {
     /**
      * Retrieves the next page of query results.
      * 
-     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
      * @returns {Promise<WeivDataQueryResult>} Fulfilled - A query result object with the next page of query results. Rejected - The errors that caused the rejection.
      */
-    next(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryResult>;
+    next(): Promise<WeivDataQueryResult>;
 
     /**
      * Retrieves the previous page of query results.
      * 
-     * @param cleanupAfter Set connection cleaning. (Defaults to false.)
      * @returns {Promise<WeivDataQueryResultI>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
      */
-    prev(cleanupAfter?: CleanupAfter): Promise<WeivDataQueryResult>;
+    prev(): Promise<WeivDataQueryResult>;
 }
 
 /** @internal */
@@ -113,7 +111,6 @@ export class InternalWeivDataQueryResult {
     private queryOptions!: QueryResultQueryOptions;
     private db!: Db;
     private collection!: Collection;
-    private cleanup!: ConnectionCleanup;
 
     constructor(options: DataQueryResultOptions) {
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection } = options;
@@ -242,7 +239,7 @@ export class InternalWeivDataQueryResult {
                 }
             }
 
-            const totalCount = await this.collection.countDocuments(query);
+            const totalCount = await this.collection.countDocuments(query, isEmpty(query) ? { hint: "_id_" } : {});
             return totalCount;
         } catch (err) {
             throw Error(`WeivData - Error when using query (getTotalCount): ${err}`);
@@ -259,9 +256,8 @@ export class InternalWeivDataQueryResult {
             }
 
             if (!this.collection) {
-                const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
+                const { collection } = await this.connectionHandler(this.suppressAuth);
                 this.collection = collection;
-                this.cleanup = cleanup;
             }
 
             const { skip } = this.queryOptions;
@@ -287,20 +283,12 @@ export class InternalWeivDataQueryResult {
                         return this.currentPage > 1;
                     }
                 }, //todo
-                next: async (cleanupAfter?: boolean) => {
+                next: async () => {
                     this.currentPage++;
-                    if (cleanupAfter === true) {
-                        // Close the connection
-                        await this.cleanup();
-                    }
                     return this.getResult();
                 },
-                prev: async (cleanupAfter?: boolean) => {
+                prev: async () => {
                     this.currentPage--;
-                    if (cleanupAfter === true) {
-                        // Close the connection
-                        await this.cleanup();
-                    }
                     return this.getResult();
                 }
             }
@@ -314,7 +302,7 @@ export class InternalWeivDataQueryResult {
 
     private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult> {
         try {
-            const { pool, cleanup, memberId } = await useClient(suppressAuth);
+            const { pool, memberId } = await useClient(suppressAuth);
 
             if (this.dbName) {
                 this.db = pool.db(this.dbName);
@@ -323,7 +311,7 @@ export class InternalWeivDataQueryResult {
             }
 
             const collection = this.db.collection(this.collectionName);
-            return { collection, cleanup, memberId };
+            return { collection, memberId };
         } catch (err) {
             throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }

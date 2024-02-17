@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getQueryCache = exports.InternalWeivDataQueryResult = void 0;
-const connection_provider_1 = require("../Connection/connection_provider");
+const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const lodash_1 = require("lodash");
 const node_cache_1 = __importDefault(require("node-cache"));
 const cache = new node_cache_1.default({
@@ -126,7 +126,7 @@ class InternalWeivDataQueryResult {
                     return 0;
                 }
             }
-            const totalCount = await this.collection.countDocuments(query);
+            const totalCount = await this.collection.countDocuments(query, (0, lodash_1.isEmpty)(query) ? { hint: "_id_" } : {});
             return totalCount;
         }
         catch (err) {
@@ -141,9 +141,8 @@ class InternalWeivDataQueryResult {
                 return cachedResult;
             }
             if (!this.collection) {
-                const { collection, cleanup } = await this.connectionHandler(this.suppressAuth);
+                const { collection } = await this.connectionHandler(this.suppressAuth);
                 this.collection = collection;
-                this.cleanup = cleanup;
             }
             const { skip } = this.queryOptions;
             const [items, totalCount] = await Promise.all([this.getItems(), this.getTotalCount()]);
@@ -169,20 +168,12 @@ class InternalWeivDataQueryResult {
                         return this.currentPage > 1;
                     }
                 }, //todo
-                next: async (cleanupAfter) => {
+                next: async () => {
                     this.currentPage++;
-                    if (cleanupAfter === true) {
-                        // Close the connection
-                        await this.cleanup();
-                    }
                     return this.getResult();
                 },
-                prev: async (cleanupAfter) => {
+                prev: async () => {
                     this.currentPage--;
-                    if (cleanupAfter === true) {
-                        // Close the connection
-                        await this.cleanup();
-                    }
                     return this.getResult();
                 }
             };
@@ -195,7 +186,7 @@ class InternalWeivDataQueryResult {
     }
     async connectionHandler(suppressAuth) {
         try {
-            const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
+            const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);
             if (this.dbName) {
                 this.db = pool.db(this.dbName);
             }
@@ -203,7 +194,7 @@ class InternalWeivDataQueryResult {
                 this.db = pool.db("exweiv");
             }
             const collection = this.db.collection(this.collectionName);
-            return { collection, cleanup, memberId };
+            return { collection, memberId };
         }
         catch (err) {
             throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);

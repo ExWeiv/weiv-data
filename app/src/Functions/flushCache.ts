@@ -4,14 +4,14 @@ import { getGetCache } from '../Functions/get';
 import { getIsReferencedCache } from '../Functions/isReferenced';
 import { getHelperSecretsCache } from '../Helpers/secret_helpers';
 import { getQueryCache } from '../Query/data_query_result';
-import { getConnectionClientsCache, cleanupClientConnections } from '../Connection/connection_provider';
+import { getClientCache } from '../Connection/automatic_connection_provider';
 import NodeCache from 'node-cache';
 
 /**@public */
 export type CacheSelections = "permissions" | "secrets" | "get" | "isreferenced" | "query" | "connectionsecrets" | "helpersecrets" | "connectionclients";
 
 type CacheSelectionsObject = {
-    [Key in CacheSelections]: () => NodeCache | string | NodeCache[]; // Define the value type as a function returning any
+    [Key in CacheSelections]: () => NodeCache | NodeCache[]; // Define the value type as a function returning any
 };
 
 const cacheSelections: CacheSelectionsObject = {
@@ -21,7 +21,7 @@ const cacheSelections: CacheSelectionsObject = {
     "query": getQueryCache,
     "connectionsecrets": getConnectionSecretsCache,
     "helpersecrets": getHelperSecretsCache,
-    "connectionclients": getConnectionClientsCache,
+    "connectionclients": getClientCache,
     "secrets": () => {
         return [getConnectionSecretsCache(), getHelperSecretsCache()]
     }
@@ -49,7 +49,7 @@ export function flushCache(filters: CacheSelections[]): void {
         }
     } else {
         for (const key of Object.keys(cacheSelections)) { //@ts-ignore
-            const cacheValue: NodeCache | string | NodeCache[] = cacheSelections[key]();
+            const cacheValue: NodeCache | NodeCache[] = cacheSelections[key]();
             if (typeof cacheValue === "string") {
                 cachesToFlush.push(cacheValue)
             } else if (Array.isArray(cacheValue)) {
@@ -61,12 +61,6 @@ export function flushCache(filters: CacheSelections[]): void {
     }
 
     for (const cacheData of cachesToFlush) {
-        if (typeof cacheData === "string") {
-            if (cacheData === "connectionclients") {
-                cleanupClientConnections();
-            }
-        } else {
-            cacheData.flushAll();
-        }
+        cacheData.flushAll();
     }
 }

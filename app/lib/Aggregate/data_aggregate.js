@@ -349,8 +349,8 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     */
     async run(options) {
         // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
-        const { suppressAuth, consistentRead, cleanupAfter } = options || {};
-        const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+        const { suppressAuth, consistentRead } = options || {};
+        const { collection } = await this.connectionHandler(suppressAuth);
         if (this.sorting) {
             this.pipeline = (0, pipeline_helpers_1.checkPipelineArray)(this.pipeline);
             this.pipeline.push({
@@ -421,10 +421,6 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
                 return document;
             }
         });
-        // Close the connection to space up the connection pool in MongoDB (if cleanupAfter === true)
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
         // Return the WeivDataAggregateResult
         return {
             ...aggregateResult,

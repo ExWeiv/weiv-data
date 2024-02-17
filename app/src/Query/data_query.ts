@@ -1,6 +1,6 @@
-import { Db, CountOptions } from 'mongodb/mongodb';
-import { merge, size, memoize } from 'lodash';
-import { useClient } from '../Connection/connection_provider';
+import { Db, CountDocumentsOptions } from 'mongodb/mongodb';
+import { merge, size, memoize, isEmpty } from 'lodash';
+import { useClient } from '../Connection/automatic_connection_provider';
 import { InternalWeivDataQueryResult, type WeivDataQueryResult } from './data_query_result';
 import { splitCollectionId } from '../Helpers/name_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
@@ -524,17 +524,11 @@ export class WeivDataQuery {
     */
     async count(options: WeivDataOptions): Promise<number> {
         try {
-            const { suppressAuth, consistentRead, cleanupAfter, suppressHooks } = options;
-            const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+            const { suppressAuth, consistentRead, suppressHooks } = options;
+            const { collection } = await this.connectionHandler(suppressAuth);
 
             // Add filters to query
             this.filtersHandler();
-
-            let countOptions: CountOptions = {};
-            if (consistentRead === true) {
-                countOptions = merge(countOptions, { readConcern: 'majority' })
-            }
-
             const context = prepareHookContext(this.collectionId);
 
             let editedQurey;
@@ -544,16 +538,13 @@ export class WeivDataQuery {
                 });
             }
 
+            const countOptions: CountDocumentsOptions = consistentRead === true ? { readConcern: 'majority' } : { readConcern: 'local' };
+
             let totalCount;
             if (editedQurey) {
-                totalCount = await collection.countDocuments(editedQurey.query, countOptions);
+                totalCount = await collection.countDocuments(editedQurey.query, isEmpty(editedQurey.query) ? { ...countOptions, hint: "_id_" } : countOptions);
             } else {
-                totalCount = await collection.countDocuments(this.query, countOptions);
-            }
-
-            // Close the connection to space up the connection pool in MongoDB (if cleanupAfter === true)
-            if (cleanupAfter === true) {
-                await cleanup();
+                totalCount = await collection.countDocuments(this.query, isEmpty(this.query) ? { ...countOptions, hint: "_id_" } : countOptions);
             }
 
             if (suppressHooks != true) {
@@ -789,8 +780,8 @@ export class WeivDataQuery {
     /** @internal */
     private async runQuery(options?: WeivDataOptions): Promise<WeivDataQueryResult> {
         try {
-            const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
-            const { cleanup, collection } = await this.connectionHandler(suppressAuth);
+            const { suppressAuth, suppressHooks, consistentRead } = options || {};
+            const { collection } = await this.connectionHandler(suppressAuth);
 
             const context = prepareHookContext(this.collectionId);
 
@@ -831,10 +822,6 @@ export class WeivDataQuery {
                     addFields: classInUse.referenceLenght
                 }
             }).getResult();
-
-            if (cleanupAfter === true) {
-                await cleanup();
-            }
 
             if (suppressHooks != true) {
                 const hookedItems = await result.items.map(async (item, index) => {
@@ -878,7 +865,7 @@ export class WeivDataQuery {
 
     /** @internal */
     private async connectionHandler(suppressAuth = false): Promise<ConnectionHandlerResult> {
-        const { pool, cleanup, memberId } = await useClient(suppressAuth);
+        const { pool, memberId } = await useClient(suppressAuth);
 
         if (this.dbName) {
             this.db = pool.db(this.dbName);
@@ -887,6 +874,6 @@ export class WeivDataQuery {
         }
 
         const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
+        return { collection, memberId };
     }
 }

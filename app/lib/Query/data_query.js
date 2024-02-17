@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeivDataQuery = void 0;
 const lodash_1 = require("lodash");
-const connection_provider_1 = require("../Connection/connection_provider");
+const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const data_query_result_1 = require("./data_query_result");
 const name_helpers_1 = require("../Helpers/name_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
@@ -409,14 +409,10 @@ class WeivDataQuery {
     */
     async count(options) {
         try {
-            const { suppressAuth, consistentRead, cleanupAfter, suppressHooks } = options;
-            const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+            const { suppressAuth, consistentRead, suppressHooks } = options;
+            const { collection } = await this.connectionHandler(suppressAuth);
             // Add filters to query
             this.filtersHandler();
-            let countOptions = {};
-            if (consistentRead === true) {
-                countOptions = (0, lodash_1.merge)(countOptions, { readConcern: 'majority' });
-            }
             const context = (0, hook_helpers_1.prepareHookContext)(this.collectionId);
             let editedQurey;
             if (suppressHooks != true) {
@@ -424,16 +420,13 @@ class WeivDataQuery {
                     throw Error(`WeivData - beforeCount Hook Failure ${err}`);
                 });
             }
+            const countOptions = consistentRead === true ? { readConcern: 'majority' } : { readConcern: 'local' };
             let totalCount;
             if (editedQurey) {
-                totalCount = await collection.countDocuments(editedQurey.query, countOptions);
+                totalCount = await collection.countDocuments(editedQurey.query, (0, lodash_1.isEmpty)(editedQurey.query) ? { ...countOptions, hint: "_id_" } : countOptions);
             }
             else {
-                totalCount = await collection.countDocuments(this.query, countOptions);
-            }
-            // Close the connection to space up the connection pool in MongoDB (if cleanupAfter === true)
-            if (cleanupAfter === true) {
-                await cleanup();
+                totalCount = await collection.countDocuments(this.query, (0, lodash_1.isEmpty)(this.query) ? { ...countOptions, hint: "_id_" } : countOptions);
             }
             if (suppressHooks != true) {
                 let editedCount = await (0, hook_manager_1.runDataHook)(this.collectionId, "afterCount", [totalCount, context]).catch((err) => {
@@ -650,8 +643,8 @@ class WeivDataQuery {
     /** @internal */
     async runQuery(options) {
         try {
-            const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
-            const { cleanup, collection } = await this.connectionHandler(suppressAuth);
+            const { suppressAuth, suppressHooks, consistentRead } = options || {};
+            const { collection } = await this.connectionHandler(suppressAuth);
             const context = (0, hook_helpers_1.prepareHookContext)(this.collectionId);
             let editedQurey;
             if (suppressHooks != true) {
@@ -687,9 +680,6 @@ class WeivDataQuery {
                     addFields: classInUse.referenceLenght
                 }
             }).getResult();
-            if (cleanupAfter === true) {
-                await cleanup();
-            }
             if (suppressHooks != true) {
                 const hookedItems = await result.items.map(async (item, index) => {
                     const editedItem = await (0, hook_manager_1.runDataHook)(classInUse.collectionId, "afterQuery", [item, context]).catch((err) => {
@@ -728,7 +718,7 @@ class WeivDataQuery {
     }
     /** @internal */
     async connectionHandler(suppressAuth = false) {
-        const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
+        const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);
         if (this.dbName) {
             this.db = pool.db(this.dbName);
         }
@@ -736,7 +726,7 @@ class WeivDataQuery {
             this.db = pool.db("exweiv");
         }
         const collection = this.db.collection(this.collectionName);
-        return { collection, cleanup, memberId };
+        return { collection, memberId };
     }
 }
 exports.WeivDataQuery = WeivDataQuery;

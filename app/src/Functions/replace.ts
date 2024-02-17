@@ -36,7 +36,7 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false };
+        const { suppressAuth, suppressHooks, consistentRead } = options || { suppressAuth: false, suppressHooks: false };
         const defaultValues = {
             _updatedDate: new Date()
         }
@@ -53,12 +53,8 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
         const filter = !itemId ? { _id: new ObjectId() } : { _id: itemId };
         delete replaceItem._id;
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { ok, value, lastErrorObject } = await collection.findOneAndReplace(filter, { $set: replaceItem }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         if (ok === 1 && value) {
             if (suppressHooks != true) {

@@ -2,7 +2,7 @@ import { Document } from "mongodb/mongodb";
 import { checkPipelineArray, sortAggregationPipeline, } from "../Helpers/pipeline_helpers";
 import { WeivDataFilter } from "../Filter/data_filter";
 import { InternalWeivDataAggregateResult, WeivDataAggregateResult } from './data_aggregate_result';
-import type { CleanupAfter, ConsistentRead, SuppressAuth } from "../Helpers/collection";
+import type { ConsistentRead, SuppressAuth } from "../Helpers/collection";
 
 /**
  * Options to use when running an aggregation.
@@ -19,11 +19,6 @@ export interface AggregateRunOptions {
      * Enable consistent read from clusters. This will change the readConvern to "majority", in this way you'll get the most up to date data.
      */
     consistentRead?: ConsistentRead,
-
-    /**
-     * When set to true .close function of MongoClient will be called after the operation. (Next call will take longer to complete)
-     */
-    cleanupAfter?: CleanupAfter
 }
 
 /** @internal */
@@ -406,8 +401,8 @@ export class WeivDataAggregate extends InternalWeivDataAggregateResult {
     */
     async run(options?: AggregateRunOptions): Promise<WeivDataAggregateResult> {
         // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
-        const { suppressAuth, consistentRead, cleanupAfter } = options || {};
-        const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+        const { suppressAuth, consistentRead } = options || {};
+        const { collection } = await this.connectionHandler(suppressAuth);
 
         if (this.sorting) {
             this.pipeline = checkPipelineArray(this.pipeline);
@@ -489,11 +484,6 @@ export class WeivDataAggregate extends InternalWeivDataAggregateResult {
                 return document;
             }
         });
-
-        // Close the connection to space up the connection pool in MongoDB (if cleanupAfter === true)
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         // Return the WeivDataAggregateResult
         return {

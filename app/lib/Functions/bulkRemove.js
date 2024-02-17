@@ -30,7 +30,7 @@ async function bulkRemove(collectionId, itemIds, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemIds`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, consistentRead } = options || {};
         let editedItemIds = itemIds.map(async (itemId) => {
             if (suppressHooks != true) {
                 const editedId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeRemove", [itemId, context]).catch((err) => {
@@ -48,11 +48,8 @@ async function bulkRemove(collectionId, itemIds, options) {
             }
         });
         editedItemIds = await Promise.all(editedItemIds);
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { acknowledged, deletedCount } = await collection.deleteMany({ _id: { $in: editedItemIds } }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
         if (acknowledged === true) {
             return {
                 removed: deletedCount,

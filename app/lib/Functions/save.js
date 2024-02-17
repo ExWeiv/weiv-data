@@ -5,6 +5,7 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+const mongodb_1 = require("mongodb");
 /**
  * Inserts or updates an item in a collection.
  *
@@ -34,13 +35,7 @@ async function save(collectionId, item, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
-        // Add _createdDate if there is not one
-        if (!item._createdDate) {
-            item._createdDate = new Date();
-        }
-        // Update _updatedDate value
-        item._updatedDate = new Date();
+        const { suppressAuth, suppressHooks, consistentRead } = options || {};
         // Convert ID to ObjectId if exist
         let editedItem;
         if (item._id && typeof item._id === "string") {
@@ -62,12 +57,8 @@ async function save(collectionId, item, options) {
             ...item,
             ...editedItem
         };
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const filter = editedItem._id ? { _id: editedItem._id } : { _id: { $exists: false } };
-        const { upsertedId, acknowledged } = await collection.updateOne(filter, { $set: editedItem }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { upsertedId, acknowledged } = await collection.updateOne(editedItem._id ? { _id: editedItem._id } : { _id: new mongodb_1.ObjectId() }, { $set: editedItem, $currentDate: { _updatedDate: new Date() }, $setOnInsert: { _createdDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
         const returnedItem = { ...editedItem, _id: editedItem._id };
         if (acknowledged) {
             // Hooks handling

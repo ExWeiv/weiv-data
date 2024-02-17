@@ -96,7 +96,6 @@ export type {
     SuppressHooks,
     ConsistentRead,
     EnableVisitorID,
-    CleanupAfter,
     CollectionID,
     Item,
     ItemID,

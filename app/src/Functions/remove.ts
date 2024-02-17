@@ -30,7 +30,7 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, consistentRead } = options || {};
 
         let editedItemId;
         if (suppressHooks != true) {
@@ -46,12 +46,8 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
             newItemId = convertStringId(itemId);
         }
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { ok, value } = await collection.findOneAndDelete({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         if (ok === 1) {
             if (suppressHooks != true) {

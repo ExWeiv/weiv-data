@@ -3,6 +3,7 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import { ObjectId } from 'mongodb';
 
 /**
  * Object returned for save function.
@@ -50,15 +51,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
-
-        // Add _createdDate if there is not one
-        if (!item._createdDate) {
-            item._createdDate = new Date();
-        }
-
-        // Update _updatedDate value
-        item._updatedDate = new Date();
+        const { suppressAuth, suppressHooks, consistentRead } = options || {};
 
         // Convert ID to ObjectId if exist
         let editedItem;
@@ -83,13 +76,12 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
             ...editedItem
         }
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const filter = editedItem._id ? { _id: editedItem._id } : { _id: { $exists: false } };
-        const { upsertedId, acknowledged } = await collection.updateOne(filter, { $set: editedItem }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
+        const { upsertedId, acknowledged } = await collection.updateOne(
+            editedItem._id ? { _id: editedItem._id } : { _id: new ObjectId() },
+            { $set: editedItem, $currentDate: { _updatedDate: new Date() }, $setOnInsert: { _createdDate: new Date() } },
+            { readConcern: consistentRead === true ? "majority" : "local", upsert: true }
+        );
 
         const returnedItem = { ...editedItem, _id: editedItem._id }
 

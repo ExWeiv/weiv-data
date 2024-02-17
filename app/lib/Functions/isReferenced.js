@@ -49,17 +49,13 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
         const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
         const cachedItem = cache.get(cacheKey);
         if (cachedItem) {
-            //@ts-ignore
             return cachedItem;
         }
-        const { suppressAuth, cleanupAfter, consistentRead } = options || {};
+        const { suppressAuth, consistentRead } = options || {};
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const totalCount = await collection.countDocuments({ _id: itemId, [propertyName]: { $in: references } }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
         if (totalCount > 0) {
             cache.set(cacheKey, true);
             return true;

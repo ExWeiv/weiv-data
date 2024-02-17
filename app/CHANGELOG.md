@@ -212,6 +212,15 @@ In this file you can find what's changed in each version.
 
 - BUG Fix
 
+### 2.5.0
+
+- BUG Fixes
+- Performance and Memory improvements
+- Now MongoDB manages the connection system with default or overwritten custom connection options. (We may revert this, will test how it performs)
+- We have changed some functions logic to use mongodb driver features instead of manual JS implementation.
+- MongoDB resource management improvements
+- And some basic changes
+
 ---
 
 _When a new version is released you can see the update notes here._

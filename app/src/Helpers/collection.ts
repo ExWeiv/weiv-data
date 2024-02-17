@@ -1,5 +1,4 @@
 import { Collection, ObjectId, Document } from 'mongodb/mongodb';
-import { type ConnectionCleanup } from '../Connection/connection_provider';
 
 /**
  * Prevents permission checks from running for the operation. (Uses AdminURI by default). Defaults to undefined.
@@ -25,16 +24,6 @@ export type ConsistentRead = boolean;
  * @public
  */
 export type EnableVisitorID = boolean;
-
-/**
- * When you want to close the MongoDB connection after the operation you make you can set this to true.
- * This will use the MongoDB's driver feature which is `close()` function to close the current connection to cluster.
- * 
- * (Note: when you close a connection you will save some resources but next call will take much more longer to complete
- * we do not recommend using this unless you know what you are doing).
- * @public
- */
-export type CleanupAfter = boolean;
 
 /**
  * Collection ID is <database>/<collection>
@@ -91,7 +80,6 @@ export interface WeivDataOptions {
     suppressAuth?: SuppressAuth,
     suppressHooks?: SuppressHooks,
     consistentRead?: ConsistentRead,
-    cleanupAfter?: CleanupAfter,
     enableVisitorId?: EnableVisitorID
 }
 
@@ -102,6 +90,5 @@ export interface WeivDataOptions {
 /** @internal */
 export type ConnectionHandlerResult = {
     collection: Collection,
-    cleanup: ConnectionCleanup,
     memberId?: string
 }

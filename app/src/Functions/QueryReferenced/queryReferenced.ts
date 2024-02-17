@@ -40,7 +40,7 @@ export async function queryReferenced(collectionId: CollectionID, targetCollecti
         }
 
         const editedItemId = convertStringId(itemId);
-        const referencedClass = new InternalWeivDataQueryReferencedResult(collectionId, targetCollectionId, editedItemId, propertyName, queryOptions, options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, consistentRead: false });
+        const referencedClass = new InternalWeivDataQueryReferencedResult(collectionId, targetCollectionId, editedItemId, propertyName, queryOptions, options || { suppressAuth: false, suppressHooks: false, consistentRead: false });
         const result = await referencedClass.getResult();
         return result;
     } catch (err) {

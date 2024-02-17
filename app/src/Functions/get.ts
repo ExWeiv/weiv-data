@@ -38,7 +38,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, consistentRead } = options || {};
 
         let editedItemId;
         if (suppressHooks != true) {
@@ -60,12 +60,8 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
             return cachedItem;
         }
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         if (item) {
             if (suppressHooks != true) {

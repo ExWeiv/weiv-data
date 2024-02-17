@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InternalWeivDataAggregateResult = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
-const connection_provider_1 = require("../Connection/connection_provider");
+const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("../Helpers/name_helpers");
 /**
  * The results of an aggregation, containing the aggregated values.
@@ -39,19 +39,15 @@ class InternalWeivDataAggregateResult {
     async getResult(suppressAuth) {
         // Setup a connection from the pool
         if (!this.collection) {
-            const { collection, cleanup } = await this.connectionHandler(suppressAuth);
+            const { collection } = await this.connectionHandler(suppressAuth);
             this.collection = collection;
-            this.cleanup = cleanup;
         }
         const items = await this.getItems();
         this.items = items;
         this.length = items.length;
         this.hasNext = () => this.currentPage * this.pageSize < length;
-        this.next = async (cleanupAfter) => {
+        this.next = async () => {
             this.currentPage++;
-            if (cleanupAfter === true) {
-                await this.cleanup();
-            }
             return this.getResult(suppressAuth);
         };
         return {
@@ -63,7 +59,7 @@ class InternalWeivDataAggregateResult {
     }
     async connectionHandler(suppressAuth) {
         try {
-            const { pool, cleanup, memberId } = await (0, connection_provider_1.useClient)(suppressAuth);
+            const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);
             if (this.dbName) {
                 this.db = pool.db(this.dbName);
             }
@@ -71,7 +67,7 @@ class InternalWeivDataAggregateResult {
                 this.db = pool.db("exweiv");
             }
             const collection = this.db.collection(this.collectionName);
-            return { collection, cleanup, memberId };
+            return { collection, memberId };
         }
         catch (err) {
             throw Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);

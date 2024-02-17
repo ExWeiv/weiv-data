@@ -31,7 +31,7 @@ async function bulkSave(collectionId, items, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, cleanupAfter, enableVisitorId, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, consistentRead } = options || {};
         let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         let editedItems = items.map(async (item) => {
             // Add _createdDate if there is not one
@@ -81,7 +81,7 @@ async function bulkSave(collectionId, items, options) {
             }
         });
         editedItems = await Promise.all(editedItems);
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const bulkOperations = editedItems.map((item) => {
             if (item._id) {
                 return {
@@ -101,9 +101,6 @@ async function bulkSave(collectionId, items, options) {
             }
         });
         const { insertedCount, modifiedCount, insertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
         if (suppressHooks != true) {
             editedItems = editedItems.map(async (item) => {
                 if (item._id) {

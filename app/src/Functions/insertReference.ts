@@ -32,20 +32,16 @@ export async function insertReference(collectionId: CollectionID, propertyName: 
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
 
-        const { suppressAuth, cleanupAfter, consistentRead } = options || {};
+        const { suppressAuth, consistentRead } = options || {};
         const references = getReferences(referencedItem);
         const itemId = getCurrentItemId(referringItem);
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { acknowledged, modifiedCount } = await collection.updateOne(
             { _id: itemId },
-            { $addToSet: { [propertyName]: { $each: references } }, $set: { _updatedDate: new Date() } },
+            { $push: { [propertyName]: { $each: references } }, $currentDate: { _updatedDate: new Date() } },
             { readConcern: consistentRead === true ? "majority" : "local" }
         );
-
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
 
         if (acknowledged) {
             if (modifiedCount <= 0) {
