@@ -47,7 +47,7 @@ async function update(collectionId, item, options) {
         const updateItem = !editedItem ? item : editedItem;
         delete updateItem._id;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate({ _id: itemId }, { $set: updateItem, $currentDate: { _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
+        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate({ _id: itemId }, { $set: { ...updateItem, _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
         if (ok === 1 && value) {
             if (suppressHooks != true) {
                 let editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [value, context]).catch((err) => {

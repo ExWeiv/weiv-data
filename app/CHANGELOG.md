@@ -221,6 +221,12 @@ In this file you can find what's changed in each version.
 - MongoDB resource management improvements
 - And some basic changes
 
+# 2.6.0
+
+- BUG Fixes
+- Performance and Memory improvements
+- Now we encrypt URIs and some other sensitive infos when storing them in cache. (Wix sites lives in a container and when container is killed anything in cache is already flushes automatically so it's not very important to encrypt data stored in global variables but we do encrypt them for better secutiry.)
+
 ---
 
 _When a new version is released you can see the update notes here._

@@ -41,23 +41,25 @@ async function bulkInsert(collectionId, items, options) {
                     throw Error(`WeivData - beforeInsert (bulkInsert) Hook Failure ${err}`);
                 });
                 if (editedItem) {
-                    return editedItem;
-                }
-                else {
-                    return item;
+                    item = editedItem;
                 }
             }
-            else {
-                return item;
-            }
+            return item;
         });
         editedItems = await Promise.all(editedItems);
+        const writeOperations = editedItems.map((value) => {
+            return {
+                insertOne: {
+                    document: value
+                }
+            };
+        });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(editedItems, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { insertedIds, insertedCount, isOk } = await collection.bulkWrite(writeOperations, { readConcern: consistentRead === true ? "majority" : "local" });
         const insertedItemIds = Object.keys(insertedIds).map((key) => {
             return insertedIds[key];
         });
-        if (acknowledged === true) {
+        if (isOk()) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedInsertItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
@@ -75,7 +77,7 @@ async function bulkInsert(collectionId, items, options) {
             return { insertedItems: editedItems, insertedItemIds, inserted: insertedCount };
         }
         else {
-            throw Error(`WeivData - Error when inserting items using bulkInsert, acknowledged: ${acknowledged}, insertedCount: ${insertedCount}`);
+            throw Error(`WeivData - Error when inserting items using bulkInsert, isOk: ${isOk()}, insertedCount: ${insertedCount}`);
         }
     }
     catch (err) {

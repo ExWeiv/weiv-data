@@ -79,7 +79,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { upsertedId, acknowledged } = await collection.updateOne(
             editedItem._id ? { _id: editedItem._id } : { _id: new ObjectId() },
-            { $set: editedItem, $currentDate: { _updatedDate: new Date() }, $setOnInsert: { _createdDate: new Date() } },
+            { $set: { ...editedItem, _updatedDate: new Date() }, $setOnInsert: !editedItem._createdDate ? { _createdDate: new Date() } : {} },
             { readConcern: consistentRead === true ? "majority" : "local", upsert: true }
         );
 

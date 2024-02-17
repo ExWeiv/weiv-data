@@ -117,6 +117,11 @@
 <td>Shared vCPU</td>
 <td>1vCPU (1 Micro Container)</td>
 </tr>
+<tr>
+<td>Security</td>
+<td>Very Good</td>
+<td>Much More Better</td>
+</tr>
 </tbody></table>
 <blockquote>
 <p>In MongoDB M0 Cluster you WON&#39;T have 100/sec limit for each class of operation you have 100/sec for any class of operation. So read/write/update/delete... sahres the same limit of 100/sec which is 6000/min</p>
@@ -211,7 +216,7 @@
 <blockquote>
 <p>If you don&#39;t create only one or two of these options defaults will be used for the one/s you didn&#39;t specify.</p>
 </blockquote>
-<a id="md:using-atlas-managed-x509" class="tsd-anchor"></a><h3><a href="#md:using-atlas-managed-x509">Using Atlas Managed X.509</a></h3><p>When we set IP address to &quot;allow any ip address&quot; it&#39;s much better to use X.509 instead of username and password. You can still use username and password method which will be fine when you are starting but we suggest X.509 method or any available method in MongoDB Atlas.</p>
+<a id="md:using-atlas-managed-x509" class="tsd-anchor"></a><h3><a href="#md:using-atlas-managed-x509">Using Atlas Managed X.509</a></h3><p>You can still use username and password method (SCRAM) which will be fine when you are starting but if you want to use X.509 here is how. Username and password method is easier and more secure with weiv-data library. Just create strong passwords!</p>
 <p>Let us explain how does weiv-data works when connecting to clusters so you can better understand which options you can use for authentication.</p>
 <blockquote>
 <p>You can also check our GitHub so you can understand how it works even create pull requests.</p>

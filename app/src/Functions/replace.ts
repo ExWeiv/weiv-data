@@ -1,4 +1,3 @@
-import { merge } from 'lodash';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
@@ -37,9 +36,6 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
 
         const context = prepareHookContext(collectionId);
         const { suppressAuth, suppressHooks, consistentRead } = options || { suppressAuth: false, suppressHooks: false };
-        const defaultValues = {
-            _updatedDate: new Date()
-        }
 
         let editedItem;
         if (suppressHooks != true) {
@@ -49,12 +45,16 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
         }
 
         const itemId = !editedItem ? convertStringId(item._id) : convertStringId(editedItem._id);
-        const replaceItem = merge(!editedItem ? item : defaultValues, editedItem);
+        const replaceItem = !editedItem ? item : editedItem;
         const filter = !itemId ? { _id: new ObjectId() } : { _id: itemId };
         delete replaceItem._id;
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { ok, value, lastErrorObject } = await collection.findOneAndReplace(filter, { $set: replaceItem }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
+        const { ok, value, lastErrorObject } = await collection.findOneAndReplace(
+            filter,
+            { $set: { ...replaceItem, _updatedDate: new Date() } },
+            { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" }
+        );
 
         if (ok === 1 && value) {
             if (suppressHooks != true) {

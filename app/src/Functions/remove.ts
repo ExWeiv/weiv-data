@@ -47,7 +47,10 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
         }
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { ok, value } = await collection.findOneAndDelete({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { ok, value } = await collection.findOneAndDelete(
+            { _id: newItemId },
+            { readConcern: consistentRead === true ? "majority" : "local" }
+        );
 
         if (ok === 1) {
             if (suppressHooks != true) {

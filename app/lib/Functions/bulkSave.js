@@ -34,12 +34,6 @@ async function bulkSave(collectionId, items, options) {
         const { suppressAuth, suppressHooks, enableVisitorId, consistentRead } = options || {};
         let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         let editedItems = items.map(async (item) => {
-            // Add _createdDate if there is not one
-            if (!item._createdDate) {
-                item._createdDate = new Date();
-            }
-            // Update _updatedDate value
-            item._updatedDate = new Date();
             if (!item._owner) {
                 item._owner = ownerId;
             }
@@ -81,13 +75,12 @@ async function bulkSave(collectionId, items, options) {
             }
         });
         editedItems = await Promise.all(editedItems);
-        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const bulkOperations = editedItems.map((item) => {
             if (item._id) {
                 return {
                     updateOne: {
                         filter: { _id: item._id },
-                        update: { $set: item },
+                        update: { $set: { ...item, _updatedDate: new Date() }, $setOnInsert: !item._createdDate ? { _createdDate: new Date() } : {} },
                         upsert: true
                     }
                 };
@@ -100,6 +93,7 @@ async function bulkSave(collectionId, items, options) {
                 };
             }
         });
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { insertedCount, modifiedCount, insertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
         if (suppressHooks != true) {
             editedItems = editedItems.map(async (item) => {

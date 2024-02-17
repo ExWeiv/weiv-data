@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Custom API Library built top of MongoDB to use with Wix/Velo websites. Clone of wix-data APIs with removed limits and faster.",
   "main": "./lib/index.js",
   "scripts": {
@@ -19,6 +19,7 @@
   "author": "ExWeiv",
   "license": "Apache-2.0",
   "dependencies": {
+    "crypto-js": "^4.2.0",
     "lodash": "^4.17.21",
     "mongodb": "^5.9.2",
     "node-cache": "^5.1.2",
@@ -26,6 +27,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.11.0",
     "@types/uuid": "^9.0.7",

@@ -61,7 +61,10 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
         }
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const item = await collection.findOne(
+            { _id: newItemId },
+            { readConcern: consistentRead === true ? "majority" : "local" }
+        );
 
         if (item) {
             if (suppressHooks != true) {

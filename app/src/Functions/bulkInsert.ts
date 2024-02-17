@@ -58,25 +58,33 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
                 });
 
                 if (editedItem) {
-                    return editedItem;
-                } else {
-                    return item;
+                    item = editedItem;
                 }
-            } else {
-                return item;
             }
+
+            return item;
         })
 
         editedItems = await Promise.all(editedItems);
+        const writeOperations = editedItems.map((value) => {
+            return {
+                insertOne: {
+                    document: value
+                }
+            }
+        })
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedIds, insertedCount, acknowledged } = await collection.insertMany(editedItems, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { insertedIds, insertedCount, isOk } = await collection.bulkWrite(
+            writeOperations,
+            { readConcern: consistentRead === true ? "majority" : "local" }
+        );
 
         const insertedItemIds = Object.keys(insertedIds).map((key: any) => {
             return insertedIds[key];
         })
 
-        if (acknowledged === true) {
+        if (isOk()) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedInsertItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
@@ -95,7 +103,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
 
             return { insertedItems: editedItems, insertedItemIds, inserted: insertedCount };
         } else {
-            throw Error(`WeivData - Error when inserting items using bulkInsert, acknowledged: ${acknowledged}, insertedCount: ${insertedCount}`);
+            throw Error(`WeivData - Error when inserting items using bulkInsert, isOk: ${isOk()}, insertedCount: ${insertedCount}`);
         }
     } catch (err) {
         throw Error(`WeivData - Error when inserting items using bulkInsert: ${err}`);

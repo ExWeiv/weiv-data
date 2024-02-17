@@ -48,16 +48,21 @@ async function bulkRemove(collectionId, itemIds, options) {
             }
         });
         editedItemIds = await Promise.all(editedItemIds);
+        const writeOperations = editedItemIds.map((editedItemId) => ({
+            deleteOne: {
+                filter: { _id: editedItemId },
+            },
+        }));
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { acknowledged, deletedCount } = await collection.deleteMany({ _id: { $in: editedItemIds } }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (acknowledged === true) {
+        const { isOk, deletedCount } = await collection.bulkWrite(writeOperations, { readConcern: consistentRead === true ? "majority" : "local" });
+        if (isOk()) {
             return {
                 removed: deletedCount,
                 removedItemIds: editedItemIds
             };
         }
         else {
-            throw Error(`WeivData - Error when removing items using bulkRemove, acknowledged: ${acknowledged}, deletedCount: ${deletedCount}`);
+            throw Error(`WeivData - Error when removing items using bulkRemove, isOk: ${isOk()}, deletedCount: ${deletedCount}`);
         }
     }
     catch (err) {

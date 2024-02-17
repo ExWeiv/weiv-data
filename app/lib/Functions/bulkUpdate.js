@@ -43,23 +43,14 @@ async function bulkUpdate(collectionId, items, options) {
                     throw Error(`WeivData - beforeUpdate (bulkUpdate) Hook Failure ${err}`);
                 });
                 if (editedItem) {
-                    return {
-                        ...editedItem,
-                        _updatedDate: new Date()
-                    };
+                    return editedItem;
                 }
                 else {
-                    return {
-                        ...item,
-                        _updatedDate: new Date()
-                    };
+                    return item;
                 }
             }
             else {
-                return {
-                    ...item,
-                    _updatedDate: new Date()
-                };
+                return item;
             }
         });
         editedItems = await Promise.all(editedItems);
@@ -67,7 +58,7 @@ async function bulkUpdate(collectionId, items, options) {
             return {
                 updateOne: {
                     filter: { _id: item._id },
-                    update: { $set: item }
+                    update: { $set: { ...item, _updatedDate: new Date() } }
                 }
             };
         });

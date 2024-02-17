@@ -24,6 +24,7 @@ This is the official documentation page for weiv-data APIs powered by **ExWeiv A
 | Multicloud                          | No                          | Yes                                 |
 | RAM                                 | Shared RAM                  | 400MB (1 Micro Container)           |
 | CPU                                 | Shared vCPU                 | 1vCPU (1 Micro Container)           |
+| Security                            | Very Good                   | Much More Better                    |
 
 > In MongoDB M0 Cluster you WON'T have 100/sec limit for each class of operation you have 100/sec for any class of operation. So read/write/update/delete... sahres the same limit of 100/sec which is 6000/min
 
@@ -173,7 +174,7 @@ In this way you can assign different certificates or options for each role.
 
 ### Using Atlas Managed X.509
 
-When we set IP address to "allow any ip address" it's much better to use X.509 instead of username and password. You can still use username and password method which will be fine when you are starting but we suggest X.509 method or any available method in MongoDB Atlas.
+You can still use username and password method (SCRAM) which will be fine when you are starting but if you want to use X.509 here is how. Username and password method is easier and more secure with weiv-data library. Just create strong passwords!
 
 Let us explain how does weiv-data works when connecting to clusters so you can better understand which options you can use for authentication.
 

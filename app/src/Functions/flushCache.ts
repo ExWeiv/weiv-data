@@ -1,5 +1,4 @@
 import { getPermissionsCache } from '../Connection/permission_helpers';
-import { getConnectionSecretsCache } from '../Connection/secret_helpers';
 import { getGetCache } from '../Functions/get';
 import { getIsReferencedCache } from '../Functions/isReferenced';
 import { getHelperSecretsCache } from '../Helpers/secret_helpers';
@@ -8,10 +7,10 @@ import { getClientCache } from '../Connection/automatic_connection_provider';
 import NodeCache from 'node-cache';
 
 /**@public */
-export type CacheSelections = "permissions" | "secrets" | "get" | "isreferenced" | "query" | "connectionsecrets" | "helpersecrets" | "connectionclients";
+export type CacheSelections = "permissions" | "secrets" | "get" | "isreferenced" | "query" | "helpersecrets" | "connectionclients";
 
 type CacheSelectionsObject = {
-    [Key in CacheSelections]: () => NodeCache | NodeCache[]; // Define the value type as a function returning any
+    [Key in CacheSelections]: () => NodeCache; // Define the value type as a function returning any
 };
 
 const cacheSelections: CacheSelectionsObject = {
@@ -19,12 +18,9 @@ const cacheSelections: CacheSelectionsObject = {
     "get": getGetCache,
     "isreferenced": getIsReferencedCache,
     "query": getQueryCache,
-    "connectionsecrets": getConnectionSecretsCache,
     "helpersecrets": getHelperSecretsCache,
     "connectionclients": getClientCache,
-    "secrets": () => {
-        return [getConnectionSecretsCache(), getHelperSecretsCache()]
-    }
+    "secrets": getHelperSecretsCache
 }
 
 /**
@@ -39,24 +35,12 @@ export function flushCache(filters: CacheSelections[]): void {
     if (filters.length > 0) {
         for (const filter of filters) {
             const cacheValue = cacheSelections[filter]();
-            if (typeof cacheValue === "string") {
-                cachesToFlush.push(cacheValue)
-            } else if (Array.isArray(cacheValue)) {
-                cachesToFlush.concat(cacheValue)
-            } else {
-                cachesToFlush.push(cacheValue)
-            }
+            cachesToFlush.push(cacheValue);
         }
     } else {
         for (const key of Object.keys(cacheSelections)) { //@ts-ignore
-            const cacheValue: NodeCache | NodeCache[] = cacheSelections[key]();
-            if (typeof cacheValue === "string") {
-                cachesToFlush.push(cacheValue)
-            } else if (Array.isArray(cacheValue)) {
-                cachesToFlush.concat(cacheValue)
-            } else {
-                cachesToFlush.push(cacheValue)
-            }
+            const cacheValue: NodeCache = cacheSelections[key]();
+            cachesToFlush.push(cacheValue);
         }
     }
 

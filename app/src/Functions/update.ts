@@ -52,7 +52,7 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { ok, value, lastErrorObject } = await collection.findOneAndUpdate(
             { _id: itemId },
-            { $set: updateItem, $currentDate: { _updatedDate: new Date() } },
+            { $set: { ...updateItem, _updatedDate: new Date() } },
             { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" }
         );
 

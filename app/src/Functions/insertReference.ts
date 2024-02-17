@@ -39,7 +39,7 @@ export async function insertReference(collectionId: CollectionID, propertyName: 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { acknowledged, modifiedCount } = await collection.updateOne(
             { _id: itemId },
-            { $push: { [propertyName]: { $each: references } }, $currentDate: { _updatedDate: new Date() } },
+            { $push: { [propertyName]: { $each: references } }, $set: { _updatedDate: new Date() } },
             { readConcern: consistentRead === true ? "majority" : "local" }
         );
 

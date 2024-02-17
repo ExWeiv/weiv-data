@@ -2,8 +2,6 @@ import { MongoClient } from 'mongodb';
 import { getMongoURI } from './permission_helpers';
 import { loadConnectionOptions, type CustomOptionsRole } from '../Helpers/connection_helpers';
 import NodeCache from 'node-cache';
-import crypto from 'crypto';
-import { getSecretKey } from '../Helpers/encrypt_helpers';
 
 const clientCache = new NodeCache({ deleteOnExpire: true });
 let expireListener = false;
@@ -16,7 +14,9 @@ export type UseClientResult = {
 
 async function setupClient(uri: string, role: CustomOptionsRole): Promise<MongoClient> {
     try {
-        const cachedClient = clientCache.get<MongoClient>(await encryptURI(uri));
+        const cachedClient = clientCache.get<MongoClient>(uri.substring(0, 19));
+        console.log("Cached Client", cachedClient, uri.substring(0, 19));
+
         if (cachedClient) {
             // If there is a cached client then return it.
             return cachedClient;
@@ -33,7 +33,7 @@ const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<Mo
     try {
         // Create a client and save it to cache
         const newMongoClient = new MongoClient(uri, await loadConnectionOptions(role));
-        clientCache.set<MongoClient>(await encryptURI(uri), newMongoClient, 60 * 5);
+        clientCache.set<MongoClient>(uri.substring(0, 19), newMongoClient, 60 * 5);
 
         if (!expireListener) {
             clientCache.on('expired', async (_key: string, value: MongoClient) => {
@@ -56,15 +56,6 @@ export async function useClient(suppressAuth: boolean = false): Promise<UseClien
     } catch (err) {
         throw Error(`WeivData - Error when connecting to cached MongoClient via useClient: ${err}`);
     }
-}
-
-const encryptURI = async (uri: string) => {
-    const secret = await getSecretKey();
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secret), iv);
-    let encrypted = cipher.update(uri, 'utf-8', 'hex');
-    encrypted += cipher.final('hex');
-    return `${iv.toString('hex')}:${encrypted}`;
 }
 
 /**@internal */

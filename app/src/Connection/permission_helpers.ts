@@ -1,8 +1,10 @@
 //@ts-ignore
 import { currentUser } from "wix-users-backend";
-import { getCachedSecret } from './secret_helpers';
+import { getCachedSecret } from '../Helpers/secret_helpers';
 import NodeCache from 'node-cache';
 import type { CustomOptionsRole } from '../Helpers/connection_helpers';
+import CryptoJS from 'crypto-js';
+import { getSecretKey } from '../Helpers/encrypt_helpers';
 
 export type GetMongoURIResult = {
     uri: string,
@@ -48,14 +50,20 @@ export async function getMongoURI(suppressAuth: boolean = false): Promise<GetMon
 const getVisitorURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Visitor (not logged in)
-        const cachedVisitorURI: string | undefined = cache.get("VisitorMongoDB_URI");
-        if (cachedVisitorURI) {
+        const cachedEncryptedVisitorURI = cache.get<CryptoJS.lib.CipherParams>("VisitorMongoDB_URI");
+        if (cachedEncryptedVisitorURI) {
+            const cachedVisitorURI = await decryptURI(cachedEncryptedVisitorURI);
             return { uri: cachedVisitorURI, role: "visitorClientOptions" };
         }
 
         const secret = await getCachedSecret("VisitorURI");
-        cache.set("VisitorMongoDB_URI", secret.toString(), 3600 * 2);
-        return { uri: secret, role: "visitorClientOptions" }
+        if (secret) {
+            const encryptedURI = await encryptURI(secret);
+            cache.set<CryptoJS.lib.CipherParams>("VisitorMongoDB_URI", encryptedURI, 60 * 5);
+            return { uri: secret, role: "visitorClientOptions" }
+        } else {
+            throw Error(`WeivData - AdminURI Secret Not Found`);
+        }
     } catch (err) {
         throw Error(`Error when getting VisitorURI: ${err}`);
     }
@@ -70,8 +78,9 @@ const getVisitorURI = async (): Promise<GetMongoURIResult> => {
 const getAdminURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Admin (permission is bypassed)
-        const cachedAdminURI: string | undefined = cache.get("AdminMongoDB_URI");
-        if (cachedAdminURI) {
+        const cachedEncryptedAdminURI = cache.get<CryptoJS.lib.CipherParams>("AdminMongoDB_URI");
+        if (cachedEncryptedAdminURI) {
+            const cachedAdminURI = await decryptURI(cachedEncryptedAdminURI);
             return {
                 uri: cachedAdminURI,
                 memberId: currentUser.id,
@@ -80,14 +89,19 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
         }
 
         const secret = await getCachedSecret("AdminURI");
-        cache.set("AdminMongoDB_URI", secret.toString(), 3600);
-        return {
-            uri: secret,
-            memberId: currentUser.id,
-            role: "adminClientOptions"
+        if (secret) {
+            const encryptedURI = await encryptURI(secret);
+            cache.set<CryptoJS.lib.CipherParams>("AdminMongoDB_URI", encryptedURI, 60 * 5);
+            return {
+                uri: secret,
+                memberId: currentUser.id,
+                role: "adminClientOptions"
+            }
+        } else {
+            throw Error(`WeivData - AdminURI Secret Not Found`);
         }
     } catch (err) {
-        throw Error(`Error when getting AdminURI: ${err}`);
+        throw Error(`WeivData - Error when getting AdminURI: ${err}`);
     }
 }
 
@@ -100,8 +114,9 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
 const getMemberURI = async (): Promise<GetMongoURIResult> => {
     try {
         //Direct Member (logged in)
-        const cachedMemberURI: string | undefined = cache.get(`MemberMongoDB_URI${currentUser.id}`);
-        if (cachedMemberURI) {
+        const cachedEncryptedMemberURI = cache.get<CryptoJS.lib.CipherParams>(`MemberMongoDB_URI${currentUser.id}`);
+        if (cachedEncryptedMemberURI) {
+            const cachedMemberURI = await decryptURI(cachedEncryptedMemberURI);
             return {
                 uri: cachedMemberURI,
                 memberId: currentUser.id,
@@ -118,21 +133,26 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
 
         const roles = await currentUser.getRoles();
         if (roles.length > 0) {
-            cache.set(`MemberRoles${currentUser.id}`, roles[0].name, 3600 * 2);
+            cache.set(`MemberRoles${currentUser.id}`, roles[0].name, 60 * 5);
             if (roles[0].name === "Admin") {
                 return getAdminURI();
             }
         } else {
-            cache.set(`MemberRoles${currentUser.id}`, "Member", 3600 * 2);
+            cache.set(`MemberRoles${currentUser.id}`, "Member", 60 * 5);
         }
 
         const secret = await getCachedSecret("MemberURI");
-        cache.set(`MemberMongoDB_URI${currentUser.id}`, secret, 3600);
+        if (secret) {
+            const encryptedURI = await encryptURI(secret);
+            cache.set<CryptoJS.lib.CipherParams>(`MemberMongoDB_URI${currentUser.id}`, encryptedURI, 60 * 5);
 
-        return {
-            uri: secret,
-            memberId: currentUser.id,
-            role: "memberClientOptions"
+            return {
+                uri: secret,
+                memberId: currentUser.id,
+                role: "memberClientOptions"
+            }
+        } else {
+            throw Error(`WeivData - AdminURI Secret Not Found`);
         }
     } catch (err) {
         throw Error(`Error when getting MemberURI: ${err}`);
@@ -142,4 +162,24 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
 /**@internal */
 export function getPermissionsCache() {
     return cache;
+}
+
+const encryptURI = async (uri: string) => {
+    const secret = await getSecretKey();
+    const encrypted = CryptoJS.AES.encrypt(uri, secret, {
+        mode: CryptoJS.mode.CBC,
+        paddding: CryptoJS.pad.Pkcs7,
+        iv: CryptoJS.lib.WordArray.random(16)
+    })
+    return encrypted;
+}
+
+const decryptURI = async (encryptedURI: CryptoJS.lib.CipherParams) => {
+    const secret = await getSecretKey();
+    const decrypted = CryptoJS.AES.decrypt(encryptedURI, secret, {
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+        iv: encryptedURI.iv
+    });
+    return decrypted.toString(CryptoJS.enc.Utf8);
 }

@@ -17,12 +17,12 @@ export async function getCachedSecret(secretName: string): Promise<string | unde
             const { value } = await getSecretValue(secretName);
             // Set the secret in the cache with a specific TTL (e.g., 1 hour)
             secret = value;
-            cache.set(secretName, value, 3600);
+            cache.set(secretName, value, 60 * 10);
         }
 
         return secret;
     } catch (err) {
-        console.error(`WeivData - Error on general cached secret helpers: ${err}`);
+        console.warn(`WeivData - Error on general cached secret helpers: ${err}`);
         return undefined;
     }
 }

@@ -49,7 +49,10 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
         }
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedId, acknowledged } = await collection.insertOne(!editedItem ? modifiedItem : editedItem, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { insertedId, acknowledged } = await collection.insertOne(
+            !editedItem ? modifiedItem : editedItem,
+            { readConcern: consistentRead === true ? "majority" : "local" }
+        );
 
         if (acknowledged) {
             if (suppressHooks != true) {

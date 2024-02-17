@@ -63,21 +63,12 @@ export async function bulkUpdate(collectionId: CollectionID, items: Items, optio
                 });
 
                 if (editedItem) {
-                    return {
-                        ...editedItem,
-                        _updatedDate: new Date()
-                    }
+                    return editedItem;
                 } else {
-                    return {
-                        ...item,
-                        _updatedDate: new Date()
-                    }
+                    return item;
                 }
             } else {
-                return {
-                    ...item,
-                    _updatedDate: new Date()
-                }
+                return item;
             }
         })
 
@@ -87,7 +78,7 @@ export async function bulkUpdate(collectionId: CollectionID, items: Items, optio
             return {
                 updateOne: {
                     filter: { _id: item._id },
-                    update: { $set: item }
+                    update: { $set: { ...item, _updatedDate: new Date() } }
                 }
             }
         })
