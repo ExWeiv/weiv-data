@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  release:
-    name: publish
+  install:
+    name: install
     runs-on: ubunutu-latest
     steps:
       - name: checkout
@@ -17,7 +17,16 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org
-      - name: 🚀 publish
+      - name: install dependencies
+        run: npm install
+        working-directory: weiv-data/app
+
+  publish:
+    runs-on: ubunutu-latest
+    needs: install
+    name: publish
+    steps:
+      - name: publish to npm
         run: npm publish --access public
         working-directory: weiv-data/app
         env:
