@@ -173,7 +173,9 @@ In this way you can assign different certificates or options for each role.
 > If you don't create only one or two of these options defaults will be used for the one/s you didn't specify.
 
 [More About Connection Options in MongoDB](https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/connection/connection-options/)
+
 [More About TLS](https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/connection/tls/)
+
 [More About Auth Options](https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/authentication/)
 
 ### Using Atlas Managed X.509

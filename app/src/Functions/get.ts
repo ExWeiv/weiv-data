@@ -82,7 +82,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
             if (enableCache) {
                 cache.set(`${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
             }
-            
+
             return item;
         } else {
             return undefined;

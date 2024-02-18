@@ -1,8 +1,14 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "2.8.0-dev",
-  "description": "Custom API Library built top of MongoDB to use with Wix/Velo websites. Clone of wix-data APIs with removed limits and faster.",
+  "version": "2.8.0",
+  "description": "Custom API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
   "main": "./lib/index.js",
+  "files": [
+    "lib",
+    "src",
+    "tsconfig.json"
+  ],
+  "types": "./src/index.ts",
   "scripts": {
     "setup": "tsc & npx typedoc"
   },
@@ -16,7 +22,10 @@
     "nosql",
     "database"
   ],
-  "author": "ExWeiv",
+  "author": {
+    "name": "ExWeiv Apps Team",
+    "email": "info@apps.exweiv.com"
+  },
   "license": "Apache-2.0",
   "dependencies": {
     "crypto-js": "^4.2.0",
@@ -35,9 +44,25 @@
     "typedoc": "^0.25.7"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "repository": {
-    "url": "https://github.com/ExWeiv/weiv-data"
+    "url": "git@github.com:ExWeiv/weiv-data.git",
+    "type": "git"
+  },
+  "homepage": "https://weivdata.exweiv.com/",
+  "bugs": {
+    "url": "https://github.com/ExWeiv/weiv-data/issues",
+    "email": "info@apps.exweiv.com"
+  },
+  "contributors": [
+    {
+      "name": "Enes Bekar",
+      "url": "https://github.com/l0eix"
+    }
+  ],
+  "engines": {
+    "node": ">=18.17.1"
   }
 }

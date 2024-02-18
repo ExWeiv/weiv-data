@@ -3,6 +3,7 @@ import type { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/col
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { convertStringId } from '../Helpers/item_helpers';
+import { isArray } from 'lodash';
 
 /**
  * You can use push function to push new values into an array field in an item.
@@ -21,11 +22,10 @@ import { convertStringId } from '../Helpers/item_helpers';
  * @param itemId ItemID to filter the _id field when performing the operation.
  * @param propertyName Property name for the array field.
  * @param value Values to push into array.
- * @param position Set the position of pushed values into array. (1 first, -1 last) *Defaults to 1 (first)
  * @param options An object containing options to use when processing this operation.
  * @returns {Promise<Item | undefined>} Fulfilled - Updated item 
  */
-export async function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, position: 1 | -1 = 1, options?: WeivDataOptions): Promise<Item | undefined> {
+export async function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | undefined> {
     try {
         if (!collectionId || !itemId || !value || !propertyName) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value, propertyName`);
@@ -48,7 +48,7 @@ export async function push(collectionId: CollectionID, itemId: ItemID, propertyN
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndUpdate(
             { _id: convertStringId(itemId) },
-            { $push: { [editedModify.propertyName]: editedModify.value, $position: position } },
+            { $push: { [editedModify.propertyName]: isArray(editedModify.value) ? { $each: editedModify.value } : editedModify.value } },
             { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false }
         );
 
