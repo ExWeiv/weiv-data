@@ -39,7 +39,8 @@
     "registry": "https://npm.pkg.github.com"
   },
   "repository": {
-    "url": "https://github.com/ExWeiv/weiv-data"
+    "url": "https://github.com/ExWeiv/weiv-data",
+    "type": "git"
   },
   "homepage": "https://weivdata.exweiv.com/",
   "bugs": {
@@ -53,7 +54,4 @@
       "url": "https://github.com/l0eix"
     }
   ],
-  "engines": {
-    "node": ">=18.17.1"
-  }
 }
