@@ -1,0 +1,24 @@
+name: "🚀 Publish"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: 🚀 publish
+    runs-on: ubunutu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org
+      - name: 🚀 publish
+        run: npm publish --access public
+        working-directory: weiv-data
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
