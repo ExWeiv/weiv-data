@@ -24,6 +24,7 @@ jobs:
     needs: install
     name: publish
     steps:
+      - run: ls
       - name: publish to npm
         run: npm publish --access public
         working-directory: weiv-data/app
