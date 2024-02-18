@@ -1,0 +1,59 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+  tsc:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: TypeScript compile
+      run: npm run tsc
+      working-directory: ./app
+
+  generate-docs:
+    needs: tsc
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Generate documentation
+      run: npx typedoc
+      working-directory: ./app
+
+  deploy-docs:
+    needs: generate-docs
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy documentation
+      run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}
+
+  npm-publish:
+    needs: deploy-docs
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Publish to NPM
+      run: npm publish
+      working-directory: ./app
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
