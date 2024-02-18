@@ -248,7 +248,7 @@ Ask for help, give feedback or anything else? info@apps.exweiv.com
 
 - [Docs](https://weiv-data.web.app/)
 - [Install - NPM](https://www.npmjs.com/package/@exweiv/weiv-data)
-- [Updates / Changelog](https://github.com/ExWeiv/weiv-data/blob/main/app/CHANGELOG.md)
+- [Changelog](https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md)
 
 ---
 
