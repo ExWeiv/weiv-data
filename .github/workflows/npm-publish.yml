@@ -16,6 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 16
+      - run: cd app
       - run: npm install
 
   publish-npm:
