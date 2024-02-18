@@ -21,14 +21,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Print working dir
-        run: cd app
-
   tsc:
     needs: build-and-deploy
     runs-on: ubuntu-latest
 
     steps:
+      - name: Move to app
+        run: cd app
+
       - name: TypeScript compile
         run: npm run tsc
 
@@ -37,6 +37,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Move to app
+        run: cd app
+
       - name: Generate documentation
         run: npx typedoc
 
@@ -53,6 +56,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Move to app
+        run: cd app
+
       - name: Publish to NPM
         run: npm publish
         env:
