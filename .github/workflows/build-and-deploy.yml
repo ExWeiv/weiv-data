@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Print working dir
-        run: ls
+        run: cd app
 
   tsc:
     needs: build-and-deploy
@@ -31,7 +31,6 @@ jobs:
     steps:
       - name: TypeScript compile
         run: npm run tsc
-        working-directory: "/home/runner/work/weiv-data/weiv-data/app/"
 
   generate-docs:
     needs: tsc
@@ -40,7 +39,6 @@ jobs:
     steps:
       - name: Generate documentation
         run: npx typedoc
-        working-directory: app
 
   deploy-docs:
     needs: generate-docs
@@ -57,6 +55,5 @@ jobs:
     steps:
       - name: Publish to NPM
         run: npm publish
-        working-directory: app
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
