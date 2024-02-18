@@ -5,7 +5,6 @@ const query_referenced_helpers_1 = require("../../Helpers/query_referenced_helpe
 const automatic_connection_provider_1 = require("../../Connection/automatic_connection_provider");
 const name_helpers_1 = require("../../Helpers/name_helpers");
 class InternalWeivDataQueryReferencedResult {
-    /**@internal */
     constructor(collectionId, targetCollectionId, itemId, propertyName, queryOptions, options) {
         this.currentPage = 0;
         this.pageSize = 50;
@@ -22,7 +21,6 @@ class InternalWeivDataQueryReferencedResult {
         this.pageSize = queryOptions.pageSize || 50;
         this.order = queryOptions.order;
     }
-    /**@internal */
     getPipelineOptions() {
         return {
             pageSize: this.pageSize,
@@ -30,7 +28,6 @@ class InternalWeivDataQueryReferencedResult {
             order: this.order
         };
     }
-    /**@internal */
     async getItems() {
         try {
             const { consistentRead } = this.options;
@@ -41,7 +38,6 @@ class InternalWeivDataQueryReferencedResult {
             throw Error(`WeivData - Error when getting items for queryReferenced result: ${err}`);
         }
     }
-    /**@internal */
     async getResult() {
         try {
             const { suppressAuth } = this.options;
@@ -89,7 +85,6 @@ class InternalWeivDataQueryReferencedResult {
             throw Error(`WeivData - Error when running queryReferenced function: ${err}`);
         }
     }
-    /**@internal */
     async connectionHandler(suppressAuth) {
         try {
             const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);

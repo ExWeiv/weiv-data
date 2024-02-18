@@ -3,30 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeReference = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const reference_helpers_1 = require("../Helpers/reference_helpers");
-/**
- * Removes a reference from the specified property.
- *
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- *
- * // Item id
- * const itemId = "..."
- *
- * // References to be removed. `ItemId[]`
- * const cpus = ["cpuId1", "cpuId3"]
- *
- * const result = await weivData.removeReference("Clusters/Ortakoy", "availableCPUs", itemId, cpus, {suppressAuth: true})
- * console.log(result);
- * ```
- *
- * @param collectionId The ID of the collection that contains the referring item.
- * @param propertyName The property to remove the reference from.
- * @param referringItem The referring item or referring item's ID.
- * @param referencedItem The referenced item, referenced item's ID, an array of referenced items, or an array of referenced item IDs.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<void>} Fulfilled - When the references have been removed. Rejected - The error that caused the rejection.
- */
 async function removeReference(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
         if (!collectionId || !propertyName || !referringItem || !referencedItem) {

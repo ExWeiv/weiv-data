@@ -5,25 +5,6 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
-/**
- * Updates a number of items in a collection.
- *
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- *
- * // Items that will be bulk updated
- * const itemsToUpdate = [{...}, {...}, {...}]
- *
- * const result = await weivData.bulkUpdate("Clusters/Odunpazari", itemsToUpdate)
- * console.log(result);
- * ```
- *
- * @param collectionId The ID of the collection that contains the item to update.
- * @param items The items to update.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<WeivDataBulkUpdateResult>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
- */
 async function bulkUpdate(collectionId, items, options) {
     try {
         if (!collectionId || !items) {
@@ -63,7 +44,7 @@ async function bulkUpdate(collectionId, items, options) {
             };
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { matchedCount } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { modifiedCount } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
         if (suppressHooks != true) {
             editedItems = editedItems.map(async (item) => {
                 const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
@@ -79,7 +60,7 @@ async function bulkUpdate(collectionId, items, options) {
             editedItems = await Promise.all(editedItems);
         }
         return {
-            updated: matchedCount,
+            updated: modifiedCount,
             updatedItems: editedItems
         };
     }

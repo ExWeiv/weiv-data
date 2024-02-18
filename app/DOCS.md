@@ -232,6 +232,14 @@ You need to name your functions correctly to let hooks work. The syntax is like 
 
 > Both database name and collection name should be all lowercase.
 
+### Manual or Automatic Pool Management
+
+If you want to use automatic pool management do not set min or max pool size in your custom connection options. In this way it will be handled by MongoDB driver and weiv-data library won't connect to cluster manually instead it will return a not connected MongoClient and driver will handle the connection when an operation starts.
+
+If you want to manually configure it you can set min or max (or both) pool size in custom connection options. In this way our library will call the .connect method and it will return a connected client when performing operations.
+
+MongoClients are cached and saved so after cold start it will be cached for 5 min. (Wix Container Time)
+
 <br>
 
 ---

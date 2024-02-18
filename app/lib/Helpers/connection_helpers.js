@@ -24,20 +24,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadConnectionOptions = exports.connectionHandler = void 0;
-//@ts-ignore
 const customConnectionOptions = __importStar(require("../../../../../../../../../user-code/backend/WeivData/connection-options"));
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("./name_helpers");
 const defaultOptions = {
-    maxPoolSize: 50,
-    minPoolSize: 5,
-    maxIdleTimeMS: 30000,
-    socketTimeoutMS: 30000,
-    connectTimeoutMS: 30000,
     tls: true,
 };
 async function connectionHandler(collectionId, suppressAuth = false) {
     try {
+        const started = new Date();
         let db;
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);
@@ -48,6 +43,8 @@ async function connectionHandler(collectionId, suppressAuth = false) {
             db = pool.db("exweiv");
         }
         const collection = db.collection(collectionName);
+        const completed = new Date() - started;
+        console.log("Connection is ready in: " + completed.toFixed(2) + "ms");
         return { collection, memberId };
     }
     catch (err) {

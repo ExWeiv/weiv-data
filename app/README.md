@@ -8,7 +8,7 @@ The official [weiv-data APIs](https://www.npmjs.com/package/@exweiv/weiv-data) f
 
 You can use this library whenever you want it's all up to you. But we recommend to use this library when you are building something large/complex and when you expect a lot of traffic. Or you want faster results from your database operations. There are more scenarios when you can use this library if you want to learn more take a look to our docs.
 
-> You can also use native mongodb collection functions with this library. Learn more about `.native` function in docs.
+> You can also use native mongodb collection cursor with this library. Learn more about `.native` function in docs.
 
 You can find more info at our **[Official Docs](https://weiv-data.web.app/)**.
 

@@ -22,7 +22,6 @@ function checkPipelineArray(pipeline) {
 exports.checkPipelineArray = checkPipelineArray;
 function sortAggregationPipeline(pipeline) {
     if (pipeline) {
-        //@ts-ignore
         pipeline = (0, lodash_1.sortBy)(pipeline, (stage) => customPipelineSortOrder[Object.keys(stage)[0]]);
         const totalGroup = (0, lodash_1.filter)(pipeline, (stage) => stage["$group"]).length;
         if (totalGroup > 1) {

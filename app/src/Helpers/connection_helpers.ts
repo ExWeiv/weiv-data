@@ -6,16 +6,12 @@ import { Db, MongoClientOptions } from 'mongodb/mongodb';
 import { type CollectionID, type ConnectionHandlerResult } from './collection';
 
 const defaultOptions: MongoClientOptions = {
-    maxPoolSize: 50,
-    minPoolSize: 5,
-    maxIdleTimeMS: 30000,
-    socketTimeoutMS: 30000,
-    connectTimeoutMS: 30000,
     tls: true,
 }
 
 export async function connectionHandler(collectionId: CollectionID, suppressAuth: boolean = false): Promise<ConnectionHandlerResult> {
     try {
+        const started = new Date();
         let db: Db | undefined;
         const { dbName, collectionName } = splitCollectionId(collectionId);
         const { pool, memberId } = await useClient(suppressAuth);
@@ -26,7 +22,9 @@ export async function connectionHandler(collectionId: CollectionID, suppressAuth
             db = pool.db("exweiv");
         }
 
-        const collection = db.collection(collectionName);
+        const collection = db.collection(collectionName); //@ts-ignore
+        const completed = new Date() - started;
+        console.log("Connection is ready in: " + completed.toFixed(2) + "ms");
         return { collection, memberId };
     } catch (err) {
         throw Error(`WeivData - Error when trying to connect to database via useClient and Mongo Client ${err}`);

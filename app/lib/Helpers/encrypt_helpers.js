@@ -4,10 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSecretKey = void 0;
-const crypto_1 = __importDefault(require("crypto")); //@ts-ignore
+const crypto_1 = __importDefault(require("crypto"));
 const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
 const secret_helpers_1 = require("./secret_helpers");
-/**@internal */
 async function getSecretKey() {
     try {
         const cachedSecret = await (0, secret_helpers_1.getCachedSecret)("WeivDataURIEncryptSecret");

@@ -5,25 +5,6 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
-/**
- * Removes a number of items from a collection.
- *
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- *
- * // Item IDs that will be bulk removed
- * const itemsToRemove = ["...", "...", "..."]
- *
- * const result = await weivData.bulkRemove("Clusters/Odunpazari", itemsToRemove)
- * console.log(result);
- * ```
- *
- * @param collectionId The ID of the collection to remove the items from.
- * @param itemIds IDs of the items to remove.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<WeivDataBulkRemoveResult | null>} Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
- */
 async function bulkRemove(collectionId, itemIds, options) {
     try {
         if (!collectionId || !itemIds) {
@@ -48,21 +29,23 @@ async function bulkRemove(collectionId, itemIds, options) {
             }
         });
         editedItemIds = await Promise.all(editedItemIds);
-        const writeOperations = editedItemIds.map((editedItemId) => ({
-            deleteOne: {
-                filter: { _id: editedItemId },
-            },
-        }));
+        const writeOperations = editedItemIds.map((itemId) => {
+            return {
+                deleteOne: {
+                    filter: { _id: itemId },
+                }
+            };
+        });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { isOk, deletedCount } = await collection.bulkWrite(writeOperations, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (isOk()) {
+        const { deletedCount } = await collection.bulkWrite(writeOperations, { readConcern: consistentRead === true ? "majority" : "local" });
+        if (deletedCount) {
             return {
                 removed: deletedCount,
                 removedItemIds: editedItemIds
             };
         }
         else {
-            throw Error(`WeivData - Error when removing items using bulkRemove, isOk: ${isOk()}, deletedCount: ${deletedCount}`);
+            throw Error(`WeivData - Error when removing items using bulkRemove, deletedCount: ${deletedCount}`);
         }
     }
     catch (err) {

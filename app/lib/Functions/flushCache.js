@@ -16,25 +16,25 @@ const cacheSelections = {
     "connectionclients": automatic_connection_provider_1.getClientCache,
     "secrets": secret_helpers_1.getHelperSecretsCache
 };
-/**
- * Use when you want to flush the caches internally. You can choose caches to flush or pass empty array to flush all of them.
- *
- * @param filters Filter which cache to flush. Pass empty array to flush all of them.
- * @public
- */
 function flushCache(filters) {
     const cachesToFlush = [];
-    if (filters.length > 0) {
-        for (const filter of filters) {
-            const cacheValue = cacheSelections[filter]();
-            cachesToFlush.push(cacheValue);
+    if (filters) {
+        if (filters.length > 0) {
+            for (const filter of filters) {
+                const cacheValue = cacheSelections[filter]();
+                cachesToFlush.push(cacheValue);
+            }
+        }
+        else {
+            for (const key of Object.keys(cacheSelections)) {
+                const cacheValue = cacheSelections[key]();
+                cachesToFlush.push(cacheValue);
+            }
         }
     }
-    else {
-        for (const key of Object.keys(cacheSelections)) { //@ts-ignore
-            const cacheValue = cacheSelections[key]();
-            cachesToFlush.push(cacheValue);
-        }
+    for (const key of Object.keys(cacheSelections)) {
+        const cacheValue = cacheSelections[key]();
+        cachesToFlush.push(cacheValue);
     }
     for (const cacheData of cachesToFlush) {
         cacheData.flushAll();

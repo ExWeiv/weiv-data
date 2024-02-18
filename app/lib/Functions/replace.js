@@ -6,29 +6,6 @@ const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const mongodb_1 = require("mongodb");
-/**
- * Replaces and item in a collection. The item you passed with `item` param will take the place of existing data/document in your collection.
- *
- * This function has it's own hooks _beforeUpdate_ and _afterUpdate_ is not used here instead _beforeReplace_ and _afterReplace_ is used.
- *
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- *
- * // An item with an id
- * const updatedVersion = {...}
- * // Options for the operation
- * const options = {suppressHooks: true};
- *
- * const result = await weivData.replace("Clusters/IST57", updatedVersion, options)
- * console.log(result);
- * ```
- *
- * @param collectionId The ID of the collection that contains the item to replace.
- * @param item The item to replace.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item>} Fulfilled - The object that was replaced. Rejected - The error that caused the rejection.
- */
 async function replace(collectionId, item, options) {
     try {
         if (!collectionId || !item._id) {

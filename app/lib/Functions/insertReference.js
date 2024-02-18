@@ -3,30 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertReference = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const reference_helpers_1 = require("../Helpers/reference_helpers");
-/**
- * Inserts a reference in the specified property.
- *
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- *
- * // Item id
- * const itemId = "..."
- *
- * // References to be inserted. `ItemId[]`
- * const cpus = ["cpuId2", "cpuId4"]
- *
- * const result = await weivData.insertReference("Clusters/Ortakoy", "availableCPUs", itemId, cpus)
- * console.log(result);
- * ```
- *
- * @param collectionId The ID of the collection that contains the referring item.
- * @param propertyName The property to insert the reference into.
- * @param referringItem The referring item or referring item's ID.
- * @param referencedItem The referenced item, referenced item's ID, an array of referenced items, or an array of referenced item IDs.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<void>} Fulfilled - When the references have been inserted. Rejected - The error that caused the rejection.
- */
 async function insertReference(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
         if (!collectionId || !propertyName || !referringItem || !referencedItem) {

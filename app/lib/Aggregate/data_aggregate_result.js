@@ -4,14 +4,7 @@ exports.InternalWeivDataAggregateResult = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("../Helpers/name_helpers");
-/**
- * The results of an aggregation, containing the aggregated values.
- * @internal
- */
 class InternalWeivDataAggregateResult {
-    /**
-     * @internal
-     */
     constructor(collectionId) {
         this.pageSize = 50;
         this.currentPage = 1;
@@ -37,7 +30,6 @@ class InternalWeivDataAggregateResult {
         return items;
     }
     async getResult(suppressAuth) {
-        // Setup a connection from the pool
         if (!this.collection) {
             const { collection } = await this.connectionHandler(suppressAuth);
             this.collection = collection;

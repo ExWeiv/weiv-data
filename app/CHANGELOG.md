@@ -221,11 +221,19 @@ In this file you can find what's changed in each version.
 - MongoDB resource management improvements
 - And some basic changes
 
-# 2.6.0
+### 2.6.X
+
+- BUG/Error Fixes
+- Performance and Memory improvements
+- Now we encrypt URIs and some other sensitive infos when storing them in cache. (Wix sites lives in a container and when container is killed anything in cache is already flushes automatically so it's not very important to encrypt data stored in global variables but we do encrypt them for better secutiry.)
+- From 2.6.0 we will log every change like this: 2.6.X (sub versions will be included in parent version)
+
+### 2.7.X
 
 - BUG Fixes
 - Performance and Memory improvements
-- Now we encrypt URIs and some other sensitive infos when storing them in cache. (Wix sites lives in a container and when container is killed anything in cache is already flushes automatically so it's not very important to encrypt data stored in global variables but we do encrypt them for better secutiry.)
+- Now you can select between manual connection management or automatic management by MongoDB driver.
+- Versions before 2.6.9 are unstable and contains direct errors that blocks library to work correctly.
 
 ---
 
