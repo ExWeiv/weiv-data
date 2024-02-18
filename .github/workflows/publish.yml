@@ -1,7 +1,9 @@
-name: "🚀 Publish"
+name: "🚀 Deploy New Version"
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   install:
@@ -28,8 +30,10 @@ jobs:
     needs: install
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_WEIV_DATA }}"
