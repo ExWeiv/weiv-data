@@ -1,6 +1,6 @@
 # CHANGELOG of weiv-data
 
-In this file you can find what's changed in each version.
+In this file you can find what's changed in each version. (Versions with -dev, -test tags can contain BUG/s and errors don't use them in production)
 
 ---
 
