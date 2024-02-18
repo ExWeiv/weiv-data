@@ -83,6 +83,16 @@ export interface WeivDataOptions {
     enableVisitorId?: EnableVisitorID
 }
 
+/**
+ * Control the cache mechanism in weiv-data and optimize your read operations by saving results. Cache is disabled by default.
+ * 
+ * @public
+ */
+export interface WeivDataOptionsCache extends WeivDataOptions {
+    enableCache?: boolean
+    cacheTimeout?: number,
+}
+
 //---------------------------------------------//
 //              Internal Types                 //
 //---------------------------------------------//

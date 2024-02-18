@@ -21,6 +21,14 @@ const idConverter_1 = require("./Functions/idConverter");
 const flushCache_1 = require("./Functions/flushCache");
 const native_1 = require("./Functions/native");
 const replace_1 = require("./Functions/replace");
+const findOne_1 = require("./Functions/Helpers/findOne");
+const getAndRemove_1 = require("./Functions/Helpers/getAndRemove");
+const getAndReplace_1 = require("./Functions/Helpers/getAndReplace");
+const getAndUpdate_1 = require("./Functions/Helpers/getAndUpdate");
+const multiply_1 = require("./Functions/multiply");
+const increment_1 = require("./Functions/increment");
+const push_1 = require("./Functions/push");
+const pull_1 = require("./Functions/pull");
 module.exports = {
     aggregate: (collectionId) => new data_aggregate_1.WeivDataAggregate(collectionId),
     filter: () => new data_filter_1.WeivDataFilter(),
@@ -43,5 +51,13 @@ module.exports = {
     idConverter: idConverter_1.idConverter,
     flushCache: flushCache_1.flushCache,
     native: native_1.native,
-    replace: replace_1.replace
+    replace: replace_1.replace,
+    findOne: findOne_1.findOne,
+    getAndRemove: getAndRemove_1.getAndRemove,
+    getAndReplace: getAndReplace_1.getAndReplace,
+    getAndUpdate: getAndUpdate_1.getAndUpdate,
+    multiply: multiply_1.multiply,
+    increment: increment_1.increment,
+    push: push_1.push,
+    pull: pull_1.pull
 };

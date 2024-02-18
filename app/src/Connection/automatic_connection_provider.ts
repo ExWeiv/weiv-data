@@ -13,8 +13,6 @@ let listeners = false;
 let manual = false;
 
 async function setupClient(uri: string, role: CustomOptionsRole): Promise<MongoClient> {
-    console.log("Setup Client: ", listeners, manual);
-
     try {
         // Return existing client in cache
         const cachedClient = clientCache.get<MongoClient>(uri.slice(0, 20));
@@ -61,13 +59,13 @@ const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<Mo
             clientCache.on('expire', async (_key: string, client: MongoClient) => {
                 client.removeAllListeners();
                 await client.close();
-                console.log("Client Expired and Connection Closed, Listeners Removed");
+                console.info("Client Expired and Connection Closed, Listeners Removed");
             });
 
             clientCache.on('del', async (_key: string, client: MongoClient) => {
                 client.removeAllListeners();
                 await client.close();
-                console.log("Client Deleted and Connection Closed, Listeners Removed");
+                console.info("Client Deleted and Connection Closed, Listeners Removed");
             });
 
             listeners = true;

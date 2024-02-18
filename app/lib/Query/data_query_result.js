@@ -8,9 +8,8 @@ const automatic_connection_provider_1 = require("../Connection/automatic_connect
 const lodash_1 = require("lodash");
 const node_cache_1 = __importDefault(require("node-cache"));
 const cache = new node_cache_1.default({
-    stdTTL: 30,
     checkperiod: 5,
-    useClones: true,
+    useClones: false,
     deleteOnExpire: true
 });
 class InternalWeivDataQueryResult {
@@ -19,10 +18,12 @@ class InternalWeivDataQueryResult {
         this.consistentRead = false;
         this.pageSize = 50;
         this.currentPage = 1;
-        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection } = options;
+        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, cacheTimeout, enableCache } = options;
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
             throw Error(`WeivData - Required Param/s Missing`);
         }
+        this.cacheTimeout = cacheTimeout;
+        this.enableCache = enableCache;
         this.collection = collection;
         this.consistentRead = consistentRead || false;
         this.suppressAuth = suppressAuth || false;
@@ -132,9 +133,11 @@ class InternalWeivDataQueryResult {
     async getResult() {
         try {
             const cacheKey = this.generateCacheKey();
-            const cachedResult = cache.get(cacheKey);
-            if (cachedResult) {
-                return cachedResult;
+            if (this.enableCache) {
+                const cachedResult = cache.get(cacheKey);
+                if (cachedResult) {
+                    return cachedResult;
+                }
             }
             if (!this.collection) {
                 const { collection } = await this.connectionHandler(this.suppressAuth);
@@ -173,7 +176,9 @@ class InternalWeivDataQueryResult {
                     return this.getResult();
                 }
             };
-            cache.set(cacheKey, result);
+            if (this.enableCache) {
+                cache.set(cacheKey, result, this.cacheTimeout);
+            }
             return result;
         }
         catch (err) {

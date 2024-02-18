@@ -27,7 +27,7 @@ async function remove(collectionId, itemId, options) {
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { ok, value } = await collection.findOneAndDelete({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (ok === 1) {
+        if (ok === 1 && value) {
             if (suppressHooks != true) {
                 let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterRemove', [value, context]).catch((err) => {
                     throw Error(`WeivData - afterRemove Hook Failure ${err}`);

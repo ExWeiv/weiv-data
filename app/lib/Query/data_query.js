@@ -360,7 +360,7 @@ class WeivDataQuery {
     }
     async runQuery(options) {
         try {
-            const { suppressAuth, suppressHooks, consistentRead } = options || {};
+            const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
             const { collection } = await this.connectionHandler(suppressAuth);
             const context = (0, hook_helpers_1.prepareHookContext)(this.collectionId);
             let editedQurey;
@@ -379,6 +379,8 @@ class WeivDataQuery {
             };
             classInUse.filtersHandler();
             const result = await new data_query_result_1.InternalWeivDataQueryResult({
+                enableCache: enableCache || false,
+                cacheTimeout: cacheTimeout || 15,
                 suppressAuth,
                 consistentRead,
                 collection,

@@ -6,9 +6,8 @@ import type { ConnectionHandlerResult, Items } from "../Helpers/collection";
 import type { LookupObject, ReferenceLenghtObject } from "./data_query";
 
 const cache = new NodeCache({
-    stdTTL: 30,
     checkperiod: 5,
-    useClones: true,
+    useClones: false,
     deleteOnExpire: true
 })
 
@@ -79,6 +78,8 @@ export interface WeivDataQueryResult {
 
 /** @internal */
 export type DataQueryResultOptions = {
+    enableCache: boolean,
+    cacheTimeout: number,
     suppressAuth?: boolean,
     consistentRead?: boolean,
     pageSize: number,
@@ -111,14 +112,18 @@ export class InternalWeivDataQueryResult {
     private queryOptions!: QueryResultQueryOptions;
     private db!: Db;
     private collection!: Collection;
+    private cacheTimeout: number;
+    private enableCache: boolean;
 
     constructor(options: DataQueryResultOptions) {
-        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection } = options;
+        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, cacheTimeout, enableCache } = options;
 
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
             throw Error(`WeivData - Required Param/s Missing`);
         }
 
+        this.cacheTimeout = cacheTimeout;
+        this.enableCache = enableCache;
         this.collection = collection;
         this.consistentRead = consistentRead || false;
         this.suppressAuth = suppressAuth || false;
@@ -249,10 +254,12 @@ export class InternalWeivDataQueryResult {
     async getResult(): Promise<WeivDataQueryResult> {
         try {
             const cacheKey = this.generateCacheKey();
-            const cachedResult = cache.get(cacheKey) as WeivDataQueryResult | undefined;
 
-            if (cachedResult) {
-                return cachedResult;
+            if (this.enableCache) {
+                const cachedResult = cache.get(cacheKey) as WeivDataQueryResult | undefined;
+                if (cachedResult) {
+                    return cachedResult;
+                }
             }
 
             if (!this.collection) {
@@ -293,7 +300,10 @@ export class InternalWeivDataQueryResult {
                 }
             }
 
-            cache.set(cacheKey, result);
+            if (this.enableCache) {
+                cache.set(cacheKey, result, this.cacheTimeout);
+            }
+
             return result;
         } catch (err) {
             throw Error(`WeivData - Error when using query: ${err}`);

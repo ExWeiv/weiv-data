@@ -20,6 +20,14 @@ import { idConverter } from './Functions/idConverter';
 import { flushCache } from './Functions/flushCache';
 import { native } from './Functions/native';
 import { replace } from './Functions/replace';
+import { findOne } from './Functions/Helpers/findOne';
+import { getAndRemove } from './Functions/Helpers/getAndRemove';
+import { getAndReplace } from './Functions/Helpers/getAndReplace';
+import { getAndUpdate } from './Functions/Helpers/getAndUpdate';
+import { multiply } from './Functions/multiply';
+import { increment } from './Functions/increment';
+import { push } from './Functions/push';
+import { pull } from './Functions/pull';
 
 /**@internal */
 import { CollectionID } from "./Helpers/collection";
@@ -46,5 +54,13 @@ export = {
     idConverter,
     flushCache,
     native,
-    replace
+    replace,
+    findOne,
+    getAndRemove,
+    getAndReplace,
+    getAndUpdate,
+    multiply,
+    increment,
+    push,
+    pull
 }

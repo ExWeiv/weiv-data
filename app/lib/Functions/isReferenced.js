@@ -9,9 +9,8 @@ const reference_helpers_1 = require("../Helpers/reference_helpers");
 const lodash_1 = require("lodash");
 const node_cache_1 = __importDefault(require("node-cache"));
 const cache = new node_cache_1.default({
-    stdTTL: 30,
     checkperiod: 5,
-    useClones: true,
+    useClones: false,
     deleteOnExpire: true
 });
 async function isReferenced(collectionId, propertyName, referringItem, referencedItem, options) {
@@ -22,22 +21,28 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
         if ((0, lodash_1.isArray)(referencedItem)) {
             throw Error(`WeivData - Wrong item type for referencedItem, it shouldn't be an array`);
         }
+        const { suppressAuth, consistentRead, enableCache, cacheTimeout } = options || {};
         const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
-        const cachedItem = cache.get(cacheKey);
-        if (cachedItem) {
-            return cachedItem;
+        if (enableCache) {
+            const cachedItem = cache.get(cacheKey);
+            if (cachedItem) {
+                return cachedItem;
+            }
         }
-        const { suppressAuth, consistentRead } = options || {};
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const totalCount = await collection.countDocuments({ _id: itemId, [propertyName]: { $in: references } }, { readConcern: consistentRead === true ? "majority" : "local" });
         if (totalCount > 0) {
-            cache.set(cacheKey, true);
+            if (enableCache) {
+                cache.set(cacheKey, true, cacheTimeout || 15);
+            }
             return true;
         }
         else {
-            cache.set(cacheKey, false);
+            if (enableCache) {
+                cache.set(cacheKey, false, cacheTimeout || 15);
+            }
             return false;
         }
     }

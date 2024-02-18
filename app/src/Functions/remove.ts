@@ -52,7 +52,7 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
             { readConcern: consistentRead === true ? "majority" : "local" }
         );
 
-        if (ok === 1) {
+        if (ok === 1 && value) {
             if (suppressHooks != true) {
                 let editedItem = await runDataHook<'afterRemove'>(collectionId, 'afterRemove', [value, context]).catch((err) => {
                     throw Error(`WeivData - afterRemove Hook Failure ${err}`);

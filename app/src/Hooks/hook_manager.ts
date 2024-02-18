@@ -4,50 +4,63 @@
 import * as data_hooks from '../../../../../../../../../user-code/backend/WeivData/data';
 import { splitCollectionId } from '../Helpers/name_helpers';
 import { type CollectionID } from '../Helpers/collection';
-import type { ObjectId } from 'mongodb';
-import type { Item } from '../Helpers/collection';
+import type { Item, ItemID } from '../Helpers/collection';
 import type { WeivDataQuery } from '../Query/data_query';
 
-/**@internal */
-export type HookContext = {
+/**@public */
+export interface HookContext {
     dbName: string;
     collectionName: string;
     userId?: string;
     userRoles: any[] | undefined;
 }
 
-/** @internal */
-export type HookName = 'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' | 'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate' | 'beforeReplace' | 'afterReplace';
+/**
+ * List of available hooks.
+ * 
+ * @public */
+export type HookName =
+    'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' |
+    'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate' |
+    'beforeReplace' | 'afterReplace' | 'beforeFindOne' | 'afterFindOne' | 'beforeGetAndUpdate' |
+    'afterGetAndUpdate' | 'beforeGetAndReplace' | 'afterGetAndReplace' | 'beforeGetAndRemove' | 'afterGetAndRemove' |
+    'beforeIncrement' | 'afterIncrement' | 'beforeMultiply' | 'afterMultiply' | 'beforePush' | 'afterPush' |
+    'beforePull' | 'afterPull';
 
-/** @internal */
+/**
+ * List of hook params and values.
+ * 
+ * @public */
 export type HookArgs<HookName> =
-    HookName extends 'beforeGet' ? [item: string | ObjectId, context: HookContext] :
-    HookName extends 'afterGet' ? [item: Item, context: HookContext] :
+    HookName extends 'beforeGet' ? [item: ItemID, context: HookContext] :
     HookName extends 'beforeCount' ? [item: WeivDataQuery, context: HookContext] :
     HookName extends 'afterCount' ? [item: number, context: HookContext] :
-    HookName extends 'beforeInsert' ? [item: Item, context: HookContext] :
-    HookName extends 'afterInsert' ? [item: Item, context: HookContext] :
     HookName extends 'beforeQuery' ? [item: WeivDataQuery, context: HookContext] :
-    HookName extends 'afterQuery' ? [item: Item, context: HookContext] :
-    HookName extends 'beforeRemove' ? [item: string | ObjectId, context: HookContext] :
-    HookName extends 'beforeUpdate' ? [item: Item, context: HookContext] :
-    HookName extends 'afterUpdate' ? [item: Item, context: HookContext] :
-    HookName extends 'beforeReplace' ? [item: Item, context: HookContext] :
-    HookName extends 'afterReplace' ? [item: Item, context: HookContext] :
-    [item: any, context: HookContext];
+    HookName extends 'beforeRemove' ? [item: ItemID, context: HookContext] :
+    HookName extends 'beforeFindOne' ? [item: { propertyName: string, value: any }, context: HookContext] :
+    HookName extends 'beforeGetAndRemove' ? [item: ItemID, context: HookContext] :
+    HookName extends 'beforeIncrement' ? [item: { propertyName: string, value: number }, context: HookContext] :
+    HookName extends 'beforeMultiply' ? [item: { propertyName: string, value: number }, context: HookContext] :
+    HookName extends 'beforePush' ? [item: { propertyName: string, value: any }, context: HookContext] :
+    HookName extends 'beforePull' ? [item: { propertyName: string, value: any }, context: HookContext] :
+    [item: Item, context: HookContext];
 
-/** @internal */
+/**
+ * List of expected values from hooks if returns.
+ * 
+ * @public */
 export type HooksResult<HookName> =
-    HookName extends 'beforeGet' ? string | ObjectId :
-    HookName extends 'afterGet' ? Item :
+    HookName extends 'beforeGet' ? ItemID :
     HookName extends 'beforeCount' ? WeivDataQuery :
     HookName extends 'afterCount' ? number :
-    HookName extends 'beforeInsert' ? Item :
     HookName extends 'beforeQuery' ? WeivDataQuery :
-    HookName extends 'afterQuery' ? Item :
-    HookName extends 'beforeRemove' ? string | ObjectId :
-    HookName extends 'afterUpdate' ? Item :
-    HookName extends 'afterReplace' ? Item :
+    HookName extends 'beforeRemove' ? ItemID :
+    HookName extends 'beforeFindOne' ? { propertyName: string, value: any } :
+    HookName extends 'beforeGetAndRemove' ? ItemID :
+    HookName extends 'beforeIncrement' ? { propertyName: string, value: number } :
+    HookName extends 'beforeMultiply' ? { propertyName: string, value: number } :
+    HookName extends 'beforePush' ? { propertyName: string, value: any } :
+    HookName extends 'beforePull' ? { propertyName: string, value: any } :
     Item;
 
 
