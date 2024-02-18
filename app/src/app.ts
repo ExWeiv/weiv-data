@@ -71,6 +71,30 @@ export { native } from './Functions/native';
 /**@public */
 export { replace } from './Functions/replace';
 
+/**@public */
+export { findOne } from './Functions/Helpers/findOne';
+
+/**@public */
+export { getAndRemove } from './Functions/Helpers/getAndRemove';
+
+/**@public */
+export { getAndReplace } from './Functions/Helpers/getAndReplace';
+
+/**@public */
+export { getAndUpdate } from './Functions/Helpers/getAndUpdate';
+
+/**@public */
+export { increment } from './Functions/increment';
+
+/**@public */
+export { multiply } from './Functions/multiply';
+
+/**@public */
+export { push } from './Functions/push';
+
+/**@public */
+export { pull } from './Functions/pull';
+
 //---------------------------------------------//
 //             Types + Interfaces              //
 //---------------------------------------------//
@@ -101,7 +125,8 @@ export type {
     ItemID,
     Items,
     ItemIDs,
-    WeivDataOptions
+    WeivDataOptions,
+    WeivDataOptionsCache
 } from './Helpers/collection';
 
 /**@public */
@@ -127,3 +152,6 @@ export { CacheSelections } from './Functions/flushCache';
 
 /**@public */
 export { ReferencedItem, ReferringItem } from './Helpers/reference_helpers';
+
+/**@public */
+export { HookName, HookArgs, HooksResult, HookContext } from './Hooks/hook_manager';

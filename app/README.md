@@ -1,6 +1,7 @@
 # weiv-data Node.js APIs
 
 [![Build for Velo by Wix](https://img.shields.io/badge/Built%20for-Velo%20by%20Wix-3638f4)](https://wix.com/velo)
+[![🚀 GitHub](https://github.com/ExWeiv/weiv-data/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/ExWeiv/weiv-data/actions/workflows/publish.yml)
 
 The official [weiv-data APIs](https://www.npmjs.com/package/@exweiv/weiv-data) for Node.js to build web applications using MongoDB inside Wix with Velo. Only limited by MongoDB and your pocket. Not limited by wix-data APIs since you won't use them.
 

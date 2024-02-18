@@ -3,12 +3,11 @@ import { convertStringId } from '../Helpers/item_helpers';
 import NodeCache from "node-cache";
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/collection';
+import { CollectionID, Item, ItemID, WeivDataOptionsCache } from '../Helpers/collection';
 
 const cache = new NodeCache({
-    stdTTL: 30,
     checkperiod: 5,
-    useClones: true,
+    useClones: false,
     deleteOnExpire: true
 })
 
@@ -31,14 +30,14 @@ const cache = new NodeCache({
  * @param options An object containing options to use when processing this operation.
  * @returns {Promise<Item | undefined>} Fulfilled - The retrieved item or null if not found. Rejected - The error that caused the rejection.
  */
-export async function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | undefined> {
+export async function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsCache): Promise<Item | undefined> {
     try {
         if (!collectionId || !itemId) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
 
         let editedItemId;
         if (suppressHooks != true) {
@@ -54,11 +53,14 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
             newItemId = convertStringId(itemId);
         }
 
-        const cacheKey = `${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`;
-        const cachedItem = cache.get(cacheKey);
-        if (cachedItem && !editedItemId) {
-            return cachedItem;
+        if (enableCache) {
+            const cacheKey = `${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`;
+            const cachedItem = cache.get(cacheKey);
+            if (cachedItem && !editedItemId) {
+                return cachedItem;
+            }
         }
+
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOne(
@@ -77,7 +79,10 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
                 }
             }
 
-            cache.set(`${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`, item);
+            if (enableCache) {
+                cache.set(`${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
+            }
+            
             return item;
         } else {
             return undefined;

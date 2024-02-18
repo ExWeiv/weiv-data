@@ -6,7 +6,7 @@ import { splitCollectionId } from '../Helpers/name_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
-import { ConnectionHandlerResult, WeivDataOptions } from '../Helpers/collection';
+import { ConnectionHandlerResult, WeivDataOptions, WeivDataOptionsCache } from '../Helpers/collection';
 
 /**@public */
 export interface IncludeObject {
@@ -778,9 +778,9 @@ export class WeivDataQuery {
 
     // HELPER FUNCTIONS IN CLASS
     /** @internal */
-    private async runQuery(options?: WeivDataOptions): Promise<WeivDataQueryResult> {
+    private async runQuery(options?: WeivDataOptionsCache): Promise<WeivDataQueryResult> {
         try {
-            const { suppressAuth, suppressHooks, consistentRead } = options || {};
+            const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
             const { collection } = await this.connectionHandler(suppressAuth);
 
             const context = prepareHookContext(this.collectionId);
@@ -805,6 +805,8 @@ export class WeivDataQuery {
             // Add filters to query
             classInUse.filtersHandler();
             const result = await new InternalWeivDataQueryResult({
+                enableCache: enableCache || false,
+                cacheTimeout: cacheTimeout || 15,
                 suppressAuth,
                 consistentRead,
                 collection,

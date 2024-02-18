@@ -1,13 +1,12 @@
-import type { CollectionID, WeivDataOptions } from '../Helpers/collection';
+import type { CollectionID, WeivDataOptionsCache } from '../Helpers/collection';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { type ReferencedItem, type ReferringItem, getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
 import { isArray } from 'lodash';
 import NodeCache from "node-cache";
 
 const cache = new NodeCache({
-    stdTTL: 30,
     checkperiod: 5,
-    useClones: true,
+    useClones: false,
     deleteOnExpire: true
 })
 
@@ -35,7 +34,7 @@ const cache = new NodeCache({
  * @param options An object containing options to use when processing this operation.
  * @returns {Promise<boolean>} Fulfilled - Whether the referring item contains a reference to the referenced item or not. Rejected - The error that caused the rejection.
  */
-export async function isReferenced(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<boolean> {
+export async function isReferenced(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptionsCache): Promise<boolean> {
     try {
         if (!collectionId || !propertyName || !referringItem || !referencedItem) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
@@ -45,14 +44,16 @@ export async function isReferenced(collectionId: CollectionID, propertyName: str
             throw Error(`WeivData - Wrong item type for referencedItem, it shouldn't be an array`);
         }
 
+        const { suppressAuth, consistentRead, enableCache, cacheTimeout } = options || {};
+
         const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
-        const cachedItem: boolean | undefined = cache.get(cacheKey);
-        if (cachedItem) {
-            return cachedItem;
+        if (enableCache) {
+            const cachedItem = cache.get<boolean>(cacheKey);
+            if (cachedItem) {
+                return cachedItem;
+            }
         }
 
-
-        const { suppressAuth, consistentRead } = options || {};
         const references = getReferences(referencedItem);
         const itemId = getCurrentItemId(referringItem);
 
@@ -63,10 +64,14 @@ export async function isReferenced(collectionId: CollectionID, propertyName: str
         );
 
         if (totalCount > 0) {
-            cache.set(cacheKey, true);
+            if (enableCache) {
+                cache.set(cacheKey, true, cacheTimeout || 15);
+            }
             return true;
         } else {
-            cache.set(cacheKey, false);
+            if (enableCache) {
+                cache.set(cacheKey, false, cacheTimeout || 15);
+            }
             return false;
         }
     } catch (err) {

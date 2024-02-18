@@ -32,7 +32,6 @@ const defaultOptions = {
 };
 async function connectionHandler(collectionId, suppressAuth = false) {
     try {
-        const started = new Date();
         let db;
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);
@@ -43,8 +42,6 @@ async function connectionHandler(collectionId, suppressAuth = false) {
             db = pool.db("exweiv");
         }
         const collection = db.collection(collectionName);
-        const completed = new Date() - started;
-        console.log("Connection is ready in: " + completed.toFixed(2) + "ms");
         return { collection, memberId };
     }
     catch (err) {

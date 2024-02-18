@@ -13,7 +13,6 @@ const statusCache = new node_cache_1.default({ useClones: false });
 let listeners = false;
 let manual = false;
 async function setupClient(uri, role) {
-    console.log("Setup Client: ", listeners, manual);
     try {
         const cachedClient = clientCache.get(uri.slice(0, 20));
         if (cachedClient) {
@@ -52,12 +51,12 @@ const createNewClient = async (uri, role) => {
             clientCache.on('expire', async (_key, client) => {
                 client.removeAllListeners();
                 await client.close();
-                console.log("Client Expired and Connection Closed, Listeners Removed");
+                console.info("Client Expired and Connection Closed, Listeners Removed");
             });
             clientCache.on('del', async (_key, client) => {
                 client.removeAllListeners();
                 await client.close();
-                console.log("Client Deleted and Connection Closed, Listeners Removed");
+                console.info("Client Deleted and Connection Closed, Listeners Removed");
             });
             listeners = true;
         }
