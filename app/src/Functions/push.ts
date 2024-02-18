@@ -3,6 +3,7 @@ import type { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/col
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { convertStringId } from '../Helpers/item_helpers';
+import { isArray } from 'lodash';
 
 /**
  * You can use push function to push new values into an array field in an item.
@@ -47,7 +48,7 @@ export async function push(collectionId: CollectionID, itemId: ItemID, propertyN
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndUpdate(
             { _id: convertStringId(itemId) },
-            { $push: { [editedModify.propertyName]: editedModify.value } },
+            { $push: { [editedModify.propertyName]: isArray(editedModify.value) ? { $each: editedModify.value } : editedModify.value } },
             { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false }
         );
 
