@@ -36,7 +36,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org"
   },
   "repository": {
     "url": "https://github.com/ExWeiv/weiv-data",
@@ -53,5 +53,8 @@
       "name": "Enes Bekar",
       "url": "https://github.com/l0eix"
     }
-  ]
+  ],
+  "engines": {
+    "node": ">=18.17.1"
+  }
 }
