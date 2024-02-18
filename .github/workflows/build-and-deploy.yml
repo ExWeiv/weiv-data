@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Print working dir
-        run: pwd
+        run: ls
 
   tsc:
     needs: build-and-deploy
