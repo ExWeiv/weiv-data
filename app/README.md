@@ -12,6 +12,8 @@ You can use this library whenever you want it's all up to you. But we recommend 
 
 You can find more info at our **[Official Docs](https://weiv-data.web.app/)**.
 
+[Read changelog here](https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md)
+
 ---
 
 Please report BUGs and leave your feedbacks. info@apps.exweiv.com or you can create an issue in [GitHub repo](https://github.com/ExWeiv/weiv-data/issues).
