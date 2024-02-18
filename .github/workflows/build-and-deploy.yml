@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Move to app
-        run: cd app
+        run: ls
 
       - name: TypeScript compile
         run: npm run tsc
