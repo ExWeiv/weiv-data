@@ -24,25 +24,8 @@ jobs:
           name: weiv-data
           path: .
 
-  create_docs:
-    needs: install
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download files
-        uses: actions/download-artifact@v4
-        with:
-          name: weiv-data
-          path: .
-      - name: Create Docs using NPX
-        run: npx typedoc
-      - name: Upload files
-        uses: actions/upload-artifact@v4
-        with:
-          name: weiv-data
-          path: .
-
   deploy_to_firebase:
-    needs: create_docs
+    needs: install
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
