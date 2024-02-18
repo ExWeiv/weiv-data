@@ -28,7 +28,7 @@ jobs:
     steps:
     - name: TypeScript compile
       run: npm run tsc
-      working-directory: /app
+      working-directory: app
 
   generate-docs:
     needs: tsc
@@ -37,7 +37,7 @@ jobs:
     steps:
     - name: Generate documentation
       run: npx typedoc
-      working-directory: /app
+      working-directory: app
 
   deploy-docs:
     needs: generate-docs
@@ -54,6 +54,6 @@ jobs:
     steps:
     - name: Publish to NPM
       run: npm publish
-      working-directory: /app
+      working-directory: app
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
