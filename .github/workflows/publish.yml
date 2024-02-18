@@ -1,9 +1,7 @@
 name: "🚀 Publish"
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   install:
@@ -19,7 +17,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: install dependencies
         run: npm install
-        working-directory: weiv-data/app
+        working-directory: app
 
   publish:
     runs-on: ubuntu-latest
