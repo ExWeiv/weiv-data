@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: "14"
 
+      - name: Move to app
+        run: cd app
+
       - name: Install dependencies
         run: npm install
 
