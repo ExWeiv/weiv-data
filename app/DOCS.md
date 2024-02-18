@@ -246,7 +246,7 @@ MongoClients are cached and saved so after cold start it will be cached for 5 mi
 
 Ask for help, give feedback or anything else? info@apps.exweiv.com
 
-- [Docs](https://weiv-data.web.app/)
+- [Docs](https://weivdata.exweiv.com/)
 - [Install - NPM](https://www.npmjs.com/package/@exweiv/weiv-data)
 - [Changelog](https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md)
 

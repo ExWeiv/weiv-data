@@ -1,0 +1,59 @@
+name: "🚀 Deploy New Version"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  install:
+    name: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org
+      - name: install dependencies
+        run: npm install
+        working-directory: app
+      - name: Upload files
+        uses: actions/upload-artifact@v4
+        with:
+          name: weiv-data
+          path: .
+
+  deploy_to_firebase:
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_WEIV_DATA }}"
+          projectId: weiv-data
+          channelId: live
+
+  publish_to_npm:
+    needs: deploy_to_firebase
+    runs-on: ubuntu-latest
+    steps:
+      - name: node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org
+      - name: Download files
+        uses: actions/download-artifact@v4
+        with:
+          name: weiv-data
+          path: .
+      - name: publish
+        run: npm publish --access public
+        working-directory: app
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
