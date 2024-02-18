@@ -1,7 +1,14 @@
 import { connectionHandler } from '../../Helpers/connection_helpers';
-import type { CollectionID, Item, WeivDataOptions } from '../../Helpers/collection';
+import type { CollectionID, Item, WeivDataOptionsCache } from '../../Helpers/collection';
 import { prepareHookContext } from '../../Helpers/hook_helpers';
 import { runDataHook } from '../../Hooks/hook_manager';
+import NodeCache from 'node-cache';
+
+const cache = new NodeCache({
+    checkperiod: 5,
+    useClones: false,
+    deleteOnExpire: true
+})
 
 /**
  * You can use findOne to find a single item from your collections based on .eq filter
@@ -20,14 +27,14 @@ import { runDataHook } from '../../Hooks/hook_manager';
  * @param options An object containing options to use when processing this operation.
  * @returns {Promise<Item | undefined>} Fulfilled - Updated item 
  */
-export async function findOne(collectionId: CollectionID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | undefined> {
+export async function findOne(collectionId: CollectionID, propertyName: string, value: any, options?: WeivDataOptionsCache): Promise<Item | undefined> {
     try {
         if (!collectionId || !propertyName || !value) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, value`);
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
 
         let editedFilter = { propertyName, value };
         if (suppressHooks != true) {
@@ -37,6 +44,14 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
 
             if (modifiedFilter) {
                 editedFilter = modifiedFilter;
+            }
+        }
+
+        if (enableCache) {
+            const cacheKey = `${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`;
+            const cachedItem = cache.get(cacheKey);
+            if (cachedItem) {
+                return cachedItem;
             }
         }
 
@@ -55,6 +70,10 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
                 if (modifiedResult) {
                     return modifiedResult;
                 }
+            }
+
+            if (enableCache) {
+                cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, item, cacheTimeout || 15);
             }
 
             return item;
