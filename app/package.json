@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "2.8.0-dev-2",
+  "version": "2.8.0-dev-3",
   "description": "Custom API Library built top of MongoDB to use with Wix/Velo websites. Clone of wix-data APIs with removed limits and faster.",
   "main": "./lib/index.js",
   "scripts": {
@@ -38,5 +38,23 @@
     "access": "public",
     "registry": "https://npm.pkg.github.com"
   },
-  "repository": "https://github.com/ExWeiv/weiv-data"
+  "repository": {
+    "url": "https://github.com/ExWeiv/weiv-data",
+    "type": "git"
+  },
+  "homepage": "https://weivdata.exweiv.com/",
+  "bugs": {
+    "url": "https://github.com/ExWeiv/weiv-data/issues",
+    "email": "info@apps.exweiv.com"
+  },
+  "typings": "weiv-data.d.ts",
+  "contributors": [
+    {
+      "name": "Enes Bekar",
+      "url": "https://github.com/l0eix"
+    }
+  ],
+  "engines": {
+    "node": ">=18.17.1"
+  }
 }
