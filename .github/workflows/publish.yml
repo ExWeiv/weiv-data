@@ -1,9 +1,7 @@
 name: "🚀 Deploy New Version"
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   install:
