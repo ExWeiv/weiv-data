@@ -35,9 +35,8 @@
     "typedoc": "^0.25.7"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
   },
-  "repository": {
-    "url": "https://github.com/ExWeiv/weiv-data"
-  }
+  "repository": "https://github.com/ExWeiv/weiv-data"
 }
