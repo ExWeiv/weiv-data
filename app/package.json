@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "2.8.0-dev-4",
+  "version": "2.8.0",
   "description": "Custom API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
   "main": "./lib/index.js",
   "files": [
@@ -9,7 +9,7 @@
     "tsconfig.json",
     "weiv-data.d.ts"
   ],
-  "types": "weiv-data.d.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "setup": "tsc & npx typedoc"
   },
