@@ -1,34 +1,45 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.update = void 0;
-const lodash_1 = require("lodash");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
 const item_helpers_1 = require("../Helpers/item_helpers");
+const hook_manager_1 = require("../Hooks/hook_manager");
+const hook_helpers_1 = require("../Helpers/hook_helpers");
 async function update(collectionId, item, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("CollectionID is required when updating an item from a collection");
+        if (!collectionId || !item._id) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item._id`);
         }
-        if (!item._id) {
-            (0, log_handlers_1.reportError)("_id is required in the item object when updating");
+        const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
+        const { suppressAuth, suppressHooks, consistentRead } = options || { suppressAuth: false, suppressHooks: false };
+        let editedItem;
+        if (suppressHooks != true) {
+            editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
+                throw Error(`WeivData - beforeUpdate Hook Failure ${err}`);
+            });
         }
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        const defaultValues = {
-            _updatedDate: new Date()
-        };
-        item._id = (0, item_helpers_1.convertStringId)(item._id);
-        item = (0, lodash_1.merge)(item, defaultValues);
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        await collection.updateOne({ _id: item._id }, { $set: item }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (cleanupAfter === true) {
-            await cleanup();
+        const itemId = !editedItem ? (0, item_helpers_1.convertStringId)(item._id) : (0, item_helpers_1.convertStringId)(editedItem._id);
+        const updateItem = !editedItem ? item : editedItem;
+        delete updateItem._id;
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate({ _id: itemId }, { $set: { ...updateItem, _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
+        if (ok === 1 && value) {
+            if (suppressHooks != true) {
+                let editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [value, context]).catch((err) => {
+                    throw Error(`WeivData - afterUpdate Hook Failure ${err}`);
+                });
+                if (editedResult) {
+                    return editedResult;
+                }
+            }
+            return value;
         }
-        return item;
+        else {
+            throw Error(`WeivData - Error when updating an item, acknowledged: ${lastErrorObject}`);
+        }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when updating an item: ${err}`);
     }
 }
 exports.update = update;

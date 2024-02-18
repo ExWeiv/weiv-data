@@ -1,36 +1,49 @@
-import _ from 'lodash';
+//@ts-nocheck
+import type { Item, ItemID, Items, ItemIDs } from './collection';
 import { convertStringId } from './item_helpers';
-import { ObjectId } from 'mongodb/mongodb';
-import { reportError } from '../Log/log_handlers'
+import type { ObjectId } from 'mongodb';
+
+/**
+ * Referring item can be the item itself that contains the _id key or directly the item id.
+ * 
+ * @public
+ */
+export type ReferringItem = Item | ItemID;
+
+/**
+ * Referenced item can be the item itself that contains the _id key or directly the item id.
+ * There can be more than one referenced item and if so you can put the values we defined above in an array.
+ * So it can also be Array<Item> or Array<ItemID>
+ * 
+ * @public
+ */
+export type ReferencedItem = Item | ItemID | Items | ItemIDs;
 
 export const getCurrentItemId = (referringItem: ReferringItem): ObjectId => {
-    if (_.isString(referringItem)) {
+    if (typeof referringItem === 'object' && referringItem !== null && referringItem._id !== undefined && referringItem._id) {
+        // Handle object cases:
+        const id = referringItem._id;
+        return convertStringId(id); // Use convertStringId to handle string or ObjectId
+    } else if (typeof referringItem === 'string') {
+        // Create ObjectId from string using convertStringId:
         return convertStringId(referringItem);
-    } else if (_.isObject(referringItem) && !_.isArray(referringItem)) {
-        return convertStringId(referringItem._id);
+    } else if (ObjectId.isValid(referringItem)) {
+        // Already an ObjectId, return it directly:
+        return referringItem;
     } else {
-        reportError("Wrong referringItem type");
+        throw new Error('WeivData - Error: Invalid value type, expected object with _id, string, or ObjectId');
     }
 }
 
 export const getReferences = (referencedItem: ReferencedItem): ObjectId[] => {
-    if (_.isString(referencedItem)) {
-        // Single String (Converted ID)
-        return [convertStringId(referencedItem)];
-    } else if (_.isObject(referencedItem) && !_.isArray(referencedItem)) {
-        // Single Object (Converted ID)
-        return [convertStringId(referencedItem._id)];
-    } else if (_.isObject(referencedItem) && _.isArray(referencedItem)) {
-        if (_.every(referencedItem, (element) => _.isString(element))) {
-            // Array of Strings (Converted to Array of IDs)
-            return referencedItem.map((itemId) => convertStringId(itemId))
-        } else if (_.every(referencedItem, (element) => _.isObject(element))) {
-            // Array of Objects (Converted to Array of IDs)
-            return referencedItem.map((item) => convertStringId(item._id));
-        } else {
-            reportError("Wrong referencedItem type")
-        }
+    if (Array.isArray(referencedItem)) {
+        // Handle arrays (Items or ItemIDs):
+        return referencedItem.flatMap((itemOrId) => getReferences(itemOrId)); // Recursively handle elements
+    } else if (typeof referencedItem === 'object' && referencedItem !== null && referencedItem._id !== undefined && referencedItem._id) {
+        // Handle objects (Items):
+        return [getReferences(referencedItem._id)]; // Extract, process, and wrap in an array
     } else {
-        reportError("Wrong referencedItem type")
+        // Handle string or ObjectId (ItemID) using convertStringId:
+        return [convertStringId(referencedItem)]; // Leverage the helper function for conversion
     }
 }

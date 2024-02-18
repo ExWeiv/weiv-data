@@ -1,7 +1,17 @@
-# weivData APIs
+# weiv-data Node.js APIs
 
-Connect MongoDB to your Wix website without wixData limits. Custom APIs designed to easily switch from wixData. Remove any wix-data platform limits with these APIs and only limited by MongoDB's limits. (You'll still be limited by backend limits of Wix if you use Wix's backend)
+<br>
 
-> Designed for backend use only don't use in frontend for better security.
+- [Docs](https://weivdata.exweiv.com/)
+- [Install - NPM](https://www.npmjs.com/package/@exweiv/weiv-data)
+- [Changelog](https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md)
 
-| THIS PACKAGE IS STILL UNDER DEVELOPMENT AND NOT READY
+<br>
+
+---
+
+<br>
+
+Powered by ExWeiv
+
+<img src="https://static.wixstatic.com/shapes/510eca_43b52053314d4ad689df41b907baef42.svg" width="120px">

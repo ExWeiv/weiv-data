@@ -1,0 +1,18 @@
+{
+    "out": "../docs",
+    "theme": "default",
+    "exclude": [
+        "node_modules/**/*",
+        "lib/**/*",
+    ],
+    "name": "weiv-data Library Documentation - ExWeiv Apps",
+    "readme": "DOCS.md",
+    "entryPoints": [
+        "src/app.ts"
+    ],
+    "skipErrorChecking": true,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeInternal": true,
+    "excludeExternals": true
+}

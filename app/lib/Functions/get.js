@@ -1,32 +1,72 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get = void 0;
+exports.getGetCache = exports.get = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
 const item_helpers_1 = require("../Helpers/item_helpers");
+const node_cache_1 = __importDefault(require("node-cache"));
+const hook_manager_1 = require("../Hooks/hook_manager");
+const hook_helpers_1 = require("../Helpers/hook_helpers");
+const cache = new node_cache_1.default({
+    checkperiod: 5,
+    useClones: false,
+    deleteOnExpire: true
+});
 async function get(collectionId, itemId, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("CollectionID is required when getting an item from a collection");
+        if (!collectionId || !itemId) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
-        if (!itemId) {
-            (0, log_handlers_1.reportError)("ItemId is required when getting an item from a collection");
+        const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
+        const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
+        let editedItemId;
+        if (suppressHooks != true) {
+            editedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGet", [itemId, context]).catch((err) => {
+                throw Error(`WeivData - beforeGet Hook Failure ${err}`);
+            });
         }
-        const { suppressAuth, suppressHooks, cleanupAfter, consistentRead } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
-        itemId = (0, item_helpers_1.convertStringId)(itemId);
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: itemId }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (cleanupAfter === true) {
-            await cleanup();
+        let newItemId;
+        if (editedItemId) {
+            newItemId = (0, item_helpers_1.convertStringId)(editedItemId);
         }
-        if (!item) {
-            (0, log_handlers_1.reportError)("Item not found in collection");
+        else {
+            newItemId = (0, item_helpers_1.convertStringId)(itemId);
         }
-        return item;
+        if (enableCache) {
+            const cacheKey = `${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`;
+            const cachedItem = cache.get(cacheKey);
+            if (cachedItem && !editedItemId) {
+                return cachedItem;
+            }
+        }
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const item = await collection.findOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
+        if (item) {
+            if (suppressHooks != true) {
+                let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterGet', [item, context]).catch((err) => {
+                    throw Error(`WeivData - afterGet Hook Failure ${err}`);
+                });
+                if (editedItem) {
+                    return editedItem;
+                }
+            }
+            if (enableCache) {
+                cache.set(`${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
+            }
+            return item;
+        }
+        else {
+            return undefined;
+        }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when trying to get item from the collectin by itemId: ${err}`);
     }
 }
 exports.get = get;
+function getGetCache() {
+    return cache;
+}
+exports.getGetCache = getGetCache;

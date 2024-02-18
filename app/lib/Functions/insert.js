@@ -4,32 +4,46 @@ exports.insert = void 0;
 const lodash_1 = require("lodash");
 const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
+const hook_manager_1 = require("../Hooks/hook_manager");
+const hook_helpers_1 = require("../Helpers/hook_helpers");
 async function insert(collectionId, item, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("CollectionID is required when inserting an item in a collection");
+        if (!collectionId || !item) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
-        const { suppressAuth, suppressHooks, cleanupAfter, enableOwnerId } = options || { suppressAuth: false, suppressHooks: false, cleanupAfter: false, enableOwnerId: true };
+        const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
+        const { suppressAuth, suppressHooks, enableVisitorId, consistentRead } = options || {};
         const defaultValues = {
             _updatedDate: new Date(),
             _createdDate: new Date(),
-            _owner: ""
         };
-        if (enableOwnerId === true) {
-            defaultValues._owner = await (0, member_id_helpers_1.getOwnerId)();
+        defaultValues["_owner"] = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
+        const modifiedItem = (0, lodash_1.merge)(defaultValues, item);
+        let editedItem;
+        if (suppressHooks != true) {
+            editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [modifiedItem, context]).catch((err) => {
+                throw Error(`WeivData - beforeInsert Hook Failure ${err}`);
+            });
         }
-        item = (0, lodash_1.merge)(item, defaultValues);
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { insertedId } = await collection.insertOne(item);
-        if (cleanupAfter === true) {
-            await cleanup();
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { insertedId, acknowledged } = await collection.insertOne(!editedItem ? modifiedItem : editedItem, { readConcern: consistentRead === true ? "majority" : "local" });
+        if (acknowledged) {
+            if (suppressHooks != true) {
+                const editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [{ ...!editedItem ? modifiedItem : editedItem, _id: insertedId }, context]).catch((err) => {
+                    throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                });
+                if (editedResult) {
+                    return editedResult;
+                }
+            }
+            return { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
         }
-        return { ...item, _id: insertedId };
+        else {
+            throw Error(`WeivData - Error when inserting an item into a collection, acknowledged: ${acknowledged}`);
+        }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when inserting an item into a collection: ${err}`);
     }
 }
 exports.insert = insert;

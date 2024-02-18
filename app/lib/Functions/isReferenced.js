@@ -3,46 +3,55 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isReferenced = void 0;
+exports.getIsReferencedCache = exports.isReferenced = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const log_handlers_1 = require("../Log/log_handlers");
 const reference_helpers_1 = require("../Helpers/reference_helpers");
-const lodash_1 = __importDefault(require("lodash"));
+const lodash_1 = require("lodash");
+const node_cache_1 = __importDefault(require("node-cache"));
+const cache = new node_cache_1.default({
+    checkperiod: 5,
+    useClones: false,
+    deleteOnExpire: true
+});
 async function isReferenced(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
-        if (!collectionId) {
-            (0, log_handlers_1.reportError)("Collection and Database name is required");
+        if (!collectionId || !propertyName || !referringItem || !referencedItem) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
-        if (!propertyName) {
-            (0, log_handlers_1.reportError)("Property name is required");
+        if ((0, lodash_1.isArray)(referencedItem)) {
+            throw Error(`WeivData - Wrong item type for referencedItem, it shouldn't be an array`);
         }
-        if (!referringItem) {
-            (0, log_handlers_1.reportError)("Referring item is required");
+        const { suppressAuth, consistentRead, enableCache, cacheTimeout } = options || {};
+        const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
+        if (enableCache) {
+            const cachedItem = cache.get(cacheKey);
+            if (cachedItem) {
+                return cachedItem;
+            }
         }
-        if (!referencedItem) {
-            (0, log_handlers_1.reportError)("Referenced item is required");
-        }
-        if (lodash_1.default.isArray(referencedItem)) {
-            (0, log_handlers_1.reportError)("Wrong type for referencedItem");
-        }
-        const { suppressAuth, cleanupAfter, consistentRead } = options || { suppressAuth: false, cleanupAfter: false, consistentRead: false };
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
-        const { collection, cleanup } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const totalCount = await collection.countDocuments({ _id: itemId, [propertyName]: { $in: references } }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (cleanupAfter === true) {
-            await cleanup();
-        }
         if (totalCount > 0) {
+            if (enableCache) {
+                cache.set(cacheKey, true, cacheTimeout || 15);
+            }
             return true;
         }
         else {
+            if (enableCache) {
+                cache.set(cacheKey, false, cacheTimeout || 15);
+            }
             return false;
         }
     }
     catch (err) {
-        console.error(err);
-        return err;
+        throw Error(`WeivData - Error when checking if item is referenced: ${err}`);
     }
 }
 exports.isReferenced = isReferenced;
+function getIsReferencedCache() {
+    return cache;
+}
+exports.getIsReferencedCache = getIsReferencedCache;

@@ -1,53 +1,56 @@
+import { WeivDataOptions, CollectionID } from '../Helpers/collection';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { reportError } from '../Log/log_handlers';
-import { getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
+import { type ReferencedItem, type ReferringItem, getCurrentItemId, getReferences } from '../Helpers/reference_helpers';
 
 /**
- * @description Inserts a reference in the specified property.
+ * Inserts a reference in the specified property.
+ * 
+ * @example
+ * ```
+ * import weivData from '@exweiv/weiv-data';
+ * 
+ * // Item id
+ * const itemId = "..."
+ * 
+ * // References to be inserted. `ItemId[]`
+ * const cpus = ["cpuId2", "cpuId4"]
+ * 
+ * const result = await weivData.insertReference("Clusters/Ortakoy", "availableCPUs", itemId, cpus)
+ * console.log(result);
+ * ```
+ * 
  * @param collectionId The ID of the collection that contains the referring item.
  * @param propertyName The property to insert the reference into.
  * @param referringItem The referring item or referring item's ID.
  * @param referencedItem The referenced item, referenced item's ID, an array of referenced items, or an array of referenced item IDs.
  * @param options An object containing options to use when processing this operation.
- * @returns Fulfilled - When the references have been inserted. Rejected - The error that caused the rejection.
+ * @returns {Promise<void>} Fulfilled - When the references have been inserted. Rejected - The error that caused the rejection.
  */
-export async function insertReference(collectionId: string, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<void> {
+export async function insertReference(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<void> {
     try {
-        if (!collectionId) {
-            reportError("Collection and Database name is required");
+        if (!collectionId || !propertyName || !referringItem || !referencedItem) {
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
 
-        if (!propertyName) {
-            reportError("Property name is required");
-        }
-
-        if (!referringItem) {
-            reportError("Referring item is required");
-        }
-
-        if (!referencedItem) {
-            reportError("Referenced item/s required");
-        }
-
-        const { suppressAuth, cleanupAfter, consistentRead } = options || { suppressAuth: false, cleanupAfter: false, consistentRead: false };
+        const { suppressAuth, consistentRead } = options || {};
         const references = getReferences(referencedItem);
         const itemId = getCurrentItemId(referringItem);
 
-        const { collection, cleanup } = await connectionHandler(collectionId, suppressAuth);
-        const { modifiedCount } = await collection.updateOne(
+        const { collection } = await connectionHandler(collectionId, suppressAuth);
+        const { acknowledged, modifiedCount } = await collection.updateOne(
             { _id: itemId },
-            { $addToSet: { [propertyName]: { $each: references } }, $set: { _updatedDate: new Date() } },
+            { $push: { [propertyName]: { $each: references } }, $set: { _updatedDate: new Date() } },
             { readConcern: consistentRead === true ? "majority" : "local" }
         );
 
-        if (modifiedCount <= 0) {
-            reportError("Operation is not succeed");
-        }
-
-        if (cleanupAfter === true) {
-            await cleanup();
+        if (acknowledged) {
+            if (modifiedCount <= 0) {
+                throw Error(`WeivData - Operation is not succeed! Modified item count: ${modifiedCount}`)
+            }
+        } else {
+            throw Error(`Error when inserting a reference item into an item, acknowledged: ${acknowledged}`);
         }
     } catch (err) {
-        console.error(err);
+        throw Error(`Error when inserting a reference item into an item: ${err}`);
     }
 }
