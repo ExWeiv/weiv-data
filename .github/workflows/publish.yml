@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: 🚀 publish
+    name: publish
     runs-on: ubunutu-latest
     steps:
       - name: checkout
@@ -19,6 +19,6 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: 🚀 publish
         run: npm publish --access public
-        working-directory: weiv-data
+        working-directory: weiv-data/app
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
