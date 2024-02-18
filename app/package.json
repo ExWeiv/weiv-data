@@ -6,8 +6,7 @@
   "files": [
     "lib",
     "src",
-    "tsconfig.json",
-    "weiv-data.d.ts"
+    "tsconfig.json"
   ],
   "types": "./src/index.ts",
   "scripts": {
