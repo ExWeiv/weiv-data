@@ -234,7 +234,6 @@ In this file you can find what's changed in each version.
 - Performance and Memory improvements
 - Now you can select between manual connection management or automatic management by MongoDB driver.
 - Versions before 2.6.9 are unstable and contains direct errors that blocks library to work correctly.
-- From 2.7.0 our library will auto publish with GitHub actions.
 
 ---
 
