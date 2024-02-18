@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install firebase globallt
+        run: npm install @firebase/tools
+
   tsc:
     needs: build-and-deploy
     runs-on: ubuntu-latest
