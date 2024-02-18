@@ -1,7 +1,9 @@
 name: "🚀 Deploy New Version"
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   install:
