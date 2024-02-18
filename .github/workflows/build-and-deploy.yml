@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: TypeScript compile
         run: npm run tsc
-        working-directory: app
+        working-directory: "/home/runner/work/weiv-data/app"
 
   generate-docs:
     needs: tsc
