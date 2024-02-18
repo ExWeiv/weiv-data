@@ -13,6 +13,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 - Docs Updated (+ Hooks Imported)
 - New Hooks for New Functions
 - Cache Features Enabled for findOne
+- Typing (TS) Changes
 
 ### 2.7.X
 
