@@ -47,14 +47,14 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
         }
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { ok, value } = await collection.findOneAndDelete(
+        const item = await collection.findOneAndDelete(
             { _id: newItemId },
-            { readConcern: consistentRead === true ? "majority" : "local" }
+            { readConcern: consistentRead === true ? "majority" : "local", includeResultMetadata: false }
         );
 
-        if (ok === 1 && value) {
+        if (item) {
             if (suppressHooks != true) {
-                let editedItem = await runDataHook<'afterRemove'>(collectionId, 'afterRemove', [value, context]).catch((err) => {
+                let editedItem = await runDataHook<'afterRemove'>(collectionId, 'afterRemove', [item, context]).catch((err) => {
                     throw Error(`WeivData - afterRemove Hook Failure ${err}`);
                 });
 
@@ -63,9 +63,8 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
                 }
             }
 
-            return value;
+            return item;
         } else {
-            console.error(`WeivData - Error when removing an item from collection, ok: ${ok}`);
             return null;
         }
     } catch (err) {
