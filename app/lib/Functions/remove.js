@@ -26,20 +26,19 @@ async function remove(collectionId, itemId, options) {
             newItemId = (0, item_helpers_1.convertStringId)(itemId);
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { ok, value } = await collection.findOneAndDelete({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (ok === 1 && value) {
+        const item = await collection.findOneAndDelete({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local", includeResultMetadata: false });
+        if (item) {
             if (suppressHooks != true) {
-                let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterRemove', [value, context]).catch((err) => {
+                let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterRemove', [item, context]).catch((err) => {
                     throw Error(`WeivData - afterRemove Hook Failure ${err}`);
                 });
                 if (editedItem) {
                     return editedItem;
                 }
             }
-            return value;
+            return item;
         }
         else {
-            console.error(`WeivData - Error when removing an item from collection, ok: ${ok}`);
             return null;
         }
     }

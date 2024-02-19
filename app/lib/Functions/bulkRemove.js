@@ -29,7 +29,7 @@ async function bulkRemove(collectionId, itemIds, options) {
             }
         });
         editedItemIds = await Promise.all(editedItemIds);
-        const writeOperations = editedItemIds.map((itemId) => {
+        const writeOperations = await editedItemIds.map((itemId) => {
             return {
                 deleteOne: {
                     filter: { _id: itemId },
@@ -45,7 +45,7 @@ async function bulkRemove(collectionId, itemIds, options) {
             };
         }
         else {
-            throw Error(`WeivData - Error when removing items using bulkRemove, deletedCount: ${deletedCount}`);
+            return null;
         }
     }
     catch (err) {

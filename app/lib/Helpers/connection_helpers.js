@@ -39,7 +39,7 @@ async function connectionHandler(collectionId, suppressAuth = false) {
             db = pool.db(dbName);
         }
         else {
-            db = pool.db("exweiv");
+            db = pool.db("ExWeiv");
         }
         const collection = db.collection(collectionName);
         return { collection, memberId };

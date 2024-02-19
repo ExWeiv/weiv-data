@@ -56,7 +56,7 @@ class InternalWeivDataAggregateResult {
                 this.db = pool.db(this.dbName);
             }
             else {
-                this.db = pool.db("exweiv");
+                this.db = pool.db("ExWeiv");
             }
             const collection = this.db.collection(this.collectionName);
             return { collection, memberId };
