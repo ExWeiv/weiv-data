@@ -72,43 +72,48 @@ async function bulkSave(collectionId, items, options) {
             }
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { insertedCount, modifiedCount, insertedIds } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (suppressHooks != true) {
-            editedItems = editedItems.map(async (item) => {
-                if (item._id) {
-                    const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterUpdate (bulkSave) Hook Failure ${err}`);
-                    });
-                    if (editedItem) {
-                        return editedItem;
+        const { insertedCount, modifiedCount, insertedIds, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local", ordered: true });
+        if (!hasWriteErrors()) {
+            if (suppressHooks != true) {
+                editedItems = editedItems.map(async (item) => {
+                    if (item._id) {
+                        const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
+                            throw Error(`WeivData - afterUpdate (bulkSave) Hook Failure ${err}`);
+                        });
+                        if (editedItem) {
+                            return editedItem;
+                        }
+                        else {
+                            return item;
+                        }
                     }
                     else {
-                        return item;
+                        const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
+                            throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                        });
+                        if (editedItem) {
+                            return editedItem;
+                        }
+                        else {
+                            return item;
+                        }
                     }
-                }
-                else {
-                    const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterInsert Hook Failure ${err}`);
-                    });
-                    if (editedItem) {
-                        return editedItem;
-                    }
-                    else {
-                        return item;
-                    }
-                }
+                });
+                editedItems = await Promise.all(editedItems);
+            }
+            const editedInsertedIds = Object.keys(insertedIds).map((key) => {
+                return insertedIds[key];
             });
-            editedItems = await Promise.all(editedItems);
+            return {
+                insertedItemIds: editedInsertedIds,
+                inserted: insertedCount,
+                updated: modifiedCount,
+                savedItems: editedItems
+            };
         }
-        const editedInsertedIds = Object.keys(insertedIds).map((key) => {
-            return (0, item_helpers_1.convertStringId)(insertedIds[key]);
-        });
-        return {
-            insertedItemIds: editedInsertedIds,
-            inserted: insertedCount,
-            updated: modifiedCount,
-            savedItems: editedItems
-        };
+        else {
+            throw Error(`WeivData - Error when saving items using bulkSave: inserted: ${insertedCount}, updated: ${modifiedCount}, write errors: ${getWriteErrors()}`);
+        }
     }
     catch (err) {
         throw Error(`WeivData - Error when saving items using bulkSave: ${err}`);

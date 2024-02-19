@@ -28,9 +28,9 @@ const cache = new NodeCache({
  * @param collectionId The ID of the collection to retrieve the item from.
  * @param itemId The ID of the item to retrieve.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | undefined>} Fulfilled - The retrieved item or null if not found. Rejected - The error that caused the rejection.
+ * @returns {Promise<Item | null>} Fulfilled - The retrieved item or null if not found. Rejected - The error that caused the rejection.
  */
-export async function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsCache): Promise<Item | undefined> {
+export async function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsCache): Promise<Item | null> {
     try {
         if (!collectionId || !itemId) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
@@ -85,7 +85,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
 
             return item;
         } else {
-            return undefined;
+            return null;
         }
     } catch (err) {
         throw Error(`WeivData - Error when trying to get item from the collectin by itemId: ${err}`);

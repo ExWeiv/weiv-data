@@ -17,6 +17,14 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 - TS Should be Working on VSCode (Auto-complete etc.)
 - Library Info Updated
 
+#### 2.8.1
+
+- Error Handling Fixes for All Functions
+- Error Message Fixes for All Functions
+- Default DB Named Changed as "ExWeiv"
+- Docs Updated
+- BUG Fixes
+
 ### 2.7.X
 
 - BUG Fixes

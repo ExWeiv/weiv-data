@@ -24,8 +24,8 @@ async function replace(collectionId, item, options) {
         const filter = !itemId ? { _id: new mongodb_1.ObjectId() } : { _id: itemId };
         delete replaceItem._id;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { ok, value, lastErrorObject } = await collection.findOneAndReplace(filter, { $set: { ...replaceItem, _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
-        if (ok === 1 && value) {
+        const value = await collection.findOneAndReplace(filter, { $set: { ...replaceItem, _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false });
+        if (value) {
             if (suppressHooks != true) {
                 let editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterReplace", [value, context]).catch((err) => {
                     throw Error(`WeivData - afterReplace Hook Failure ${err}`);
@@ -37,7 +37,7 @@ async function replace(collectionId, item, options) {
             return value;
         }
         else {
-            throw Error(`WeivData - Error when replacing an item, acknowledged: ${lastErrorObject}`);
+            throw Error(`WeivData - Error when replacing an item, returned value: ${value}`);
         }
     }
     catch (err) {

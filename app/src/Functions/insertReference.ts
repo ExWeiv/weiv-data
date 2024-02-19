@@ -43,12 +43,8 @@ export async function insertReference(collectionId: CollectionID, propertyName: 
             { readConcern: consistentRead === true ? "majority" : "local" }
         );
 
-        if (acknowledged) {
-            if (modifiedCount <= 0) {
-                throw Error(`WeivData - Operation is not succeed! Modified item count: ${modifiedCount}`)
-            }
-        } else {
-            throw Error(`Error when inserting a reference item into an item, acknowledged: ${acknowledged}`);
+        if (!acknowledged || modifiedCount <= 0) {
+            throw Error(`Error when inserting a reference item into an item, acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }
     } catch (err) {
         throw Error(`Error when inserting a reference item into an item: ${err}`);

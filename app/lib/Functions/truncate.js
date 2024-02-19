@@ -11,7 +11,7 @@ async function truncate(collectionId, options) {
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { acknowledged } = await collection.deleteMany({});
         if (acknowledged) {
-            return null;
+            return true;
         }
         else {
             throw Error(`WeivData - Error when removing all items in a collection (truncate), acknowledged: ${acknowledged}`);

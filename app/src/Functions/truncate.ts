@@ -14,9 +14,9 @@ import { connectionHandler } from '../Helpers/connection_helpers';
  * 
  * @param collectionId The ID of the collection to remove items from.
  * @param options An object containing options you can use when calling this function.
- * @returns {Promise<null>} Fulfilled - When the items have been removed. Rejected - The error that caused the rejection.
+ * @returns {Promise<boolean>} Fulfilled - When the items have been removed. Rejected - The error that caused the rejection.
  */
-export async function truncate(collectionId: CollectionID, options?: WeivDataOptions): Promise<null> {
+export async function truncate(collectionId: CollectionID, options?: WeivDataOptions): Promise<boolean> {
     try {
         if (!collectionId) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
@@ -27,7 +27,7 @@ export async function truncate(collectionId: CollectionID, options?: WeivDataOpt
         const { acknowledged } = await collection.deleteMany({});
 
         if (acknowledged) {
-            return null;
+            return true;
         } else {
             throw Error(`WeivData - Error when removing all items in a collection (truncate), acknowledged: ${acknowledged}`);
         }

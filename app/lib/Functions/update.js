@@ -22,8 +22,8 @@ async function update(collectionId, item, options) {
         const updateItem = !editedItem ? item : editedItem;
         delete updateItem._id;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate({ _id: itemId }, { $set: { ...updateItem, _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" });
-        if (ok === 1 && value) {
+        const value = await collection.findOneAndUpdate({ _id: itemId }, { $set: { ...updateItem, _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false });
+        if (value) {
             if (suppressHooks != true) {
                 let editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [value, context]).catch((err) => {
                     throw Error(`WeivData - afterUpdate Hook Failure ${err}`);
@@ -35,7 +35,7 @@ async function update(collectionId, item, options) {
             return value;
         }
         else {
-            throw Error(`WeivData - Error when updating an item, acknowledged: ${lastErrorObject}`);
+            throw Error(`WeivData - Error when updating an item, returned value: ${value}`);
         }
     }
     catch (err) {

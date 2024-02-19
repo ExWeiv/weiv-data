@@ -18,7 +18,7 @@ export async function connectionHandler(collectionId: CollectionID, suppressAuth
         if (dbName) {
             db = pool.db(dbName);
         } else {
-            db = pool.db("exweiv");
+            db = pool.db("ExWeiv");
         }
 
         const collection = db.collection(collectionName);

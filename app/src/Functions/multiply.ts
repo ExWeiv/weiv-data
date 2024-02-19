@@ -21,9 +21,9 @@ import { convertStringId } from '../Helpers/item_helpers';
  * @param propertyName Property name for the multiply field.
  * @param value Multiply current value by that much. (If you set it to 10 it will multiply it by 10 `x*10`)
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | undefined>} Fulfilled - Updated item 
+ * @returns {Promise<Item | null>} Fulfilled - Updated item 
  */
-export async function multiply(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions): Promise<Item | undefined> {
+export async function multiply(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions): Promise<Item | null> {
     try {
         if (!collectionId || !itemId || !value || !propertyName) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value, propertyName`);
@@ -63,7 +63,7 @@ export async function multiply(collectionId: CollectionID, itemId: ItemID, prope
 
             return item;
         } else {
-            return undefined;
+            return null;
         }
     } catch (err) {
         throw Error(`WeivData - Error when multiplying a filed in an item: ${err}`);

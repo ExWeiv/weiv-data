@@ -35,7 +35,7 @@ async function increment(collectionId, itemId, propertyName, value, options) {
             return item;
         }
         else {
-            return undefined;
+            return null;
         }
     }
     catch (err) {
