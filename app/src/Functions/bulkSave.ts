@@ -48,9 +48,9 @@ export interface WeivDataBulkSaveResult {
  * @param collectionId The ID of the collection to save the items to.
  * @param items The items to insert or update.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<WeivDataBulkSaveResult | void>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
+ * @returns {Promise<WeivDataBulkSaveResult>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
  */
-export async function bulkSave(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<WeivDataBulkSaveResult | void> {
+export async function bulkSave(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<WeivDataBulkSaveResult> {
     try {
         if (!collectionId || !items || items.length <= 0) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
@@ -120,50 +120,54 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
         })
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedCount, modifiedCount, insertedIds } = await collection.bulkWrite(
+        const { insertedCount, modifiedCount, insertedIds, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(
             bulkOperations,
-            { readConcern: consistentRead === true ? "majority" : "local" }
+            { readConcern: consistentRead === true ? "majority" : "local", ordered: true }
         );
 
-        if (suppressHooks != true) {
-            editedItems = editedItems.map(async (item) => {
-                if (item._id) {
-                    // Run afterUpdate hook for that item.
-                    const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterUpdate (bulkSave) Hook Failure ${err}`);
-                    });
+        if (!hasWriteErrors()) {
+            if (suppressHooks != true) {
+                editedItems = editedItems.map(async (item) => {
+                    if (item._id) {
+                        // Run afterUpdate hook for that item.
+                        const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
+                            throw Error(`WeivData - afterUpdate (bulkSave) Hook Failure ${err}`);
+                        });
 
-                    if (editedItem) {
-                        return editedItem;
+                        if (editedItem) {
+                            return editedItem;
+                        } else {
+                            return item;
+                        }
                     } else {
-                        return item;
-                    }
-                } else {
-                    // Run afterInsert hook for that item.
-                    const editedItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterInsert Hook Failure ${err}`);
-                    });
+                        // Run afterInsert hook for that item.
+                        const editedItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
+                            throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                        });
 
-                    if (editedItem) {
-                        return editedItem;
-                    } else {
-                        return item;
+                        if (editedItem) {
+                            return editedItem;
+                        } else {
+                            return item;
+                        }
                     }
-                }
+                })
+
+                editedItems = await Promise.all(editedItems);
+            }
+
+            const editedInsertedIds = Object.keys(insertedIds).map((key: any) => {
+                return insertedIds[key];
             })
 
-            editedItems = await Promise.all(editedItems);
-        }
-
-        const editedInsertedIds = Object.keys(insertedIds).map((key: any) => {
-            return convertStringId(insertedIds[key]);
-        })
-
-        return {
-            insertedItemIds: editedInsertedIds,
-            inserted: insertedCount,
-            updated: modifiedCount,
-            savedItems: editedItems
+            return {
+                insertedItemIds: editedInsertedIds,
+                inserted: insertedCount,
+                updated: modifiedCount,
+                savedItems: editedItems
+            }
+        } else {
+            throw Error(`WeivData - Error when saving items using bulkSave: inserted: ${insertedCount}, updated: ${modifiedCount}, write errors: ${getWriteErrors()}`);
         }
     } catch (err) {
         throw Error(`WeivData - Error when saving items using bulkSave: ${err}`);

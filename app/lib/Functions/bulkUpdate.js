@@ -44,25 +44,30 @@ async function bulkUpdate(collectionId, items, options) {
             };
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { modifiedCount } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (suppressHooks != true) {
-            editedItems = editedItems.map(async (item) => {
-                const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterUpdate (bulkUpdate) Hook Failure ${err}`);
+        const { modifiedCount, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local", ordered: true });
+        if (!hasWriteErrors()) {
+            if (suppressHooks != true) {
+                editedItems = editedItems.map(async (item) => {
+                    const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
+                        throw Error(`WeivData - afterUpdate (bulkUpdate) Hook Failure ${err}`);
+                    });
+                    if (editedItem) {
+                        return editedItem;
+                    }
+                    else {
+                        return item;
+                    }
                 });
-                if (editedItem) {
-                    return editedItem;
-                }
-                else {
-                    return item;
-                }
-            });
-            editedItems = await Promise.all(editedItems);
+                editedItems = await Promise.all(editedItems);
+            }
+            return {
+                updated: modifiedCount,
+                updatedItems: editedItems
+            };
         }
-        return {
-            updated: modifiedCount,
-            updatedItems: editedItems
-        };
+        else {
+            throw Error(`WeivData  - Error when updating items using bulkUpdate: updated: ${modifiedCount}, write errors: ${getWriteErrors()}`);
+        }
     }
     catch (err) {
         throw Error(`WeivData - Error when updating items using bulkUpdate: ${err}`);

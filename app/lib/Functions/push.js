@@ -36,7 +36,7 @@ async function push(collectionId, itemId, propertyName, value, options) {
             return item;
         }
         else {
-            return undefined;
+            return null;
         }
     }
     catch (err) {

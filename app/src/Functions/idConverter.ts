@@ -9,9 +9,13 @@ import { convertStringId } from "../Helpers/item_helpers";
  * @returns ObjectId or string reverse of the input
  */
 export function idConverter(id: string | ObjectId, stringMethod?: "base64" | "hex"): ObjectId | string {
-    if (typeof id === "string") {
-        return convertStringId(id);
-    } else {
-        return id.toString(stringMethod || "hex");
+    try {
+        if (typeof id === "string") {
+            return convertStringId(id);
+        } else {
+            return id.toString(stringMethod || "hex");
+        }
+    } catch (err) {
+        throw Error(`WeivData - Error when converting an ID: ${err}`);
     }
 }

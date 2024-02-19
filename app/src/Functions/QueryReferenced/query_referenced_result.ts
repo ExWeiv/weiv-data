@@ -171,7 +171,7 @@ export class InternalWeivDataQueryReferencedResult {
             const collection = this.db.collection(this.collectionName);
             return { collection, memberId };
         } catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
+            throw Error(`WeivData - Error when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
         }
     }
 }

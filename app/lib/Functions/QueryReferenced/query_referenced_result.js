@@ -98,7 +98,7 @@ class InternalWeivDataQueryReferencedResult {
             return { collection, memberId };
         }
         catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
+            throw Error(`WeivData - Error when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
         }
     }
 }

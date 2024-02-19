@@ -37,15 +37,15 @@ async function bulkRemove(collectionId, itemIds, options) {
             };
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { deletedCount } = await collection.bulkWrite(writeOperations, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (deletedCount) {
+        const { deletedCount, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(writeOperations, { readConcern: consistentRead === true ? "majority" : "local", ordered: true });
+        if (!hasWriteErrors()) {
             return {
                 removed: deletedCount,
                 removedItemIds: editedItemIds
             };
         }
         else {
-            return null;
+            throw Error(`WeivData - Error when removing items using bulkRemove: removed: ${deletedCount}, write errors: ${getWriteErrors()}`);
         }
     }
     catch (err) {

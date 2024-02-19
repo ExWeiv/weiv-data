@@ -38,9 +38,9 @@ export interface WeivDataBulkRemoveResult {
  * @param collectionId The ID of the collection to remove the items from.
  * @param itemIds IDs of the items to remove.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<WeivDataBulkRemoveResult | null>} Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
+ * @returns {Promise<WeivDataBulkRemoveResult>} Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
  */
-export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, options?: WeivDataOptions): Promise<WeivDataBulkRemoveResult | null> {
+export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, options?: WeivDataOptions): Promise<WeivDataBulkRemoveResult> {
     try {
         if (!collectionId || !itemIds) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemIds`);
@@ -75,18 +75,18 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, o
         });
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { deletedCount } = await collection.bulkWrite(
+        const { deletedCount, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(
             writeOperations,
-            { readConcern: consistentRead === true ? "majority" : "local" }
+            { readConcern: consistentRead === true ? "majority" : "local", ordered: true }
         );
 
-        if (deletedCount) {
+        if (!hasWriteErrors()) {
             return {
                 removed: deletedCount,
                 removedItemIds: editedItemIds
             }
         } else {
-            return null;
+            throw Error(`WeivData - Error when removing items using bulkRemove: removed: ${deletedCount}, write errors: ${getWriteErrors()}`)
         }
     } catch (err) {
         throw Error(`WeivData - Error when removing items using bulkRemove: ${err}`);

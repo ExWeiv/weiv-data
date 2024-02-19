@@ -22,9 +22,9 @@ import { convertStringId } from '../Helpers/item_helpers';
  * @param propertyName Property name for the array field.
  * @param value Values to pull from array.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | undefined>} Fulfilled - Updated item 
+ * @returns {Promise<Item | null>} Fulfilled - Updated item 
  */
-export async function pull(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | undefined> {
+export async function pull(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null> {
     try {
         if (!collectionId || !itemId || !value || !propertyName) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value, propertyName`);
@@ -64,7 +64,7 @@ export async function pull(collectionId: CollectionID, itemId: ItemID, propertyN
 
             return item;
         } else {
-            return undefined;
+            return null;
         }
     } catch (err) {
         throw Error(`WeivData - Error when removıng (pullıng) value/s from an array filed in an item: ${err}`);

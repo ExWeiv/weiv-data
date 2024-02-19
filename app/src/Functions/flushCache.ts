@@ -30,29 +30,33 @@ const cacheSelections: CacheSelectionsObject = {
  * @public
  */
 export function flushCache(filters?: CacheSelections[]): void {
-    const cachesToFlush = [];
+    try {
+        const cachesToFlush = [];
 
-    if (filters) {
-        if (filters.length > 0) {
-            for (const filter of filters) {
-                const cacheValue = cacheSelections[filter]();
-                cachesToFlush.push(cacheValue);
-            }
-        } else {
-            for (const key of Object.keys(cacheSelections)) { //@ts-ignore
-                const cacheValue: NodeCache = cacheSelections[key]();
-                cachesToFlush.push(cacheValue);
+        if (filters) {
+            if (filters.length > 0) {
+                for (const filter of filters) {
+                    const cacheValue = cacheSelections[filter]();
+                    cachesToFlush.push(cacheValue);
+                }
+            } else {
+                for (const key of Object.keys(cacheSelections)) { //@ts-ignore
+                    const cacheValue: NodeCache = cacheSelections[key]();
+                    cachesToFlush.push(cacheValue);
+                }
             }
         }
-    }
 
-    for (const key of Object.keys(cacheSelections)) { //@ts-ignore
-        const cacheValue: NodeCache = cacheSelections[key]();
-        cachesToFlush.push(cacheValue);
-    }
+        for (const key of Object.keys(cacheSelections)) { //@ts-ignore
+            const cacheValue: NodeCache = cacheSelections[key]();
+            cachesToFlush.push(cacheValue);
+        }
 
 
-    for (const cacheData of cachesToFlush) {
-        cacheData.flushAll();
+        for (const cacheData of cachesToFlush) {
+            cacheData.flushAll();
+        }
+    } catch (err) {
+        throw Error(`WeivData - Error when flushing caches! ${err}`);
     }
 }

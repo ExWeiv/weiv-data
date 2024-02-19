@@ -3,7 +3,7 @@ import { type ReferencedItem, type ReferringItem, getCurrentItemId, getReference
 import { update } from './update';
 
 /**
- * Replaces current references with references in the specified property.
+ * Replaces current references with references in the specified property. *This function uses update function internally.
  * 
  * @example
  * ```
@@ -34,13 +34,12 @@ export async function replaceReferences(collectionId: CollectionID, propertyName
 
         const references = getReferences(referencedItem);
         const itemId = getCurrentItemId(referringItem);
-
         const updated = await update(collectionId, { _id: itemId, [propertyName]: references }, options);
 
         if (!updated) {
-            throw Error(`WeivData - Error when replacing references, result: ${updated}`)
+            throw Error(`WeivData - Error when replacing references, result: ${updated}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when replacing references: ${err}`)
+        throw Error(`WeivData - Error when replacing references: ${err}`);
     }
 }

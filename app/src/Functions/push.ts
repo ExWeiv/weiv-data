@@ -23,9 +23,9 @@ import { isArray } from 'lodash';
  * @param propertyName Property name for the array field.
  * @param value Values to push into array.
  * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | undefined>} Fulfilled - Updated item 
+ * @returns {Promise<Item | null>} Fulfilled - Updated item 
  */
-export async function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | undefined> {
+export async function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null> {
     try {
         if (!collectionId || !itemId || !value || !propertyName) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value, propertyName`);
@@ -65,7 +65,7 @@ export async function push(collectionId: CollectionID, itemId: ItemID, propertyN
 
             return item;
         } else {
-            return undefined;
+            return null;
         }
     } catch (err) {
         throw Error(`WeivData - Error when inserting (pushing) new value/s into an array filed in an item: ${err}`);

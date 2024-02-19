@@ -58,7 +58,7 @@ async function get(collectionId, itemId, options) {
             return item;
         }
         else {
-            return undefined;
+            return null;
         }
     }
     catch (err) {

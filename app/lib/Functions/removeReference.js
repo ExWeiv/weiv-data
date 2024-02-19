@@ -13,7 +13,7 @@ async function removeReference(collectionId, propertyName, referringItem, refere
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { acknowledged, modifiedCount } = await collection.updateOne({ _id: itemId }, { $pull: { [propertyName]: { $in: references } }, $set: { _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local" });
-        if (!acknowledged || modifiedCount === 0) {
+        if (!acknowledged || modifiedCount <= 0) {
             throw Error(`WeivData - Error when removing references, acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }
     }

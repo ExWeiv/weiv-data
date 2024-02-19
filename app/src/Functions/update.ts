@@ -50,13 +50,13 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         delete updateItem._id;
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { ok, value, lastErrorObject } = await collection.findOneAndUpdate(
+        const value = await collection.findOneAndUpdate(
             { _id: itemId },
             { $set: { ...updateItem, _updatedDate: new Date() } },
-            { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after" }
+            { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false }
         );
 
-        if (ok === 1 && value) {
+        if (value) {
             if (suppressHooks != true) {
                 let editedResult = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [value, context]).catch((err) => {
                     throw Error(`WeivData - afterUpdate Hook Failure ${err}`);
@@ -69,7 +69,7 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
 
             return value;
         } else {
-            throw Error(`WeivData - Error when updating an item, acknowledged: ${lastErrorObject}`);
+            throw Error(`WeivData - Error when updating an item, returned value: ${value}`);
         }
     } catch (err) {
         throw Error(`WeivData - Error when updating an item: ${err}`);
