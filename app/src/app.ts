@@ -154,4 +154,4 @@ export { CacheSelections } from './Functions/flushCache';
 export { ReferencedItem, ReferringItem } from './Helpers/reference_helpers';
 
 /**@public */
-export { HookName, HookArgs, HooksResult, HookContext } from './Hooks/hook_manager';
+export { HookName, HookArgs, HooksResults, HookContext } from './Hooks/hook_manager';
