@@ -4,7 +4,22 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
-### 2.8.X
+### 2.8.2
+
+- Error Handling BUGs Fixed and Tested (Should be Working Now)
+- mongodb version upgraded to 6.3.0
+- TS config changes.
+- Changelog updated.
+
+### 2.8.1
+
+- Error Handling Fixes for All Functions
+- Error Message Fixes for All Functions
+- Default DB Named Changed as "ExWeiv"
+- Docs Updated
+- BUG Fixes
+
+### 2.8.0
 
 - BUG Fixes
 - New Helper Functions (findOne, getAndRemove, getAndReplace, getAndUpdate)
@@ -16,14 +31,6 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 - Typing (TS) Changes
 - TS Should be Working on VSCode (Auto-complete etc.)
 - Library Info Updated
-
-#### 2.8.1
-
-- Error Handling Fixes for All Functions
-- Error Message Fixes for All Functions
-- Default DB Named Changed as "ExWeiv"
-- Docs Updated
-- BUG Fixes
 
 ### 2.7.X
 

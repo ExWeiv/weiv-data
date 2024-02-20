@@ -72,8 +72,8 @@ async function bulkSave(collectionId, items, options) {
             }
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { insertedCount, modifiedCount, insertedIds, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local", ordered: true });
-        if (!hasWriteErrors()) {
+        const { insertedCount, modifiedCount, insertedIds, ok } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local", ordered: true });
+        if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     if (item._id) {
@@ -112,7 +112,7 @@ async function bulkSave(collectionId, items, options) {
             };
         }
         else {
-            throw Error(`WeivData - Error when saving items using bulkSave: inserted: ${insertedCount}, updated: ${modifiedCount}, write errors: ${getWriteErrors()}`);
+            throw Error(`WeivData - Error when saving items using bulkSave: inserted: ${insertedCount}, updated: ${modifiedCount}, ok: ${ok}`);
         }
     }
     catch (err) {

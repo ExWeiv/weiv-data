@@ -75,7 +75,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
         })
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { insertedIds, insertedCount, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(
+        const { insertedIds, insertedCount, ok } = await collection.bulkWrite(
             writeOperations,
             { readConcern: consistentRead === true ? "majority" : "local", ordered: true }
         );
@@ -84,7 +84,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
             return insertedIds[key];
         })
 
-        if (!hasWriteErrors()) {
+        if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedInsertItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
@@ -103,7 +103,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Items, optio
 
             return { insertedItems: editedItems, insertedItemIds, inserted: insertedCount };
         } else {
-            throw Error(`WeivData - Error when inserting items using bulkInsert, inserted: ${insertedCount}, write errors: ${getWriteErrors()}`);
+            throw Error(`WeivData - Error when inserting items using bulkInsert, inserted: ${insertedCount}, ok: ${ok}`);
         }
     } catch (err) {
         throw Error(`WeivData - Error when inserting items using bulkInsert: ${err}`);

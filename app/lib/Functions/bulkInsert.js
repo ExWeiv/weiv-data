@@ -36,11 +36,11 @@ async function bulkInsert(collectionId, items, options) {
             };
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { insertedIds, insertedCount, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(writeOperations, { readConcern: consistentRead === true ? "majority" : "local", ordered: true });
+        const { insertedIds, insertedCount, ok } = await collection.bulkWrite(writeOperations, { readConcern: consistentRead === true ? "majority" : "local", ordered: true });
         const insertedItemIds = Object.keys(insertedIds).map((key) => {
             return insertedIds[key];
         });
-        if (!hasWriteErrors()) {
+        if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedInsertItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
@@ -58,7 +58,7 @@ async function bulkInsert(collectionId, items, options) {
             return { insertedItems: editedItems, insertedItemIds, inserted: insertedCount };
         }
         else {
-            throw Error(`WeivData - Error when inserting items using bulkInsert, inserted: ${insertedCount}, write errors: ${getWriteErrors()}`);
+            throw Error(`WeivData - Error when inserting items using bulkInsert, inserted: ${insertedCount}, ok: ${ok}`);
         }
     }
     catch (err) {
