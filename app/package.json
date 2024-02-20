@@ -10,7 +10,7 @@
   ],
   "types": "./src/index.ts",
   "scripts": {
-    "setup": "tsc & npx typedoc"
+    "build": "tsc & npx typedoc"
   },
   "keywords": [
     "exweiv",
@@ -20,7 +20,9 @@
     "weiv-data",
     "mongodb",
     "nosql",
-    "database"
+    "database",
+    "weivdata",
+    "wixdata"
   ],
   "author": {
     "name": "ExWeiv Apps Team",
