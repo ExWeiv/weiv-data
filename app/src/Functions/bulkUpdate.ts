@@ -84,12 +84,12 @@ export async function bulkUpdate(collectionId: CollectionID, items: Items, optio
         })
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { modifiedCount, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(
+        const { modifiedCount, ok } = await collection.bulkWrite(
             bulkOperations,
             { readConcern: consistentRead === true ? "majority" : "local", ordered: true }
         );
 
-        if (!hasWriteErrors()) {
+        if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
@@ -111,7 +111,7 @@ export async function bulkUpdate(collectionId: CollectionID, items: Items, optio
                 updatedItems: editedItems
             }
         } else {
-            throw Error(`WeivData  - Error when updating items using bulkUpdate: updated: ${modifiedCount}, write errors: ${getWriteErrors()}`);
+            throw Error(`WeivData  - Error when updating items using bulkUpdate: updated: ${modifiedCount}, ok: ${ok}`);
         }
     } catch (err) {
         throw Error(`WeivData - Error when updating items using bulkUpdate: ${err}`);

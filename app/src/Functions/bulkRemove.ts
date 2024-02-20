@@ -75,18 +75,18 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, o
         });
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { deletedCount, hasWriteErrors, getWriteErrors } = await collection.bulkWrite(
+        const { deletedCount, ok } = await collection.bulkWrite(
             writeOperations,
             { readConcern: consistentRead === true ? "majority" : "local", ordered: true }
         );
 
-        if (!hasWriteErrors()) {
+        if (ok) {
             return {
                 removed: deletedCount,
                 removedItemIds: editedItemIds
             }
         } else {
-            throw Error(`WeivData - Error when removing items using bulkRemove: removed: ${deletedCount}, write errors: ${getWriteErrors()}`)
+            throw Error(`WeivData - Error when removing items using bulkRemove: removed: ${deletedCount}, ok: ${ok}`)
         }
     } catch (err) {
         throw Error(`WeivData - Error when removing items using bulkRemove: ${err}`);
