@@ -10,6 +10,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 - mongodb version upgraded to 6.3.0
 - TS config changes.
 - Changelog updated.
+- Docs updated.
 
 ### 2.8.1
 
