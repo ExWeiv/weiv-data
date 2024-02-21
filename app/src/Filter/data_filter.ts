@@ -62,7 +62,7 @@ export class WeivDataFilter {
      * @param rangeEnd The ending value of the range to match against.
      * @returns {WeivDataFilter} A `WeivDataFilter` object representing the refined filters.
      */
-    between(propertyName: string, rangeStart: string | number | Date, rangeEnd: string | number | Date): WeivDataFilter {
+    between(propertyName: string, rangeStart: any, rangeEnd: any): WeivDataFilter {
         if (!this.memoizedBetween) {
             this.memoizedBetween = memoize((propertyName, rangeStart, rangeEnd) => {
                 return this.addFilter(propertyName, {
@@ -183,7 +183,7 @@ export class WeivDataFilter {
      * @param value The value to match against.
      * @returns {WeivDataFilter} A `WeivDataFilter` object representing the refined filters.
      */
-    ge(propertyName: string, value: string | number | Date): WeivDataFilter {
+    ge(propertyName: string, value: any): WeivDataFilter {
         if (!this.memoizedGe) {
             this.memoizedGe = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $gte: value, });
@@ -209,7 +209,7 @@ export class WeivDataFilter {
      * @param value The value to match against.
      * @returns {WeivDataFilter} A `WeivDataFilter` object representing the refined filters.
      */
-    gt(propertyName: string, value: string | number | Date): WeivDataFilter {
+    gt(propertyName: string, value: any): WeivDataFilter {
         if (!this.memoizedGt) {
             this.memoizedGt = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $gt: value, });
@@ -237,7 +237,7 @@ export class WeivDataFilter {
      * @param value The values to match against.
      * @returns {WeivDataFilter} A `WeivDataFilter` object representing the refined filters.
      */
-    hasAll(propertyName: string, value: string | number | Date | [any]): WeivDataFilter {
+    hasAll(propertyName: string, value: any): WeivDataFilter {
         if (!Array.isArray(value)) {
             value = [value];
         }
@@ -269,7 +269,7 @@ export class WeivDataFilter {
      * @param value The values to match against.
      * @returns {WeivDataFilter} A `WeivDataFilter` object representing the refined filters.
      */
-    hasSome(propertyName: string, value: string | number | Date | [any]): WeivDataFilter {
+    hasSome(propertyName: string, value: any): WeivDataFilter {
         if (!Array.isArray(value)) {
             value = [value];
         }
@@ -349,7 +349,7 @@ export class WeivDataFilter {
      * @param value The value to match against.
      * @returns {WeivDataFilter} A `WeivDataFilter` object representing the refined filters.
      */
-    le(propertyName: string, value: string | number | Date): WeivDataFilter {
+    le(propertyName: string, value: any): WeivDataFilter {
         if (!this.memoizedLe) {
             this.memoizedLe = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $lte: value, });
@@ -375,7 +375,7 @@ export class WeivDataFilter {
      * @param value The value to match against.
      * @returns {WeivDataFilter} A `WeivDataFilter` object representing the refined filters.
      */
-    lt(propertyName: string, value: string | number | Date): WeivDataFilter {
+    lt(propertyName: string, value: any): WeivDataFilter {
         if (!this.memoizedLt) {
             this.memoizedLt = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $lt: value, });

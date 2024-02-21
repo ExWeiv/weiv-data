@@ -127,7 +127,7 @@ export class WeivDataQuery {
      * @param rangeEnd The ending value of the range to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    between(propertyName: string, rangeStart: string | number | Date, rangeEnd: string | number | Date): WeivDataQuery {
+    between(propertyName: string, rangeStart: any, rangeEnd: any): WeivDataQuery {
         if (!this.memoizedBetween) {
             this.memoizedBetween = memoize((propertyName, rangeStart, rangeEnd) => {
                 return this.addFilter(propertyName, {
@@ -193,7 +193,7 @@ export class WeivDataQuery {
      * @param value The value to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    eq(propertyName: string, value: unknown): WeivDataQuery {
+    eq(propertyName: string, value: any): WeivDataQuery {
         if (!this.memoizedEq) {
             this.memoizedEq = memoize((propertyName, value) => {
                 if (propertyName === "_id") {
@@ -220,7 +220,7 @@ export class WeivDataQuery {
      * @param value The value to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    ge(propertyName: string, value: string | number | Date): WeivDataQuery {
+    ge(propertyName: string, value: any): WeivDataQuery {
         if (!this.memoizedGe) {
             this.memoizedGe = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $gte: value, });
@@ -239,7 +239,7 @@ export class WeivDataQuery {
      * @param value The value to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    gt(propertyName: string, value: string | number | Date): WeivDataQuery {
+    gt(propertyName: string, value: any): WeivDataQuery {
         if (!this.memoizedGt) {
             this.memoizedGt = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $gt: value, });
@@ -258,7 +258,7 @@ export class WeivDataQuery {
      * @param value The values to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    hasAll(propertyName: string, value: string | number | Date | [unknown]): WeivDataQuery {
+    hasAll(propertyName: string, value: any): WeivDataQuery {
         if (!Array.isArray(value)) {
             value = [value];
         }
@@ -281,7 +281,7 @@ export class WeivDataQuery {
      * @param value The values to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    hasSome(propertyName: string, value: string | number | Date | [unknown]): WeivDataQuery {
+    hasSome(propertyName: string, value: any): WeivDataQuery {
         if (!Array.isArray(value)) {
             value = [value];
         }
@@ -340,7 +340,7 @@ export class WeivDataQuery {
      * @param value The value to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    le(propertyName: string, value: string | number | Date): WeivDataQuery {
+    le(propertyName: string, value: any): WeivDataQuery {
         if (!this.memoizedLe) {
             this.memoizedLe = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $lte: value, });
@@ -359,7 +359,7 @@ export class WeivDataQuery {
      * @param value The value to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    lt(propertyName: string, value: string | number | Date): WeivDataQuery {
+    lt(propertyName: string, value: any): WeivDataQuery {
         if (!this.memoizedLt) {
             this.memoizedLt = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $lt: value, });
@@ -378,7 +378,7 @@ export class WeivDataQuery {
      * @param value The value to match against.
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
-    ne(propertyName: string, value: unknown): WeivDataQuery {
+    ne(propertyName: string, value: any): WeivDataQuery {
         if (!this.memoizedNe) {
             this.memoizedNe = memoize((propertyName, value) => {
                 return this.addFilter(propertyName, { $ne: value, });
