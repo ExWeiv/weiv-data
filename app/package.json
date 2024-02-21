@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "2.8.2",
+  "version": "2.8.3",
   "description": "Custom API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
   "main": "./lib/index.js",
   "files": [

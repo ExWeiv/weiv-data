@@ -87,7 +87,7 @@ export class WeivDataQuery {
     private skipNumber!: number;
     private limitNumber = 50;
     private referenceLenght: ReferenceLenghtObject = {};
-    private filters: { [key: string]: object | string | number } = {};
+    private filters: { [key: string]: any } = {};
 
     /** @internal */
     constructor(collectionId: string) {
@@ -110,7 +110,11 @@ export class WeivDataQuery {
      * @return {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
     and(query: WeivDataQuery): WeivDataQuery {
-        this.filters = merge(query.filters, this.filters);
+        if (!this.filters["$and"]) {
+            this.filters["$and"] = [];
+        }
+        this.filters["$and"].push(query.filters);
+
         return this;
     }
 
@@ -126,11 +130,9 @@ export class WeivDataQuery {
     between(propertyName: string, rangeStart: string | number | Date, rangeEnd: string | number | Date): WeivDataQuery {
         if (!this.memoizedBetween) {
             this.memoizedBetween = memoize((propertyName, rangeStart, rangeEnd) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $gte: rangeStart,
-                        $lte: rangeEnd,
-                    },
+                return this.addFilter(propertyName, {
+                    $gte: rangeStart,
+                    $lte: rangeEnd,
                 });
             })
         }
@@ -150,11 +152,9 @@ export class WeivDataQuery {
     contains(propertyName: string, string: string): WeivDataQuery {
         if (!this.memoizedContains) {
             this.memoizedContains = memoize((propertyName, string) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $regex: string,
-                        $options: "i",
-                    },
+                return this.addFilter(propertyName, {
+                    $regex: string,
+                    $options: "i",
                 });
             })
         }
@@ -174,11 +174,9 @@ export class WeivDataQuery {
     endsWith(propertyName: string, string: string): WeivDataQuery {
         if (!this.memoizedEndsWith) {
             this.memoizedEndsWith = memoize((propertyName, string) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $regex: `${string}$`,
-                        $options: "i",
-                    },
+                return this.addFilter(propertyName, {
+                    $regex: `${string}$`,
+                    $options: "i",
                 });
             })
         }
@@ -199,13 +197,13 @@ export class WeivDataQuery {
         if (!this.memoizedEq) {
             this.memoizedEq = memoize((propertyName, value) => {
                 if (propertyName === "_id") {
-                    return this.addFilter({
-                        [propertyName]: convertStringId(value),
+                    return this.addFilter(propertyName, {
+                        $eq: convertStringId(value),
                     });
                 }
 
-                return this.addFilter({
-                    [propertyName]: value,
+                return this.addFilter(propertyName, {
+                    $eq: value,
                 });
             })
         }
@@ -225,11 +223,7 @@ export class WeivDataQuery {
     ge(propertyName: string, value: string | number | Date): WeivDataQuery {
         if (!this.memoizedGe) {
             this.memoizedGe = memoize((propertyName, value) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $gte: value,
-                    },
-                });
+                return this.addFilter(propertyName, { $gte: value, });
             })
         }
 
@@ -248,11 +242,7 @@ export class WeivDataQuery {
     gt(propertyName: string, value: string | number | Date): WeivDataQuery {
         if (!this.memoizedGt) {
             this.memoizedGt = memoize((propertyName, value) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $gt: value,
-                    },
-                });
+                return this.addFilter(propertyName, { $gt: value, });
             })
         }
 
@@ -275,11 +265,7 @@ export class WeivDataQuery {
 
         if (!this.memoizedHasAll) {
             this.memoizedHasAll = memoize((propertyName, value) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $all: value,
-                    },
-                });
+                return this.addFilter(propertyName, { $all: value, });
             })
         }
 
@@ -302,11 +288,7 @@ export class WeivDataQuery {
 
         if (!this.memoizedHasSome) {
             this.memoizedHasSome = memoize((propertyName, value) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $in: value,
-                    },
-                });
+                return this.addFilter(propertyName, { $in: value, });
             })
         }
 
@@ -324,11 +306,7 @@ export class WeivDataQuery {
     isEmpty(propertyName: string): WeivDataQuery {
         if (!this.memoizedIsEmpty) {
             this.memoizedIsEmpty = memoize((propertyName) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $exists: false,
-                    },
-                });
+                return this.addFilter(propertyName, { $exists: false, });
             })
         }
 
@@ -346,11 +324,7 @@ export class WeivDataQuery {
     isNotEmpty(propertyName: string): WeivDataQuery {
         if (!this.memoizedIsNotEmpty) {
             this.memoizedIsNotEmpty = memoize((propertyName) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $exists: true,
-                    },
-                });
+                return this.addFilter(propertyName, { $exists: true, });
             })
         }
 
@@ -369,11 +343,7 @@ export class WeivDataQuery {
     le(propertyName: string, value: string | number | Date): WeivDataQuery {
         if (!this.memoizedLe) {
             this.memoizedLe = memoize((propertyName, value) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $lte: value,
-                    },
-                });
+                return this.addFilter(propertyName, { $lte: value, });
             })
         }
 
@@ -392,11 +362,7 @@ export class WeivDataQuery {
     lt(propertyName: string, value: string | number | Date): WeivDataQuery {
         if (!this.memoizedLt) {
             this.memoizedLt = memoize((propertyName, value) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $lt: value,
-                    },
-                });
+                return this.addFilter(propertyName, { $lt: value, });
             })
         }
 
@@ -415,11 +381,7 @@ export class WeivDataQuery {
     ne(propertyName: string, value: unknown): WeivDataQuery {
         if (!this.memoizedNe) {
             this.memoizedNe = memoize((propertyName, value) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $ne: value,
-                    },
-                });
+                return this.addFilter(propertyName, { $ne: value, });
             })
         }
 
@@ -434,10 +396,11 @@ export class WeivDataQuery {
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
     not(query: WeivDataQuery): WeivDataQuery {
-        this.filters = {
-            ...this.filters,
-            $nor: [query.filters],
-        };
+        if (!this.filters["$nor"]) {
+            this.filters["$nor"] = [];
+        }
+        this.filters["$nor"].push(query.filters);
+
         return this;
     }
 
@@ -448,10 +411,11 @@ export class WeivDataQuery {
      * @returns {WeivDataQuery} A `WeivDataQuery` object representing the refined query.
      */
     or(query: WeivDataQuery): WeivDataQuery {
-        this.filters = {
-            ...this.filters,
-            $or: [query.filters],
-        };
+        if (!this.filters["$or"]) {
+            this.filters["$or"] = [];
+        }
+        this.filters["$or"].push(query.filters);
+
         return this;
     }
 
@@ -466,11 +430,9 @@ export class WeivDataQuery {
     startsWith(propertyName: string, string: string): WeivDataQuery {
         if (!this.memoizedStartsWith) {
             this.memoizedStartsWith = memoize((propertyName, string) => {
-                return this.addFilter({
-                    [propertyName]: {
-                        $regex: `^${string}`,
-                        $options: "i",
-                    },
+                return this.addFilter(propertyName, {
+                    $regex: `^${string}`,
+                    $options: "i",
                 });
             })
         }
@@ -852,8 +814,11 @@ export class WeivDataQuery {
     }
 
     /**@internal */
-    private addFilter(newFilter: object) {
-        this.filters = merge(this.filters, newFilter);
+    private addFilter(propertyName: string, newFilter: { [key: string]: any }) {
+        this.filters[propertyName] = {
+            ...this.filters[propertyName],
+            ...newFilter
+        }
         return this.filters;
     }
 
