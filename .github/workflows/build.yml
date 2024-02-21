@@ -1,0 +1,31 @@
+name: "🏗️ Build TS + Docs"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev, test]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org
+      - name: install dependencies
+        run: npm install
+        working-directory: app
+      - name: Build
+        run: npm run build
+        working-directory: app
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.email "git-bot@exweiv.com"
+          git config --global user.name "ExWeiv GitHub BOT"
+          git add .
+          git commit -m "Build and Generate Docs - BOT"
+          git push origin ${{ github.ref }}

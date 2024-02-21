@@ -4,6 +4,12 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 2.8.3
+
+- Filtering BUG fixed for query and filter classes. (Filters were not working correctly especially for or, not, and)
+- BUG Fixes
+- TS type changes for filters. (Most filters changed to any since it allows too many data types)
+
 ### 2.8.2
 
 - Error Handling BUGs Fixed and Tested (Should be Working Now)
