@@ -32,10 +32,47 @@ import { pull } from './Functions/pull';
 /**@internal */
 import { CollectionID } from "./Helpers/collection";
 
-export = {
-    aggregate: (collectionId: CollectionID) => new WeivDataAggregate(collectionId),
-    filter: () => new WeivDataFilter(),
-    query: (collectionId: CollectionID) => new WeivDataQuery(collectionId),
+const aggregate = (collectionId: CollectionID) => new WeivDataAggregate(collectionId);
+const query = (collectionId: CollectionID) => new WeivDataQuery(collectionId);
+const filter = () => new WeivDataFilter();
+
+export {
+    query,
+    filter,
+    aggregate,
+    queryReferenced,
+    bulkInsert,
+    bulkRemove,
+    bulkSave,
+    bulkUpdate,
+    get,
+    insert,
+    insertReference,
+    isReferenced,
+    remove,
+    removeReference,
+    replaceReferences,
+    save,
+    truncate,
+    update,
+    idConverter,
+    flushCache,
+    native,
+    replace,
+    findOne,
+    getAndRemove,
+    getAndReplace,
+    getAndUpdate,
+    multiply,
+    increment,
+    push,
+    pull
+}
+
+export default {
+    query,
+    filter,
+    aggregate,
     queryReferenced,
     bulkInsert,
     bulkRemove,

@@ -4,6 +4,10 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 2.8.4
+
+- Enabled module import of single-function imports. (TS Change)
+
 ### 2.8.3
 
 - Filtering BUG fixed for query and filter classes. (Filters were not working correctly especially for or, not, and)
