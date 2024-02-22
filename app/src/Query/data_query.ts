@@ -622,7 +622,7 @@ export class WeivDataQuery {
      * @param options An object containing options to use when processing this operation.
      * @returns {Promise<WeivDataQueryResult>} Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
      */
-    async find(options: WeivDataOptions): Promise<WeivDataQueryResult> {
+    async find(options: WeivDataOptionsCache): Promise<WeivDataQueryResult> {
         return this.runQuery(options);
     }
 
