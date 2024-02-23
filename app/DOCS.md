@@ -90,7 +90,7 @@ Let's start by setting up our environment for weiv-data and make things ready. F
    3. You will see the `@exweiv/weiv-data` npm package install that package.
    4. You may also want to install `mongodb` package since you will deal with `ObjectIDs`.
    5. Search for "mongodb" and click the three dots. Select choose version and install the 5.9.2
-   6. You can import ObjectId like that: `import { ObjectId } from 'mongodb';`. (More examples below).
+   6. You can import ObjectId like that: `import { ObjectId } from 'mongodb';`. (More examples below and can only be used in backend).
 8. For the last step go to your Wix Studio editor and open up the `Public & Backend` section.
    1. Create a folder named `WeivData` in your backend section of your site.
    2. Inside of this folder create a JS file named `connection-options.js` and `data.js`. These are required even if you don't set any data hooks or custom connection options.
@@ -158,25 +158,34 @@ const defaultOptions = () => {
   };
 };
 
-export const adminClientOptions = {
-  ...defaultOptions(),
-  tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/admin.pem",
+// Defined as a function (can be async)
+export const adminClientOptions = () => {
+  return {
+    ...defaultOptions(),
+    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/admin.pem",
+  };
 };
 
-export const memberClientOptions = {
-  ...defaultOptions(),
-  tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/member.pem",
+// Defined as a function (can be async)
+export const memberClientOptions = () => {
+  return {
+    ...defaultOptions(),
+    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/member.pem",
+  };
 };
 
-export const visitorClientOptions = {
-  ...defaultOptions(),
-  tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/visitor.pem",
+// Defined as a function (can be async)
+export const visitorClientOptions = () => {
+  return {
+    ...defaultOptions(),
+    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/visitor.pem",
+  };
 };
 ```
 
 Let's talk about how it works. Basically you can create three different client options for each role and export them named as above example. And export them in that js file.
 
-`adminClientOptions` variable will be used for admins. `memberClientOptions` variable will be used for members. `visitorClientOptions` variable will be used for visitors.
+`adminClientOptions` function will be used for admins. `memberClientOptions` function will be used for members. `visitorClientOptions` function will be used for visitors.
 
 In this way you can assign different certificates or options for each role.
 

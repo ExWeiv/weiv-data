@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadConnectionOptions = exports.connectionHandler = void 0;
+exports.getCustomCacheRules = exports.loadConnectionOptions = exports.connectionHandler = void 0;
 const customConnectionOptions = __importStar(require("../../../../../../../../../user-code/backend/WeivData/connection-options"));
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("./name_helpers");
@@ -53,7 +53,7 @@ async function loadConnectionOptions(role) {
     try {
         const customOptions = customConnectionOptions[role];
         if (customOptions) {
-            return customOptions;
+            return await customOptions();
         }
         else {
             return defaultOptions;
@@ -64,3 +64,18 @@ async function loadConnectionOptions(role) {
     }
 }
 exports.loadConnectionOptions = loadConnectionOptions;
+async function getCustomCacheRules() {
+    try {
+        const cacheRules = customConnectionOptions["clientCacheRules"];
+        if (cacheRules) {
+            return await cacheRules();
+        }
+        else {
+            return { useClones: false, stdTTL: 5 * 60, deleteOnExpire: true };
+        }
+    }
+    catch (err) {
+        throw Error(`WeivData - Error when loading custom cache rules for MongoClient connections, err: ${err}`);
+    }
+}
+exports.getCustomCacheRules = getCustomCacheRules;
