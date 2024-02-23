@@ -1,4 +1,4 @@
-import { Collection, ObjectId, Document} from 'mongodb/mongodb';
+import { Collection, ObjectId, Document, ReadConcernLevel } from 'mongodb/mongodb';
 
 /**
  * Prevents permission checks from running for the operation. Set uri to AdminURI. Defaults to undefined.
@@ -16,7 +16,7 @@ export type SuppressHooks = boolean;
  * Set the read concern level of your operation. Defaults to local.
  * @public
  */
-export type ReadConcern = "local" | "majority" | "linearizable" | "available" | "snapshot";
+export type ReadConcern = ReadConcernLevel;
 
 /**
  * When you want to get not just only members or admins id (member id in Wix) also visitors id enable this and system will create a data using wix-data and then it will use the _owner field to get the current user temp id.
