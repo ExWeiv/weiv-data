@@ -1,7 +1,7 @@
 import { Collection, ObjectId, Document } from 'mongodb/mongodb';
 
 /**
- * Prevents permission checks from running for the operation. (Uses AdminURI by default). Defaults to undefined.
+ * Prevents permission checks from running for the operation. Set uri to AdminURI. Defaults to undefined.
  * @public
  */
 export type SuppressAuth = boolean;

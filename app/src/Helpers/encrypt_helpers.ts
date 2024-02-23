@@ -5,7 +5,7 @@ import { getCachedSecret } from './secret_helpers';
 /**@internal */
 export async function getSecretKey(): Promise<string> {
     try {
-        const cachedSecret = await getCachedSecret("WeivDataURIEncryptSecret");
+        const cachedSecret: string = await getCachedSecret("WeivDataURIEncryptSecret");
         if (cachedSecret) {
             return cachedSecret;
         } else {

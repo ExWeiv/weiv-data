@@ -56,13 +56,13 @@ const getVisitorURI = async (): Promise<GetMongoURIResult> => {
             return { uri: cachedVisitorURI, role: "visitorClientOptions" };
         }
 
-        const secret = await getCachedSecret("VisitorURI");
+        const secret = await getSecretURI("visitor");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
             cache.set<CryptoJS.lib.CipherParams>("VisitorMongoDB_URI", encryptedURI, 60 * 5);
             return { uri: secret, role: "visitorClientOptions" }
         } else {
-            throw Error(`WeivData - AdminURI Secret Not Found`);
+            throw Error(`WeivData - WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
         throw Error(`Error when getting VisitorURI: ${err}`);
@@ -88,7 +88,7 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
             };
         }
 
-        const secret = await getCachedSecret("AdminURI");
+        const secret = await getSecretURI("admin");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
             cache.set<CryptoJS.lib.CipherParams>("AdminMongoDB_URI", encryptedURI, 60 * 5);
@@ -98,7 +98,7 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
                 role: "adminClientOptions"
             }
         } else {
-            throw Error(`WeivData - AdminURI Secret Not Found`);
+            throw Error(`WeivData - WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
         throw Error(`WeivData - Error when getting AdminURI: ${err}`);
@@ -141,7 +141,7 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
             cache.set(`MemberRoles${currentUser.id}`, "Member", 60 * 5);
         }
 
-        const secret = await getCachedSecret("MemberURI");
+        const secret = await getSecretURI("member");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
             cache.set<CryptoJS.lib.CipherParams>(`MemberMongoDB_URI${currentUser.id}`, encryptedURI, 60 * 5);
@@ -152,7 +152,7 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
                 role: "memberClientOptions"
             }
         } else {
-            throw Error(`WeivData - AdminURI Secret Not Found`);
+            throw Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
         throw Error(`Error when getting MemberURI: ${err}`);
@@ -182,4 +182,9 @@ const decryptURI = async (encryptedURI: CryptoJS.lib.CipherParams) => {
         iv: encryptedURI.iv
     });
     return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+const getSecretURI = async (uri: "admin" | "member" | "visitor"): Promise<string> => {
+    const secret = await getCachedSecret<"URI">("WeivDataURIs", true);
+    return secret[uri];
 }

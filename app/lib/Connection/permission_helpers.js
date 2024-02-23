@@ -36,14 +36,14 @@ const getVisitorURI = async () => {
             const cachedVisitorURI = await decryptURI(cachedEncryptedVisitorURI);
             return { uri: cachedVisitorURI, role: "visitorClientOptions" };
         }
-        const secret = await (0, secret_helpers_1.getCachedSecret)("VisitorURI");
+        const secret = await getSecretURI("visitor");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
             cache.set("VisitorMongoDB_URI", encryptedURI, 60 * 5);
             return { uri: secret, role: "visitorClientOptions" };
         }
         else {
-            throw Error(`WeivData - AdminURI Secret Not Found`);
+            throw Error(`WeivData - WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     }
     catch (err) {
@@ -61,7 +61,7 @@ const getAdminURI = async () => {
                 role: "adminClientOptions"
             };
         }
-        const secret = await (0, secret_helpers_1.getCachedSecret)("AdminURI");
+        const secret = await getSecretURI("admin");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
             cache.set("AdminMongoDB_URI", encryptedURI, 60 * 5);
@@ -72,7 +72,7 @@ const getAdminURI = async () => {
             };
         }
         else {
-            throw Error(`WeivData - AdminURI Secret Not Found`);
+            throw Error(`WeivData - WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     }
     catch (err) {
@@ -106,7 +106,7 @@ const getMemberURI = async () => {
         else {
             cache.set(`MemberRoles${wix_users_backend_1.currentUser.id}`, "Member", 60 * 5);
         }
-        const secret = await (0, secret_helpers_1.getCachedSecret)("MemberURI");
+        const secret = await getSecretURI("member");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
             cache.set(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`, encryptedURI, 60 * 5);
@@ -117,7 +117,7 @@ const getMemberURI = async () => {
             };
         }
         else {
-            throw Error(`WeivData - AdminURI Secret Not Found`);
+            throw Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     }
     catch (err) {
@@ -145,4 +145,8 @@ const decryptURI = async (encryptedURI) => {
         iv: encryptedURI.iv
     });
     return decrypted.toString(crypto_js_1.default.enc.Utf8);
+};
+const getSecretURI = async (uri) => {
+    const secret = await (0, secret_helpers_1.getCachedSecret)("WeivDataURIs", true);
+    return secret[uri];
 };

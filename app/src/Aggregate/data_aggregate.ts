@@ -11,7 +11,7 @@ import type { ConsistentRead, SuppressAuth } from "../Helpers/collection";
  */
 export interface AggregateRunOptions {
     /**
-     * Bypass permissions of user when using aggregate. When set to true AdminURI will be used automatically.
+     * Bypass permissions of user when using aggregate. When set to true admin uri will be used automatically.
      */
     suppressAuth?: SuppressAuth,
 
