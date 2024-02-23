@@ -29,7 +29,7 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
 
         let editedItem = value;
         if (suppressHooks != true) {
@@ -48,7 +48,7 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
         const item = await collection.findOneAndReplace(
             { _id: convertStringId(itemId) },
             editedItem,
-            { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {

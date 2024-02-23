@@ -47,7 +47,7 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, o
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
 
         let editedItemIds: ObjectId[] | Promise<ObjectId>[] = itemIds.map(async (itemId) => {
             if (suppressHooks != true) {
@@ -77,7 +77,7 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemIDs, o
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { deletedCount, ok } = await collection.bulkWrite(
             writeOperations,
-            { readConcern: consistentRead === true ? "majority" : "local", ordered: true }
+            { readConcern: readConcern ? readConcern : "local", ordered: true }
         );
 
         if (ok) {

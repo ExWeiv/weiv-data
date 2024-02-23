@@ -2,7 +2,7 @@ import { Db, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/automatic_connection_provider';
 import { isEmpty, size } from 'lodash';
 import NodeCache from "node-cache";
-import type { ConnectionHandlerResult, Items } from "../Helpers/collection";
+import type { ConnectionHandlerResult, Items, ReadConcern } from "../Helpers/collection";
 import type { LookupObject, ReferenceLenghtObject } from "./data_query";
 
 const cache = new NodeCache({
@@ -81,7 +81,7 @@ export type DataQueryResultOptions = {
     enableCache: boolean,
     cacheTimeout: number,
     suppressAuth?: boolean,
-    consistentRead?: boolean,
+    readConcern?: ReadConcern,
     pageSize: number,
     dbName: string,
     collectionName: string,
@@ -104,7 +104,7 @@ type QueryResultQueryOptions = {
 export class InternalWeivDataQueryResult {
     private dataQueryClass!: { [key: string]: any };
     private suppressAuth = false;
-    private consistentRead = false;
+    private readConcern: ReadConcern = "local";
     private pageSize: number = 50;
     private dbName!: string;
     private collectionName!: string;
@@ -116,7 +116,7 @@ export class InternalWeivDataQueryResult {
     private enableCache: boolean;
 
     constructor(options: DataQueryResultOptions) {
-        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, cacheTimeout, enableCache } = options;
+        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, readConcern, collection, cacheTimeout, enableCache } = options;
 
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
             throw Error(`WeivData - Required Param/s Missing`);
@@ -125,7 +125,7 @@ export class InternalWeivDataQueryResult {
         this.cacheTimeout = cacheTimeout;
         this.enableCache = enableCache;
         this.collection = collection;
-        this.consistentRead = consistentRead || false;
+        this.readConcern = readConcern || "local";
         this.suppressAuth = suppressAuth || false;
         this.dataQueryClass = queryClass;
         this.pageSize = pageSize;
@@ -198,8 +198,8 @@ export class InternalWeivDataQueryResult {
 
                     const aggregateCursor = this.collection.aggregate(pipeline);
 
-                    if (this.consistentRead === true) {
-                        aggregateCursor.withReadConcern('majority');
+                    if (this.readConcern) {
+                        aggregateCursor.withReadConcern(this.readConcern);
                     }
 
                     return await aggregateCursor.toArray();
@@ -213,8 +213,8 @@ export class InternalWeivDataQueryResult {
                     findCursor.skip(skip || 0 + ((this.currentPage - 1) * this.pageSize));
                     findCursor.limit(this.pageSize);
 
-                    if (this.consistentRead === true) {
-                        findCursor.withReadConcern("majority")
+                    if (this.readConcern) {
+                        findCursor.withReadConcern(this.readConcern)
                     }
 
                     return await findCursor.toArray();

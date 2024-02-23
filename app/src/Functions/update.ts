@@ -36,7 +36,7 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || { suppressAuth: false, suppressHooks: false };
+        const { suppressAuth, suppressHooks, readConcern } = options || { suppressAuth: false, suppressHooks: false };
 
         let editedItem;
         if (suppressHooks != true) {
@@ -53,7 +53,7 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         const value = await collection.findOneAndUpdate(
             { _id: itemId },
             { $set: { ...updateItem, _updatedDate: new Date() } },
-            { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
         );
 
         if (value) {
