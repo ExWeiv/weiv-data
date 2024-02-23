@@ -11,7 +11,7 @@ async function getAndRemove(collectionId, itemId, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
         let editedItemId = itemId;
         if (suppressHooks != true) {
             const modifiedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndRemove", [itemId, context]).catch((err) => {
@@ -23,7 +23,7 @@ async function getAndRemove(collectionId, itemId, options) {
         }
         editedItemId = (0, item_helpers_1.convertStringId)(editedItemId);
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOneAndDelete({ _id: editedItemId }, { readConcern: consistentRead === true ? "majority" : "local", includeResultMetadata: false });
+        const item = await collection.findOneAndDelete({ _id: editedItemId }, { readConcern: readConcern ? readConcern : "local", includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndRemove", [item, context]).catch((err) => {

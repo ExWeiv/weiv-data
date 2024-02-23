@@ -21,7 +21,7 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
         if ((0, lodash_1.isArray)(referencedItem)) {
             throw Error(`WeivData - Wrong item type for referencedItem, it shouldn't be an array`);
         }
-        const { suppressAuth, consistentRead, enableCache, cacheTimeout } = options || {};
+        const { suppressAuth, readConcern, enableCache, cacheTimeout } = options || {};
         const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
         if (enableCache) {
             const cachedItem = cache.get(cacheKey);
@@ -32,7 +32,7 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const totalCount = await collection.countDocuments({ _id: itemId, [propertyName]: { $in: references } }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const totalCount = await collection.countDocuments({ _id: itemId, [propertyName]: { $in: references } }, { readConcern: readConcern ? readConcern : "local" });
         if (totalCount > 0) {
             if (enableCache) {
                 cache.set(cacheKey, true, cacheTimeout || 15);

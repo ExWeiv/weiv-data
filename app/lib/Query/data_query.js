@@ -209,7 +209,7 @@ class WeivDataQuery {
     }
     async count(options) {
         try {
-            const { suppressAuth, consistentRead, suppressHooks } = options;
+            const { suppressAuth, readConcern, suppressHooks } = options;
             const { collection } = await this.connectionHandler(suppressAuth);
             this.filtersHandler();
             const context = (0, hook_helpers_1.prepareHookContext)(this.collectionId);
@@ -219,7 +219,7 @@ class WeivDataQuery {
                     throw Error(`WeivData - beforeCount Hook Failure ${err}`);
                 });
             }
-            const countOptions = consistentRead === true ? { readConcern: 'majority' } : { readConcern: 'local' };
+            const countOptions = readConcern ? { readConcern } : {};
             let totalCount;
             if (editedQurey) {
                 totalCount = await collection.countDocuments(editedQurey.query, (0, lodash_1.isEmpty)(editedQurey.query) ? { ...countOptions, hint: "_id_" } : countOptions);
@@ -319,7 +319,7 @@ class WeivDataQuery {
     }
     async runQuery(options) {
         try {
-            const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
+            const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = options || {};
             const { collection } = await this.connectionHandler(suppressAuth);
             const context = (0, hook_helpers_1.prepareHookContext)(this.collectionId);
             let editedQurey;
@@ -341,7 +341,7 @@ class WeivDataQuery {
                 enableCache: enableCache || false,
                 cacheTimeout: cacheTimeout || 15,
                 suppressAuth,
-                consistentRead,
+                readConcern,
                 collection,
                 pageSize: classInUse.limitNumber,
                 dbName: classInUse.dbName,

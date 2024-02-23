@@ -8,11 +8,11 @@ async function insertReference(collectionId, propertyName, referringItem, refere
         if (!collectionId || !propertyName || !referringItem || !referencedItem) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
         }
-        const { suppressAuth, consistentRead } = options || {};
+        const { suppressAuth, readConcern } = options || {};
         const references = (0, reference_helpers_1.getReferences)(referencedItem);
         const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { acknowledged, modifiedCount } = await collection.updateOne({ _id: itemId }, { $push: { [propertyName]: { $each: references } }, $set: { _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const { acknowledged, modifiedCount } = await collection.updateOne({ _id: itemId }, { $push: { [propertyName]: { $each: references } }, $set: { _updatedDate: new Date() } }, { readConcern: readConcern ? readConcern : "local" });
         if (!acknowledged || modifiedCount <= 0) {
             throw Error(`Error when inserting a reference item into an item, acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }

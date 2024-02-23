@@ -15,17 +15,17 @@ const cache = new node_cache_1.default({
 class InternalWeivDataQueryResult {
     constructor(options) {
         this.suppressAuth = false;
-        this.consistentRead = false;
+        this.readConcern = "local";
         this.pageSize = 50;
         this.currentPage = 1;
-        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, consistentRead, collection, cacheTimeout, enableCache } = options;
+        const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, readConcern, collection, cacheTimeout, enableCache } = options;
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
             throw Error(`WeivData - Required Param/s Missing`);
         }
         this.cacheTimeout = cacheTimeout;
         this.enableCache = enableCache;
         this.collection = collection;
-        this.consistentRead = consistentRead || false;
+        this.readConcern = readConcern || "local";
         this.suppressAuth = suppressAuth || false;
         this.dataQueryClass = queryClass;
         this.pageSize = pageSize;
@@ -84,8 +84,8 @@ class InternalWeivDataQueryResult {
                         $limit: this.pageSize
                     });
                     const aggregateCursor = this.collection.aggregate(pipeline);
-                    if (this.consistentRead === true) {
-                        aggregateCursor.withReadConcern('majority');
+                    if (this.readConcern) {
+                        aggregateCursor.withReadConcern(this.readConcern);
                     }
                     return await aggregateCursor.toArray();
                 }
@@ -96,8 +96,8 @@ class InternalWeivDataQueryResult {
                     });
                     findCursor.skip(skip || 0 + ((this.currentPage - 1) * this.pageSize));
                     findCursor.limit(this.pageSize);
-                    if (this.consistentRead === true) {
-                        findCursor.withReadConcern("majority");
+                    if (this.readConcern) {
+                        findCursor.withReadConcern(this.readConcern);
                     }
                     return await findCursor.toArray();
                 }

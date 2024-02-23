@@ -20,7 +20,7 @@ async function get(collectionId, itemId, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
+        const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = options || {};
         let editedItemId;
         if (suppressHooks != true) {
             editedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGet", [itemId, context]).catch((err) => {
@@ -42,7 +42,7 @@ async function get(collectionId, itemId, options) {
             }
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: newItemId }, { readConcern: consistentRead === true ? "majority" : "local" });
+        const item = await collection.findOne({ _id: newItemId }, { readConcern: readConcern ? readConcern : "local" });
         if (item) {
             if (suppressHooks != true) {
                 let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterGet', [item, context]).catch((err) => {

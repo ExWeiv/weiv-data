@@ -125,7 +125,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         return this;
     }
     async run(options) {
-        const { suppressAuth, consistentRead } = options || {};
+        const { suppressAuth, readConcern } = options || {};
         const { collection } = await this.connectionHandler(suppressAuth);
         if (this.sorting) {
             this.pipeline = (0, pipeline_helpers_1.checkPipelineArray)(this.pipeline);
@@ -168,8 +168,8 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
         if (this.limitNumber) {
             aggregation.limit(this.limitNumber);
         }
-        if (consistentRead === true) {
-            aggregation.withReadConcern("majority");
+        if (readConcern) {
+            aggregation.withReadConcern(readConcern);
         }
         const aggregateResult = await this.getResult(suppressAuth);
         let modifiedItems = aggregateResult.items.map((document) => {

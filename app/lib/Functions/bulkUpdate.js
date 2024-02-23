@@ -16,7 +16,7 @@ async function bulkUpdate(collectionId, items, options) {
             }
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
         let editedItems = items.map(async (item) => {
             item._id = (0, item_helpers_1.convertStringId)(item._id);
             if (suppressHooks != true) {
@@ -44,7 +44,7 @@ async function bulkUpdate(collectionId, items, options) {
             };
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { modifiedCount, ok } = await collection.bulkWrite(bulkOperations, { readConcern: consistentRead === true ? "majority" : "local", ordered: true });
+        const { modifiedCount, ok } = await collection.bulkWrite(bulkOperations, { readConcern: readConcern ? readConcern : "local", ordered: true });
         if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
