@@ -51,7 +51,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
 
         // Convert ID to ObjectId if exist
         let editedItem;
@@ -80,7 +80,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         const { upsertedId, acknowledged } = await collection.updateOne(
             editedItem._id ? { _id: editedItem._id } : { _id: new ObjectId() },
             { $set: { ...editedItem, _updatedDate: new Date() }, $setOnInsert: !editedItem._createdDate ? { _createdDate: new Date() } : {} },
-            { readConcern: consistentRead === true ? "majority" : "local", upsert: true }
+            { readConcern: readConcern ? readConcern : "local", upsert: true }
         );
 
         const returnedItem = { ...editedItem, _id: editedItem._id }

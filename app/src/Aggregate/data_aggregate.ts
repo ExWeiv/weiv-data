@@ -2,7 +2,7 @@ import { Document } from "mongodb/mongodb";
 import { checkPipelineArray, sortAggregationPipeline, } from "../Helpers/pipeline_helpers";
 import { WeivDataFilter } from "../Filter/data_filter";
 import { InternalWeivDataAggregateResult, WeivDataAggregateResult } from './data_aggregate_result';
-import type { ConsistentRead, SuppressAuth } from "../Helpers/collection";
+import type { ReadConcern, SuppressAuth } from "../Helpers/collection";
 
 /**
  * Options to use when running an aggregation.
@@ -11,14 +11,14 @@ import type { ConsistentRead, SuppressAuth } from "../Helpers/collection";
  */
 export interface AggregateRunOptions {
     /**
-     * Bypass permissions of user when using aggregate. When set to true AdminURI will be used automatically.
+     * Bypass permissions of user when using aggregate. When set to true admin uri will be used automatically.
      */
     suppressAuth?: SuppressAuth,
 
     /**
      * Enable consistent read from clusters. This will change the readConvern to "majority", in this way you'll get the most up to date data.
      */
-    consistentRead?: ConsistentRead,
+    readConcern?: ReadConcern,
 }
 
 /** @internal */
@@ -401,7 +401,7 @@ export class WeivDataAggregate extends InternalWeivDataAggregateResult {
     */
     async run(options?: AggregateRunOptions): Promise<WeivDataAggregateResult> {
         // Get the options passed with run() and then connect to client and get memberId (if there is a memberId) and also pass suppressAuth option
-        const { suppressAuth, consistentRead } = options || {};
+        const { suppressAuth, readConcern } = options || {};
         const { collection } = await this.connectionHandler(suppressAuth);
 
         if (this.sorting) {
@@ -461,9 +461,9 @@ export class WeivDataAggregate extends InternalWeivDataAggregateResult {
             aggregation.limit(this.limitNumber);
         }
 
-        // Enable read consistency if consistentRead enabled via run options
-        if (consistentRead === true) {
-            aggregation.withReadConcern("majority");
+        // Enable read consistency if readConcern enabled via run options
+        if (readConcern) {
+            aggregation.withReadConcern(readConcern);
         }
 
         // Make the call to the MongoDB and convert it to an array via result function

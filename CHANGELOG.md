@@ -88,7 +88,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 ### 2.3.2
 
 - Docs updated.
-- consistentRead BUG fixed for query and aggregation
+- readConcern BUG fixed for query and aggregation
 
 ### 2.3.1
 
@@ -218,7 +218,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 - Error handling.
 - Function testing and fixing.
 - bulkInsert returned itemIds fixed (it was an object instead of an array)
-- consistentRead feature added to bulkInsert and bulkRemove
+- readConcern feature added to bulkInsert and bulkRemove
 - BUG fixes for bulkInsert and bulkRemove
 - BUG fixes for bulkSave
 - BUG fixes for bulkUpdate

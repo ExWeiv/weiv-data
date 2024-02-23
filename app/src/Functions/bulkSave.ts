@@ -57,7 +57,7 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = options || {};
 
         let ownerId = await getOwnerId(enableVisitorId);
         let editedItems: Items | Promise<Items>[] = items.map(async (item) => {
@@ -122,7 +122,7 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { insertedCount, modifiedCount, insertedIds, ok } = await collection.bulkWrite(
             bulkOperations,
-            { readConcern: consistentRead === true ? "majority" : "local", ordered: true }
+            { readConcern: readConcern ? readConcern : "local", ordered: true }
         );
 
         if (ok) {

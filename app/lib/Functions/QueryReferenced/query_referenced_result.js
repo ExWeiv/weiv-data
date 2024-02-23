@@ -30,8 +30,8 @@ class InternalWeivDataQueryReferencedResult {
     }
     async getItems() {
         try {
-            const { consistentRead } = this.options;
-            const items = await this.collection.aggregate((0, query_referenced_helpers_1.getPipeline)(this.itemId, this.targetCollectionId, this.propertyName, this.getPipelineOptions()), { readConcern: consistentRead === true ? "majority" : "local" }).toArray();
+            const { readConcern } = this.options;
+            const items = await this.collection.aggregate((0, query_referenced_helpers_1.getPipeline)(this.itemId, this.targetCollectionId, this.propertyName, this.getPipelineOptions()), { readConcern: readConcern ? readConcern : "local" }).toArray();
             return items;
         }
         catch (err) {

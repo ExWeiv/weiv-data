@@ -12,7 +12,7 @@ async function replace(collectionId, item, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item._id`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || { suppressAuth: false, suppressHooks: false };
+        const { suppressAuth, suppressHooks, readConcern } = options || { suppressAuth: false, suppressHooks: false };
         let editedItem;
         if (suppressHooks != true) {
             editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeReplace", [item, context]).catch((err) => {
@@ -24,7 +24,7 @@ async function replace(collectionId, item, options) {
         const filter = !itemId ? { _id: new mongodb_1.ObjectId() } : { _id: itemId };
         delete replaceItem._id;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const value = await collection.findOneAndReplace(filter, { $set: { ...replaceItem, _updatedDate: new Date() } }, { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false });
+        const value = await collection.findOneAndReplace(filter, { $set: { ...replaceItem, _updatedDate: new Date() } }, { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false });
         if (value) {
             if (suppressHooks != true) {
                 let editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterReplace", [value, context]).catch((err) => {

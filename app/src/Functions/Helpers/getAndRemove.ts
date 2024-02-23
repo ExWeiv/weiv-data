@@ -28,7 +28,7 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
 
         let editedItemId = itemId;
         if (suppressHooks != true) {
@@ -46,7 +46,7 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndDelete(
             { _id: editedItemId },
-            { readConcern: consistentRead === true ? "majority" : "local", includeResultMetadata: false }
+            { readConcern: readConcern ? readConcern : "local", includeResultMetadata: false }
         );
 
         if (item) {

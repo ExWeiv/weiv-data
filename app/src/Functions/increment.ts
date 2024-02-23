@@ -30,7 +30,7 @@ export async function increment(collectionId: CollectionID, itemId: ItemID, prop
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
 
         let editedModify = { propertyName, value };
         if (suppressHooks != true) {
@@ -47,7 +47,7 @@ export async function increment(collectionId: CollectionID, itemId: ItemID, prop
         const item = await collection.findOneAndUpdate(
             { _id: convertStringId(itemId) },
             { $inc: { [editedModify.propertyName]: editedModify.value } },
-            { readConcern: consistentRead === true ? "majority" : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {

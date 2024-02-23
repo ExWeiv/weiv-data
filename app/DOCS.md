@@ -69,8 +69,17 @@ Let's start by setting up our environment for weiv-data and make things ready. F
    3. Keep in mind that you can setup custom IP addresses if you want.
 5. When you complete the 4th step. You are now ready to switch to your Wix Studio Dashboard.
    1. Open up the Wix dashboard and go to `Developer Tools -> Secrets Manager`
-   2. You will create 3 different secret for each user you created in MongoDB.
-   3. Create three different secret for Admin, Member and Visitor roles named as like that: AdminURI, MemberURI, VisitorURI. And as value pass your connection URIs/strings.
+   2. You will create a single secret for all users you've created in MongoDB. Create a secret named as `WeivDataURIs`.
+   3. After you create the secret you will paste the URIs in JSON format like below:
+
+```json
+{
+  "visitor": "<visitor-uri>",
+  "member": "<member-uri>",
+  "admin": "<admin-uri>"
+}
+```
+
 6. You are done with Secrets Manager now go to CMS from your Wix Dashboard.
    1. Create a collection and name it as `WeivOwnerID`. This collection will be used to get visitor ids when you enable it for each operation.
    2. You don't need to create any field just create the collection and leave it as it is. weiv-data will remove any data it creates.
@@ -78,15 +87,14 @@ Let's start by setting up our environment for weiv-data and make things ready. F
 7. Now it's time to install the `weiv-data` library.
    1. Go to your Wix Studio Editor and enable coding features (Velo). (Click the code icon = { })
    2. Go to `Packages & Apps`. You will see npm click `+` button. And search for "@exweiv".
-   3. You will see the `@exweiv/weiv-data/` npm package install that package.
+   3. You will see the `@exweiv/weiv-data` npm package install that package.
    4. You may also want to install `mongodb` package since you will deal with `ObjectIDs`.
    5. Search for "mongodb" and click the three dots. Select choose version and install the 5.9.2
-   6. You can import ObjectId like that: `import { ObjectId } from 'mongodb';`. (More examples below).
-8. For the last step if you need/want to set custom connection options. Go to your Wix Studio editor and open up the `Public & Backend` section.
+   6. You can import ObjectId like that: `import { ObjectId } from 'mongodb';`. (More examples below and can only be used in backend).
+8. For the last step go to your Wix Studio editor and open up the `Public & Backend` section.
    1. Create a folder named `WeivData` in your backend section of your site.
-   2. Inside of this folder create a JS file named `connection-options.js` and export a variable named `clientOptions` that contains your custom options.
-   3. _This will be required when you want to use X.509 method._
-9. You are ready!
+   2. Inside of this folder create a JS file named `connection-options.js` and `data.js`. These are required even if you don't set any data hooks or custom connection options.
+9. You should be good to go!
 
 **Even if you won't setup any custom connection settings or data hooks create `WeivData` folder in your backend and create two .js files `data.js` and `connection-options.js`. This is important and must have to let library work.`**
 
@@ -136,6 +144,8 @@ idConverter(objectId); // returns stringid
 
 Here is a direct example for advanced users to let them understand it directly.
 
+> Example shows a path but you can also use buffer data with `key` field in options. See MongoDB docs for more.
+
 ```js
 // In your `backend/WeivData/connection-options.js` file.
 const defaultOptions = () => {
@@ -148,25 +158,34 @@ const defaultOptions = () => {
   };
 };
 
-export const adminClientOptions = {
-  ...defaultOptions(),
-  tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/admin.pem",
+// Defined as a function (can be async)
+export const adminClientOptions = () => {
+  return {
+    ...defaultOptions(),
+    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/admin.pem",
+  };
 };
 
-export const memberClientOptions = {
-  ...defaultOptions(),
-  tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/member.pem",
+// Defined as a function (can be async)
+export const memberClientOptions = () => {
+  return {
+    ...defaultOptions(),
+    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/member.pem",
+  };
 };
 
-export const visitorClientOptions = {
-  ...defaultOptions(),
-  tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/visitor.pem",
+// Defined as a function (can be async)
+export const visitorClientOptions = () => {
+  return {
+    ...defaultOptions(),
+    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/visitor.pem",
+  };
 };
 ```
 
 Let's talk about how it works. Basically you can create three different client options for each role and export them named as above example. And export them in that js file.
 
-`adminClientOptions` variable will be used for admins. `memberClientOptions` variable will be used for members. `visitorClientOptions` variable will be used for visitors.
+`adminClientOptions` function will be used for admins. `memberClientOptions` function will be used for members. `visitorClientOptions` function will be used for visitors.
 
 In this way you can assign different certificates or options for each role.
 
@@ -180,13 +199,13 @@ In this way you can assign different certificates or options for each role.
 
 ### Using Atlas Managed X.509
 
-You can still use username and password method (SCRAM) which will be fine when you are starting but if you want to use X.509 here is how. Username and password method is easier and more secure with weiv-data library. Just create strong passwords!
+You can still use username and password method (SCRAM) which will be fine if you have strong passwords but if you want to use X.509 here is how. Username and password method (SCRAM) is easier and secure. Just create strong passwords!
 
 Let us explain how does weiv-data works when connecting to clusters so you can better understand which options you can use for authentication.
 
 > You can also check our GitHub so you can understand how it works even create pull requests.
 
-- Our connection provider gets the URI from the secrets you create in your Wix secrets manager.
+- Our connection provider gets the URI from the secret you create in your Wix secrets manager.
 - We use secrets manager for URIs but for connection options (`MongoClientOptions`) we use a JS file you create in your Wix backend. As we explain above.
 
 In this way you can manage connection uris/strings as well as connection options.
@@ -212,6 +231,8 @@ const pathToBackend = "../../../../../../../../../user-code/backend/";
 This is the path to your Wix backend. Yes it's different than what you have in your codes. But this one is the working one. Use this path to access your backend folder. You can also check the example code above.
 
 > You can probably also access to other folders like public, pages etc. Just let you know not needed for our library.
+
+> You can also use Buffer data of your .pem files which is probably what you'll prefer in production. You can store your .pem files in cloud providers and get signed URLs after that you can use that signed URLs to create a Buffer data via axios. And then you can use that Buffer data for X.509 method.
 
 ### How to Create Hooks
 

@@ -32,19 +32,24 @@ const wixAuth = __importStar(require("wix-auth"));
 const node_cache_1 = __importDefault(require("node-cache"));
 const cache = new node_cache_1.default();
 const getSecretValue = wixAuth.elevate(wix_secrets_backend_v2_1.secrets.getSecretValue);
-async function getCachedSecret(secretName) {
+async function getCachedSecret(secretName, parse) {
     try {
         let secret = cache.get(secretName);
         if (secret === undefined) {
             const { value } = await getSecretValue(secretName);
-            secret = value;
+            if (parse === true) {
+                const objectSecret = await JSON.parse(value);
+                secret = objectSecret;
+            }
+            else {
+                secret = value;
+            }
             cache.set(secretName, value, 60 * 10);
         }
         return secret;
     }
     catch (err) {
-        console.warn(`WeivData - Error on general cached secret helpers: ${err}`);
-        return undefined;
+        throw Error(`WeivData - Error on general cached secret helpers: ${err}`);
     }
 }
 exports.getCachedSecret = getCachedSecret;

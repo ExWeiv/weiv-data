@@ -31,7 +31,7 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = options || {};
         const defaultValues: { [key: string]: any } = {
             _updatedDate: new Date(),
             _createdDate: new Date(),
@@ -51,7 +51,7 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { insertedId, acknowledged } = await collection.insertOne(
             !editedItem ? modifiedItem : editedItem,
-            { readConcern: consistentRead === true ? "majority" : "local" }
+            { readConcern: readConcern ? readConcern : "local" }
         );
 
         if (acknowledged) {

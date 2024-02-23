@@ -12,7 +12,7 @@ async function save(collectionId, item, options) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
         }
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
         let editedItem;
         if (item._id && typeof item._id === "string") {
             item._id = (0, item_helpers_1.convertStringId)(item._id);
@@ -34,7 +34,7 @@ async function save(collectionId, item, options) {
             ...editedItem
         };
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { upsertedId, acknowledged } = await collection.updateOne(editedItem._id ? { _id: editedItem._id } : { _id: new mongodb_1.ObjectId() }, { $set: { ...editedItem, _updatedDate: new Date() }, $setOnInsert: !editedItem._createdDate ? { _createdDate: new Date() } : {} }, { readConcern: consistentRead === true ? "majority" : "local", upsert: true });
+        const { upsertedId, acknowledged } = await collection.updateOne(editedItem._id ? { _id: editedItem._id } : { _id: new mongodb_1.ObjectId() }, { $set: { ...editedItem, _updatedDate: new Date() }, $setOnInsert: !editedItem._createdDate ? { _createdDate: new Date() } : {} }, { readConcern: readConcern ? readConcern : "local", upsert: true });
         const returnedItem = { ...editedItem, _id: editedItem._id };
         if (acknowledged) {
             if (upsertedId) {

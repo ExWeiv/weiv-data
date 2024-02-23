@@ -99,9 +99,9 @@ export class InternalWeivDataQueryReferencedResult {
     /**@internal */
     private async getItems(): Promise<Items> {
         try {
-            const { consistentRead } = this.options;
+            const { readConcern } = this.options;
             const items = await this.collection.aggregate(getPipeline(this.itemId, this.targetCollectionId, this.propertyName, this.getPipelineOptions()),
-                { readConcern: consistentRead === true ? "majority" : "local" }).toArray();
+                { readConcern: readConcern ? readConcern : "local" }).toArray();
             return items;
         } catch (err) {
             throw Error(`WeivData - Error when getting items for queryReferenced result: ${err}`);

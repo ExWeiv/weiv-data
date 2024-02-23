@@ -52,7 +52,7 @@ export async function bulkUpdate(collectionId: CollectionID, items: Items, optio
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = options || {};
 
         let editedItems: Items | Promise<Items>[] = items.map(async (item) => {
             item._id = convertStringId(item._id);
@@ -86,7 +86,7 @@ export async function bulkUpdate(collectionId: CollectionID, items: Items, optio
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { modifiedCount, ok } = await collection.bulkWrite(
             bulkOperations,
-            { readConcern: consistentRead === true ? "majority" : "local", ordered: true }
+            { readConcern: readConcern ? readConcern : "local", ordered: true }
         );
 
         if (ok) {

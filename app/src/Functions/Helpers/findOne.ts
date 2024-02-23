@@ -34,7 +34,7 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
         }
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
+        const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = options || {};
 
         let editedFilter = { propertyName, value };
         if (suppressHooks != true) {
@@ -58,7 +58,7 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOne(
             { [editedFilter.propertyName]: editedFilter.value },
-            { readConcern: consistentRead === true ? "majority" : "local" }
+            { readConcern: readConcern ? readConcern : "local" }
         );
 
         if (item) {

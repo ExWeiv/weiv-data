@@ -1,7 +1,7 @@
-import { Collection, ObjectId, Document } from 'mongodb/mongodb';
+import { Collection, ObjectId, Document} from 'mongodb/mongodb';
 
 /**
- * Prevents permission checks from running for the operation. (Uses AdminURI by default). Defaults to undefined.
+ * Prevents permission checks from running for the operation. Set uri to AdminURI. Defaults to undefined.
  * @public
  */
 export type SuppressAuth = boolean;
@@ -13,10 +13,10 @@ export type SuppressAuth = boolean;
 export type SuppressHooks = boolean;
 
 /**
- * When true, `readConcern` overwritten as "majority". This decreases performance but ensures data retrieved is up to date even immediately after an update.
+ * Set the read concern level of your operation. Defaults to local.
  * @public
  */
-export type ConsistentRead = boolean;
+export type ReadConcern = "local" | "majority" | "linearizable" | "available" | "snapshot";
 
 /**
  * When you want to get not just only members or admins id (member id in Wix) also visitors id enable this and system will create a data using wix-data and then it will use the _owner field to get the current user temp id.
@@ -79,7 +79,7 @@ export type ItemIDs = Array<ItemID>;
 export interface WeivDataOptions {
     suppressAuth?: SuppressAuth,
     suppressHooks?: SuppressHooks,
-    consistentRead?: ConsistentRead,
+    readConcern?: ReadConcern,
     enableVisitorId?: EnableVisitorID
 }
 

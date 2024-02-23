@@ -486,7 +486,7 @@ export class WeivDataQuery {
     */
     async count(options: WeivDataOptions): Promise<number> {
         try {
-            const { suppressAuth, consistentRead, suppressHooks } = options;
+            const { suppressAuth, readConcern, suppressHooks } = options;
             const { collection } = await this.connectionHandler(suppressAuth);
 
             // Add filters to query
@@ -500,7 +500,7 @@ export class WeivDataQuery {
                 });
             }
 
-            const countOptions: CountDocumentsOptions = consistentRead === true ? { readConcern: 'majority' } : { readConcern: 'local' };
+            const countOptions: CountDocumentsOptions = readConcern ? { readConcern } : {};
 
             let totalCount;
             if (editedQurey) {
@@ -614,7 +614,7 @@ export class WeivDataQuery {
      * const queryResult = await weivData.query("Clusters/IST12")
      *  .hasSome("availableCPUs", ["M1", "S1", "A2"])
      *  .fields("clusterType", "balance", "_updatedDate")
-     *  .find({suppressHooks: true, consistentRead: true});
+     *  .find({suppressHooks: true, readConcern: true});
      * 
      * console.log(queryResult);
      * ```
@@ -622,7 +622,7 @@ export class WeivDataQuery {
      * @param options An object containing options to use when processing this operation.
      * @returns {Promise<WeivDataQueryResult>} Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
      */
-    async find(options: WeivDataOptions): Promise<WeivDataQueryResult> {
+    async find(options: WeivDataOptionsCache): Promise<WeivDataQueryResult> {
         return this.runQuery(options);
     }
 
@@ -637,7 +637,7 @@ export class WeivDataQuery {
      *  .eq("memberTier", 1)
      *  .include("members", "CPUs")
      *  .hasSome("availableCPUs", ["M1", "S1", "A2"])
-     *  .find({suppressHooks: true, consistentRead: true});
+     *  .find({suppressHooks: true, readConcern: true});
      * 
      * console.log(queryResult);
      * ```
@@ -742,7 +742,7 @@ export class WeivDataQuery {
     /** @internal */
     private async runQuery(options?: WeivDataOptionsCache): Promise<WeivDataQueryResult> {
         try {
-            const { suppressAuth, suppressHooks, consistentRead, enableCache, cacheTimeout } = options || {};
+            const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = options || {};
             const { collection } = await this.connectionHandler(suppressAuth);
 
             const context = prepareHookContext(this.collectionId);
@@ -770,7 +770,7 @@ export class WeivDataQuery {
                 enableCache: enableCache || false,
                 cacheTimeout: cacheTimeout || 15,
                 suppressAuth,
-                consistentRead,
+                readConcern,
                 collection,
                 pageSize: classInUse.limitNumber,
                 dbName: classInUse.dbName,

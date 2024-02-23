@@ -15,7 +15,7 @@ export type WeivDataQueryReferencedOptions = { pageSize: number, order: 'asc' | 
  * // Item ID that will be used when searching for references
  * const itemId = "..."
  * 
- * const result = await weivData.queryReferenced("Clusters/All", "clusterLocations", itemId, {consistentRead: true})
+ * const result = await weivData.queryReferenced("Clusters/All", "clusterLocations", itemId, {readConcern: true})
  * 
  * if (result.hasNext()) {
  *  const nextPage = await result.next();
@@ -40,7 +40,7 @@ export async function queryReferenced(collectionId: CollectionID, targetCollecti
         }
 
         const editedItemId = convertStringId(itemId);
-        const referencedClass = new InternalWeivDataQueryReferencedResult(collectionId, targetCollectionId, editedItemId, propertyName, queryOptions, options || { suppressAuth: false, suppressHooks: false, consistentRead: false });
+        const referencedClass = new InternalWeivDataQueryReferencedResult(collectionId, targetCollectionId, editedItemId, propertyName, queryOptions, options || { suppressAuth: false, suppressHooks: false, readConcern: "local" });
         const result = await referencedClass.getResult();
         return result;
     } catch (err) {

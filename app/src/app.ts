@@ -118,7 +118,7 @@ export { WeivDataQueryReferencedOptions } from './Functions/QueryReferenced/quer
 export type {
     SuppressAuth,
     SuppressHooks,
-    ConsistentRead,
+    ReadConcern,
     EnableVisitorID,
     CollectionID,
     Item,
