@@ -4,6 +4,13 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 3.0.0 **(Includes Breaking Changes)**
+
+- `consistentRead` replaced with `readConcern` and now it's using string based data that syncs with mongodb readConcern options.
+- Added custom cache rules to control how MongoClient's cached when they are created.
+- URI storing strategy changed and now all URIs stored as JSON in a single secret in secrets manager. (Update your secrets before you update to ^3.0.0)
+- General TS changes and BUG fixes.
+
 ### 2.8.4
 
 - Enabled module import of single-function imports. (TS Change)
