@@ -14,7 +14,7 @@ import type { CreateCollectionOptions, Collection } from 'mongodb';
 export async function createCollection(collectionId: CollectionID, collectionOptions?: CreateCollectionOptions, options?: WeivDataOptions): Promise<Collection> {
     try {
         if (!collectionId) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: name`);
+            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
         }
 
         const { suppressAuth } = options || {};
