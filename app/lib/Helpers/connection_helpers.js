@@ -30,7 +30,7 @@ const name_helpers_1 = require("./name_helpers");
 const defaultOptions = {
     tls: true,
 };
-async function connectionHandler(collectionId, suppressAuth = false) {
+async function connectionHandler(collectionId, suppressAuth = false, returnDb) {
     try {
         let db;
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
@@ -41,8 +41,13 @@ async function connectionHandler(collectionId, suppressAuth = false) {
         else {
             db = pool.db("ExWeiv");
         }
-        const collection = db.collection(collectionName);
-        return { collection, memberId };
+        if (returnDb === true && db) {
+            return { memberId, database: db };
+        }
+        else {
+            const collection = db.collection(collectionName);
+            return { collection, memberId, database: db };
+        }
     }
     catch (err) {
         throw Error(`WeivData - Error when trying to connect to database via useClient and Mongo Client ${err}`);

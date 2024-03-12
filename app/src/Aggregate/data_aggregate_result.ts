@@ -105,7 +105,7 @@ export class InternalWeivDataAggregateResult {
         };
     }
 
-    protected async connectionHandler(suppressAuth?: SuppressAuth): Promise<ConnectionHandlerResult> {
+    protected async connectionHandler(suppressAuth?: SuppressAuth): Promise<ConnectionHandlerResult<false>> {
         try {
             const { pool, memberId } = await useClient(suppressAuth);
 

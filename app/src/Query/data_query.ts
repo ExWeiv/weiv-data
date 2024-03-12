@@ -831,7 +831,7 @@ export class WeivDataQuery {
     }
 
     /** @internal */
-    private async connectionHandler(suppressAuth = false): Promise<ConnectionHandlerResult> {
+    private async connectionHandler(suppressAuth = false): Promise<ConnectionHandlerResult<false>> {
         const { pool, memberId } = await useClient(suppressAuth);
 
         if (this.dbName) {

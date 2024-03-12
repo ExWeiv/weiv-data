@@ -100,4 +100,4 @@ export interface WeivDataOptionsCache extends WeivDataOptions {
 /** @internal */
 export type ConnectionHandlerResult<DB extends boolean> =
     DB extends true ? { database: Db, memberId?: string } :
-    { collection: Collection, memberId?: string, database: Db }
+    { collection: Collection, memberId?: string, database?: Db }
