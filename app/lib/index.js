@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.pull = exports.push = exports.increment = exports.multiply = exports.getAndUpdate = exports.getAndReplace = exports.getAndRemove = exports.findOne = exports.replace = exports.native = exports.flushCache = exports.idConverter = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.aggregate = exports.filter = exports.query = void 0;
+exports.listCollections = exports.renameCollection = exports.deleteCollection = exports.createCollection = exports.pull = exports.push = exports.increment = exports.multiply = exports.getAndUpdate = exports.getAndReplace = exports.getAndRemove = exports.findOne = exports.replace = exports.native = exports.flushCache = exports.idConverter = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.aggregate = exports.filter = exports.query = void 0;
 const data_aggregate_1 = require("./Aggregate/data_aggregate");
 const data_filter_1 = require("./Filter/data_filter");
 const data_query_1 = require("./Query/data_query");
@@ -58,6 +58,14 @@ const push_1 = require("./Functions/push");
 Object.defineProperty(exports, "push", { enumerable: true, get: function () { return push_1.push; } });
 const pull_1 = require("./Functions/pull");
 Object.defineProperty(exports, "pull", { enumerable: true, get: function () { return pull_1.pull; } });
+const createCollection_1 = require("./Collections/createCollection");
+Object.defineProperty(exports, "createCollection", { enumerable: true, get: function () { return createCollection_1.createCollection; } });
+const deleteCollection_1 = require("./Collections/deleteCollection");
+Object.defineProperty(exports, "deleteCollection", { enumerable: true, get: function () { return deleteCollection_1.deleteCollection; } });
+const renameCollection_1 = require("./Collections/renameCollection");
+Object.defineProperty(exports, "renameCollection", { enumerable: true, get: function () { return renameCollection_1.renameCollection; } });
+const listCollections_1 = require("./Collections/listCollections");
+Object.defineProperty(exports, "listCollections", { enumerable: true, get: function () { return listCollections_1.listCollections; } });
 const aggregate = (collectionId) => new data_aggregate_1.WeivDataAggregate(collectionId);
 exports.aggregate = aggregate;
 const query = (collectionId) => new data_query_1.WeivDataQuery(collectionId);
@@ -94,5 +102,9 @@ exports.default = {
     multiply: multiply_1.multiply,
     increment: increment_1.increment,
     push: push_1.push,
-    pull: pull_1.pull
+    pull: pull_1.pull,
+    createCollection: createCollection_1.createCollection,
+    deleteCollection: deleteCollection_1.deleteCollection,
+    renameCollection: renameCollection_1.renameCollection,
+    listCollections: listCollections_1.listCollections
 };
