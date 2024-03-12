@@ -310,7 +310,7 @@ export class InternalWeivDataQueryResult {
         }
     }
 
-    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult> {
+    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult<false>> {
         try {
             const { pool, memberId } = await useClient(suppressAuth);
 

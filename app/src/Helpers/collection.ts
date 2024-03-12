@@ -1,4 +1,4 @@
-import { Collection, ObjectId, Document, ReadConcernLevel } from 'mongodb/mongodb';
+import { Collection, ObjectId, Document, ReadConcernLevel, Db } from 'mongodb/mongodb';
 
 /**
  * Prevents permission checks from running for the operation. Set uri to AdminURI. Defaults to undefined.
@@ -98,7 +98,6 @@ export interface WeivDataOptionsCache extends WeivDataOptions {
 //---------------------------------------------//
 
 /** @internal */
-export type ConnectionHandlerResult = {
-    collection: Collection,
-    memberId?: string
-}
+export type ConnectionHandlerResult<DB extends boolean> =
+    DB extends true ? { database: Db, memberId?: string } :
+    { collection: Collection, memberId?: string, database?: Db }
