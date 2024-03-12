@@ -22,6 +22,6 @@ export async function createCollection(collectionId: CollectionID, options?: Wei
         const { collectionName } = splitCollectionId(collectionId);
         return await database.createCollection(collectionName, createOptions);
     } catch (err) {
-        throw Error(`WeivData - Error when creating a new collection, details: ${err}`);
+        throw Error(`WeivData - Error when creating a new collection in a database, details: ${err}`);
     }
 }

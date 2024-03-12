@@ -21,6 +21,6 @@ export async function listCollections(databaseName: string, options?: WeivDataOp
         const { database } = await connectionHandler<true>(`${databaseName}/`, suppressAuth);
         return await database.listCollections(filter, listOptions);
     } catch (err) {
-        throw Error(`WeivData - Error when deleting a collection, details: ${err}`);
+        throw Error(`WeivData - Error when listing all collections in a database, details: ${err}`);
     }
 }

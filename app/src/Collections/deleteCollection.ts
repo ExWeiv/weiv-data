@@ -22,6 +22,6 @@ export async function deleteCollection(collectionId: CollectionID, options?: Wei
         const { collectionName } = splitCollectionId(collectionId);
         return await database.dropCollection(collectionName, deleteOptions);
     } catch (err) {
-        throw Error(`WeivData - Error when deleting a collection, details: ${err}`);
+        throw Error(`WeivData - Error when deleting a collection in a database, details: ${err}`);
     }
 }
