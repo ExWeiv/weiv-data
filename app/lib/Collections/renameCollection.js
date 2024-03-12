@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createCollection = void 0;
+exports.renameCollection = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const name_helpers_1 = require("../Helpers/name_helpers");
-async function createCollection(collectionId, newCollectionName, options, renameOptions) {
+async function renameCollection(collectionId, newCollectionName, options, renameOptions) {
     try {
         if (!collectionId || !newCollectionName) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, newCollectionName`);
@@ -17,4 +17,4 @@ async function createCollection(collectionId, newCollectionName, options, rename
         throw Error(`WeivData - Error when renaming a collection, details: ${err}`);
     }
 }
-exports.createCollection = createCollection;
+exports.renameCollection = renameCollection;
