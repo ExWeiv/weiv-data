@@ -5,6 +5,13 @@ import type { ListCollectionsCursor, Document, ListCollectionsOptions } from 'mo
 /**
  * Lists collections inside of a selected database. (User must have listCollections permission inside MongoDB dashboard, you can also use suppressAuth with options).
  * 
+ * @example
+ * ```js
+ * import { listCollections } from '@exweiv/weiv-data';
+ * 
+ * listCollections('DatabaseName', { suppressAuth: true });
+ * ```
+ * 
  * @param databaseName Database name that you want to get the collections of.
  * @param options An object containing options to use when processing this operation.
  * @param filter MongoDB native filtering options. [Read more in native docs.](https://mongodb.github.io/node-mongodb-native/6.5/classes/Db.html#listCollections)

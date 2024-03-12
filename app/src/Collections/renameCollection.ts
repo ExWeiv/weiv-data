@@ -6,7 +6,14 @@ import type { Collection, RenameOptions } from 'mongodb';
 /**
  * Renames a collection inside of a selected database. (User must have renameCollection permission inside MongoDB dashboard, you can also use suppressAuth with options).
  * 
- * @param collectionId CollectionID (<database>/<collection>). 
+ * @example
+ * ```js
+ * import { renameCollection } from '@exweiv/weiv-data';
+ * 
+ * renameCollection('Database/ExistingCollectionName', 'NewCollectionName', { suppressAuth: true });
+ * ```
+ * 
+ * @param collectionId CollectionID (< database >/< collection >). 
  * @param newCollectionName New name of collection.
  * @param options An object containing options to use when processing this operation.
  * @param renameOptions Native options of MongoDB driver when renaming a collection. [Checkout here.](https://mongodb.github.io/node-mongodb-native/6.5/classes/Db.html#renameCollection)

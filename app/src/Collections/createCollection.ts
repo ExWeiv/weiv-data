@@ -6,7 +6,14 @@ import type { CreateCollectionOptions, Collection } from 'mongodb';
 /**
  * Creates a new collection inside of a selected database. (User must have createCollection permission inside MongoDB dashboard, you can also use suppressAuth with options).
  * 
- * @param collectionId CollectionID (<database>/<collection>). 
+ * @example
+ * ```js
+ * import { createCollection } from '@exweiv/weiv-data';
+ * 
+ * createCollection('Database/NewCollectionName', { suppressAuth: true });
+ * ```
+ * 
+ * @param collectionId CollectionID (< database >/< collection >). 
  * @param options An object containing options to use when processing this operation.
  * @param createOptions Native options of MongoDB driver when creating a collection. [Checkout here.](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/CreateCollectionOptions.html)
  * @returns {Promise<Collection>} Fulfilled - The Collection cursor of native MongoDB driver.
