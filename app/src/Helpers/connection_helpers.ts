@@ -10,7 +10,7 @@ const defaultOptions: MongoClientOptions = {
     tls: true,
 }
 
-export async function connectionHandler(collectionId: CollectionID, suppressAuth: boolean = false): Promise<ConnectionHandlerResult> {
+export async function connectionHandler<T extends boolean = false>(collectionId: CollectionID, suppressAuth: boolean = false, returnDb?: T): Promise<ConnectionHandlerResult<T>> {
     try {
         let db: Db | undefined;
         const { dbName, collectionName } = splitCollectionId(collectionId);
@@ -22,8 +22,12 @@ export async function connectionHandler(collectionId: CollectionID, suppressAuth
             db = pool.db("ExWeiv");
         }
 
-        const collection = db.collection(collectionName);
-        return { collection, memberId };
+        if (returnDb === true && db) {
+            return { memberId, database: db } as T extends true ? ConnectionHandlerResult<true> : ConnectionHandlerResult<false>;
+        } else {
+            const collection = db.collection(collectionName);
+            return { collection, memberId, database: db } as T extends true ? ConnectionHandlerResult<true> : ConnectionHandlerResult<false>;
+        }
     } catch (err) {
         throw Error(`WeivData - Error when trying to connect to database via useClient and Mongo Client ${err}`);
     }
