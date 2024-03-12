@@ -12,7 +12,7 @@ import type { Collection, RenameOptions } from 'mongodb';
  * @param renameOptions Native options of MongoDB driver when renaming a collection. [Checkout here.](https://mongodb.github.io/node-mongodb-native/6.5/classes/Db.html#renameCollection)
  * @returns {Promise<Collection>} Fulfilled - The Collection cursor of native MongoDB driver.
  */
-export async function createCollection(collectionId: CollectionID, newCollectionName: string, options?: WeivDataOptions, renameOptions?: RenameOptions): Promise<Collection> {
+export async function renameCollection(collectionId: CollectionID, newCollectionName: string, options?: WeivDataOptions, renameOptions?: RenameOptions): Promise<Collection> {
     try {
         if (!collectionId || !newCollectionName) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, newCollectionName`);

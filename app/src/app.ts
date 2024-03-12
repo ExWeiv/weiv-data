@@ -95,6 +95,18 @@ export { push } from './Functions/push';
 /**@public */
 export { pull } from './Functions/pull';
 
+/**@public */
+export { createCollection } from './Collections/createCollection';
+
+/**@public */
+export { deleteCollection } from './Collections/deleteCollection';
+
+/**@public */
+export { listCollections } from './Collections/listCollections';
+
+/**@public */
+export { renameCollection } from './Collections/renameCollection';
+
 //---------------------------------------------//
 //             Types + Interfaces              //
 //---------------------------------------------//
