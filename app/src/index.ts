@@ -28,6 +28,10 @@ import { multiply } from './Functions/multiply';
 import { increment } from './Functions/increment';
 import { push } from './Functions/push';
 import { pull } from './Functions/pull';
+import { createCollection } from './Collections/createCollection';
+import { deleteCollection } from './Collections/deleteCollection';
+import { renameCollection } from './Collections/renameCollection';
+import { listCollections } from './Collections/listCollections';
 
 /**@internal */
 import { CollectionID } from "./Helpers/collection";
@@ -66,7 +70,11 @@ export {
     multiply,
     increment,
     push,
-    pull
+    pull,
+    createCollection,
+    deleteCollection,
+    renameCollection,
+    listCollections
 }
 
 export default {
@@ -99,5 +107,9 @@ export default {
     multiply,
     increment,
     push,
-    pull
+    pull,
+    createCollection,
+    deleteCollection,
+    renameCollection,
+    listCollections
 }
