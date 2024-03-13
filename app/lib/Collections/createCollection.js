@@ -9,9 +9,9 @@ async function createCollection(collectionId, options, createOptions) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
         }
         const { suppressAuth } = options || {};
-        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth, true);
         const { collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
-        return await database.createCollection(collectionName, createOptions);
+        await database.createCollection(collectionName, createOptions);
     }
     catch (err) {
         throw Error(`WeivData - Error when creating a new collection in a database, details: ${err}`);

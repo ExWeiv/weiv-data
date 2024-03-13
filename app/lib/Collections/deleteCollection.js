@@ -9,7 +9,7 @@ async function deleteCollection(collectionId, options, deleteOptions) {
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
         }
         const { suppressAuth } = options || {};
-        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth, true);
         const { collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         return await database.dropCollection(collectionName, deleteOptions);
     }

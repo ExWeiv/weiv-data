@@ -25,7 +25,7 @@ export async function deleteCollection(collectionId: CollectionID, options?: Wei
         }
 
         const { suppressAuth } = options || {};
-        const { database } = await connectionHandler<true>(collectionId, suppressAuth);
+        const { database } = await connectionHandler<true>(collectionId, suppressAuth, true);
         const { collectionName } = splitCollectionId(collectionId);
         return await database.dropCollection(collectionName, deleteOptions);
     } catch (err) {
