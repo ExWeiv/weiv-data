@@ -4,6 +4,10 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 3.0.2
+
+- BUG Fixes
+
 ### 3.0.1
 
 - New functions to `create`, `delete`, `rename` and `list` collections from a selected database. Now you can manage collections in databases with these APIs.

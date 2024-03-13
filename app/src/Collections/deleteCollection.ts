@@ -6,7 +6,14 @@ import type { DropCollectionOptions } from 'mongodb';
 /**
  * Deletes a collection inside of a selected database. (User must have dropCollection permission inside MongoDB dashboard, you can also use suppressAuth with options).
  * 
- * @param collectionId CollectionID (<database>/<collection>). 
+ * @example
+ * ```js
+ * import { deleteCollection } from '@exweiv/weiv-data';
+ * 
+ * deleteCollection('Database/ExistingCollectionName', { suppressAuth: true });
+ * ```
+ * 
+ * @param collectionId CollectionID (< database >/< collection >). 
  * @param options An object containing options to use when processing this operation.
  * @param deleteOptions Native options of MongoDB driver when deleting a collection. [Checkout here.](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/DropCollectionOptions.html)
  * @returns {Promise<boolean>} Fulfilled - True if succeed.
@@ -18,7 +25,7 @@ export async function deleteCollection(collectionId: CollectionID, options?: Wei
         }
 
         const { suppressAuth } = options || {};
-        const { database } = await connectionHandler<true>(collectionId, suppressAuth);
+        const { database } = await connectionHandler<true>(collectionId, suppressAuth, true);
         const { collectionName } = splitCollectionId(collectionId);
         return await database.dropCollection(collectionName, deleteOptions);
     } catch (err) {

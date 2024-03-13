@@ -9,9 +9,9 @@ async function renameCollection(collectionId, newCollectionName, options, rename
             throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, newCollectionName`);
         }
         const { suppressAuth } = options || {};
-        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
+        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth, true);
         const { collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
-        return await database.renameCollection(collectionName, newCollectionName, renameOptions);
+        await database.renameCollection(collectionName, newCollectionName, renameOptions);
     }
     catch (err) {
         throw Error(`WeivData - Error when renaming a collection, details: ${err}`);
