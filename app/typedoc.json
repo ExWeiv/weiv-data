@@ -5,7 +5,7 @@
         "node_modules/**/*",
         "lib/**/*",
     ],
-    "name": "WeivData Library Documentation - ExWeiv Apps",
+    "name": "WeivData API Reference | ExWeiv Apps",
     "readme": "DOCS.md",
     "entryPoints": [
         "src/app.ts"
@@ -14,5 +14,8 @@
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeInternal": true,
-    "excludeExternals": true
+    "excludeExternals": true,
+    "plugin": [
+        "typedoc-plugin-extras"
+    ],
 }

@@ -7,7 +7,7 @@ import NodeCache from 'node-cache';
 This is a global variable which will hold the cached (saved) clients that's already created before using same URI.
 This will remove the cold start and make the process much more faster after first few calls.
 */
-const clientCache = new NodeCache({ useClones: false, stdTTL: 5 * 60, deleteOnExpire: true });
+const clientCache = new NodeCache({ useClones: false, stdTTL: 10 * 60, deleteOnExpire: true });
 const statusCache = new NodeCache({ useClones: false });
 let listeners = false;
 let manual = false;
