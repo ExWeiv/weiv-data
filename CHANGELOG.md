@@ -4,6 +4,10 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 3.0.3
+
+- Default cache time for MongoClient changed to 10 min (it was 5 min)
+
 ### 3.0.2
 
 - BUG Fixes

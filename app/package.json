@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Custom API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
   "main": "./lib/index.js",
   "files": [
@@ -10,7 +10,7 @@
   ],
   "types": "./src/index.ts",
   "scripts": {
-    "build": "tsc & npx typedoc"
+    "build": "tsc & npx typedoc --favicon https://static.wixstatic.com/media/510eca_9c4238093ad44527867402ae5fc8d7dd~mv2.png --footerLastModified true"
   },
   "keywords": [
     "exweiv",
@@ -44,7 +44,8 @@
     "@types/node": "^20.11.0",
     "@types/uuid": "^9.0.7",
     "nodemon": "^3.0.2",
-    "typedoc": "^0.25.7"
+    "typedoc": "^0.25.7",
+    "typedoc-plugin-extras": "^3.0.0"
   },
   "publishConfig": {
     "access": "public",
