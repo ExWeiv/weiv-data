@@ -55,7 +55,7 @@
     "url": "git@github.com:ExWeiv/weiv-data.git",
     "type": "git"
   },
-  "homepage": "https://weivdata.exweiv.com/",
+  "homepage": "https://weiv-data.apps.exweiv.com/",
   "bugs": {
     "url": "https://github.com/ExWeiv/weiv-data/issues",
     "email": "info@apps.exweiv.com"
