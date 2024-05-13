@@ -34,17 +34,31 @@ const cache = new node_cache_1.default();
 const getSecretValue = wixAuth.elevate(wix_secrets_backend_v2_1.secrets.getSecretValue);
 async function getCachedSecret(secretName, parse) {
     try {
+        if (typeof secretName !== "string") {
+            throw new Error(`Secret Name param is not string!`);
+        }
         let secret = cache.get(secretName);
         if (secret === undefined) {
             const { value } = await getSecretValue(secretName);
             if (parse === true) {
-                const objectSecret = await JSON.parse(value);
-                secret = objectSecret;
+                let objectSecret;
+                try {
+                    objectSecret = JSON.parse(value);
+                }
+                catch (err) {
+                    throw new Error(`Failed to parse JSON for secret '${secretName}': ${err}`);
+                }
+                if (typeof objectSecret === 'object' && objectSecret !== null) {
+                    secret = objectSecret;
+                }
+                else {
+                    throw new Error(`Parsed JSON is not an object for secret '${secretName}'`);
+                }
             }
             else {
                 secret = value;
             }
-            cache.set(secretName, value, 60 * 10);
+            cache.set(secretName, secret, 60 * 6);
         }
         return secret;
     }
