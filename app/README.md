@@ -11,7 +11,7 @@ You can use this library whenever you want it's all up to you. But we recommend 
 
 > You can also use native mongodb collection cursor with this library. Learn more about `.native` function in docs.
 
-You can find more info at our **[Official Docs](https://weivdata.exweiv.com/)**.
+You can find more info at our **[API Reference](https://weiv-data.apps.exweiv.com/)**.
 
 [Read changelog here](https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md)
 
@@ -19,8 +19,8 @@ You can find more info at our **[Official Docs](https://weivdata.exweiv.com/)**.
 
 Please report BUGs and leave your feedbacks. info@apps.exweiv.com or you can create an issue in [GitHub repo](https://github.com/ExWeiv/weiv-data/issues).
 
-<br>
+---
 
-Powered by ExWeiv Apps
+[Kolay Gelsin](https://medium.com/the-optimists-daily/kolay-gelsin-a-turkish-expression-we-should-all-know-and-use-83fc1207ae5d) 💜
 
-<img src="https://static.wixstatic.com/shapes/510eca_43b52053314d4ad689df41b907baef42.svg" width="120px">
+<img src="https://static.wixstatic.com/media/510eca_399a582544de4cb2b958ce934578097f~mv2.png">

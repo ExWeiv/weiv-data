@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Custom API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
   "main": "./lib/index.js",
   "files": [
@@ -55,7 +55,7 @@
     "url": "git@github.com:ExWeiv/weiv-data.git",
     "type": "git"
   },
-  "homepage": "https://weivdata.exweiv.com/",
+  "homepage": "https://weiv-data.apps.exweiv.com/",
   "bugs": {
     "url": "https://github.com/ExWeiv/weiv-data/issues",
     "email": "info@apps.exweiv.com"

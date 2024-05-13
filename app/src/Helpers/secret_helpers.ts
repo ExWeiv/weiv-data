@@ -19,6 +19,10 @@ type SecretResponse<T> = T extends "URI" ? { visitor: string, member: string, ad
  */
 export async function getCachedSecret<URI>(secretName: string, parse?: boolean): Promise<SecretResponse<URI>> {
     try {
+        if (typeof secretName !== "string") {
+            throw new Error(`Secret Name param is not string!`);
+        }
+
         // Try to get the secret from the cache
         let secret: any = cache.get(secretName);
 
@@ -27,14 +31,25 @@ export async function getCachedSecret<URI>(secretName: string, parse?: boolean):
             const { value } = await getSecretValue(secretName);
 
             if (parse === true) {
-                const objectSecret: object = await JSON.parse(value);
-                secret = objectSecret;
+                // Parse the JSON safely
+                let objectSecret;
+                try {
+                    objectSecret = JSON.parse(value);
+                } catch (err) {
+                    throw new Error(`Failed to parse JSON for secret '${secretName}': ${err}`);
+                }
+
+                if (typeof objectSecret === 'object' && objectSecret !== null) {
+                    secret = objectSecret;
+                } else {
+                    throw new Error(`Parsed JSON is not an object for secret '${secretName}'`);
+                }
             } else {
                 secret = value;
             }
 
             // Set the secret in the cache with a specific TTL (e.g., 1 hour)
-            cache.set(secretName, value, 60 * 10);
+            cache.set(secretName, secret, 60 * 6);
         }
 
         return secret;
