@@ -23,9 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runDataHook = void 0;
+exports.runErrorHook = exports.runDataHook = void 0;
 const data_hooks = __importStar(require("../../../../../../../../../user-code/backend/WeivData/data"));
 const name_helpers_1 = require("../Helpers/name_helpers");
+const hook_helpers_1 = require("../Helpers/hook_helpers");
 function hookExist(collectionId, hookName) {
     if (typeof hookName !== "string") {
         throw new Error("type of hook name is not string!");
@@ -54,11 +55,17 @@ async function runDataHook(collectionId, hookName, args) {
         }
     }
     catch (err) {
-        const errorHandlerFunction = hookExist(collectionId, "onFailure");
-        if (errorHandlerFunction) {
-            errorHandlerFunction(err);
-        }
+        const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
+        runErrorHook(collectionId, new Error(`${err}`), context);
         throw new Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
     }
 }
 exports.runDataHook = runDataHook;
+function runErrorHook(collectionId, err, context) {
+    console.error(err.message);
+    const errorHandlerFunction = hookExist(collectionId, "onFailure");
+    if (errorHandlerFunction) {
+        errorHandlerFunction(err, context);
+    }
+}
+exports.runErrorHook = runErrorHook;
