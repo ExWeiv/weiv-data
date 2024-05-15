@@ -2,15 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertReference = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const reference_helpers_1 = require("../Helpers/reference_helpers");
+const validator_1 = require("../Helpers/validator");
 async function insertReference(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
-        if (!collectionId || !propertyName || !referringItem || !referencedItem) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
-        }
-        const { suppressAuth, readConcern } = options || {};
-        const references = (0, reference_helpers_1.getReferences)(referencedItem);
-        const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
+        const { safeReferencedItemIds, safeReferringItemId, safeOptions } = await (0, validator_1.validateParams)({ collectionId, propertyName, referringItem, referencedItem, options }, ["collectionId", "propertyName", "referringItem", "referencedItem"], "insertReference");
+        const { suppressAuth, readConcern } = safeOptions || {};
+        const references = safeReferencedItemIds;
+        const itemId = safeReferringItemId;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { acknowledged, modifiedCount } = await collection.updateOne({ _id: itemId }, { $push: { [propertyName]: { $each: references } }, $set: { _updatedDate: new Date() } }, { readConcern: readConcern ? readConcern : "local" });
         if (!acknowledged || modifiedCount <= 0) {

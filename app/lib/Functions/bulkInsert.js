@@ -5,15 +5,14 @@ const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+const validator_1 = require("../Helpers/validator");
 async function bulkInsert(collectionId, items, options) {
     try {
-        if (!collectionId || !items || items.length <= 0) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
-        }
+        const { safeItems, safeOptions } = await (0, validator_1.validateParams)({ collectionId, items, options }, ["collectionId", "items"], "bulkInsert");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
         let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
-        let editedItems = items.map(async (item) => {
+        let editedItems = safeItems.map(async (item) => {
             item._updatedDate = new Date();
             item._createdDate = new Date();
             item._owner = ownerId;

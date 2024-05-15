@@ -2,11 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.native = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
+const validator_1 = require("../Helpers/validator");
 async function native(collectionId, suppressAuth) {
     try {
-        if (!collectionId) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
-        }
+        await (0, validator_1.validateParams)({ collectionId }, ["collectionId"], "native");
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         return collection;
     }

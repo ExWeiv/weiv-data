@@ -6,16 +6,15 @@ const hook_helpers_1 = require("../Helpers/hook_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const lodash_1 = require("lodash");
+const validator_1 = require("../Helpers/validator");
 async function push(collectionId, itemId, propertyName, value, options) {
     try {
-        if (!collectionId || !itemId || !value || !propertyName) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value, propertyName`);
-        }
+        const { safeValue, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemId, propertyName, value, options }, ["collectionId", "itemId", "propertyName", "value"], "push");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
-        let editedModify = { propertyName, value };
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        let editedModify = { propertyName, value: safeValue };
         if (suppressHooks != true) {
-            const modifiedParams = await (0, hook_manager_1.runDataHook)(collectionId, "beforePush", [{ propertyName, value }, context]).catch((err) => {
+            const modifiedParams = await (0, hook_manager_1.runDataHook)(collectionId, "beforePush", [{ propertyName, value: safeValue }, context]).catch((err) => {
                 throw Error(`WeivData - beforePush Hook Failure ${err}`);
             });
             if (modifiedParams) {

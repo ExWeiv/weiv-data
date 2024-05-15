@@ -4,8 +4,8 @@ exports.prepareHookContext = void 0;
 const wix_users_backend_1 = require("wix-users-backend");
 const name_helpers_1 = require("./name_helpers");
 function prepareHookContext(collectionId) {
-    const roles = wix_users_backend_1.currentUser.getRoles();
     const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
+    const roles = wix_users_backend_1.currentUser.getRoles();
     if (wix_users_backend_1.currentUser.loggedIn) {
         return {
             dbName,

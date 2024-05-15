@@ -5,19 +5,13 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+const validator_1 = require("../Helpers/validator");
 async function bulkUpdate(collectionId, items, options) {
     try {
-        if (!collectionId || !items) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
-        }
-        for (const item of items) {
-            if (!item._id) {
-                throw Error(`WeivData - Item (_id) ID is required for each item when bulk updating ID is missing for one or more item in your array!`);
-            }
-        }
+        const { safeItems, safeOptions } = await (0, validator_1.validateParams)({ collectionId, items, options }, ["collectionId", "items"], "bulkUpdate");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
-        let editedItems = items.map(async (item) => {
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        let editedItems = safeItems.map(async (item) => {
             item._id = (0, item_helpers_1.convertStringId)(item._id);
             if (suppressHooks != true) {
                 const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {

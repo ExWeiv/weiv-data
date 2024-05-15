@@ -27,6 +27,9 @@ exports.runDataHook = void 0;
 const data_hooks = __importStar(require("../../../../../../../../../user-code/backend/WeivData/data"));
 const name_helpers_1 = require("../Helpers/name_helpers");
 function hookExist(collectionId, hookName) {
+    if (typeof hookName !== "string") {
+        throw new Error("type of hook name is not string!");
+    }
     const { collectionName, dbName } = (0, name_helpers_1.splitCollectionId)(collectionId);
     const hook = data_hooks[`${dbName.toLowerCase()}_${collectionName.toLowerCase()}_${hookName}`];
     if (hook) {
@@ -38,6 +41,9 @@ function hookExist(collectionId, hookName) {
 }
 async function runDataHook(collectionId, hookName, args) {
     try {
+        if (typeof hookName !== "string" && typeof collectionId !== "string") {
+            throw new Error("type of hook name or collection id is not string!");
+        }
         const hookFunction = hookExist(collectionId, hookName);
         if (hookFunction) {
             const item = await hookFunction(...args);
@@ -48,6 +54,10 @@ async function runDataHook(collectionId, hookName, args) {
         }
     }
     catch (err) {
+        const errorHandlerFunction = hookExist(collectionId, "onFailure");
+        if (errorHandlerFunction) {
+            errorHandlerFunction(err);
+        }
         throw Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
     }
 }

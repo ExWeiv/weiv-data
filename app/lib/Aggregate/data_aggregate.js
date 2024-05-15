@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeivDataAggregate = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const data_aggregate_result_1 = require("./data_aggregate_result");
-class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregateResult {
+class WeivDataAggregate extends data_aggregate_result_1.AggregateResult {
     constructor(collectionId) {
         if (!collectionId) {
             throw Error(`WeivData - Database and Collection name required`);

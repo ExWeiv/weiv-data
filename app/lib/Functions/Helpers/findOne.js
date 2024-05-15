@@ -8,6 +8,7 @@ const connection_helpers_1 = require("../../Helpers/connection_helpers");
 const hook_helpers_1 = require("../../Helpers/hook_helpers");
 const hook_manager_1 = require("../../Hooks/hook_manager");
 const node_cache_1 = __importDefault(require("node-cache"));
+const validator_1 = require("../../Helpers/validator");
 const cache = new node_cache_1.default({
     checkperiod: 5,
     useClones: false,
@@ -15,14 +16,12 @@ const cache = new node_cache_1.default({
 });
 async function findOne(collectionId, propertyName, value, options) {
     try {
-        if (!collectionId || !propertyName || !value) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, value`);
-        }
+        const { safeValue, safeOptions } = await (0, validator_1.validateParams)({ collectionId, propertyName, value, options }, ["collectionId", "propertyName", "value"], "findOne");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = options || {};
-        let editedFilter = { propertyName, value };
+        const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = safeOptions || {};
+        let editedFilter = { propertyName, value: safeValue };
         if (suppressHooks != true) {
-            const modifiedFilter = await (0, hook_manager_1.runDataHook)(collectionId, "beforeFindOne", [{ propertyName, value }, context]).catch((err) => {
+            const modifiedFilter = await (0, hook_manager_1.runDataHook)(collectionId, "beforeFindOne", [{ propertyName, value: safeValue }, context]).catch((err) => {
                 throw Error(`WeivData - beforeFindOne Hook Failure ${err}`);
             });
             if (modifiedFilter) {

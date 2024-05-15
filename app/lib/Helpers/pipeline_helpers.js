@@ -21,16 +21,21 @@ function checkPipelineArray(pipeline) {
 }
 exports.checkPipelineArray = checkPipelineArray;
 function sortAggregationPipeline(pipeline) {
-    if (pipeline) {
-        pipeline = (0, lodash_1.sortBy)(pipeline, (stage) => customPipelineSortOrder[Object.keys(stage)[0]]);
-        const totalGroup = (0, lodash_1.filter)(pipeline, (stage) => stage["$group"]).length;
-        if (totalGroup > 1) {
-            throw new Error("You can't use more than one group.");
+    if (Array.isArray(pipeline) === true) {
+        if (pipeline) {
+            pipeline = (0, lodash_1.sortBy)(pipeline, (stage) => customPipelineSortOrder[Object.keys(stage)[0]]);
+            const totalGroup = (0, lodash_1.filter)(pipeline, (stage) => stage["$group"]).length;
+            if (totalGroup > 1) {
+                throw new Error("You can't use more than one group.");
+            }
+            return pipeline;
         }
-        return pipeline;
+        else {
+            return [];
+        }
     }
     else {
-        return [];
+        throw new Error(`WeivData - Error: Incoming aggregate pipeline is not an array!`);
     }
 }
 exports.sortAggregationPipeline = sortAggregationPipeline;

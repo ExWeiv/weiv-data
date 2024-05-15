@@ -6,21 +6,20 @@ const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const mongodb_1 = require("mongodb");
+const validator_1 = require("../Helpers/validator");
 async function replace(collectionId, item, options) {
     try {
-        if (!collectionId || !item._id) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item._id`);
-        }
+        const { safeItem, safeOptions } = await (0, validator_1.validateParams)({ collectionId, item, options }, ["collectionId", "item"], "replace");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || { suppressAuth: false, suppressHooks: false };
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
         let editedItem;
         if (suppressHooks != true) {
-            editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeReplace", [item, context]).catch((err) => {
+            editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeReplace", [safeItem, context]).catch((err) => {
                 throw Error(`WeivData - beforeReplace Hook Failure ${err}`);
             });
         }
-        const itemId = !editedItem ? (0, item_helpers_1.convertStringId)(item._id) : (0, item_helpers_1.convertStringId)(editedItem._id);
-        const replaceItem = !editedItem ? item : editedItem;
+        const itemId = !editedItem ? (0, item_helpers_1.convertStringId)(safeItem._id) : (0, item_helpers_1.convertStringId)(editedItem._id);
+        const replaceItem = !editedItem ? safeItem : editedItem;
         const filter = !itemId ? { _id: new mongodb_1.ObjectId() } : { _id: itemId };
         delete replaceItem._id;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InternalWeivDataQueryReferencedResult = void 0;
+exports.QueryReferencedResult = void 0;
 const query_referenced_helpers_1 = require("../../Helpers/query_referenced_helpers");
 const automatic_connection_provider_1 = require("../../Connection/automatic_connection_provider");
 const name_helpers_1 = require("../../Helpers/name_helpers");
-class InternalWeivDataQueryReferencedResult {
+class QueryReferencedResult {
     constructor(collectionId, targetCollectionId, itemId, propertyName, queryOptions, options) {
         this.currentPage = 0;
         this.pageSize = 50;
@@ -102,4 +102,4 @@ class InternalWeivDataQueryReferencedResult {
         }
     }
 }
-exports.InternalWeivDataQueryReferencedResult = InternalWeivDataQueryReferencedResult;
+exports.QueryReferencedResult = QueryReferencedResult;

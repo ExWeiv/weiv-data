@@ -6,31 +6,30 @@ const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const mongodb_1 = require("mongodb");
+const validator_1 = require("../Helpers/validator");
 async function save(collectionId, item, options) {
     try {
-        if (!collectionId || !item) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
-        }
+        const { safeOptions, safeItem } = await (0, validator_1.validateParams)({ collectionId, item, options }, ["collectionId", "item"], "save");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
         let editedItem;
-        if (item._id && typeof item._id === "string") {
-            item._id = (0, item_helpers_1.convertStringId)(item._id);
+        if (safeItem._id && typeof safeItem._id === "string") {
+            safeItem._id = (0, item_helpers_1.convertStringId)(safeItem._id);
             if (suppressHooks != true) {
-                editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
+                editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [safeItem, context]).catch((err) => {
                     throw Error(`WeivData - beforeUpdate (save) Hook Failure ${err}`);
                 });
             }
         }
         else {
             if (suppressHooks != true) {
-                editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [item, context]).catch((err) => {
+                editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [safeItem, context]).catch((err) => {
                     throw Error(`WeivData - beforeInsert (save) Hook Failure ${err}`);
                 });
             }
         }
         editedItem = {
-            ...item,
+            ...safeItem,
             ...editedItem
         };
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);

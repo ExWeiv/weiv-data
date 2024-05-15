@@ -337,7 +337,7 @@ class WeivDataQuery {
                 collectionName: classInUse.collectionName
             };
             classInUse.filtersHandler();
-            const result = await new data_query_result_1.InternalWeivDataQueryResult({
+            const result = await new data_query_result_1.QueryResult({
                 enableCache: enableCache || false,
                 cacheTimeout: cacheTimeout || 15,
                 suppressAuth,

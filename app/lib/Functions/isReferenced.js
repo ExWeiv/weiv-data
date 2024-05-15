@@ -5,8 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getIsReferencedCache = exports.isReferenced = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const reference_helpers_1 = require("../Helpers/reference_helpers");
-const lodash_1 = require("lodash");
+const validator_1 = require("../Helpers/validator");
 const node_cache_1 = __importDefault(require("node-cache"));
 const cache = new node_cache_1.default({
     checkperiod: 5,
@@ -15,13 +14,8 @@ const cache = new node_cache_1.default({
 });
 async function isReferenced(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
-        if (!collectionId || !propertyName || !referringItem || !referencedItem) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, referringItem, referencedItem`);
-        }
-        if ((0, lodash_1.isArray)(referencedItem)) {
-            throw Error(`WeivData - Wrong item type for referencedItem, it shouldn't be an array`);
-        }
-        const { suppressAuth, readConcern, enableCache, cacheTimeout } = options || {};
+        const { safeReferencedItemIds, safeReferringItemId, safeOptions } = await (0, validator_1.validateParams)({ collectionId, propertyName, referencedItem, referringItem, options }, ["collectionId", "propertyName", "referringItem", "referencedItem"], "isReferenced");
+        const { suppressAuth, readConcern, enableCache, cacheTimeout } = safeOptions || {};
         const cacheKey = `${collectionId}-${propertyName}-${referringItem}-${referencedItem}-${options ? JSON.stringify(options) : "{}"}`;
         if (enableCache) {
             const cachedItem = cache.get(cacheKey);
@@ -29,8 +23,8 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
                 return cachedItem;
             }
         }
-        const references = (0, reference_helpers_1.getReferences)(referencedItem);
-        const itemId = (0, reference_helpers_1.getCurrentItemId)(referringItem);
+        const references = safeReferencedItemIds;
+        const itemId = safeReferringItemId;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const totalCount = await collection.countDocuments({ _id: itemId, [propertyName]: { $in: references } }, { readConcern: readConcern ? readConcern : "local" });
         if (totalCount > 0) {
