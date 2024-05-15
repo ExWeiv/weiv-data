@@ -8,7 +8,7 @@
     "name": "WeivData API Reference | ExWeiv Apps",
     "readme": "DOCS.md",
     "entryPoints": [
-        "src/app.ts"
+        "weivdata.d.ts",
     ],
     "skipErrorChecking": true,
     "excludePrivate": true,
