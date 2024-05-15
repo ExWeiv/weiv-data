@@ -3,35 +3,19 @@ import { getOwnerId } from '../Helpers/member_id_helpers';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import { CollectionID, Item, WeivDataOptions } from '../Helpers/collection';
+import type { CollectionID, Item, WeivDataOptions } from '@exweiv/weiv-data';
+import { validateParams } from '../Helpers/validator';
 
-/**
- * Adds an item to a collection.
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * // Item that will be inserted
- * const item = {...}
- * 
- * const result = await weivData.insert("Clusters/All", item)
- * console.log(result);
- * ```
- * 
- * @param collectionId The ID of the collection to add the item to.
- * @param item The item to add.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item>} Fulfilled - The item that was added. Rejected - The error that caused the rejection.
- */
 export async function insert(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<Item> {
     try {
-        if (!collectionId || !item) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, item`);
-        }
+        const { safeItem, safeOptions } = await validateParams<"insert">(
+            { collectionId, item, options },
+            ["collectionId", "item"],
+            "insert"
+        );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
         const defaultValues: { [key: string]: any } = {
             _updatedDate: new Date(),
             _createdDate: new Date(),
@@ -39,7 +23,7 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
 
         // Get owner ID
         defaultValues["_owner"] = await getOwnerId(enableVisitorId);
-        const modifiedItem = merge(defaultValues, item);
+        const modifiedItem = merge(defaultValues, safeItem);
 
         let editedItem;
         if (suppressHooks != true) {

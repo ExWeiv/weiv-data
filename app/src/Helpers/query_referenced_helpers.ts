@@ -1,9 +1,12 @@
-import { ObjectId } from 'mongodb/mongodb';
+import type { ObjectId } from 'mongodb/mongodb';
 import { splitCollectionId } from './name_helpers';
 
 export function getPipeline(itemId: ObjectId, targetCollectionId: string, propertyName: string, pipelineOptions: { pageSize: number, skip: number, order: 'asc' | 'desc' }) {
-    const { collectionName } = splitCollectionId(targetCollectionId);
+    if (typeof itemId !== "object" || typeof targetCollectionId !== "string" || typeof propertyName !== "string" || typeof pipelineOptions !== "object") {
+        throw new Error("One or multiple parameter type is wrong!");
+    }
 
+    const { collectionName } = splitCollectionId(targetCollectionId);
     return [
         {
             $match: {

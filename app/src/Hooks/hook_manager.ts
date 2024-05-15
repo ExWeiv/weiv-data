@@ -3,8 +3,7 @@
 //@ts-ignore
 import * as data_hooks from '../../../../../../../../../user-code/backend/WeivData/data';
 import { splitCollectionId } from '../Helpers/name_helpers';
-import { type CollectionID } from '../Helpers/collection';
-import type { Item, ItemID } from '../Helpers/collection';
+import type { Item, ItemID, CollectionID } from '@exweiv/weiv-data'
 import type { WeivDataQuery } from '../Query/data_query';
 
 /**@public */
@@ -39,7 +38,7 @@ export type HookName =
     'beforeReplace' | 'afterReplace' | 'beforeFindOne' | 'afterFindOne' | 'beforeGetAndUpdate' |
     'afterGetAndUpdate' | 'beforeGetAndReplace' | 'afterGetAndReplace' | 'beforeGetAndRemove' | 'afterGetAndRemove' |
     'beforeIncrement' | 'afterIncrement' | 'beforeMultiply' | 'afterMultiply' | 'beforePush' | 'afterPush' |
-    'beforePull' | 'afterPull';
+    'beforePull' | 'afterPull' | 'onFailure';
 
 /**
  * List of hook params and values.
@@ -79,6 +78,10 @@ export type HooksResults<HookName> =
 
 
 function hookExist(collectionId: CollectionID, hookName: HookName): Function | undefined {
+    if (typeof hookName !== "string") {
+        throw new Error("type of hook name is not string!");
+    }
+
     const { collectionName, dbName } = splitCollectionId(collectionId);
     const hook = data_hooks[`${dbName.toLowerCase()}_${collectionName.toLowerCase()}_${hookName}`];
     if (hook) {
@@ -90,6 +93,10 @@ function hookExist(collectionId: CollectionID, hookName: HookName): Function | u
 
 export async function runDataHook<R>(collectionId: CollectionID, hookName: HookName, args: HookArgs<R>): Promise<HooksResults<R> | undefined> {
     try {
+        if (typeof hookName !== "string" && typeof collectionId !== "string") {
+            throw new Error("type of hook name or collection id is not string!");
+        }
+
         const hookFunction = hookExist(collectionId, hookName);
         if (hookFunction) {
             const item = await hookFunction(...args);
@@ -98,6 +105,12 @@ export async function runDataHook<R>(collectionId: CollectionID, hookName: HookN
             return undefined;
         }
     } catch (err) {
+        // Send Error to onFailure Hook with Error Object
+        const errorHandlerFunction = hookExist(collectionId, "onFailure");
+        if (errorHandlerFunction) {
+            errorHandlerFunction(err);
+        }
+
         throw Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
     }
 }

@@ -1,5 +1,5 @@
 import { sortBy, filter, defaultTo } from 'lodash';
-import { Document } from 'mongodb/mongodb'
+import type { Document } from 'mongodb/mongodb';
 
 /** @internal */
 export type PipelineArray = Document[];
@@ -24,17 +24,21 @@ export function checkPipelineArray(pipeline: PipelineArray): PipelineArray {
 }
 
 export function sortAggregationPipeline(pipeline: PipelineArray): PipelineArray {
-    if (pipeline) {
-        //@ts-ignore
-        pipeline = sortBy(pipeline, (stage) => customPipelineSortOrder[Object.keys(stage)[0]]);
-        const totalGroup = filter(pipeline, (stage) => stage["$group"]).length;
+    if (Array.isArray(pipeline) === true) {
+        if (pipeline) {
+            //@ts-ignore
+            pipeline = sortBy(pipeline, (stage) => customPipelineSortOrder[Object.keys(stage)[0]]);
+            const totalGroup = filter(pipeline, (stage) => stage["$group"]).length;
 
-        if (totalGroup > 1) {
-            throw new Error("You can't use more than one group.");
+            if (totalGroup > 1) {
+                throw new Error("You can't use more than one group.");
+            }
+
+            return pipeline;
+        } else {
+            return [];
         }
-
-        return pipeline;
     } else {
-        return [];
+        throw new Error(`WeivData - Error: Incoming aggregate pipeline is not an array!`);
     }
 }

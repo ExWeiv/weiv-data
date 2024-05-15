@@ -3,7 +3,8 @@ import { convertStringId } from '../Helpers/item_helpers';
 import NodeCache from "node-cache";
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import { CollectionID, Item, ItemID, WeivDataOptionsCache } from '../Helpers/collection';
+import { CollectionID, Item, ItemID, WeivDataOptionsCache } from '@exweiv/weiv-data';
+import { validateParams } from '../Helpers/validator';
 
 const cache = new NodeCache({
     checkperiod: 5,
@@ -11,50 +12,31 @@ const cache = new NodeCache({
     deleteOnExpire: true
 })
 
-/**
- * Retrieves an item from a collection.
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * // Item ID
- * const itemId = "..."
- * 
- * const result = await weivData.get("Clusters/All", itemId)
- * console.log(result);
- * ```
- * 
- * @param collectionId The ID of the collection to retrieve the item from.
- * @param itemId The ID of the item to retrieve.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | null>} Fulfilled - The retrieved item or null if not found. Rejected - The error that caused the rejection.
- */
 export async function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsCache): Promise<Item | null> {
     try {
-        if (!collectionId || !itemId) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
-        }
+        const { safeOptions, safeItemId } = await validateParams<"get">(
+            { collectionId, itemId, options },
+            ["collectionId", "itemId"],
+            "get"
+        );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = options || {};
+        const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = safeOptions || {};
 
         let editedItemId;
         if (suppressHooks != true) {
-            editedItemId = await runDataHook<'beforeGet'>(collectionId, "beforeGet", [itemId, context]).catch((err) => {
+            editedItemId = await runDataHook<'beforeGet'>(collectionId, "beforeGet", [safeItemId, context]).catch((err) => {
                 throw Error(`WeivData - beforeGet Hook Failure ${err}`);
             });
         }
 
-        let newItemId;
+        let newItemId = safeItemId;
         if (editedItemId) {
             newItemId = convertStringId(editedItemId);
-        } else {
-            newItemId = convertStringId(itemId);
         }
 
         if (enableCache) {
-            const cacheKey = `${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`;
+            const cacheKey = `${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`;
             const cachedItem = cache.get(cacheKey);
             if (cachedItem && !editedItemId) {
                 return cachedItem;
@@ -80,7 +62,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
             }
 
             if (enableCache) {
-                cache.set(`${collectionId}-${itemId}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
+                cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
             }
 
             return item;

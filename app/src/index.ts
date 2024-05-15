@@ -34,7 +34,7 @@ import { renameCollection } from './Collections/renameCollection';
 import { listCollections } from './Collections/listCollections';
 
 /**@internal */
-import { CollectionID } from "./Helpers/collection";
+import { CollectionID } from "@exweiv/weiv-data";
 
 const aggregate = (collectionId: CollectionID) => new WeivDataAggregate(collectionId);
 const query = (collectionId: CollectionID) => new WeivDataQuery(collectionId);

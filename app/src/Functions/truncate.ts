@@ -1,37 +1,22 @@
-import { CollectionID, WeivDataOptions } from '../Helpers/collection';
+import { CollectionID, WeivDataOptions } from '@exweiv/weiv-data';
 import { connectionHandler } from '../Helpers/connection_helpers';
+import { validateParams } from '../Helpers/validator';
 
-/**
- * Removes all items from a collection.
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * const result = await weivData.truncate("Clusters/Uskudar");
- * console.log(result);
- * ```
- * 
- * @param collectionId The ID of the collection to remove items from.
- * @param options An object containing options you can use when calling this function.
- * @returns {Promise<boolean>} Fulfilled - When the items have been removed. Rejected - The error that caused the rejection.
- */
 export async function truncate(collectionId: CollectionID, options?: WeivDataOptions): Promise<boolean> {
     try {
-        if (!collectionId) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
-        }
+        // Validate Params
+        const { safeOptions } = await validateParams<"truncate">({ collectionId, options }, ["collectionId"], "truncate");
 
-        const { suppressAuth } = options || {};
+        const { suppressAuth } = safeOptions || {};
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { acknowledged } = await collection.deleteMany({});
 
         if (acknowledged) {
             return true;
         } else {
-            throw Error(`WeivData - Error when removing all items in a collection (truncate), acknowledged: ${acknowledged}`);
+            throw new Error(`couldn't remove all items in the collection, acknowledged: ${acknowledged}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when removing all items in a collection (truncate): ${err}`);
+        throw new Error(`WeivData - Error when removing all items in a collection (truncate): ${err}`);
     }
 }

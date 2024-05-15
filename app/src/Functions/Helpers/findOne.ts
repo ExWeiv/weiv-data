@@ -1,8 +1,9 @@
 import { connectionHandler } from '../../Helpers/connection_helpers';
-import type { CollectionID, Item, WeivDataOptionsCache } from '../../Helpers/collection';
+import type { CollectionID, Item, WeivDataOptionsCache } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../../Helpers/hook_helpers';
 import { runDataHook } from '../../Hooks/hook_manager';
 import NodeCache from 'node-cache';
+import { validateParams } from '../../Helpers/validator';
 
 const cache = new NodeCache({
     checkperiod: 5,
@@ -10,35 +11,20 @@ const cache = new NodeCache({
     deleteOnExpire: true
 })
 
-/**
- * You can use findOne to find a single item from your collections based on .eq filter
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * const filteredItem = await weivData.findOne("Db/Collection", "name", "John");
- * console.log(filteredItem);
- * ```
- * 
- * @param collectionId The ID of the collection to remove the item from.
- * @param propertyName Property to filter.
- * @param value Filter value (mathing value for .eq filter)
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | undefined>} Fulfilled - Updated item 
- */
 export async function findOne(collectionId: CollectionID, propertyName: string, value: any, options?: WeivDataOptionsCache): Promise<Item | undefined> {
     try {
-        if (!collectionId || !propertyName || !value) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, propertyName, value`);
-        }
+        const { safeValue, safeOptions } = await validateParams<"findOne">(
+            { collectionId, propertyName, value, options },
+            ["collectionId", "propertyName", "value"],
+            "findOne"
+        );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = options || {};
+        const { suppressAuth, suppressHooks, readConcern, enableCache, cacheTimeout } = safeOptions || {};
 
-        let editedFilter = { propertyName, value };
+        let editedFilter = { propertyName, value: safeValue };
         if (suppressHooks != true) {
-            const modifiedFilter = await runDataHook<'beforeFindOne'>(collectionId, "beforeFindOne", [{ propertyName, value }, context]).catch((err) => {
+            const modifiedFilter = await runDataHook<'beforeFindOne'>(collectionId, "beforeFindOne", [{ propertyName, value: safeValue }, context]).catch((err) => {
                 throw Error(`WeivData - beforeFindOne Hook Failure ${err}`);
             });
 

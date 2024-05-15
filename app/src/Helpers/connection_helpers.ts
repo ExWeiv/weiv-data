@@ -2,13 +2,10 @@
 import * as customConnectionOptions from '../../../../../../../../../user-code/backend/WeivData/connection-options';
 import { useClient } from '../Connection/automatic_connection_provider';
 import { splitCollectionId } from './name_helpers';
-import { Db, MongoClientOptions } from 'mongodb/mongodb';
-import { type CollectionID, type ConnectionHandlerResult } from './collection';
-import { Options } from 'node-cache';
-
-const defaultOptions: MongoClientOptions = {
-    tls: true,
-}
+import type { Db, MongoClientOptions } from 'mongodb/mongodb';
+import type { ConnectionHandlerResult } from './collection';
+import type { CollectionID } from '@exweiv/weiv-data';
+import type { Options } from 'node-cache';
 
 export async function connectionHandler<T extends boolean = false>(collectionId: CollectionID, suppressAuth: boolean = false, returnDb?: T): Promise<ConnectionHandlerResult<T>> {
     try {
@@ -16,7 +13,7 @@ export async function connectionHandler<T extends boolean = false>(collectionId:
         const { dbName, collectionName } = splitCollectionId(collectionId);
         const { pool, memberId } = await useClient(suppressAuth);
 
-        if (dbName) {
+        if (dbName && typeof dbName === "string") {
             db = pool.db(dbName);
         } else {
             db = pool.db("ExWeiv");
@@ -36,11 +33,17 @@ export async function connectionHandler<T extends boolean = false>(collectionId:
 export type CustomOptionsRole = "adminClientOptions" | "memberClientOptions" | "visitorClientOptions";
 export async function loadConnectionOptions(role: CustomOptionsRole): Promise<MongoClientOptions> {
     try {
+        if (typeof role !== "string") {
+            throw new Error("type of role is not string!");
+        }
+
         const customOptions: (() => MongoClientOptions | Promise<MongoClientOptions>) | undefined = customConnectionOptions[role];
         if (customOptions) {
             return await customOptions();
         } else {
-            return defaultOptions;
+            return {
+                tls: true,
+            };
         }
     } catch (err) {
         throw Error(`WeivData - Error when returning options for MongoDB Client connection: ${err}`);

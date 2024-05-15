@@ -1,39 +1,23 @@
 import { connectionHandler } from '../../Helpers/connection_helpers';
-import type { CollectionID, Item, ItemID, WeivDataOptions } from '../../Helpers/collection';
+import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../../Helpers/hook_helpers';
 import { runDataHook } from '../../Hooks/hook_manager';
-import { convertStringId } from '../../Helpers/item_helpers';
+import { validateParams } from '../../Helpers/validator';
 
-/**
- * You can use getAndReplace to find an item by it's _id and replace it with new data. (ID will stay same)
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * const itemId = "...";
- * const replacedItem = await weivData.getAndReplace("Db/Collection", itemId, {...});
- * console.log(replacedItem);
- * ```
- * 
- * @param collectionId The ID of the collection to remove the item from.
- * @param itemId ItemID to filter the _id field when performing the operation.
- * @param value Object contains new data.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | undefined>} Fulfilled - Updated item 
- */
 export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptions): Promise<Item | undefined> {
     try {
-        if (!collectionId || !itemId || !value) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value`);
-        }
+        const { safeItemId, safeValue, safeOptions } = await validateParams<"getAndReplace">(
+            { collectionId, itemId, value, options },
+            ["collectionId", "itemId", "value"],
+            "getAndReplace"
+        );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
 
-        let editedItem = value;
+        let editedItem = safeValue;
         if (suppressHooks != true) {
-            const modifiedItem = await runDataHook<'beforeGetAndReplace'>(collectionId, "beforeGetAndReplace", [value, context]).catch((err) => {
+            const modifiedItem = await runDataHook<'beforeGetAndReplace'>(collectionId, "beforeGetAndReplace", [safeValue, context]).catch((err) => {
                 throw Error(`WeivData - beforeGetAndReplace Hook Failure ${err}`);
             });
 
@@ -46,7 +30,7 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndReplace(
-            { _id: convertStringId(itemId) },
+            { _id: safeItemId },
             editedItem,
             { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
         );

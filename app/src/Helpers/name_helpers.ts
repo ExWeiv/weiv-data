@@ -1,16 +1,10 @@
 import { memoize } from 'lodash';
-import type { CollectionID } from './collection'
+import type { CollectionID } from '@exweiv/weiv-data'
 
-/**
- * @description Get database and collection name from single string
- * @param text Database name and collection name splited by `/`
- * @returns `dbName` and `collectionName`
- */
 export const splitCollectionId = memoize(splitCollectionIdMain);
-
 function splitCollectionIdMain(collectionId: CollectionID): { dbName: string, collectionName: string } {
-    if (!collectionId) {
-        throw Error(`WeivData - CollectionID is Required with this syntax: <database>/<collection>`);
+    if (!collectionId || typeof collectionId !== "string") {
+        throw Error(`WeivData - CollectionID is Required with this syntax: <database>/<collection> and it must be a string!`);
     }
 
     const [dbName, collectionName] = collectionId.split('/');

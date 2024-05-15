@@ -9,14 +9,6 @@ const getSecretValue: (secretName: string) => Promise<{ value: string }> = wixAu
 
 type SecretResponse<T> = T extends "URI" ? { visitor: string, member: string, admin: string } : string;
 
-/**
- * 
- * @param secretName Secret name in Wix's secret manager
- * @param parse Enable JSON parsing or not (defaults to false)
- * @returns {string | object | undefined}
- * 
- * @internal
- */
 export async function getCachedSecret<URI>(secretName: string, parse?: boolean): Promise<SecretResponse<URI>> {
     try {
         if (typeof secretName !== "string") {

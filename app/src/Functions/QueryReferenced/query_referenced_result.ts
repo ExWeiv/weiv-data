@@ -2,52 +2,10 @@ import { ObjectId, Db, Collection } from 'mongodb/mongodb';
 import { getPipeline } from '../../Helpers/query_referenced_helpers';
 import { useClient } from '../../Connection/automatic_connection_provider';
 import { splitCollectionId } from '../../Helpers/name_helpers';
-import type { CollectionID, ConnectionHandlerResult, Items, WeivDataOptions } from '../../Helpers/collection';
-import type { WeivDataQueryReferencedOptions } from './queryReferenced';
+import type { CollectionID, Item, WeivDataOptions, WeivDataQueryReferencedResult, WeivDataQueryReferencedOptions } from '@exweiv/weiv-data';
+import type { ConnectionHandlerResult } from '../../Helpers/collection';
 
-/**
- * Result object of queryReferenced function.
- * 
- * @public */
-export interface WeivDataQueryReferencedResult {
-    /**
-     * Returns the items that match the reference query.
-     * @readonly
-     */
-    items: Items;
-
-    /**
-     * Returns the total number of items that match the reference query.
-     * @readonly
-     */
-    totalCount: number;
-
-    /**
-     * Indicates if the reference query has more results.
-     */
-    hasNext(): boolean;
-
-    /**
-     * Indicates if the reference query has previous results.
-     */
-    hasPrev(): boolean;
-
-    /**
-     * Retrieves the next page of reference query results.
-     * 
-     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A reference query result object with the next page of query results. Rejected - The errors that caused the rejection.
-     */
-    next(): Promise<WeivDataQueryReferencedResult>;
-
-    /**
-     * Retrieves the previous page of reference query results.
-     * 
-     * @returns {Promise<WeivDataQueryReferencedResult>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
-     */
-    prev(): Promise<WeivDataQueryReferencedResult>;
-}
-
-export class InternalWeivDataQueryReferencedResult {
+export class QueryReferencedResult {
     private targetCollectionId: string;
     private itemId: ObjectId;
     private propertyName: string;
@@ -61,7 +19,7 @@ export class InternalWeivDataQueryReferencedResult {
     private db!: Db;
     private collection!: Collection;
 
-    protected items!: Items;
+    protected items!: Item[];
     protected totalCount!: number;
     protected hasNext!: () => boolean;
     protected hasPrev!: () => boolean;
@@ -97,7 +55,7 @@ export class InternalWeivDataQueryReferencedResult {
     }
 
     /**@internal */
-    private async getItems(): Promise<Items> {
+    private async getItems(): Promise<Item[]> {
         try {
             const { readConcern } = this.options;
             const items = await this.collection.aggregate(getPipeline(this.itemId, this.targetCollectionId, this.propertyName, this.getPipelineOptions()),

@@ -2,79 +2,15 @@ import { Db, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/automatic_connection_provider';
 import { isEmpty, size } from 'lodash';
 import NodeCache from "node-cache";
-import type { ConnectionHandlerResult, Items, ReadConcern } from "../Helpers/collection";
+import type { ConnectionHandlerResult } from "../Helpers/collection";
 import type { LookupObject, ReferenceLenghtObject } from "./data_query";
+import type { ReadConcern, Item, WeivDataQueryResult } from '@exweiv/weiv-data'
 
 const cache = new NodeCache({
     checkperiod: 5,
     useClones: false,
     deleteOnExpire: true
-})
-
-/**@public */
-export interface WeivDataQueryResult {
-    /**
-     * Returns the index of the current results page number.
-     * @readonly
-     */
-    currentPage: number;
-
-    /**
-     * Returns the items that match the query.
-     * @readonly
-     */
-    items: Items;
-
-    /**
-     * Returns the number of items in the current results page.
-     * @readonly
-     */
-    length: number;
-
-    /**
-     * Returns the query page size.
-     * @readonly
-     */
-    pageSize: number;
-
-    /**
-     * Returns the total number of items that match the query.
-     * @readonly
-     */
-    totalCount: number;
-
-    /**
-     * Returns the total number of pages the query produced.
-     * @readonly
-     */
-    totalPages: number;
-
-    /**
-     * Indicates if the query has more results.
-     * @returns {boolean}
-     */
-    hasNext(): boolean;
-
-    /**
-     * Indicates the query has previous results.
-     * @returns {boolean}
-     */
-    hasPrev(): boolean;
-
-    /**
-     * Retrieves the next page of query results.
-     * 
-     * @returns {Promise<WeivDataQueryResult>} Fulfilled - A query result object with the next page of query results. Rejected - The errors that caused the rejection.
-     */
-    next(): Promise<WeivDataQueryResult>;
-
-    /**
-     * Retrieves the previous page of query results.
-     * 
-     * @returns {Promise<WeivDataQueryResultI>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
-     */
-    prev(): Promise<WeivDataQueryResult>;
-}
+});
 
 /** @internal */
 export type DataQueryResultOptions = {
@@ -101,7 +37,7 @@ type QueryResultQueryOptions = {
     addFields: ReferenceLenghtObject
 }
 
-export class InternalWeivDataQueryResult {
+export class QueryResult {
     private dataQueryClass!: { [key: string]: any };
     private suppressAuth = false;
     private readConcern: ReadConcern = "local";
@@ -134,7 +70,7 @@ export class InternalWeivDataQueryResult {
         this.collectionName = collectionName;
     }
 
-    private async getItems(): Promise<Items> {
+    private async getItems(): Promise<Item[]> {
         try {
             const { query, distinctProperty, skip, sort, fields, includes, addFields } = this.queryOptions;
 

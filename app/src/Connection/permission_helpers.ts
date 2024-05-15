@@ -6,6 +6,7 @@ import type { CustomOptionsRole } from '../Helpers/connection_helpers';
 import CryptoJS from 'crypto-js';
 import { getSecretKey } from '../Helpers/encrypt_helpers';
 
+/**@internal */
 export type GetMongoURIResult = {
     uri: string,
     memberId?: string,

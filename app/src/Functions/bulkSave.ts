@@ -3,64 +3,22 @@ import { getOwnerId } from '../Helpers/member_id_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import type { CollectionID, ItemIDs, Items, WeivDataOptions } from '../Helpers/collection';
+import type { CollectionID, Item, WeivDataOptions, BulkSaveResult } from '@exweiv/weiv-data';
+import { validateParams } from '../Helpers/validator';
 
-/**
- * Object returned for bulkSave function.
- * @public
- */
-export interface WeivDataBulkSaveResult {
-    /**
-     * Number of inserted items.
-     */
-    inserted: number;
-
-    /**
-     * Number of updated items.
-     */
-    updated: number;
-
-    /**
-     * Saved items.
-     */
-    savedItems: Items;
-
-    /**
-     * Inserted item ids.
-     */
-    insertedItemIds: ItemIDs
-}
-
-/**
- * Inserts or updates a number of items in a collection.
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * // Items that will be bulk saved
- * const itemsToSave = [{...}, {...}, {...}]
- * 
- * const result = await weivData.bulkSave("Clusters/Odunpazari", itemsToSave)
- * console.log(result);
- * ```
- * 
- * @param collectionId The ID of the collection to save the items to.
- * @param items The items to insert or update.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<WeivDataBulkSaveResult>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
- */
-export async function bulkSave(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<WeivDataBulkSaveResult> {
+export async function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptions): Promise<BulkSaveResult> {
     try {
-        if (!collectionId || !items || items.length <= 0) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
-        }
+        const { safeItems, safeOptions } = await validateParams<"bulkSave">(
+            { collectionId, items, options },
+            ["collectionId", "items"],
+            "bulkSave"
+        );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
 
         let ownerId = await getOwnerId(enableVisitorId);
-        let editedItems: Items | Promise<Items>[] = items.map(async (item) => {
+        let editedItems: Item[] | Promise<Item[]>[] = safeItems.map(async (item) => {
             if (!item._owner) {
                 item._owner = ownerId;
             }
