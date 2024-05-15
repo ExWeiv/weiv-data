@@ -2,17 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listCollections = void 0;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
+const validator_1 = require("../Helpers/validator");
 async function listCollections(databaseName, options, filter, listOptions) {
     try {
-        if (!databaseName) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: databaseName`);
-        }
-        const { suppressAuth } = options || {};
+        const { safeCollectionFilter, safeCollectionOptions, safeOptions } = await (0, validator_1.validateParams)({ databaseName, options, collectionFilter: filter, collectionOptions: listOptions }, ["databaseName"], "listCollections");
+        const { suppressAuth } = safeOptions || {};
         const { database } = await (0, connection_helpers_1.connectionHandler)(`${databaseName}/`, suppressAuth, true);
-        return await database.listCollections(filter, listOptions).toArray();
+        return await database.listCollections(safeCollectionFilter, safeCollectionOptions).toArray();
     }
     catch (err) {
-        throw Error(`WeivData - Error when listing all collections in a database, details: ${err}`);
+        throw new Error(`WeivData - Error when listing all collections in a database, details: ${err}`);
     }
 }
 exports.listCollections = listCollections;

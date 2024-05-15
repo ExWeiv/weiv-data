@@ -25,7 +25,7 @@ async function getMongoURI(suppressAuth = false) {
         }
     }
     catch (err) {
-        throw Error(`Error on getting URI for MongoDB based on permission of current user: ${err}`);
+        throw new Error(`Error on getting URI for MongoDB based on permission of current user: ${err}`);
     }
 }
 exports.getMongoURI = getMongoURI;
@@ -43,11 +43,11 @@ const getVisitorURI = async () => {
             return { uri: secret, role: "visitorClientOptions" };
         }
         else {
-            throw Error(`WeivData - WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     }
     catch (err) {
-        throw Error(`Error when getting VisitorURI: ${err}`);
+        throw new Error(`Error when getting VisitorURI: ${err}`);
     }
 };
 const getAdminURI = async () => {
@@ -72,11 +72,11 @@ const getAdminURI = async () => {
             };
         }
         else {
-            throw Error(`WeivData - WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when getting AdminURI: ${err}`);
+        throw new Error(`Error when getting AdminURI: ${err}`);
     }
 };
 const getMemberURI = async () => {
@@ -117,11 +117,11 @@ const getMemberURI = async () => {
             };
         }
         else {
-            throw Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     }
     catch (err) {
-        throw Error(`Error when getting MemberURI: ${err}`);
+        throw new Error(`Error when getting MemberURI: ${err}`);
     }
 };
 function getPermissionsCache() {

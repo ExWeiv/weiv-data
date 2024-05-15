@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InternalWeivDataQueryReferencedResult = void 0;
+exports.QueryReferencedResult = void 0;
 const query_referenced_helpers_1 = require("../../Helpers/query_referenced_helpers");
 const automatic_connection_provider_1 = require("../../Connection/automatic_connection_provider");
 const name_helpers_1 = require("../../Helpers/name_helpers");
-class InternalWeivDataQueryReferencedResult {
+class QueryReferencedResult {
     constructor(collectionId, targetCollectionId, itemId, propertyName, queryOptions, options) {
         this.currentPage = 0;
         this.pageSize = 50;
         if (!collectionId || !targetCollectionId || !itemId || !propertyName || !queryOptions || !options) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName, queryOptions, options, itemId`);
+            throw new Error(`one or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName, queryOptions, options, itemId`);
         }
         const { collectionName, dbName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
@@ -35,7 +35,7 @@ class InternalWeivDataQueryReferencedResult {
             return items;
         }
         catch (err) {
-            throw Error(`WeivData - Error when getting items for queryReferenced result: ${err}`);
+            throw new Error(`when getting items for queryReferenced result: ${err}`);
         }
     }
     async getResult() {
@@ -82,7 +82,7 @@ class InternalWeivDataQueryReferencedResult {
             };
         }
         catch (err) {
-            throw Error(`WeivData - Error when running queryReferenced function: ${err}`);
+            throw new Error(`when running queryReferenced function: ${err}`);
         }
     }
     async connectionHandler(suppressAuth) {
@@ -98,8 +98,8 @@ class InternalWeivDataQueryReferencedResult {
             return { collection, memberId };
         }
         catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
+            throw new Error(`when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
         }
     }
 }
-exports.InternalWeivDataQueryReferencedResult = InternalWeivDataQueryReferencedResult;
+exports.QueryReferencedResult = QueryReferencedResult;

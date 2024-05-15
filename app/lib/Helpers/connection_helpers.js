@@ -27,15 +27,12 @@ exports.getCustomCacheRules = exports.loadConnectionOptions = exports.connection
 const customConnectionOptions = __importStar(require("../../../../../../../../../user-code/backend/WeivData/connection-options"));
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("./name_helpers");
-const defaultOptions = {
-    tls: true,
-};
 async function connectionHandler(collectionId, suppressAuth = false, returnDb) {
     try {
         let db;
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);
-        if (dbName) {
+        if (dbName && typeof dbName === "string") {
             db = pool.db(dbName);
         }
         else {
@@ -50,22 +47,27 @@ async function connectionHandler(collectionId, suppressAuth = false, returnDb) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when trying to connect to database via useClient and Mongo Client ${err}`);
+        throw new Error(`when trying to connect to database via useClient and Mongo Client ${err}`);
     }
 }
 exports.connectionHandler = connectionHandler;
 async function loadConnectionOptions(role) {
     try {
+        if (typeof role !== "string") {
+            throw new Error("type of role is not string!");
+        }
         const customOptions = customConnectionOptions[role];
         if (customOptions) {
             return await customOptions();
         }
         else {
-            return defaultOptions;
+            return {
+                tls: true,
+            };
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when returning options for MongoDB Client connection: ${err}`);
+        throw new Error(`when returning options for MongoDB Client connection: ${err}`);
     }
 }
 exports.loadConnectionOptions = loadConnectionOptions;
@@ -80,7 +82,7 @@ async function getCustomCacheRules() {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when loading custom cache rules for MongoClient connections, err: ${err}`);
+        throw new Error(`when loading custom cache rules for MongoClient connections, err: ${err}`);
     }
 }
 exports.getCustomCacheRules = getCustomCacheRules;

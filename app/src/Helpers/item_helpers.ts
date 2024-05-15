@@ -9,6 +9,6 @@ export function convertStringId(_id: string | ObjectId | undefined, create = fal
         if (create === true) {
             return new ObjectId();
         }
-        throw Error(`WeivData - Wrong _id type!`);
+        throw new Error(`wrong _id type for convertStringId!`);
     }
 }

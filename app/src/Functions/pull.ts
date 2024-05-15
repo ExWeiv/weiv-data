@@ -1,42 +1,21 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import type { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/collection';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { convertStringId } from '../Helpers/item_helpers';
+import type { CollectionID, ItemID, WeivDataOptions, Item } from '@exweiv/weiv-data';
+import { validateParams } from '../Helpers/validator';
 
-/**
- * You can use pull function to pull values from an array field in an item.
- * This function uses $pull operator.
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * const itemId = "...";
- * const result = await weivData.pull("Db/Collection", itemId, "arrField", [...], -1);
- * console.log(result);
- * ```
- * 
- * @param collectionId The ID of the collection to remove the item from.
- * @param itemId ItemID to filter the _id field when performing the operation.
- * @param propertyName Property name for the array field.
- * @param value Values to pull from array.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | null>} Fulfilled - Updated item 
- */
 export async function pull(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null> {
     try {
-        if (!collectionId || !itemId || !value || !propertyName) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value, propertyName`);
-        }
+        const { safeValue, safeOptions } = await validateParams<"pull">({ collectionId, itemId, propertyName, value, options }, ["collectionId", "itemId", "value", "propertyName"], "pull");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
 
-        let editedModify = { propertyName, value };
+        let editedModify = { propertyName, value: safeValue };
         if (suppressHooks != true) {
-            const modifiedParams = await runDataHook<'beforePull'>(collectionId, "beforePull", [{ propertyName, value }, context]).catch((err) => {
-                throw Error(`WeivData - beforePull Hook Failure ${err}`);
+            const modifiedParams = await runDataHook<'beforePull'>(collectionId, "beforePull", [{ propertyName, value: safeValue }, context]).catch((err) => {
+                throw new Error(`beforePull Hook Failure ${err}`);
             });
 
             if (modifiedParams) {
@@ -54,7 +33,7 @@ export async function pull(collectionId: CollectionID, itemId: ItemID, propertyN
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await runDataHook<'afterPull'>(collectionId, "afterPull", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterPull Hook Failure ${err}`);
+                    throw new Error(`afterPull Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
@@ -67,6 +46,6 @@ export async function pull(collectionId: CollectionID, itemId: ItemID, propertyN
             return null;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when removıng (pullıng) value/s from an array filed in an item: ${err}`);
+        throw new Error(`WeivData - Error when removıng (pullıng) value/s from an array filed in an item: ${err}`);
     }
 }

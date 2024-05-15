@@ -24,7 +24,7 @@ async function getSecretKey() {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when creating or getting URI secret key: ${err}`);
+        throw new Error(`Error when creating or getting URI secret key: ${err}`);
     }
 }
 exports.getSecretKey = getSecretKey;

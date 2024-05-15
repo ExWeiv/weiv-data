@@ -1,32 +1,54 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReferences = exports.getCurrentItemId = void 0;
+exports.getReferencesItemIds = exports.getReferenceItemId = void 0;
 const item_helpers_1 = require("./item_helpers");
-const getCurrentItemId = (referringItem) => {
-    if (typeof referringItem === 'object' && referringItem !== null && referringItem._id !== undefined && referringItem._id) {
-        const id = referringItem._id;
-        return (0, item_helpers_1.convertStringId)(id);
-    }
-    else if (typeof referringItem === 'string') {
-        return (0, item_helpers_1.convertStringId)(referringItem);
-    }
-    else if (ObjectId.isValid(referringItem)) {
-        return referringItem;
+const mongodb_1 = require("mongodb");
+const validator_1 = require("./validator");
+const lodash_1 = require("lodash");
+const getReferenceItemId = (referringItem) => {
+    if (referringItem) {
+        let safeReferringItem;
+        if (mongodb_1.ObjectId.isValid(referringItem)) {
+            return referringItem;
+        }
+        else {
+            if (typeof referringItem === "object") {
+                if (!referringItem._id) {
+                    throw new Error(`when sending Item it must contain _id field in it with a valid value!`);
+                }
+                safeReferringItem = (0, validator_1.copyOwnPropsOnly)(referringItem);
+                return (0, item_helpers_1.convertStringId)(safeReferringItem._id);
+            }
+            else {
+                if (typeof referringItem !== "string") {
+                    throw new Error(`ItemID must be ObjectId or StringId! It cannot be something else!`);
+                }
+                return (0, item_helpers_1.convertStringId)(referringItem);
+                ;
+            }
+        }
     }
     else {
-        throw new Error('WeivData - Error: Invalid value type, expected object with _id, string, or ObjectId');
+        throw new Error(`RefferingItem is empty there is no value!`);
     }
 };
-exports.getCurrentItemId = getCurrentItemId;
-const getReferences = (referencedItem) => {
-    if (Array.isArray(referencedItem)) {
-        return referencedItem.flatMap((itemOrId) => (0, exports.getReferences)(itemOrId));
-    }
-    else if (typeof referencedItem === 'object' && referencedItem !== null && referencedItem._id !== undefined && referencedItem._id) {
-        return [(0, exports.getReferences)(referencedItem._id)];
+exports.getReferenceItemId = getReferenceItemId;
+const getReferencesItemIds = (referencedItem) => {
+    if (referencedItem) {
+        let saveObjectIds = [];
+        if ((0, lodash_1.isArray)(referencedItem)) {
+            for (const i of referencedItem) {
+                saveObjectIds.push((0, exports.getReferenceItemId)(i));
+            }
+            return saveObjectIds;
+        }
+        else {
+            saveObjectIds.push((0, exports.getReferenceItemId)(referencedItem));
+            return saveObjectIds;
+        }
     }
     else {
-        return [(0, item_helpers_1.convertStringId)(referencedItem)];
+        throw new Error(`ReferencedItem is empty there is no value!`);
     }
 };
-exports.getReferences = getReferences;
+exports.getReferencesItemIds = getReferencesItemIds;

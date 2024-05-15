@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InternalWeivDataAggregateResult = void 0;
+exports.AggregateResult = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("../Helpers/name_helpers");
-class InternalWeivDataAggregateResult {
+class AggregateResult {
     constructor(collectionId) {
         this.pageSize = 50;
         this.currentPage = 1;
@@ -62,8 +62,8 @@ class InternalWeivDataAggregateResult {
             return { collection, memberId };
         }
         catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
+            throw new Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
         }
     }
 }
-exports.InternalWeivDataAggregateResult = InternalWeivDataAggregateResult;
+exports.AggregateResult = AggregateResult;

@@ -1,40 +1,24 @@
 import { connectionHandler } from '../../Helpers/connection_helpers';
-import type { CollectionID, Item, ItemID, WeivDataOptions } from '../../Helpers/collection';
+import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../../Helpers/hook_helpers';
 import { runDataHook } from '../../Hooks/hook_manager';
-import { convertStringId } from '../../Helpers/item_helpers';
+import { validateParams } from '../../Helpers/validator';
 
-/**
- * You can use getAndUpdate to find an item by it's _id and update it's content. (ID will stay same)
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * const itemId = "...";
- * const updatedItem = await weivData.getAndUpdate("Db/Collection", itemId, {...});
- * console.log(updatedItem);
- * ```
- * 
- * @param collectionId The ID of the collection to remove the item from.
- * @param itemId ItemID to filter the _id field when performing the operation.
- * @param value Object contains updated data.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | undefined>} Fulfilled - Updated item 
- */
 export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptions): Promise<Item | undefined> {
     try {
-        if (!collectionId || !itemId || !value) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value`);
-        }
+        const { safeItemId, safeValue, safeOptions } = await validateParams<"getAndUpdate">(
+            { collectionId, itemId, value, options },
+            ["collectionId", "itemId", "value"],
+            "getAndUpdate"
+        );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
 
-        let editedItem = value;
+        let editedItem = safeValue;
         if (suppressHooks != true) {
-            const modifiedItem = await runDataHook<'beforeGetAndUpdate'>(collectionId, "beforeGetAndUpdate", [value, context]).catch((err) => {
-                throw Error(`WeivData - beforeGetAndUpdate Hook Failure ${err}`);
+            const modifiedItem = await runDataHook<'beforeGetAndUpdate'>(collectionId, "beforeGetAndUpdate", [safeValue, context]).catch((err) => {
+                throw new Error(`beforeGetAndUpdate Hook Failure ${err}`);
             });
 
             if (modifiedItem) {
@@ -46,7 +30,7 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndUpdate(
-            { _id: convertStringId(itemId) },
+            { _id: safeItemId },
             { $set: editedItem },
             { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
         );
@@ -54,7 +38,7 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await runDataHook<'afterGetAndUpdate'>(collectionId, "afterGetAndUpdate", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterGetAndUpdate Hook Failure ${err}`);
+                    throw new Error(`afterGetAndUpdate Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
@@ -67,6 +51,6 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
             return undefined;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when updating an item from collection (getAndUpdate): ${err}`);
+        throw new Error(`WeivData - Error when updating an item from collection (getAndUpdate): ${err}`);
     }
 }

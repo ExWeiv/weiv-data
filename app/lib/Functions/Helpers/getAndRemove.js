@@ -5,29 +5,27 @@ const connection_helpers_1 = require("../../Helpers/connection_helpers");
 const hook_helpers_1 = require("../../Helpers/hook_helpers");
 const hook_manager_1 = require("../../Hooks/hook_manager");
 const item_helpers_1 = require("../../Helpers/item_helpers");
+const validator_1 = require("../../Helpers/validator");
 async function getAndRemove(collectionId, itemId, options) {
     try {
-        if (!collectionId || !itemId) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
-        }
+        const { safeItemId, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemId, options }, ["collectionId", "itemId"], "getAndRemove");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
-        let editedItemId = itemId;
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        let editedItemId = safeItemId;
         if (suppressHooks != true) {
-            const modifiedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndRemove", [itemId, context]).catch((err) => {
-                throw Error(`WeivData - beforeGetAndRemove Hook Failure ${err}`);
+            const modifiedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndRemove", [safeItemId, context]).catch((err) => {
+                throw new Error(`beforeGetAndRemove Hook Failure ${err}`);
             });
             if (modifiedItemId) {
-                editedItemId = modifiedItemId;
+                editedItemId = (0, item_helpers_1.convertStringId)(modifiedItemId);
             }
         }
-        editedItemId = (0, item_helpers_1.convertStringId)(editedItemId);
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const item = await collection.findOneAndDelete({ _id: editedItemId }, { readConcern: readConcern ? readConcern : "local", includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndRemove", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterGetAndRemove Hook Failure ${err}`);
+                    throw new Error(`afterGetAndRemove Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
                     return modifiedResult;
@@ -40,7 +38,7 @@ async function getAndRemove(collectionId, itemId, options) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when removing an item from collection (getAndRemove): ${err}`);
+        throw new Error(`WeivData - Error when removing an item from collection (getAndRemove): ${err}`);
     }
 }
 exports.getAndRemove = getAndRemove;

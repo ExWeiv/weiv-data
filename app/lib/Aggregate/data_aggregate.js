@@ -3,16 +3,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeivDataAggregate = void 0;
 const pipeline_helpers_1 = require("../Helpers/pipeline_helpers");
 const data_aggregate_result_1 = require("./data_aggregate_result");
-class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregateResult {
+class WeivDataAggregate extends data_aggregate_result_1.AggregateResult {
     constructor(collectionId) {
         if (!collectionId) {
-            throw Error(`WeivData - Database and Collection name required`);
+            throw new Error(`WeivData - Database and Collection name required`);
         }
         super(collectionId);
     }
     ascending(propertyName) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
         this.sorting = {
             propertyName,
@@ -22,7 +22,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     avg(propertyName, projectedName = `${propertyName}Avg`) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -38,7 +38,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     descending(propertyName) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.sorting = {
             propertyName,
@@ -48,7 +48,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     filter(filter) {
         if (!filter) {
-            throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
+            throw new Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
         this.pipeline = (0, pipeline_helpers_1.checkPipelineArray)(this.pipeline);
         this.pipeline.push({
@@ -60,10 +60,10 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     group(...propertyName) {
         if (!propertyName) {
-            throw Error(`WeivData - Property or properties are required!`);
+            throw new Error(`WeivData - Property or properties are required!`);
         }
         if (this.groupCreated === true) {
-            throw Error(`WeivData - Group is already set!`);
+            throw new Error(`WeivData - Group is already set!`);
         }
         let propertyNames = {};
         if (typeof propertyName === "string") {
@@ -82,7 +82,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     having(filter) {
         if (!filter) {
-            throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
+            throw new Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
         this.havingFilter = {
             $match: {
@@ -93,7 +93,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     limit(limit) {
         if (!limit && limit != 0) {
-            throw Error(`WeivData - Limit number is required please specify a limit amount`);
+            throw new Error(`WeivData - Limit number is required please specify a limit amount`);
         }
         if (limit != 0) {
             this.limitNumber = limit;
@@ -102,7 +102,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     max(propertyName, projectedName = `${propertyName}Max`) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -114,7 +114,7 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     min(propertyName, projectedName = `${propertyName}Min`) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -193,14 +193,14 @@ class WeivDataAggregate extends data_aggregate_result_1.InternalWeivDataAggregat
     }
     skip(skip) {
         if (!skip && skip != 0) {
-            throw Error(`WeivData - Skip number is required please specify a skip number`);
+            throw new Error(`WeivData - Skip number is required please specify a skip number`);
         }
         this.skipNumber = skip;
         return this;
     }
     sum(propertyName, projectedName = `${propertyName}Sum`) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",

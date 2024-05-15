@@ -3,64 +3,22 @@ import { getOwnerId } from '../Helpers/member_id_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import type { CollectionID, ItemIDs, Items, WeivDataOptions } from '../Helpers/collection';
+import type { CollectionID, Item, WeivDataOptions, BulkSaveResult } from '@exweiv/weiv-data';
+import { validateParams } from '../Helpers/validator';
 
-/**
- * Object returned for bulkSave function.
- * @public
- */
-export interface WeivDataBulkSaveResult {
-    /**
-     * Number of inserted items.
-     */
-    inserted: number;
-
-    /**
-     * Number of updated items.
-     */
-    updated: number;
-
-    /**
-     * Saved items.
-     */
-    savedItems: Items;
-
-    /**
-     * Inserted item ids.
-     */
-    insertedItemIds: ItemIDs
-}
-
-/**
- * Inserts or updates a number of items in a collection.
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * // Items that will be bulk saved
- * const itemsToSave = [{...}, {...}, {...}]
- * 
- * const result = await weivData.bulkSave("Clusters/Odunpazari", itemsToSave)
- * console.log(result);
- * ```
- * 
- * @param collectionId The ID of the collection to save the items to.
- * @param items The items to insert or update.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<WeivDataBulkSaveResult>} Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
- */
-export async function bulkSave(collectionId: CollectionID, items: Items, options?: WeivDataOptions): Promise<WeivDataBulkSaveResult> {
+export async function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptions): Promise<BulkSaveResult> {
     try {
-        if (!collectionId || !items || items.length <= 0) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
-        }
+        const { safeItems, safeOptions } = await validateParams<"bulkSave">(
+            { collectionId, items, options },
+            ["collectionId", "items"],
+            "bulkSave"
+        );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
 
         let ownerId = await getOwnerId(enableVisitorId);
-        let editedItems: Items | Promise<Items>[] = items.map(async (item) => {
+        let editedItems: Item[] | Promise<Item[]>[] = safeItems.map(async (item) => {
             if (!item._owner) {
                 item._owner = ownerId;
             }
@@ -70,7 +28,7 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
                 // Run beforeUpdate hook for that item.
                 if (suppressHooks != true) {
                     const editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [item, context]).catch((err) => {
-                        throw Error(`WeivData - beforeUpdate (bulkSave) Hook Failure ${err}`);
+                        throw new Error(`beforeUpdate (bulkSave) Hook Failure ${err}`);
                     })
 
                     if (editedItem) {
@@ -86,7 +44,7 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
                 // Run beforeInsert hook for that item.
                 if (suppressHooks != true) {
                     const editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [item, context]).catch((err) => {
-                        throw Error(`WeivData - beforeInsert (bulkSave) Hook Failure ${err}`);
+                        throw new Error(`beforeInsert (bulkSave) Hook Failure ${err}`);
                     });
 
                     if (editedItem) {
@@ -131,7 +89,7 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
                     if (item._id) {
                         // Run afterUpdate hook for that item.
                         const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                            throw Error(`WeivData - afterUpdate (bulkSave) Hook Failure ${err}`);
+                            throw new Error(`afterUpdate (bulkSave) Hook Failure ${err}`);
                         });
 
                         if (editedItem) {
@@ -142,7 +100,7 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
                     } else {
                         // Run afterInsert hook for that item.
                         const editedItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
-                            throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                            throw new Error(`afterInsert Hook Failure ${err}`);
                         });
 
                         if (editedItem) {
@@ -167,9 +125,9 @@ export async function bulkSave(collectionId: CollectionID, items: Items, options
                 savedItems: editedItems
             }
         } else {
-            throw Error(`WeivData - Error when saving items using bulkSave: inserted: ${insertedCount}, updated: ${modifiedCount}, ok: ${ok}`);
+            throw new Error(`inserted: ${insertedCount}, updated: ${modifiedCount}, ok: ${ok}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when saving items using bulkSave: ${err}`);
+        throw new Error(`WeivData - Error when saving items using bulkSave: ${err}`);
     }
 }

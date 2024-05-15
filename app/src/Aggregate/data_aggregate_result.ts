@@ -2,42 +2,14 @@ import { Collection, Db } from "mongodb/mongodb";
 import { type PipelineArray, sortAggregationPipeline } from "../Helpers/pipeline_helpers";
 import { useClient } from '../Connection/automatic_connection_provider';
 import { splitCollectionId } from "../Helpers/name_helpers";
-import type { CollectionID, ConnectionHandlerResult, Items, SuppressAuth } from "../Helpers/collection";
-
-/**@public */
-export interface WeivDataAggregateResult {
-    /**
-    * Gets the aggregated values.
-    * 
-    * @readonly
-    */
-    items: Items;
-
-    /**
-     * Returns the number of values in the aggregate results.
-     * 
-     * @readonly
-     */
-    length: number;
-
-    /**
-     * Indicates if the aggregation has more results.
-     */
-    hasNext(): boolean;
-
-    /**
-     * Retrieves the next page of aggregate results.
-     * 
-     * @returns {WeivDataAggregateResult} Fulfilled - An aggregate object with the next page of aggregate results. Rejected - The errors that caused the rejection.
-     */
-    next(): Promise<WeivDataAggregateResult>;
-}
+import type { CollectionID, Item, WeivDataAggregateResult } from "@exweiv/weiv-data";
+import type { ConnectionHandlerResult } from "../Helpers/collection";
 
 /**
  * The results of an aggregation, containing the aggregated values.
  * @internal
  */
-export class InternalWeivDataAggregateResult {
+export class AggregateResult {
     protected pageSize: number = 50;
     protected currentPage = 1;
     protected pipeline!: PipelineArray;
@@ -46,7 +18,7 @@ export class InternalWeivDataAggregateResult {
     protected dbName: string;
     protected collection!: Collection;
 
-    protected items!: Items;
+    protected items!: Item[];
     protected length!: number;
     protected hasNext!: () => boolean;
     protected next!: () => Promise<WeivDataAggregateResult>;
@@ -61,7 +33,7 @@ export class InternalWeivDataAggregateResult {
         this.dbName = dbName;
     }
 
-    private async getItems(): Promise<Items> {
+    private async getItems(): Promise<Item[]> {
         const currentSkip = this.pipeline.find((stage) => "$skip" in stage);
 
         if (currentSkip) {
@@ -80,7 +52,7 @@ export class InternalWeivDataAggregateResult {
         return items;
     }
 
-    protected async getResult(suppressAuth?: SuppressAuth): Promise<WeivDataAggregateResult> {
+    protected async getResult(suppressAuth?: boolean): Promise<WeivDataAggregateResult> {
         // Setup a connection from the pool
         if (!this.collection) {
             const { collection } = await this.connectionHandler(suppressAuth);
@@ -105,7 +77,7 @@ export class InternalWeivDataAggregateResult {
         };
     }
 
-    protected async connectionHandler(suppressAuth?: SuppressAuth): Promise<ConnectionHandlerResult<false>> {
+    protected async connectionHandler(suppressAuth?: boolean): Promise<ConnectionHandlerResult<false>> {
         try {
             const { pool, memberId } = await useClient(suppressAuth);
 
@@ -118,7 +90,7 @@ export class InternalWeivDataAggregateResult {
             const collection = this.db.collection(this.collectionName);
             return { collection, memberId };
         } catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
+            throw new Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
         }
     }
 }

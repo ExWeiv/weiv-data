@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getQueryCache = exports.InternalWeivDataQueryResult = void 0;
+exports.getQueryCache = exports.QueryResult = void 0;
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const lodash_1 = require("lodash");
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -12,7 +12,7 @@ const cache = new node_cache_1.default({
     useClones: false,
     deleteOnExpire: true
 });
-class InternalWeivDataQueryResult {
+class QueryResult {
     constructor(options) {
         this.suppressAuth = false;
         this.readConcern = "local";
@@ -20,7 +20,7 @@ class InternalWeivDataQueryResult {
         this.currentPage = 1;
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, readConcern, collection, cacheTimeout, enableCache } = options;
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
-            throw Error(`WeivData - Required Param/s Missing`);
+            throw new Error(`required param/s missing! (pageSize, queryOptions, dbName, collectionName and queryClass are required params)`);
         }
         this.cacheTimeout = cacheTimeout;
         this.enableCache = enableCache;
@@ -104,7 +104,7 @@ class InternalWeivDataQueryResult {
             }
         }
         catch (err) {
-            throw Error(`WeivData - Error when using query (getItems): ${err}`);
+            throw new Error(`WeivData - Error when using query (getItems): ${err}`);
         }
     }
     async getTotalCount() {
@@ -127,7 +127,7 @@ class InternalWeivDataQueryResult {
             return totalCount;
         }
         catch (err) {
-            throw Error(`WeivData - Error when using query (getTotalCount): ${err}`);
+            throw new Error(`WeivData - Error when using query (getTotalCount): ${err}`);
         }
     }
     async getResult() {
@@ -182,7 +182,7 @@ class InternalWeivDataQueryResult {
             return result;
         }
         catch (err) {
-            throw Error(`WeivData - Error when using query: ${err}`);
+            throw new Error(`WeivData - Error when using query: ${err}`);
         }
     }
     async connectionHandler(suppressAuth) {
@@ -198,14 +198,14 @@ class InternalWeivDataQueryResult {
             return { collection, memberId };
         }
         catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
+            throw new Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }
     }
     generateCacheKey() {
         return `${this.dbName}-${this.collectionName}-${this.currentPage}-${JSON.stringify(this.queryOptions)}`;
     }
 }
-exports.InternalWeivDataQueryResult = InternalWeivDataQueryResult;
+exports.QueryResult = QueryResult;
 function getQueryCache() {
     return cache;
 }

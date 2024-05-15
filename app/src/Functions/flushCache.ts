@@ -5,9 +5,7 @@ import { getHelperSecretsCache } from '../Helpers/secret_helpers';
 import { getQueryCache } from '../Query/data_query_result';
 import { getClientCache } from '../Connection/automatic_connection_provider';
 import NodeCache from 'node-cache';
-
-/**@public */
-export type CacheSelections = "permissions" | "secrets" | "get" | "isreferenced" | "query" | "helpersecrets" | "connectionclients";
+import type { CacheSelections } from '@exweiv/weiv-data';
 
 type CacheSelectionsObject = {
     [Key in CacheSelections]: () => NodeCache; // Define the value type as a function returning any
@@ -23,12 +21,6 @@ const cacheSelections: CacheSelectionsObject = {
     "secrets": getHelperSecretsCache
 }
 
-/**
- * Use when you want to flush the caches internally. You can choose caches to flush or pass empty array to flush all of them.
- * 
- * @param filters Filter which cache to flush. Pass empty array to flush all of them.
- * @public
- */
 export function flushCache(filters?: CacheSelections[]): void {
     try {
         const cachesToFlush = [];
@@ -57,6 +49,6 @@ export function flushCache(filters?: CacheSelections[]): void {
             cacheData.flushAll();
         }
     } catch (err) {
-        throw Error(`WeivData - Error when flushing caches! ${err}`);
+        throw new Error(`WeivData - Error when flushing caches! ${err}`);
     }
 }

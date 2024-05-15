@@ -5,17 +5,16 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+const validator_1 = require("../Helpers/validator");
 async function bulkRemove(collectionId, itemIds, options) {
     try {
-        if (!collectionId || !itemIds) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemIds`);
-        }
+        const { safeItemIds, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemIds, options }, ["collectionId", "itemIds"], "bulkRemove");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
-        let editedItemIds = itemIds.map(async (itemId) => {
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        let editedItemIds = safeItemIds.map(async (itemId) => {
             if (suppressHooks != true) {
                 const editedId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeRemove", [itemId, context]).catch((err) => {
-                    throw Error(`WeivData - beforeRemove (bulkRemove) Hook Failure ${err}`);
+                    throw new Error(`beforeRemove (bulkRemove) Hook Failure ${err}`);
                 });
                 if (editedId) {
                     return (0, item_helpers_1.convertStringId)(editedId);
@@ -45,11 +44,11 @@ async function bulkRemove(collectionId, itemIds, options) {
             };
         }
         else {
-            throw Error(`WeivData - Error when removing items using bulkRemove: removed: ${deletedCount}, ok: ${ok}`);
+            throw new Error(`removed: ${deletedCount}, ok: ${ok}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when removing items using bulkRemove: ${err}`);
+        throw new Error(`WeivData - Error when removing items using bulkRemove: ${err}`);
     }
 }
 exports.bulkRemove = bulkRemove;

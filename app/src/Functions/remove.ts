@@ -2,48 +2,26 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import type { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/collection';
+import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
+import { validateParams } from '../Helpers/validator';
 
-/**
- * Removes an item from a collection.
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * // ID of item that will be removed
- * const itemId = "..."
- * 
- * const result = await weivData.remove("Clusters/Riva", itemId)
- * console.log(result);
- * ```
- * 
- * @param collectionId The ID of the collection to remove the item from.
- * @param itemId The ID of the item to remove.
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | null>} Fulfilled - The removed item, or null if the item was not found. Rejected - The error that caused the rejection.
- */
 export async function remove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | null> {
     try {
-        if (!collectionId || !itemId) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId`);
-        }
+        const { safeItemId, safeOptions } = await validateParams<"remove">({ collectionId, itemId, options }, ["collectionId", "itemId"], "remove");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
 
         let editedItemId;
         if (suppressHooks != true) {
-            editedItemId = await runDataHook<'beforeRemove'>(collectionId, "beforeRemove", [itemId, context]).catch((err) => {
-                throw Error(`WeivData - beforeRemove Hook Failure ${err}`);
+            editedItemId = await runDataHook<'beforeRemove'>(collectionId, "beforeRemove", [safeItemId, context]).catch((err) => {
+                throw new Error(`beforeRemove Hook Failure ${err}`);
             });
         }
 
-        let newItemId;
+        let newItemId = safeItemId;
         if (editedItemId) {
             newItemId = convertStringId(editedItemId);
-        } else {
-            newItemId = convertStringId(itemId);
         }
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
@@ -55,7 +33,7 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
         if (item) {
             if (suppressHooks != true) {
                 let editedItem = await runDataHook<'afterRemove'>(collectionId, 'afterRemove', [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterRemove Hook Failure ${err}`);
+                    throw new Error(`afterRemove Hook Failure ${err}`);
                 });
 
                 if (editedItem) {
@@ -68,6 +46,6 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
             return null;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when removing an item from collection: ${err}`);
+        throw new Error(`WeivData - Error when removing an item from collection: ${err}`);
     }
 }

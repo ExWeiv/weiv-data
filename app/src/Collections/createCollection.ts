@@ -1,34 +1,22 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { splitCollectionId } from '../Helpers/name_helpers';
-import { CollectionID, WeivDataOptions } from '../Helpers/collection';
-import type { CreateCollectionOptions } from 'mongodb';
+import { CollectionID, WeivDataOptions } from '@exweiv/weiv-data';
+import type { CreateCollectionOptions } from 'mongodb/mongodb';
+import { validateParams } from '../Helpers/validator';
 
-/**
- * Creates a new collection inside of a selected database. (User must have createCollection permission inside MongoDB dashboard, you can also use suppressAuth with options).
- * 
- * @example
- * ```js
- * import { createCollection } from '@exweiv/weiv-data';
- * 
- * createCollection('Database/NewCollectionName', { suppressAuth: true });
- * ```
- * 
- * @param collectionId CollectionID (< database >/< collection >). 
- * @param options An object containing options to use when processing this operation.
- * @param createOptions Native options of MongoDB driver when creating a collection. [Checkout here.](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/CreateCollectionOptions.html)
- * @returns {Promise<void>} void
- */
 export async function createCollection(collectionId: CollectionID, options?: WeivDataOptions, createOptions?: CreateCollectionOptions): Promise<void> {
     try {
-        if (!collectionId) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId`);
-        }
+        const { safeCollectionOptions, safeOptions } = await validateParams<"createCollection">(
+            { collectionId, collectionOptions: createOptions, options },
+            ["collectionId"],
+            "createCollection"
+        );
 
-        const { suppressAuth } = options || {};
+        const { suppressAuth } = safeOptions || {};
         const { database } = await connectionHandler<true>(collectionId, suppressAuth, true);
         const { collectionName } = splitCollectionId(collectionId);
-        await database.createCollection(collectionName, createOptions);
+        await database.createCollection(collectionName, safeCollectionOptions);
     } catch (err) {
-        throw Error(`WeivData - Error when creating a new collection in a database, details: ${err}`);
+        throw new Error(`WeivData - Error when creating a new collection in a database, details: ${err}`);
     }
 }

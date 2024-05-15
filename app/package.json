@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "3.0.4",
+  "version": "3.1.0.beta-1",
   "description": "Custom API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
   "main": "./lib/index.js",
   "files": [
@@ -8,7 +8,7 @@
     "src",
     "tsconfig.json"
   ],
-  "types": "./src/index.ts",
+  "types": "weivdata.d.ts",
   "scripts": {
     "build": "tsc & npx typedoc --favicon https://static.wixstatic.com/media/510eca_9c4238093ad44527867402ae5fc8d7dd~mv2.png --footerLastModified true"
   },
@@ -32,19 +32,19 @@
   "dependencies": {
     "crypto-js": "^4.2.0",
     "lodash": "^4.17.21",
-    "mongodb": "^6.3.0",
+    "mongodb": "^6.6.1",
     "mongodb-schema": "^12.1.1",
     "node-cache": "^5.1.2",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.5",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
-    "@types/lodash": "^4.14.202",
-    "@types/node": "^20.11.0",
-    "@types/uuid": "^9.0.7",
-    "nodemon": "^3.0.2",
-    "typedoc": "^0.25.7",
+    "@types/lodash": "^4.17.1",
+    "@types/node": "^20.12.8",
+    "@types/uuid": "^9.0.8",
+    "nodemon": "^3.1.0",
+    "typedoc": "^0.25.13",
     "typedoc-plugin-extras": "^3.0.0"
   },
   "publishConfig": {
@@ -63,7 +63,7 @@
   "contributors": [
     {
       "name": "Enes Bekar",
-      "url": "https://github.com/l0eix"
+      "url": "https://github.com/loeiks"
     }
   ],
   "engines": {

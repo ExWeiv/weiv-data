@@ -35,7 +35,7 @@ const getSecretValue = wixAuth.elevate(wix_secrets_backend_v2_1.secrets.getSecre
 async function getCachedSecret(secretName, parse) {
     try {
         if (typeof secretName !== "string") {
-            throw new Error(`Secret Name param is not string!`);
+            throw new Error(`secretName param is not string!`);
         }
         let secret = cache.get(secretName);
         if (secret === undefined) {
@@ -46,13 +46,13 @@ async function getCachedSecret(secretName, parse) {
                     objectSecret = JSON.parse(value);
                 }
                 catch (err) {
-                    throw new Error(`Failed to parse JSON for secret '${secretName}': ${err}`);
+                    throw new Error(`failed to parse JSON for secret '${secretName}': ${err}`);
                 }
                 if (typeof objectSecret === 'object' && objectSecret !== null) {
                     secret = objectSecret;
                 }
                 else {
-                    throw new Error(`Parsed JSON is not an object for secret '${secretName}'`);
+                    throw new Error(`parsed JSON is not an object for secret '${secretName}'`);
                 }
             }
             else {
@@ -63,7 +63,7 @@ async function getCachedSecret(secretName, parse) {
         return secret;
     }
     catch (err) {
-        throw Error(`WeivData - Error on general cached secret helpers: ${err}`);
+        throw new Error(`Error on general cached secret helpers: ${err}`);
     }
 }
 exports.getCachedSecret = getCachedSecret;

@@ -2,79 +2,15 @@ import { Db, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/automatic_connection_provider';
 import { isEmpty, size } from 'lodash';
 import NodeCache from "node-cache";
-import type { ConnectionHandlerResult, Items, ReadConcern } from "../Helpers/collection";
+import type { ConnectionHandlerResult } from "../Helpers/collection";
 import type { LookupObject, ReferenceLenghtObject } from "./data_query";
+import type { ReadConcern, Item, WeivDataQueryResult } from '@exweiv/weiv-data'
 
 const cache = new NodeCache({
     checkperiod: 5,
     useClones: false,
     deleteOnExpire: true
-})
-
-/**@public */
-export interface WeivDataQueryResult {
-    /**
-     * Returns the index of the current results page number.
-     * @readonly
-     */
-    currentPage: number;
-
-    /**
-     * Returns the items that match the query.
-     * @readonly
-     */
-    items: Items;
-
-    /**
-     * Returns the number of items in the current results page.
-     * @readonly
-     */
-    length: number;
-
-    /**
-     * Returns the query page size.
-     * @readonly
-     */
-    pageSize: number;
-
-    /**
-     * Returns the total number of items that match the query.
-     * @readonly
-     */
-    totalCount: number;
-
-    /**
-     * Returns the total number of pages the query produced.
-     * @readonly
-     */
-    totalPages: number;
-
-    /**
-     * Indicates if the query has more results.
-     * @returns {boolean}
-     */
-    hasNext(): boolean;
-
-    /**
-     * Indicates the query has previous results.
-     * @returns {boolean}
-     */
-    hasPrev(): boolean;
-
-    /**
-     * Retrieves the next page of query results.
-     * 
-     * @returns {Promise<WeivDataQueryResult>} Fulfilled - A query result object with the next page of query results. Rejected - The errors that caused the rejection.
-     */
-    next(): Promise<WeivDataQueryResult>;
-
-    /**
-     * Retrieves the previous page of query results.
-     * 
-     * @returns {Promise<WeivDataQueryResultI>} Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
-     */
-    prev(): Promise<WeivDataQueryResult>;
-}
+});
 
 /** @internal */
 export type DataQueryResultOptions = {
@@ -101,7 +37,7 @@ type QueryResultQueryOptions = {
     addFields: ReferenceLenghtObject
 }
 
-export class InternalWeivDataQueryResult {
+export class QueryResult {
     private dataQueryClass!: { [key: string]: any };
     private suppressAuth = false;
     private readConcern: ReadConcern = "local";
@@ -119,7 +55,7 @@ export class InternalWeivDataQueryResult {
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, readConcern, collection, cacheTimeout, enableCache } = options;
 
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
-            throw Error(`WeivData - Required Param/s Missing`);
+            throw new Error(`required param/s missing! (pageSize, queryOptions, dbName, collectionName and queryClass are required params)`);
         }
 
         this.cacheTimeout = cacheTimeout;
@@ -134,7 +70,7 @@ export class InternalWeivDataQueryResult {
         this.collectionName = collectionName;
     }
 
-    private async getItems(): Promise<Items> {
+    private async getItems(): Promise<Item[]> {
         try {
             const { query, distinctProperty, skip, sort, fields, includes, addFields } = this.queryOptions;
 
@@ -221,7 +157,7 @@ export class InternalWeivDataQueryResult {
                 }
             }
         } catch (err) {
-            throw Error(`WeivData - Error when using query (getItems): ${err}`);
+            throw new Error(`WeivData - Error when using query (getItems): ${err}`);
         }
     }
 
@@ -247,7 +183,7 @@ export class InternalWeivDataQueryResult {
             const totalCount = await this.collection.countDocuments(query, isEmpty(query) ? { hint: "_id_" } : {});
             return totalCount;
         } catch (err) {
-            throw Error(`WeivData - Error when using query (getTotalCount): ${err}`);
+            throw new Error(`WeivData - Error when using query (getTotalCount): ${err}`);
         }
     }
 
@@ -306,7 +242,7 @@ export class InternalWeivDataQueryResult {
 
             return result;
         } catch (err) {
-            throw Error(`WeivData - Error when using query: ${err}`);
+            throw new Error(`WeivData - Error when using query: ${err}`);
         }
     }
 
@@ -323,7 +259,7 @@ export class InternalWeivDataQueryResult {
             const collection = this.db.collection(this.collectionName);
             return { collection, memberId };
         } catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
+            throw new Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }
     }
 

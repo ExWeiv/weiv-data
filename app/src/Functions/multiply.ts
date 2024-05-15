@@ -1,41 +1,21 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import type { CollectionID, Item, ItemID, WeivDataOptions } from '../Helpers/collection';
+import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { convertStringId } from '../Helpers/item_helpers';
+import { validateParams } from '../Helpers/validator';
 
-/**
- * You can use multiply function to multiply the value of a filed in an item.
- * 
- * @example
- * ```
- * import weivData from '@exweiv/weiv-data';
- * 
- * const itemId = "...";
- * const result = await weivData.multiply("Db/Collection", itemId, "numberField", 3 {...});
- * console.log(result);
- * ```
- * 
- * @param collectionId The ID of the collection to remove the item from.
- * @param itemId ItemID to filter the _id field when performing the operation.
- * @param propertyName Property name for the multiply field.
- * @param value Multiply current value by that much. (If you set it to 10 it will multiply it by 10 `x*10`)
- * @param options An object containing options to use when processing this operation.
- * @returns {Promise<Item | null>} Fulfilled - Updated item 
- */
 export async function multiply(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions): Promise<Item | null> {
     try {
-        if (!collectionId || !itemId || !value || !propertyName) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, itemId, value, propertyName`);
-        }
+        const { safeOptions } = await validateParams<"multiply">({ collectionId, itemId, propertyName, value, options }, ["collectionId", "itemId", "value", "propertyName"], "multiply");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
 
         let editedModify = { propertyName, value };
         if (suppressHooks != true) {
             const modifiedParams = await runDataHook<'beforeMultiply'>(collectionId, "beforeMultiply", [{ propertyName, value }, context]).catch((err) => {
-                throw Error(`WeivData - beforeMultiply Hook Failure ${err}`);
+                throw new Error(`beforeMultiply Hook Failure ${err}`);
             });
 
             if (modifiedParams) {
@@ -53,7 +33,7 @@ export async function multiply(collectionId: CollectionID, itemId: ItemID, prope
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await runDataHook<'afterMultiply'>(collectionId, "afterMultiply", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterMultiply Hook Failure ${err}`);
+                    throw new Error(`afterMultiply Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
@@ -66,6 +46,6 @@ export async function multiply(collectionId: CollectionID, itemId: ItemID, prope
             return null;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when multiplying a filed in an item: ${err}`);
+        throw new Error(`WeivData - Error when multiplying a filed in an item: ${err}`);
     }
 }

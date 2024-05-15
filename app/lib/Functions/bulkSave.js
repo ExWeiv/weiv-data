@@ -6,22 +6,21 @@ const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const item_helpers_1 = require("../Helpers/item_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+const validator_1 = require("../Helpers/validator");
 async function bulkSave(collectionId, items, options) {
     try {
-        if (!collectionId || !items || items.length <= 0) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, items`);
-        }
+        const { safeItems, safeOptions } = await (0, validator_1.validateParams)({ collectionId, items, options }, ["collectionId", "items"], "bulkSave");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = options || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
         let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
-        let editedItems = items.map(async (item) => {
+        let editedItems = safeItems.map(async (item) => {
             if (!item._owner) {
                 item._owner = ownerId;
             }
             if (item._id) {
                 if (suppressHooks != true) {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
-                        throw Error(`WeivData - beforeUpdate (bulkSave) Hook Failure ${err}`);
+                        throw new Error(`beforeUpdate (bulkSave) Hook Failure ${err}`);
                     });
                     if (editedItem) {
                         return editedItem;
@@ -38,7 +37,7 @@ async function bulkSave(collectionId, items, options) {
             else {
                 if (suppressHooks != true) {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [item, context]).catch((err) => {
-                        throw Error(`WeivData - beforeInsert (bulkSave) Hook Failure ${err}`);
+                        throw new Error(`beforeInsert (bulkSave) Hook Failure ${err}`);
                     });
                     if (editedItem) {
                         return editedItem;
@@ -78,7 +77,7 @@ async function bulkSave(collectionId, items, options) {
                 editedItems = editedItems.map(async (item) => {
                     if (item._id) {
                         const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                            throw Error(`WeivData - afterUpdate (bulkSave) Hook Failure ${err}`);
+                            throw new Error(`afterUpdate (bulkSave) Hook Failure ${err}`);
                         });
                         if (editedItem) {
                             return editedItem;
@@ -89,7 +88,7 @@ async function bulkSave(collectionId, items, options) {
                     }
                     else {
                         const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
-                            throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                            throw new Error(`afterInsert Hook Failure ${err}`);
                         });
                         if (editedItem) {
                             return editedItem;
@@ -112,11 +111,11 @@ async function bulkSave(collectionId, items, options) {
             };
         }
         else {
-            throw Error(`WeivData - Error when saving items using bulkSave: inserted: ${insertedCount}, updated: ${modifiedCount}, ok: ${ok}`);
+            throw new Error(`inserted: ${insertedCount}, updated: ${modifiedCount}, ok: ${ok}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when saving items using bulkSave: ${err}`);
+        throw new Error(`WeivData - Error when saving items using bulkSave: ${err}`);
     }
 }
 exports.bulkSave = bulkSave;
