@@ -15,7 +15,7 @@ export async function multiply(collectionId: CollectionID, itemId: ItemID, prope
         let editedModify = { propertyName, value };
         if (suppressHooks != true) {
             const modifiedParams = await runDataHook<'beforeMultiply'>(collectionId, "beforeMultiply", [{ propertyName, value }, context]).catch((err) => {
-                throw Error(`WeivData - beforeMultiply Hook Failure ${err}`);
+                throw new Error(`beforeMultiply Hook Failure ${err}`);
             });
 
             if (modifiedParams) {
@@ -33,7 +33,7 @@ export async function multiply(collectionId: CollectionID, itemId: ItemID, prope
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await runDataHook<'afterMultiply'>(collectionId, "afterMultiply", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterMultiply Hook Failure ${err}`);
+                    throw new Error(`afterMultiply Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
@@ -46,6 +46,6 @@ export async function multiply(collectionId: CollectionID, itemId: ItemID, prope
             return null;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when multiplying a filed in an item: ${err}`);
+        throw new Error(`WeivData - Error when multiplying a filed in an item: ${err}`);
     }
 }

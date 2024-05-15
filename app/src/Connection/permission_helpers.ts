@@ -38,7 +38,7 @@ export async function getMongoURI(suppressAuth: boolean = false): Promise<GetMon
             return getAdminURI();
         }
     } catch (err) {
-        throw Error(`Error on getting URI for MongoDB based on permission of current user: ${err}`);
+        throw new Error(`Error on getting URI for MongoDB based on permission of current user: ${err}`);
     }
 }
 
@@ -63,10 +63,10 @@ const getVisitorURI = async (): Promise<GetMongoURIResult> => {
             cache.set<CryptoJS.lib.CipherParams>("VisitorMongoDB_URI", encryptedURI, 60 * 5);
             return { uri: secret, role: "visitorClientOptions" }
         } else {
-            throw Error(`WeivData - WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
-        throw Error(`Error when getting VisitorURI: ${err}`);
+        throw new Error(`Error when getting VisitorURI: ${err}`);
     }
 }
 
@@ -99,10 +99,10 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
                 role: "adminClientOptions"
             }
         } else {
-            throw Error(`WeivData - WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when getting AdminURI: ${err}`);
+        throw new Error(`Error when getting AdminURI: ${err}`);
     }
 }
 
@@ -153,10 +153,10 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
                 role: "memberClientOptions"
             }
         } else {
-            throw Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
-        throw Error(`Error when getting MemberURI: ${err}`);
+        throw new Error(`Error when getting MemberURI: ${err}`);
     }
 }
 

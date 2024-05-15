@@ -18,7 +18,7 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
         let editedItem = safeValue;
         if (suppressHooks != true) {
             const modifiedItem = await runDataHook<'beforeGetAndReplace'>(collectionId, "beforeGetAndReplace", [safeValue, context]).catch((err) => {
-                throw Error(`WeivData - beforeGetAndReplace Hook Failure ${err}`);
+                throw new Error(`beforeGetAndReplace Hook Failure ${err}`);
             });
 
             if (modifiedItem) {
@@ -38,7 +38,7 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await runDataHook<'afterGetAndReplace'>(collectionId, "afterGetAndReplace", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterGetAndReplace Hook Failure ${err}`);
+                    throw new Error(`afterGetAndReplace Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
@@ -51,6 +51,6 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
             return undefined;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when replacing an item from collection (getAndReplace): ${err}`);
+        throw new Error(`WeivData - Error when replacing an item from collection (getAndReplace): ${err}`);
     }
 }

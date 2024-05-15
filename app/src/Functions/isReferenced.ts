@@ -47,7 +47,7 @@ export async function isReferenced(collectionId: CollectionID, propertyName: str
             return false;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when checking if item is referenced: ${err}`);
+        throw new Error(`WeivData - Error when checking if item is referenced: ${err}`);
     }
 }
 

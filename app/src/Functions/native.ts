@@ -9,6 +9,6 @@ export async function native(collectionId: CollectionID, suppressAuth?: boolean)
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         return collection;
     } catch (err) {
-        throw Error(`WeivData - Error when returning native collection cursor from mongodb driver: ${err}`);
+        throw new Error(`WeivData - Error when returning native collection cursor from mongodb driver: ${err}`);
     }
 }

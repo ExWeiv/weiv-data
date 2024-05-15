@@ -3,7 +3,7 @@ import { splitCollectionId } from './name_helpers';
 
 export function getPipeline(itemId: ObjectId, targetCollectionId: string, propertyName: string, pipelineOptions: { pageSize: number, skip: number, order: 'asc' | 'desc' }) {
     if (typeof itemId !== "object" || typeof targetCollectionId !== "string" || typeof propertyName !== "string" || typeof pipelineOptions !== "object") {
-        throw new Error("One or multiple parameter type is wrong!");
+        throw new Error("one or multiple parameter type is wrong!");
     }
 
     const { collectionName } = splitCollectionId(targetCollectionId);

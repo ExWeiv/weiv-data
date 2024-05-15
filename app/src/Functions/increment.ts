@@ -19,7 +19,7 @@ export async function increment(collectionId: CollectionID, itemId: ItemID, prop
         let editedModify = { propertyName, value };
         if (suppressHooks != true) {
             const modifiedParams = await runDataHook<'beforeIncrement'>(collectionId, "beforeIncrement", [{ propertyName, value }, context]).catch((err) => {
-                throw Error(`WeivData - beforeIncrement Hook Failure ${err}`);
+                throw new Error(`beforeIncrement Hook Failure ${err}`);
             });
 
             if (modifiedParams) {
@@ -37,7 +37,7 @@ export async function increment(collectionId: CollectionID, itemId: ItemID, prop
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await runDataHook<'afterIncrement'>(collectionId, "afterIncrement", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterIncrement Hook Failure ${err}`);
+                    throw new Error(`afterIncrement Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
@@ -50,6 +50,6 @@ export async function increment(collectionId: CollectionID, itemId: ItemID, prop
             return null;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when incrementing a filed in an item: ${err}`);
+        throw new Error(`WeivData - Error when incrementing a filed in an item: ${err}`);
     }
 }

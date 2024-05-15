@@ -26,7 +26,7 @@ export async function connectionHandler<T extends boolean = false>(collectionId:
             return { collection, memberId, database: db } as T extends true ? ConnectionHandlerResult<true> : ConnectionHandlerResult<false>;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when trying to connect to database via useClient and Mongo Client ${err}`);
+        throw new Error(`when trying to connect to database via useClient and Mongo Client ${err}`);
     }
 }
 
@@ -46,7 +46,7 @@ export async function loadConnectionOptions(role: CustomOptionsRole): Promise<Mo
             };
         }
     } catch (err) {
-        throw Error(`WeivData - Error when returning options for MongoDB Client connection: ${err}`);
+        throw new Error(`when returning options for MongoDB Client connection: ${err}`);
     }
 }
 
@@ -59,6 +59,6 @@ export async function getCustomCacheRules() {
             return { useClones: false, stdTTL: 5 * 60, deleteOnExpire: true };
         }
     } catch (err) {
-        throw Error(`WeivData - Error when loading custom cache rules for MongoClient connections, err: ${err}`);
+        throw new Error(`when loading custom cache rules for MongoClient connections, err: ${err}`);
     }
 }

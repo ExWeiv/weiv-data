@@ -31,7 +31,7 @@ export function sortAggregationPipeline(pipeline: PipelineArray): PipelineArray 
             const totalGroup = filter(pipeline, (stage) => stage["$group"]).length;
 
             if (totalGroup > 1) {
-                throw new Error("You can't use more than one group.");
+                throw new Error("you can't use more than one group.");
             }
 
             return pipeline;

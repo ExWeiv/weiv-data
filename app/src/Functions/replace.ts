@@ -16,7 +16,7 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
         let editedItem;
         if (suppressHooks != true) {
             editedItem = await runDataHook<'beforeReplace'>(collectionId, "beforeReplace", [safeItem, context]).catch((err) => {
-                throw Error(`WeivData - beforeReplace Hook Failure ${err}`);
+                throw new Error(`beforeReplace Hook Failure ${err}`);
             });
         }
 
@@ -35,7 +35,7 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
         if (value) {
             if (suppressHooks != true) {
                 let editedResult = await runDataHook<'afterReplace'>(collectionId, "afterReplace", [value, context]).catch((err) => {
-                    throw Error(`WeivData - afterReplace Hook Failure ${err}`);
+                    throw new Error(`afterReplace Hook Failure ${err}`);
                 });
 
                 if (editedResult) {
@@ -45,9 +45,9 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
 
             return value;
         } else {
-            throw Error(`WeivData - Error when replacing an item, returned value: ${value}`);
+            throw new Error(`returned value has problem value: ${value}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when replacing an item: ${err}`);
+        throw new Error(`WeivData - Error when replacing an item: ${err}`);
     }
 }

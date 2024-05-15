@@ -55,7 +55,7 @@ export class QueryResult {
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, readConcern, collection, cacheTimeout, enableCache } = options;
 
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
-            throw Error(`WeivData - Required Param/s Missing`);
+            throw new Error(`required param/s missing! (pageSize, queryOptions, dbName, collectionName and queryClass are required params)`);
         }
 
         this.cacheTimeout = cacheTimeout;
@@ -157,7 +157,7 @@ export class QueryResult {
                 }
             }
         } catch (err) {
-            throw Error(`WeivData - Error when using query (getItems): ${err}`);
+            throw new Error(`WeivData - Error when using query (getItems): ${err}`);
         }
     }
 
@@ -183,7 +183,7 @@ export class QueryResult {
             const totalCount = await this.collection.countDocuments(query, isEmpty(query) ? { hint: "_id_" } : {});
             return totalCount;
         } catch (err) {
-            throw Error(`WeivData - Error when using query (getTotalCount): ${err}`);
+            throw new Error(`WeivData - Error when using query (getTotalCount): ${err}`);
         }
     }
 
@@ -242,7 +242,7 @@ export class QueryResult {
 
             return result;
         } catch (err) {
-            throw Error(`WeivData - Error when using query: ${err}`);
+            throw new Error(`WeivData - Error when using query: ${err}`);
         }
     }
 
@@ -259,7 +259,7 @@ export class QueryResult {
             const collection = this.db.collection(this.collectionName);
             return { collection, memberId };
         } catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
+            throw new Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }
     }
 

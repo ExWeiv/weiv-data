@@ -49,6 +49,6 @@ export function flushCache(filters?: CacheSelections[]): void {
             cacheData.flushAll();
         }
     } catch (err) {
-        throw Error(`WeivData - Error when flushing caches! ${err}`);
+        throw new Error(`WeivData - Error when flushing caches! ${err}`);
     }
 }

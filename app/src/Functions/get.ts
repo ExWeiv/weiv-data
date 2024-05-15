@@ -26,7 +26,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
         let editedItemId;
         if (suppressHooks != true) {
             editedItemId = await runDataHook<'beforeGet'>(collectionId, "beforeGet", [safeItemId, context]).catch((err) => {
-                throw Error(`WeivData - beforeGet Hook Failure ${err}`);
+                throw new Error(`beforeGet Hook Failure ${err}`);
             });
         }
 
@@ -53,7 +53,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
         if (item) {
             if (suppressHooks != true) {
                 let editedItem = await runDataHook<'afterGet'>(collectionId, 'afterGet', [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterGet Hook Failure ${err}`);
+                    throw new Error(`afterGet Hook Failure ${err}`);
                 });
 
                 if (editedItem) {
@@ -70,7 +70,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
             return null;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when trying to get item from the collectin by itemId: ${err}`);
+        throw new Error(`WeivData - Error when trying to get item from the collectin by itemId: ${err}`);
     }
 }
 

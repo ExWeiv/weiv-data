@@ -17,6 +17,6 @@ export async function renameCollection(collectionId: CollectionID, newCollection
         const { collectionName } = splitCollectionId(collectionId);
         await database.renameCollection(collectionName, newCollectionName, safeCollectionOptions);
     } catch (err) {
-        throw Error(`WeivData - Error when renaming a collection, details: ${err}`);
+        throw new Error(`WeivData - Error when renaming a collection, details: ${err}`);
     }
 }

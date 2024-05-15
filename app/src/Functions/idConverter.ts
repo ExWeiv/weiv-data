@@ -9,6 +9,6 @@ export function idConverter(id: string | ObjectId, stringMethod?: "base64" | "he
             return id.toString(stringMethod || "hex");
         }
     } catch (err) {
-        throw Error(`WeivData - Error when converting an ID: ${err}`);
+        throw new Error(`WeivData - Error when converting an ID: ${err}`);
     }
 }

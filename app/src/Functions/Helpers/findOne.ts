@@ -25,7 +25,7 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
         let editedFilter = { propertyName, value: safeValue };
         if (suppressHooks != true) {
             const modifiedFilter = await runDataHook<'beforeFindOne'>(collectionId, "beforeFindOne", [{ propertyName, value: safeValue }, context]).catch((err) => {
-                throw Error(`WeivData - beforeFindOne Hook Failure ${err}`);
+                throw new Error(`beforeFindOne Hook Failure ${err}`);
             });
 
             if (modifiedFilter) {
@@ -50,7 +50,7 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await runDataHook<'afterFindOne'>(collectionId, "afterFindOne", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterFindOne Hook Failure ${err}`);
+                    throw new Error(`afterFindOne Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
@@ -67,6 +67,6 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
             return undefined;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when finding an item from collection (findOne): ${err}`);
+        throw new Error(`WeivData - Error when finding an item from collection (findOne): ${err}`);
     }
 }

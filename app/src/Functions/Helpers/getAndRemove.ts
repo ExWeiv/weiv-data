@@ -19,7 +19,7 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
         let editedItemId = safeItemId;
         if (suppressHooks != true) {
             const modifiedItemId = await runDataHook<'beforeGetAndRemove'>(collectionId, "beforeGetAndRemove", [safeItemId, context]).catch((err) => {
-                throw Error(`WeivData - beforeGetAndRemove Hook Failure ${err}`);
+                throw new Error(`beforeGetAndRemove Hook Failure ${err}`);
             });
 
             if (modifiedItemId) {
@@ -36,7 +36,7 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await runDataHook<'afterGetAndRemove'>(collectionId, "afterGetAndRemove", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterGetAndRemove Hook Failure ${err}`);
+                    throw new Error(`afterGetAndRemove Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
@@ -49,6 +49,6 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
             return undefined;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when removing an item from collection (getAndRemove): ${err}`);
+        throw new Error(`WeivData - Error when removing an item from collection (getAndRemove): ${err}`);
     }
 }

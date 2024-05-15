@@ -23,7 +23,7 @@ export class WeivDataAggregate extends AggregateResult {
     /** @internal */
     constructor(collectionId: string) {
         if (!collectionId) {
-            throw Error(`WeivData - Database and Collection name required`);
+            throw new Error(`WeivData - Database and Collection name required`);
         }
 
         super(collectionId);
@@ -31,7 +31,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     ascending(propertyName: string): WeivDataAggregate {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
         this.sorting = {
             propertyName,
@@ -42,7 +42,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     avg(propertyName: string, projectedName = `${propertyName}Avg`): WeivDataAggregate {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -60,7 +60,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     descending(propertyName: string): WeivDataAggregate {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.sorting = {
             propertyName,
@@ -71,7 +71,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     filter(filter: WeivDataFilter): WeivDataAggregate {
         if (!filter) {
-            throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
+            throw new Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
         this.pipeline = checkPipelineArray(this.pipeline);
         this.pipeline.push({
@@ -84,10 +84,10 @@ export class WeivDataAggregate extends AggregateResult {
 
     group(...propertyName: string[]): WeivDataAggregate {
         if (!propertyName) {
-            throw Error(`WeivData - Property or properties are required!`);
+            throw new Error(`WeivData - Property or properties are required!`);
         }
         if (this.groupCreated === true) {
-            throw Error(`WeivData - Group is already set!`);
+            throw new Error(`WeivData - Group is already set!`);
         }
 
         let propertyNames: { [key: string]: string } = {};
@@ -112,7 +112,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     having(filter: WeivDataFilter): WeivDataAggregate {
         if (!filter) {
-            throw Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
+            throw new Error(`WeivData - Filter is empty, please add a filter using weivData.filter method!`);
         }
         this.havingFilter = {
             $match: {
@@ -124,7 +124,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     limit(limit: number): WeivDataAggregate {
         if (!limit && limit != 0) {
-            throw Error(`WeivData - Limit number is required please specify a limit amount`);
+            throw new Error(`WeivData - Limit number is required please specify a limit amount`);
         }
 
         if (limit != 0) {
@@ -136,7 +136,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     max(propertyName: string, projectedName = `${propertyName}Max`): WeivDataAggregate {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -149,7 +149,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     min(propertyName: string, projectedName = `${propertyName}Min`): WeivDataAggregate {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`);
+            throw new Error(`WeivData - Property name is required!`);
         }
         this.addGroup({
             _id: "0",
@@ -255,7 +255,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     skip(skip: number): WeivDataAggregate {
         if (!skip && skip != 0) {
-            throw Error(`WeivData - Skip number is required please specify a skip number`);
+            throw new Error(`WeivData - Skip number is required please specify a skip number`);
         }
 
         this.skipNumber = skip;
@@ -264,7 +264,7 @@ export class WeivDataAggregate extends AggregateResult {
 
     sum(propertyName: string, projectedName = `${propertyName}Sum`): WeivDataAggregate {
         if (!propertyName) {
-            throw Error(`WeivData - Property name is required!`)
+            throw new Error(`WeivData - Property name is required!`)
         }
 
         this.addGroup({

@@ -14,6 +14,6 @@ export async function queryReferenced(collectionId: CollectionID, targetCollecti
         const result = await referencedClass.getResult();
         return result;
     } catch (err) {
-        throw Error(`WeivData - Error when querying referenced items: ${err}`);
+        throw new Error(`WeivData - Error when querying referenced items: ${err}`);
     }
 }

@@ -22,9 +22,9 @@ export async function insertReference(collectionId: CollectionID, propertyName: 
         );
 
         if (!acknowledged || modifiedCount <= 0) {
-            throw Error(`Error when inserting a reference item into an item, acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
+            throw new Error(`acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }
     } catch (err) {
-        throw Error(`Error when inserting a reference item into an item: ${err}`);
+        throw new Error(`Error when inserting a reference item into an item: ${err}`);
     }
 }

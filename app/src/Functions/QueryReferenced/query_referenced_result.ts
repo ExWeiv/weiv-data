@@ -30,7 +30,7 @@ export class QueryReferencedResult {
     /**@internal */
     constructor(collectionId: CollectionID, targetCollectionId: string, itemId: ObjectId, propertyName: string, queryOptions: WeivDataQueryReferencedOptions, options: WeivDataOptions) {
         if (!collectionId || !targetCollectionId || !itemId || !propertyName || !queryOptions || !options) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName, queryOptions, options, itemId`);
+            throw new Error(`one or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName, queryOptions, options, itemId`);
         }
 
         const { collectionName, dbName } = splitCollectionId(collectionId);
@@ -62,7 +62,7 @@ export class QueryReferencedResult {
                 { readConcern: readConcern ? readConcern : "local" }).toArray();
             return items;
         } catch (err) {
-            throw Error(`WeivData - Error when getting items for queryReferenced result: ${err}`);
+            throw new Error(`when getting items for queryReferenced result: ${err}`);
         }
     }
 
@@ -111,7 +111,7 @@ export class QueryReferencedResult {
                 prev: this.prev
             };
         } catch (err) {
-            throw Error(`WeivData - Error when running queryReferenced function: ${err}`);
+            throw new Error(`when running queryReferenced function: ${err}`);
         }
     }
 
@@ -129,7 +129,7 @@ export class QueryReferencedResult {
             const collection = this.db.collection(this.collectionName);
             return { collection, memberId };
         } catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
+            throw new Error(`when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
         }
     }
 }

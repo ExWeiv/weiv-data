@@ -21,7 +21,7 @@ export async function bulkUpdate(collectionId: CollectionID, items: Item[], opti
 
             if (suppressHooks != true) {
                 const editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [item, context]).catch((err) => {
-                    throw Error(`WeivData - beforeUpdate (bulkUpdate) Hook Failure ${err}`);
+                    throw new Error(`beforeUpdate (bulkUpdate) Hook Failure ${err}`);
                 });
 
                 if (editedItem) {
@@ -55,7 +55,7 @@ export async function bulkUpdate(collectionId: CollectionID, items: Item[], opti
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterUpdate (bulkUpdate) Hook Failure ${err}`);
+                        throw new Error(`afterUpdate (bulkUpdate) Hook Failure ${err}`);
                     });
 
                     if (editedItem) {
@@ -73,9 +73,9 @@ export async function bulkUpdate(collectionId: CollectionID, items: Item[], opti
                 updatedItems: editedItems
             }
         } else {
-            throw Error(`WeivData  - Error when updating items using bulkUpdate: updated: ${modifiedCount}, ok: ${ok}`);
+            throw new Error(`updated: ${modifiedCount}, ok: ${ok}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when updating items using bulkUpdate: ${err}`);
+        throw new Error(`WeivData - Error when updating items using bulkUpdate: ${err}`);
     }
 }

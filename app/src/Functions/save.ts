@@ -21,13 +21,13 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
 
             if (suppressHooks != true) {
                 editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [safeItem, context]).catch((err) => {
-                    throw Error(`WeivData - beforeUpdate (save) Hook Failure ${err}`);
+                    throw new Error(`beforeUpdate (save) Hook Failure ${err}`);
                 });
             }
         } else {
             if (suppressHooks != true) {
                 editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [safeItem, context]).catch((err) => {
-                    throw Error(`WeivData - beforeInsert (save) Hook Failure ${err}`);
+                    throw new Error(`beforeInsert (save) Hook Failure ${err}`);
                 });
             }
         }
@@ -51,7 +51,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
             if (upsertedId) {
                 // Item Inserted
                 const editedResult = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [returnedItem, context]).catch((err) => {
-                    throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                    throw new Error(`afterInsert Hook Failure ${err}`);
                 });
 
                 if (editedResult) {
@@ -62,7 +62,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
             } else {
                 // Item Updated
                 const editedResult = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [returnedItem, context]).catch((err) => {
-                    throw Error(`WeivData - afterUpdate Hook Failure ${err}`);
+                    throw new Error(`afterUpdate Hook Failure ${err}`);
                 });
 
                 if (editedResult) {
@@ -72,9 +72,9 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 }
             }
         } else {
-            throw Error(`WeivData - Error when saving an item to collection, acknowledged: ${acknowledged}`);
+            throw new Error(`acknowledged: ${acknowledged}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when saving an item to collection: ${err}`);
+        throw new Error(`WeivData - Error when saving an item to collection: ${err}`);
     }
 }

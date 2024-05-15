@@ -47,7 +47,7 @@ export class WeivDataQuery {
     /** @internal */
     constructor(collectionId: string) {
         if (!collectionId) {
-            throw Error(`WeivData - Collection name required`);
+            throw new Error(`WeivData - Collection name required`);
         }
 
         this.collectionId = collectionId;
@@ -284,7 +284,7 @@ export class WeivDataQuery {
 
     ascending(...propertyName: string[]): WeivDataQuery {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
 
         for (const name of propertyName) {
@@ -308,7 +308,7 @@ export class WeivDataQuery {
             let editedQurey;
             if (suppressHooks != true) {
                 editedQurey = await runDataHook<'beforeCount'>(this.collectionId, "beforeCount", [this, context]).catch((err) => {
-                    throw Error(`WeivData - beforeCount Hook Failure ${err}`);
+                    throw new Error(`beforeCount Hook Failure ${err}`);
                 });
             }
 
@@ -323,7 +323,7 @@ export class WeivDataQuery {
 
             if (suppressHooks != true) {
                 let editedCount = await runDataHook<'afterCount'>(this.collectionId, "afterCount", [totalCount, context]).catch((err) => {
-                    throw Error(`WeivData - afterCount Hook Failure ${err}`);
+                    throw new Error(`afterCount Hook Failure ${err}`);
                 });
 
                 if (editedCount) {
@@ -333,13 +333,13 @@ export class WeivDataQuery {
 
             return totalCount;
         } catch (err) {
-            throw Error(`WeivData - Error when using count with weivData.query: ${err}`);
+            throw new Error(`WeivData - Error when using count with weivData.query: ${err}`);
         }
     }
 
     descending(...propertyName: string[]): WeivDataQuery {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
 
         for (const name of propertyName) {
@@ -353,7 +353,7 @@ export class WeivDataQuery {
 
     async distinct(propertyName: string, options: WeivDataOptions): Promise<WeivDataQueryResult> {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
         this.distinctValue = propertyName;
         return this.runQuery(options);
@@ -361,7 +361,7 @@ export class WeivDataQuery {
 
     fields(...propertyName: string[]): WeivDataQuery {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
 
         for (const name of propertyName) {
@@ -379,7 +379,7 @@ export class WeivDataQuery {
 
     include(...includes: IncludeObject[]): WeivDataQuery {
         if (!includes) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
 
         for (const { fieldName, collectionName, foreignField, as, maxItems, countItems } of includes) {
@@ -411,7 +411,7 @@ export class WeivDataQuery {
 
     limit(limit: number): WeivDataQuery {
         if (!limit && limit != 0) {
-            throw Error(`WeivData - Limit number is required!`);
+            throw new Error(`WeivData - Limit number is required!`);
         }
 
         if (limit != 0) {
@@ -423,7 +423,7 @@ export class WeivDataQuery {
 
     skip(skip: number): WeivDataQuery {
         if (!skip && skip != 0) {
-            throw Error(`WeivData - Skip number is required!`);
+            throw new Error(`WeivData - Skip number is required!`);
         }
         this.skipNumber = skip;
         return this;
@@ -441,7 +441,7 @@ export class WeivDataQuery {
             let editedQurey;
             if (suppressHooks != true) {
                 editedQurey = await runDataHook<'beforeQuery'>(this.collectionId, "beforeQuery", [this, context]).catch((err) => {
-                    throw Error(`WeivData - beforeQuery Hook Failure ${err}`);
+                    throw new Error(`beforeQuery Hook Failure ${err}`);
                 });
             }
 
@@ -481,7 +481,7 @@ export class WeivDataQuery {
             if (suppressHooks != true) {
                 const hookedItems = await result.items.map(async (item, index) => {
                     const editedItem = await runDataHook<'afterQuery'>(classInUse.collectionId, "afterQuery", [item, context]).catch((err) => {
-                        console.error(`WeivData - afterQuery Hook Failure ${err} Item Index: ${index}`);
+                        throw new Error(`afterQuery Hook Failure ${err} Item Index: ${index}`);
                     });
 
                     if (editedItem) {
@@ -500,7 +500,7 @@ export class WeivDataQuery {
 
             return result;
         } catch (err) {
-            throw Error(`WeivData - Error when using query (runQuery): ${err}`);
+            throw new Error(`WeivData - Error when using query (runQuery): ${err}`);
         }
     }
 

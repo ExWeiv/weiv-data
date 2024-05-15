@@ -25,7 +25,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
 
             if (suppressHooks != true) {
                 let editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [item, context]).catch((err) => {
-                    throw Error(`WeivData - beforeInsert (bulkInsert) Hook Failure ${err}`);
+                    throw new Error(`beforeInsert (bulkInsert) Hook Failure ${err}`);
                 });
 
                 if (editedItem) {
@@ -59,7 +59,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedInsertItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterInsert (bulkInsert) Hook Failure ${err}`);
+                        throw new Error(`afterInsert (bulkInsert) Hook Failure ${err}`);
                     });
 
                     if (editedInsertItem) {
@@ -74,9 +74,9 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
 
             return { insertedItems: editedItems, insertedItemIds, inserted: insertedCount };
         } else {
-            throw Error(`WeivData - Error when inserting items using bulkInsert, inserted: ${insertedCount}, ok: ${ok}`);
+            throw new Error(`inserted: ${insertedCount}, ok: ${ok}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when inserting items using bulkInsert: ${err}`);
+        throw new Error(`WeivData - Error when inserting items using bulkInsert: ${err}`);
     }
 }

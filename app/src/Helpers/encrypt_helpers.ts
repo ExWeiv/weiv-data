@@ -19,6 +19,6 @@ export async function getSecretKey(): Promise<string> {
             return secret.value;
         }
     } catch (err) {
-        throw Error(`WeivData - Error when creating or getting URI secret key: ${err}`);
+        throw new Error(`Error when creating or getting URI secret key: ${err}`);
     }
 }

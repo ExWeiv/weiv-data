@@ -6,7 +6,6 @@ import { splitCollectionId } from '../Helpers/name_helpers';
 import type { Item, ItemID, CollectionID } from '@exweiv/weiv-data'
 import type { WeivDataQuery } from '../Query/data_query';
 
-/**@public */
 export interface HookContext {
     dbName: string;
     collectionName: string;
@@ -14,24 +13,6 @@ export interface HookContext {
     userRoles: any[] | undefined;
 }
 
-/**
- * List of available hooks.
- * 
- * Example use of any hook:
- * @example
- * ```
- * // Define your hooks inside `backend/WeivData/data.js` file.
- * 
- * export function <dbName>_<collectionName>_<hookName>(item, context) {
- *  // Handle hook logic.
- * }
- * ```
- * 
- * You don't need to return a value in your hooks but if you return value should align with `[HookResults](https://weiv-data.web.app/types/HooksResult.html)`.
- * You can use async functions or not async functions in your hooks.
- * 
- * Sometimes it takes few minutes to let hooks start working. Publish or save your site when you define new hooks.
- * @public */
 export type HookName =
     'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' |
     'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate' |
@@ -40,10 +21,6 @@ export type HookName =
     'beforeIncrement' | 'afterIncrement' | 'beforeMultiply' | 'afterMultiply' | 'beforePush' | 'afterPush' |
     'beforePull' | 'afterPull' | 'onFailure';
 
-/**
- * List of hook params and values.
- * 
- * @public */
 export type HookArgs<HookName> =
     HookName extends 'beforeGet' ? [item: ItemID, context: HookContext] :
     HookName extends 'beforeCount' ? [item: WeivDataQuery, context: HookContext] :
@@ -58,10 +35,6 @@ export type HookArgs<HookName> =
     HookName extends 'beforePull' ? [item: { propertyName: string, value: any }, context: HookContext] :
     [item: Item, context: HookContext];
 
-/**
- * List of expected values from hooks if returns.
- * 
- * @public */
 export type HooksResults<HookName> =
     HookName extends 'beforeGet' ? ItemID :
     HookName extends 'beforeCount' ? WeivDataQuery :
@@ -105,12 +78,12 @@ export async function runDataHook<R>(collectionId: CollectionID, hookName: HookN
             return undefined;
         }
     } catch (err) {
-        // Send Error to onFailure Hook with Error Object
+        // Send Error to onFailure Hook with Error Object (Only Runs for Hooks not All Actions are Covered)
         const errorHandlerFunction = hookExist(collectionId, "onFailure");
         if (errorHandlerFunction) {
             errorHandlerFunction(err);
         }
 
-        throw Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
+        throw new Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
     }
 }

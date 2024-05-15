@@ -26,14 +26,14 @@ async function setupClient(uri: string, role: CustomOptionsRole): Promise<MongoC
             if (connection) {
                 return connection;
             } else {
-                throw Error(`There is a problem with client caching and it's a important problem please report it! This will directly impact to all operations`);
+                throw new Error(`there is a problem with client caching and it's a important problem please report it! This will directly impact to all operations`);
             }
         } else {
             // If there are no clients in cache create new one and return
             return createNewClient(uri, role);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when connecting to MongoDB Client via setupClient: ${err}`);
+        throw new Error(`Error when connecting to MongoDB Client via setupClient: ${err}`);
     }
 }
 
@@ -74,10 +74,10 @@ const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<Mo
         if (connection) {
             return connection;
         } else {
-            throw Error(`WeivData - Failed to connect to a MongoClient: connection: ${newMongoClient}`);
+            throw new Error(`Failed to connect to a MongoClient: connection: ${newMongoClient}`);
         }
     } catch (err) {
-        throw Error(`WeivData - Error when creating a new MongoDB client: ${err}`);
+        throw new Error(`Error when creating a new MongoDB client: ${err}`);
     }
 }
 
@@ -106,7 +106,7 @@ const connectClient = async (client: MongoClient, uri: string): Promise<MongoCli
             const handleError = async () => {
                 clientCache.del(uri.slice(0, 20));
                 statusCache.set<boolean>(uri.slice(0, 20), false);
-                throw Error(`WeivData - Error when trying to connect client (connection error): ${uri}`); // Rethrow with URI for context
+                throw new Error(`when trying to connect client (connection error): ${uri}`); // Rethrow with URI for context
             };
 
             client.on('close', handleClose);
@@ -121,7 +121,7 @@ const connectClient = async (client: MongoClient, uri: string): Promise<MongoCli
         statusCache.set<boolean>(uri.slice(0, 20), true);
         return connectedClient;
     } catch (err) {
-        throw Error(`WeivData - Unexpected error: ${err}`); // Handle unexpected errors gracefully
+        throw new Error(`Unexpected error: ${err}`); // Handle unexpected errors gracefully
     }
 };
 
@@ -131,7 +131,7 @@ export async function useClient(suppressAuth: boolean = false): Promise<{ pool: 
         const pool = await setupClient(uri, role);
         return { pool, memberId };
     } catch (err) {
-        throw Error(`WeivData - Error when connecting to cached MongoClient via useClient: ${err}`);
+        throw new Error(`when connecting to cached MongoClient via useClient: ${err}`);
     }
 }
 
