@@ -985,7 +985,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Found item. Rejected - The error caused the rejection.
      */
-    function findOne(collectionId: CollectionID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | undefined>;
+    function findOne(collectionId: CollectionID, propertyName: string, value: any, options?: WeivDataOptionsCache): Promise<Item | undefined>;
 
     /**
      * @description
@@ -1004,7 +1004,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The retrieved item or null if not found. Rejected - The error that caused the rejection.
      */
-    function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | null>;
+    function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsCache): Promise<Item | null>;
 
     /**
      * @description
@@ -1108,7 +1108,7 @@ declare module '@exweiv/weiv-data' {
         propertyName: string,
         referringItem: ItemID | Item,
         referencedItem: Item | Item[] | ItemID | ItemID[],
-        options?: WeivDataOptions): Promise<boolean>;
+        options?: WeivDataOptionsCache): Promise<boolean>;
 
     /**
      * @description
