@@ -1368,4 +1368,364 @@ declare module '@exweiv/weiv-data' {
      * @returns Fulfilled - The object that was updated. Rejected - The error that caused the rejection.
      */
     function update(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<Item>;
+
+    /**
+     * Hooks are just like in wix-data but we have some notes for you:
+     * 
+     * 1. We have some extra hooks for extra functions in weivData.
+     * 2. onFailure will tun only for the errors that's fired from hooks.
+     * 
+     * > We are working to keep docs updated and add as much info as we can to provide better details.
+     */
+    namespace Hooks {
+        type HookContext = {
+            /**
+             * @description
+             * Database name.
+             */
+            dbName: string;
+
+            /**
+             * @description
+             * Collection name.
+             */
+            collectionName: string;
+
+            /**
+             * @description
+             * If there is one you'll have user id here (fetched from Wix Members data via wix-users-backend APIs)
+             */
+            userId?: string;
+
+            /**
+             * @description
+             * Currecn user roles. (fetched from Wix Members data via wix-users-backend APIs)
+             */
+            userRoles: any[] | undefined;
+        }
+
+        /**
+         * @description
+         * Currently all supported hooks:
+         * 
+         * @note
+         * onFailure hook is only triggered if error happens inside of the hooks it does not triggered by every error action.
+         */
+        type HookName = 'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' |
+            'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate' | 'onFailure' |
+
+            'beforeReplace' | 'afterReplace' | 'beforeFindOne' | 'afterFindOne' | 'beforeGetAndUpdate' |
+            'afterGetAndUpdate' | 'beforeGetAndReplace' | 'afterGetAndReplace' | 'beforeGetAndRemove' | 'afterGetAndRemove' |
+            'beforeIncrement' | 'afterIncrement' | 'beforeMultiply' | 'afterMultiply' | 'beforePush' | 'afterPush' |
+            'beforePull' | 'afterPull';
+
+        /**
+         * @description
+         * A hook that is triggered after a `count()` operation.
+         * 
+         * @param count The number of items the count operation has found.
+         * @param context Contextual information about the hook.
+         * @returns The count to return to `count()` instead of the original count. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterCount(count: number, context: Hooks.HookContext): Promise<number> | number;
+
+        /**
+         * @description
+         * A hook that is triggered after a `get()` operation.
+         * 
+         * @param item The item that was retrieved from the collection.
+         * @param context Contextual information about the hook.
+         * @returns The item to return to `get()` instead of the retrieved item. Returning a rejected promise will not block the operation, but will return a rejected promise to the operation caller as well as trigger the `onFailure()` hook.
+         */
+        function afterGet(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered after an `insert()` operation.
+         * 
+         * @param item The item that was inserted.
+         * @param context Contextual information about the hook.
+         * @returns The item to return to `insert()` instead of the inserted item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterInsert(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered after a `find` operation, for each of the items in the query results.
+         * 
+         * @param item One of the items of the query result. The hook is called for each item in the results.
+         * @param context Contextual information about the hook.
+         * @returns The item to return to `find` instead of the item retrieved from the database. Returning a rejected promise will not block the operation, but will return a rejected promise to the operation caller as well as trigger the `onFailure()` hook.
+         */
+        function afterQuery(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered after a `remove()` operation.
+         * 
+         * @param item The item that was removed.
+         * @param context Contextual information about the hook.
+         * @returns The item to return to `remove()` instead of the deleted item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterRemove(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered after an `update()` operation.
+         * 
+         * @param item The updated item.
+         * @param context Contextual information about the hook.
+         * @returns The item to return to `update()` instead of the updated item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterUpdate(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before a `count()` operation.
+         * 
+         * @param query The original query as defined by `count()`.
+         * @param context Contextual information about the hook.
+         * @returns The query to be used for the `count()` operation instead of the original query. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeCount(query: WeivDataQuery, context: Hooks.HookContext): Promise<WeivDataQuery> | WeivDataQuery;
+
+        /**
+         * @description
+         * A hook that is triggered before a `get()` operation.
+         * 
+         * @param itemId The ID of the original item to be retrieved.
+         * @param context The ID of the original item to be retrieved.
+         * @returns The ID to be used for the `get()` operation instead of the original itemId specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeGet(itemId: ItemID, context: Hooks.HookContext): Promise<ItemID> | ItemID;
+
+        /**
+         * @description
+         * A hook that is triggered before an `insert()` operation.
+         * 
+         * @param item The original item to be inserted.
+         * @param context Contextual information about the hook.
+         * @returns The item to be inserted instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeInsert(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before a `find()` operation.
+         * 
+         * @param query The original query as specified by the caller.
+         * @param context Contextual information about the hook.
+         * @returns The query to use instead of the original query specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the operation caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeQuery(query: WeivDataQuery, context: Hooks.HookContext): Promise<WeivDataQuery> | WeivDataQuery;
+
+        /**
+         * @description
+         * A hook that is called before a `remove()` operation.
+         * 
+         * @param itemId The ID of the original item to be removed.
+         * @param context Contextual information about the hook.
+         * @returns The ID to be used for the `remove()` instead of the original `itemId` specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeRemove(itemId: ItemID, context: Hooks.HookContext): Promise<ItemID> | ItemID;
+
+        /**
+         * @description
+         * A hook that is triggered before an `update()` operation.
+         * 
+         * @param item The original item to be updated.
+         * @param context Contextual information about the hook.
+         * @returns The item to be updated instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeUpdate(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered on any error or rejected Promise from any of the weiv-data **hook** operations. (Operations except hooks doesn't trigger that currently.)
+         * 
+         * @param error The error that caused the failure.
+         * @param context Contextual information about the hook.
+         * @returns Fulfilled - Returning a fulfilled promise will result in a fulfilled data operation with the provided result. Rejected - Returning a rejected promise will result in returning a rejected promise to the caller of the data operation.
+         */
+        function onFailure(error: Error, context: Hooks.HookContext): Promise<Object>;
+
+        /**
+         * @description
+         * A hook that is triggered before an `replace()` operation.
+         * 
+         * @param item The original item to be replaced.
+         * @param context Contextual information about the hook.
+         * @returns The item to be replaced instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeReplace(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered after an `replace()` operation.
+         * 
+         * @param item The replaced item.
+         * @param context 
+         * @returns The item to return to `replace()` instead of the replaced item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterReplace(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before `findOne()` operation.
+         * 
+         * @param item The original find object to be used.
+         * @param context 
+         * @returns The find object to be used instead of the original find object specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeFindOne(findObject: { propertyName: string, value: any }, context: Hooks.HookContext): Promise<{ propertyName: string, value: any }> | { propertyName: string, value: any };
+
+        /**
+         * @description
+         * A hook that is triggered after a `findOne()` operation.
+         * 
+         * @param item The found item.
+         * @param context 
+         * @returns The item to return to `findOne()` instead of the found item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterFindOne(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before `getAndUpdate()` operation.
+         * 
+         * @param item The original item to be updated.
+         * @param context 
+         * @returns The item to be updated instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeGetAndUpdate(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered after a `getAndUpdate()` operation.
+         * 
+         * @param item The updated item.
+         * @param context 
+         * @returns The item to return to `getAndUpdate()` instead of the updated item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterGetAndUpdate(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before `getAndReplace()` operation.
+         * 
+         * @param item The original item to be replaced.
+         * @param context 
+         * @returns The item to be replaced instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeGetAndReplace(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered after a `getAndReplace()` operation.
+         * 
+         * @param item The replaced item.
+         * @param context 
+         * @returns The item to return to `getAndReplace()` instead of the replaced item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+        */
+        function afterGetAndReplace(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before `getAndRemove()` operation.
+         * 
+         * @param itemId The original itemId of the item to be removed.
+         * @param context 
+         * @returns The itemId of the item to be removed instead of the original itemId specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeGetAndRemove(itemId: ItemID, context: Hooks.HookContext): Promise<ItemID> | ItemID;
+
+        /**
+         * @description
+         * A hook that is triggered after a `getAndRemove()` operation.
+         * 
+         * @param item The removed item.
+         * @param context 
+         * @returns The item to return to `getAndRemove()` instead of the removed item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterGetAndRemove(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before `increment()` operation.
+         * 
+         * @param incObject The original incObject to be used.
+         * @param context 
+         * @returns The incObject to be used instead of the original incObject specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeIncrement(incObject: { propertyName: string, value: number }, context: Hooks.HookContext): Promise<{ propertyName: string, value: number }> | { propertyName: string, value: number };
+
+        /**
+         * @description
+         * A hook that is triggered after a `increment()` operation.
+         * 
+         * @param item The incremented item.
+         * @param context 
+         * @returns The item to return to `increment()` instead of the incremented item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterIncrement(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before `multiply()` operation.
+         * 
+         * @param multObject The original multObject to be used.
+         * @param context 
+         * @returns The multObject to be used instead of the original multObject specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforeMultiply(multObject: { propertyName: string, value: number }, context: Hooks.HookContext): Promise<{ propertyName: string, value: number }> | { propertyName: string, value: number };
+
+        /**
+         * @description
+         * A hook that is triggered after a `multiply()` operation.
+         * 
+         * @param item The multiplied item.
+         * @param context 
+         * @returns The item to return to `multiply()` instead of the multiplied item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterMultiply(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before `push()` operation.
+         * 
+         * @param pushObject The original pushObject to be used.
+         * @param context 
+         * @returns The pushObject to be used instead of the original pushObject specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforePush(pushObject: { propertyName: string, value: any }, context: Hooks.HookContext): Promise<{ propertyName: string, value: any }> | { propertyName: string, value: any };
+
+        /**
+         * @description
+         * A hook that is triggered after a `push()` operation.
+         * 
+         * @param item The updated item with push.
+         * @param context 
+         * @returns The item to return to `push()` instead of the updated item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterPush(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+
+        /**
+         * @description
+         * A hook that is triggered before `pull()` operation.
+         * 
+         * @param pullObject The original pushObject to be used.
+         * @param context 
+         * @returns The pullObject to be used instead of the original pullObject specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function beforePull(pullObject: { propertyName: string, value: any }, context: Hooks.HookContext): Promise<{ propertyName: string, value: any }> | { propertyName: string, value: any };
+
+        /**
+         * @description
+         * A hook that is triggered after a `pull()` operation.
+         * 
+         * @param item The updated item with pull.
+         * @param context The item to return to `pull()` instead of the updated item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
+         */
+        function afterPull(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+    }
 }

@@ -3,39 +3,25 @@
 //@ts-ignore
 import * as data_hooks from '../../../../../../../../../user-code/backend/WeivData/data';
 import { splitCollectionId } from '../Helpers/name_helpers';
-import type { Item, ItemID, CollectionID } from '@exweiv/weiv-data'
+import type { Item, ItemID, CollectionID, Hooks } from '@exweiv/weiv-data'
 import type { WeivDataQuery } from '../Query/data_query';
+import { prepareHookContext } from '../Helpers/hook_helpers';
 
-export interface HookContext {
-    dbName: string;
-    collectionName: string;
-    userId?: string;
-    userRoles: any[] | undefined;
-}
+type HookArgs<HookName> =
+    HookName extends 'beforeGet' ? [item: ItemID, context: Hooks.HookContext] :
+    HookName extends 'beforeCount' ? [item: WeivDataQuery, context: Hooks.HookContext] :
+    HookName extends 'afterCount' ? [item: number, context: Hooks.HookContext] :
+    HookName extends 'beforeQuery' ? [item: WeivDataQuery, context: Hooks.HookContext] :
+    HookName extends 'beforeRemove' ? [item: ItemID, context: Hooks.HookContext] :
+    HookName extends 'beforeFindOne' ? [item: { propertyName: string, value: any }, context: Hooks.HookContext] :
+    HookName extends 'beforeGetAndRemove' ? [item: ItemID, context: Hooks.HookContext] :
+    HookName extends 'beforeIncrement' ? [item: { propertyName: string, value: number }, context: Hooks.HookContext] :
+    HookName extends 'beforeMultiply' ? [item: { propertyName: string, value: number }, context: Hooks.HookContext] :
+    HookName extends 'beforePush' ? [item: { propertyName: string, value: any }, context: Hooks.HookContext] :
+    HookName extends 'beforePull' ? [item: { propertyName: string, value: any }, context: Hooks.HookContext] :
+    [item: Item, context: Hooks.HookContext];
 
-export type HookName =
-    'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' |
-    'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate' |
-    'beforeReplace' | 'afterReplace' | 'beforeFindOne' | 'afterFindOne' | 'beforeGetAndUpdate' |
-    'afterGetAndUpdate' | 'beforeGetAndReplace' | 'afterGetAndReplace' | 'beforeGetAndRemove' | 'afterGetAndRemove' |
-    'beforeIncrement' | 'afterIncrement' | 'beforeMultiply' | 'afterMultiply' | 'beforePush' | 'afterPush' |
-    'beforePull' | 'afterPull' | 'onFailure';
-
-export type HookArgs<HookName> =
-    HookName extends 'beforeGet' ? [item: ItemID, context: HookContext] :
-    HookName extends 'beforeCount' ? [item: WeivDataQuery, context: HookContext] :
-    HookName extends 'afterCount' ? [item: number, context: HookContext] :
-    HookName extends 'beforeQuery' ? [item: WeivDataQuery, context: HookContext] :
-    HookName extends 'beforeRemove' ? [item: ItemID, context: HookContext] :
-    HookName extends 'beforeFindOne' ? [item: { propertyName: string, value: any }, context: HookContext] :
-    HookName extends 'beforeGetAndRemove' ? [item: ItemID, context: HookContext] :
-    HookName extends 'beforeIncrement' ? [item: { propertyName: string, value: number }, context: HookContext] :
-    HookName extends 'beforeMultiply' ? [item: { propertyName: string, value: number }, context: HookContext] :
-    HookName extends 'beforePush' ? [item: { propertyName: string, value: any }, context: HookContext] :
-    HookName extends 'beforePull' ? [item: { propertyName: string, value: any }, context: HookContext] :
-    [item: Item, context: HookContext];
-
-export type HooksResults<HookName> =
+type HooksResults<HookName> =
     HookName extends 'beforeGet' ? ItemID :
     HookName extends 'beforeCount' ? WeivDataQuery :
     HookName extends 'afterCount' ? number :
@@ -50,7 +36,7 @@ export type HooksResults<HookName> =
     Item;
 
 
-function hookExist(collectionId: CollectionID, hookName: HookName): Function | undefined {
+function hookExist(collectionId: CollectionID, hookName: Hooks.HookName): Function | undefined {
     if (typeof hookName !== "string") {
         throw new Error("type of hook name is not string!");
     }
@@ -64,7 +50,7 @@ function hookExist(collectionId: CollectionID, hookName: HookName): Function | u
     }
 }
 
-export async function runDataHook<R>(collectionId: CollectionID, hookName: HookName, args: HookArgs<R>): Promise<HooksResults<R> | undefined> {
+export async function runDataHook<R>(collectionId: CollectionID, hookName: Hooks.HookName, args: HookArgs<R>): Promise<HooksResults<R> | undefined> {
     try {
         if (typeof hookName !== "string" && typeof collectionId !== "string") {
             throw new Error("type of hook name or collection id is not string!");
@@ -79,11 +65,16 @@ export async function runDataHook<R>(collectionId: CollectionID, hookName: HookN
         }
     } catch (err) {
         // Send Error to onFailure Hook with Error Object (Only Runs for Hooks not All Actions are Covered)
-        const errorHandlerFunction = hookExist(collectionId, "onFailure");
-        if (errorHandlerFunction) {
-            errorHandlerFunction(err);
-        }
-
+        const context = prepareHookContext(collectionId);
+        runErrorHook(collectionId, new Error(`${err}`), context);
         throw new Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
+    }
+}
+
+export function runErrorHook(collectionId: string, err: Error, context: Hooks.HookContext) {
+    console.error(err.message);
+    const errorHandlerFunction = hookExist(collectionId, "onFailure");
+    if (errorHandlerFunction) {
+        errorHandlerFunction(err, context);
     }
 }
