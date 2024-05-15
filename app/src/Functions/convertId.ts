@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { convertStringId } from "../Helpers/item_helpers";
 
-export function idConverter(id: string | ObjectId, stringMethod?: "base64" | "hex"): ObjectId | string {
+export function convertId(id: string | ObjectId, stringMethod?: "base64" | "hex"): ObjectId | string {
     try {
         if (typeof id === "string") {
             return convertStringId(id);
