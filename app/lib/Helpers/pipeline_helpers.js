@@ -26,7 +26,7 @@ function sortAggregationPipeline(pipeline) {
             pipeline = (0, lodash_1.sortBy)(pipeline, (stage) => customPipelineSortOrder[Object.keys(stage)[0]]);
             const totalGroup = (0, lodash_1.filter)(pipeline, (stage) => stage["$group"]).length;
             if (totalGroup > 1) {
-                throw new Error("You can't use more than one group.");
+                throw new Error("you can't use more than one group.");
             }
             return pipeline;
         }

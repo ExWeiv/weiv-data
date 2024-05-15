@@ -42,7 +42,7 @@ function flushCache(filters) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when flushing caches! ${err}`);
+        throw new Error(`WeivData - Error when flushing caches! ${err}`);
     }
 }
 exports.flushCache = flushCache;

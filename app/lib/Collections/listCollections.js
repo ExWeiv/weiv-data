@@ -11,7 +11,7 @@ async function listCollections(databaseName, options, filter, listOptions) {
         return await database.listCollections(safeCollectionFilter, safeCollectionOptions).toArray();
     }
     catch (err) {
-        throw Error(`WeivData - Error when listing all collections in a database, details: ${err}`);
+        throw new Error(`WeivData - Error when listing all collections in a database, details: ${err}`);
     }
 }
 exports.listCollections = listCollections;

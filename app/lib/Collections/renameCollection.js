@@ -13,7 +13,7 @@ async function renameCollection(collectionId, newCollectionName, options, rename
         await database.renameCollection(collectionName, newCollectionName, safeCollectionOptions);
     }
     catch (err) {
-        throw Error(`WeivData - Error when renaming a collection, details: ${err}`);
+        throw new Error(`WeivData - Error when renaming a collection, details: ${err}`);
     }
 }
 exports.renameCollection = renameCollection;

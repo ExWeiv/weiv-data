@@ -47,7 +47,7 @@ async function connectionHandler(collectionId, suppressAuth = false, returnDb) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when trying to connect to database via useClient and Mongo Client ${err}`);
+        throw new Error(`when trying to connect to database via useClient and Mongo Client ${err}`);
     }
 }
 exports.connectionHandler = connectionHandler;
@@ -67,7 +67,7 @@ async function loadConnectionOptions(role) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when returning options for MongoDB Client connection: ${err}`);
+        throw new Error(`when returning options for MongoDB Client connection: ${err}`);
     }
 }
 exports.loadConnectionOptions = loadConnectionOptions;
@@ -82,7 +82,7 @@ async function getCustomCacheRules() {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when loading custom cache rules for MongoClient connections, err: ${err}`);
+        throw new Error(`when loading custom cache rules for MongoClient connections, err: ${err}`);
     }
 }
 exports.getCustomCacheRules = getCustomCacheRules;

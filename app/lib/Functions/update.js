@@ -14,7 +14,7 @@ async function update(collectionId, item, options) {
         let editedItem;
         if (suppressHooks != true) {
             editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [safeItem, context]).catch((err) => {
-                throw Error(`WeivData - beforeUpdate Hook Failure ${err}`);
+                throw new Error(`beforeUpdate Hook Failure ${err}`);
             });
         }
         const itemId = !editedItem ? (0, item_helpers_1.convertStringId)(safeItem._id) : (0, item_helpers_1.convertStringId)(editedItem._id);
@@ -25,7 +25,7 @@ async function update(collectionId, item, options) {
         if (value) {
             if (suppressHooks != true) {
                 let editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [value, context]).catch((err) => {
-                    throw Error(`WeivData - afterUpdate Hook Failure ${err}`);
+                    throw new Error(`afterUpdate Hook Failure ${err}`);
                 });
                 if (editedResult) {
                     return editedResult;
@@ -34,11 +34,11 @@ async function update(collectionId, item, options) {
             return value;
         }
         else {
-            throw Error(`WeivData - Error when updating an item, returned value: ${value}`);
+            throw new Error(`returned value has problem value: ${value}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when updating an item: ${err}`);
+        throw new Error(`WeivData - Error when updating an item: ${err}`);
     }
 }
 exports.update = update;

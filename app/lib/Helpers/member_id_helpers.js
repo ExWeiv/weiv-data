@@ -21,7 +21,7 @@ async function getOwnerId(enableVisitorId = false) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when checking user id: (Possible Velo API BUG) ${err}`);
+        throw new Error(`Error when checking user id: (Possible Velo API BUG) ${err}`);
     }
 }
 exports.getOwnerId = getOwnerId;

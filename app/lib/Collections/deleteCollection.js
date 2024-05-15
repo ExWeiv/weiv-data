@@ -13,7 +13,7 @@ async function deleteCollection(collectionId, options, deleteOptions) {
         return await database.dropCollection(collectionName, safeCollectionOptions);
     }
     catch (err) {
-        throw Error(`WeivData - Error when deleting a collection in a database, details: ${err}`);
+        throw new Error(`WeivData - Error when deleting a collection in a database, details: ${err}`);
     }
 }
 exports.deleteCollection = deleteCollection;

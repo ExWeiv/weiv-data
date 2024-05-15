@@ -13,7 +13,7 @@ async function createCollection(collectionId, options, createOptions) {
         await database.createCollection(collectionName, safeCollectionOptions);
     }
     catch (err) {
-        throw Error(`WeivData - Error when creating a new collection in a database, details: ${err}`);
+        throw new Error(`WeivData - Error when creating a new collection in a database, details: ${err}`);
     }
 }
 exports.createCollection = createCollection;

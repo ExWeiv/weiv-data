@@ -58,7 +58,7 @@ async function runDataHook(collectionId, hookName, args) {
         if (errorHandlerFunction) {
             errorHandlerFunction(err);
         }
-        throw Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
+        throw new Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
     }
 }
 exports.runDataHook = runDataHook;

@@ -10,11 +10,11 @@ async function removeReference(collectionId, propertyName, referringItem, refere
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { acknowledged, modifiedCount } = await collection.updateOne({ _id: safeReferringItemId }, { $pull: { [propertyName]: { $in: safeReferencedItemIds } }, $set: { _updatedDate: new Date() } }, { readConcern: readConcern ? readConcern : "local" });
         if (!acknowledged || modifiedCount <= 0) {
-            throw Error(`WeivData - Error when removing references, acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
+            throw new Error(`acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when removing references: ${err}`);
+        throw new Error(`WeivData - Error when removing references: ${err}`);
     }
 }
 exports.removeReference = removeReference;

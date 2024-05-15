@@ -20,7 +20,7 @@ async function bulkSave(collectionId, items, options) {
             if (item._id) {
                 if (suppressHooks != true) {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
-                        throw Error(`WeivData - beforeUpdate (bulkSave) Hook Failure ${err}`);
+                        throw new Error(`beforeUpdate (bulkSave) Hook Failure ${err}`);
                     });
                     if (editedItem) {
                         return editedItem;
@@ -37,7 +37,7 @@ async function bulkSave(collectionId, items, options) {
             else {
                 if (suppressHooks != true) {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [item, context]).catch((err) => {
-                        throw Error(`WeivData - beforeInsert (bulkSave) Hook Failure ${err}`);
+                        throw new Error(`beforeInsert (bulkSave) Hook Failure ${err}`);
                     });
                     if (editedItem) {
                         return editedItem;
@@ -77,7 +77,7 @@ async function bulkSave(collectionId, items, options) {
                 editedItems = editedItems.map(async (item) => {
                     if (item._id) {
                         const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                            throw Error(`WeivData - afterUpdate (bulkSave) Hook Failure ${err}`);
+                            throw new Error(`afterUpdate (bulkSave) Hook Failure ${err}`);
                         });
                         if (editedItem) {
                             return editedItem;
@@ -88,7 +88,7 @@ async function bulkSave(collectionId, items, options) {
                     }
                     else {
                         const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
-                            throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                            throw new Error(`afterInsert Hook Failure ${err}`);
                         });
                         if (editedItem) {
                             return editedItem;
@@ -111,11 +111,11 @@ async function bulkSave(collectionId, items, options) {
             };
         }
         else {
-            throw Error(`WeivData - Error when saving items using bulkSave: inserted: ${insertedCount}, updated: ${modifiedCount}, ok: ${ok}`);
+            throw new Error(`inserted: ${insertedCount}, updated: ${modifiedCount}, ok: ${ok}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when saving items using bulkSave: ${err}`);
+        throw new Error(`WeivData - Error when saving items using bulkSave: ${err}`);
     }
 }
 exports.bulkSave = bulkSave;

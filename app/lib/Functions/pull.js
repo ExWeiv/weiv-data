@@ -14,7 +14,7 @@ async function pull(collectionId, itemId, propertyName, value, options) {
         let editedModify = { propertyName, value: safeValue };
         if (suppressHooks != true) {
             const modifiedParams = await (0, hook_manager_1.runDataHook)(collectionId, "beforePull", [{ propertyName, value: safeValue }, context]).catch((err) => {
-                throw Error(`WeivData - beforePull Hook Failure ${err}`);
+                throw new Error(`beforePull Hook Failure ${err}`);
             });
             if (modifiedParams) {
                 editedModify = modifiedParams;
@@ -25,7 +25,7 @@ async function pull(collectionId, itemId, propertyName, value, options) {
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterPull", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterPull Hook Failure ${err}`);
+                    throw new Error(`afterPull Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
                     return modifiedResult;
@@ -38,7 +38,7 @@ async function pull(collectionId, itemId, propertyName, value, options) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when removıng (pullıng) value/s from an array filed in an item: ${err}`);
+        throw new Error(`WeivData - Error when removıng (pullıng) value/s from an array filed in an item: ${err}`);
     }
 }
 exports.pull = pull;

@@ -21,7 +21,7 @@ async function insert(collectionId, item, options) {
         let editedItem;
         if (suppressHooks != true) {
             editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [modifiedItem, context]).catch((err) => {
-                throw Error(`WeivData - beforeInsert Hook Failure ${err}`);
+                throw new Error(`beforeInsert Hook Failure ${err}`);
             });
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
@@ -29,7 +29,7 @@ async function insert(collectionId, item, options) {
         if (acknowledged) {
             if (suppressHooks != true) {
                 const editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [{ ...!editedItem ? modifiedItem : editedItem, _id: insertedId }, context]).catch((err) => {
-                    throw Error(`WeivData - afterInsert Hook Failure ${err}`);
+                    throw new Error(`afterInsert Hook Failure ${err}`);
                 });
                 if (editedResult) {
                     return editedResult;
@@ -38,11 +38,11 @@ async function insert(collectionId, item, options) {
             return { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
         }
         else {
-            throw Error(`WeivData - Error when inserting an item into a collection, acknowledged: ${acknowledged}`);
+            throw new Error(`acknowledged: ${acknowledged}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when inserting an item into a collection: ${err}`);
+        throw new Error(`WeivData - Error when inserting an item into a collection: ${err}`);
     }
 }
 exports.insert = insert;

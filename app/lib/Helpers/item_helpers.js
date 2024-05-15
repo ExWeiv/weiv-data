@@ -13,7 +13,7 @@ function convertStringId(_id, create = false) {
         if (create === true) {
             return new mongodb_1.ObjectId();
         }
-        throw Error(`WeivData - Wrong _id type!`);
+        throw new Error(`wrong _id type for convertStringId!`);
     }
 }
 exports.convertStringId = convertStringId;

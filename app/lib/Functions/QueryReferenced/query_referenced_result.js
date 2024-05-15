@@ -9,7 +9,7 @@ class QueryReferencedResult {
         this.currentPage = 0;
         this.pageSize = 50;
         if (!collectionId || !targetCollectionId || !itemId || !propertyName || !queryOptions || !options) {
-            throw Error(`WeivData - One or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName, queryOptions, options, itemId`);
+            throw new Error(`one or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName, queryOptions, options, itemId`);
         }
         const { collectionName, dbName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         this.collectionName = collectionName;
@@ -35,7 +35,7 @@ class QueryReferencedResult {
             return items;
         }
         catch (err) {
-            throw Error(`WeivData - Error when getting items for queryReferenced result: ${err}`);
+            throw new Error(`when getting items for queryReferenced result: ${err}`);
         }
     }
     async getResult() {
@@ -82,7 +82,7 @@ class QueryReferencedResult {
             };
         }
         catch (err) {
-            throw Error(`WeivData - Error when running queryReferenced function: ${err}`);
+            throw new Error(`when running queryReferenced function: ${err}`);
         }
     }
     async connectionHandler(suppressAuth) {
@@ -98,7 +98,7 @@ class QueryReferencedResult {
             return { collection, memberId };
         }
         catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
+            throw new Error(`when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
         }
     }
 }

@@ -17,7 +17,7 @@ class WeivDataQuery {
         this.referenceLenght = {};
         this.filters = {};
         if (!collectionId) {
-            throw Error(`WeivData - Collection name required`);
+            throw new Error(`WeivData - Collection name required`);
         }
         this.collectionId = collectionId;
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
@@ -198,7 +198,7 @@ class WeivDataQuery {
     }
     ascending(...propertyName) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
         for (const name of propertyName) {
             this.sorting = (0, lodash_1.merge)(this.sorting, {
@@ -216,7 +216,7 @@ class WeivDataQuery {
             let editedQurey;
             if (suppressHooks != true) {
                 editedQurey = await (0, hook_manager_1.runDataHook)(this.collectionId, "beforeCount", [this, context]).catch((err) => {
-                    throw Error(`WeivData - beforeCount Hook Failure ${err}`);
+                    throw new Error(`beforeCount Hook Failure ${err}`);
                 });
             }
             const countOptions = readConcern ? { readConcern } : {};
@@ -229,7 +229,7 @@ class WeivDataQuery {
             }
             if (suppressHooks != true) {
                 let editedCount = await (0, hook_manager_1.runDataHook)(this.collectionId, "afterCount", [totalCount, context]).catch((err) => {
-                    throw Error(`WeivData - afterCount Hook Failure ${err}`);
+                    throw new Error(`afterCount Hook Failure ${err}`);
                 });
                 if (editedCount) {
                     return editedCount;
@@ -238,12 +238,12 @@ class WeivDataQuery {
             return totalCount;
         }
         catch (err) {
-            throw Error(`WeivData - Error when using count with weivData.query: ${err}`);
+            throw new Error(`WeivData - Error when using count with weivData.query: ${err}`);
         }
     }
     descending(...propertyName) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
         for (const name of propertyName) {
             this.sorting = (0, lodash_1.merge)(this.sorting, {
@@ -254,14 +254,14 @@ class WeivDataQuery {
     }
     async distinct(propertyName, options) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
         this.distinctValue = propertyName;
         return this.runQuery(options);
     }
     fields(...propertyName) {
         if (!propertyName) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
         for (const name of propertyName) {
             this.queryFields = (0, lodash_1.merge)(this.queryFields, {
@@ -275,7 +275,7 @@ class WeivDataQuery {
     }
     include(...includes) {
         if (!includes) {
-            throw Error(`WeivData - Property name required!`);
+            throw new Error(`WeivData - Property name required!`);
         }
         for (const { fieldName, collectionName, foreignField, as, maxItems, countItems } of includes) {
             if (countItems === true) {
@@ -303,7 +303,7 @@ class WeivDataQuery {
     }
     limit(limit) {
         if (!limit && limit != 0) {
-            throw Error(`WeivData - Limit number is required!`);
+            throw new Error(`WeivData - Limit number is required!`);
         }
         if (limit != 0) {
             this.limitNumber = limit;
@@ -312,7 +312,7 @@ class WeivDataQuery {
     }
     skip(skip) {
         if (!skip && skip != 0) {
-            throw Error(`WeivData - Skip number is required!`);
+            throw new Error(`WeivData - Skip number is required!`);
         }
         this.skipNumber = skip;
         return this;
@@ -325,7 +325,7 @@ class WeivDataQuery {
             let editedQurey;
             if (suppressHooks != true) {
                 editedQurey = await (0, hook_manager_1.runDataHook)(this.collectionId, "beforeQuery", [this, context]).catch((err) => {
-                    throw Error(`WeivData - beforeQuery Hook Failure ${err}`);
+                    throw new Error(`beforeQuery Hook Failure ${err}`);
                 });
             }
             let classInUse = !editedQurey ? this : editedQurey;
@@ -360,7 +360,7 @@ class WeivDataQuery {
             if (suppressHooks != true) {
                 const hookedItems = await result.items.map(async (item, index) => {
                     const editedItem = await (0, hook_manager_1.runDataHook)(classInUse.collectionId, "afterQuery", [item, context]).catch((err) => {
-                        console.error(`WeivData - afterQuery Hook Failure ${err} Item Index: ${index}`);
+                        throw new Error(`afterQuery Hook Failure ${err} Item Index: ${index}`);
                     });
                     if (editedItem) {
                         return editedItem;
@@ -378,7 +378,7 @@ class WeivDataQuery {
             return result;
         }
         catch (err) {
-            throw Error(`WeivData - Error when using query (runQuery): ${err}`);
+            throw new Error(`WeivData - Error when using query (runQuery): ${err}`);
         }
     }
     addFilter(propertyName, newFilter) {

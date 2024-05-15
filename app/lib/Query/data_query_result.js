@@ -20,7 +20,7 @@ class QueryResult {
         this.currentPage = 1;
         const { suppressAuth, pageSize, dbName, collectionName, queryClass, queryOptions, readConcern, collection, cacheTimeout, enableCache } = options;
         if (!pageSize || !queryOptions || !dbName || !collectionName || !queryClass) {
-            throw Error(`WeivData - Required Param/s Missing`);
+            throw new Error(`required param/s missing! (pageSize, queryOptions, dbName, collectionName and queryClass are required params)`);
         }
         this.cacheTimeout = cacheTimeout;
         this.enableCache = enableCache;
@@ -104,7 +104,7 @@ class QueryResult {
             }
         }
         catch (err) {
-            throw Error(`WeivData - Error when using query (getItems): ${err}`);
+            throw new Error(`WeivData - Error when using query (getItems): ${err}`);
         }
     }
     async getTotalCount() {
@@ -127,7 +127,7 @@ class QueryResult {
             return totalCount;
         }
         catch (err) {
-            throw Error(`WeivData - Error when using query (getTotalCount): ${err}`);
+            throw new Error(`WeivData - Error when using query (getTotalCount): ${err}`);
         }
     }
     async getResult() {
@@ -182,7 +182,7 @@ class QueryResult {
             return result;
         }
         catch (err) {
-            throw Error(`WeivData - Error when using query: ${err}`);
+            throw new Error(`WeivData - Error when using query: ${err}`);
         }
     }
     async connectionHandler(suppressAuth) {
@@ -198,7 +198,7 @@ class QueryResult {
             return { collection, memberId };
         }
         catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
+            throw new Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }
     }
     generateCacheKey() {

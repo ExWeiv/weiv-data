@@ -12,7 +12,7 @@ function idConverter(id, stringMethod) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when converting an ID: ${err}`);
+        throw new Error(`WeivData - Error when converting an ID: ${err}`);
     }
 }
 exports.idConverter = idConverter;

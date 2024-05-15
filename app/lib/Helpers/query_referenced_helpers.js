@@ -4,7 +4,7 @@ exports.getPipeline = void 0;
 const name_helpers_1 = require("./name_helpers");
 function getPipeline(itemId, targetCollectionId, propertyName, pipelineOptions) {
     if (typeof itemId !== "object" || typeof targetCollectionId !== "string" || typeof propertyName !== "string" || typeof pipelineOptions !== "object") {
-        throw new Error("One or multiple parameter type is wrong!");
+        throw new Error("one or multiple parameter type is wrong!");
     }
     const { collectionName } = (0, name_helpers_1.splitCollectionId)(targetCollectionId);
     return [

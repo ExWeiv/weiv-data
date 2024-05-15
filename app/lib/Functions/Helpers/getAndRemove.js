@@ -14,7 +14,7 @@ async function getAndRemove(collectionId, itemId, options) {
         let editedItemId = safeItemId;
         if (suppressHooks != true) {
             const modifiedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndRemove", [safeItemId, context]).catch((err) => {
-                throw Error(`WeivData - beforeGetAndRemove Hook Failure ${err}`);
+                throw new Error(`beforeGetAndRemove Hook Failure ${err}`);
             });
             if (modifiedItemId) {
                 editedItemId = (0, item_helpers_1.convertStringId)(modifiedItemId);
@@ -25,7 +25,7 @@ async function getAndRemove(collectionId, itemId, options) {
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndRemove", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterGetAndRemove Hook Failure ${err}`);
+                    throw new Error(`afterGetAndRemove Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
                     return modifiedResult;
@@ -38,7 +38,7 @@ async function getAndRemove(collectionId, itemId, options) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when removing an item from collection (getAndRemove): ${err}`);
+        throw new Error(`WeivData - Error when removing an item from collection (getAndRemove): ${err}`);
     }
 }
 exports.getAndRemove = getAndRemove;

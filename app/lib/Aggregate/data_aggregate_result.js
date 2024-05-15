@@ -62,7 +62,7 @@ class AggregateResult {
             return { collection, memberId };
         }
         catch (err) {
-            throw Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
+            throw new Error(`WeivData - Error when connecting to MongoDB Client via aggregate function class: ${err}`);
         }
     }
 }

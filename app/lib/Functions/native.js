@@ -10,7 +10,7 @@ async function native(collectionId, suppressAuth) {
         return collection;
     }
     catch (err) {
-        throw Error(`WeivData - Error when returning native collection cursor from mongodb driver: ${err}`);
+        throw new Error(`WeivData - Error when returning native collection cursor from mongodb driver: ${err}`);
     }
 }
 exports.native = native;

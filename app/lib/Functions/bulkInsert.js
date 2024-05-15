@@ -18,7 +18,7 @@ async function bulkInsert(collectionId, items, options) {
             item._owner = ownerId;
             if (suppressHooks != true) {
                 let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [item, context]).catch((err) => {
-                    throw Error(`WeivData - beforeInsert (bulkInsert) Hook Failure ${err}`);
+                    throw new Error(`beforeInsert (bulkInsert) Hook Failure ${err}`);
                 });
                 if (editedItem) {
                     item = editedItem;
@@ -43,7 +43,7 @@ async function bulkInsert(collectionId, items, options) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedInsertItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterInsert (bulkInsert) Hook Failure ${err}`);
+                        throw new Error(`afterInsert (bulkInsert) Hook Failure ${err}`);
                     });
                     if (editedInsertItem) {
                         return editedInsertItem;
@@ -57,11 +57,11 @@ async function bulkInsert(collectionId, items, options) {
             return { insertedItems: editedItems, insertedItemIds, inserted: insertedCount };
         }
         else {
-            throw Error(`WeivData - Error when inserting items using bulkInsert, inserted: ${insertedCount}, ok: ${ok}`);
+            throw new Error(`inserted: ${insertedCount}, ok: ${ok}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when inserting items using bulkInsert: ${err}`);
+        throw new Error(`WeivData - Error when inserting items using bulkInsert: ${err}`);
     }
 }
 exports.bulkInsert = bulkInsert;

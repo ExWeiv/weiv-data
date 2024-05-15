@@ -13,7 +13,7 @@ async function getAndUpdate(collectionId, itemId, value, options) {
         let editedItem = safeValue;
         if (suppressHooks != true) {
             const modifiedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndUpdate", [safeValue, context]).catch((err) => {
-                throw Error(`WeivData - beforeGetAndUpdate Hook Failure ${err}`);
+                throw new Error(`beforeGetAndUpdate Hook Failure ${err}`);
             });
             if (modifiedItem) {
                 editedItem = modifiedItem;
@@ -25,7 +25,7 @@ async function getAndUpdate(collectionId, itemId, value, options) {
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndUpdate", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterGetAndUpdate Hook Failure ${err}`);
+                    throw new Error(`afterGetAndUpdate Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
                     return modifiedResult;
@@ -38,7 +38,7 @@ async function getAndUpdate(collectionId, itemId, value, options) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when updating an item from collection (getAndUpdate): ${err}`);
+        throw new Error(`WeivData - Error when updating an item from collection (getAndUpdate): ${err}`);
     }
 }
 exports.getAndUpdate = getAndUpdate;

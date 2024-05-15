@@ -15,7 +15,7 @@ async function bulkUpdate(collectionId, items, options) {
             item._id = (0, item_helpers_1.convertStringId)(item._id);
             if (suppressHooks != true) {
                 const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [item, context]).catch((err) => {
-                    throw Error(`WeivData - beforeUpdate (bulkUpdate) Hook Failure ${err}`);
+                    throw new Error(`beforeUpdate (bulkUpdate) Hook Failure ${err}`);
                 });
                 if (editedItem) {
                     return editedItem;
@@ -43,7 +43,7 @@ async function bulkUpdate(collectionId, items, options) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                        throw Error(`WeivData - afterUpdate (bulkUpdate) Hook Failure ${err}`);
+                        throw new Error(`afterUpdate (bulkUpdate) Hook Failure ${err}`);
                     });
                     if (editedItem) {
                         return editedItem;
@@ -60,11 +60,11 @@ async function bulkUpdate(collectionId, items, options) {
             };
         }
         else {
-            throw Error(`WeivData  - Error when updating items using bulkUpdate: updated: ${modifiedCount}, ok: ${ok}`);
+            throw new Error(`updated: ${modifiedCount}, ok: ${ok}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when updating items using bulkUpdate: ${err}`);
+        throw new Error(`WeivData - Error when updating items using bulkUpdate: ${err}`);
     }
 }
 exports.bulkUpdate = bulkUpdate;

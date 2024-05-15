@@ -14,7 +14,7 @@ async function bulkRemove(collectionId, itemIds, options) {
         let editedItemIds = safeItemIds.map(async (itemId) => {
             if (suppressHooks != true) {
                 const editedId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeRemove", [itemId, context]).catch((err) => {
-                    throw Error(`WeivData - beforeRemove (bulkRemove) Hook Failure ${err}`);
+                    throw new Error(`beforeRemove (bulkRemove) Hook Failure ${err}`);
                 });
                 if (editedId) {
                     return (0, item_helpers_1.convertStringId)(editedId);
@@ -44,11 +44,11 @@ async function bulkRemove(collectionId, itemIds, options) {
             };
         }
         else {
-            throw Error(`WeivData - Error when removing items using bulkRemove: removed: ${deletedCount}, ok: ${ok}`);
+            throw new Error(`removed: ${deletedCount}, ok: ${ok}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when removing items using bulkRemove: ${err}`);
+        throw new Error(`WeivData - Error when removing items using bulkRemove: ${err}`);
     }
 }
 exports.bulkRemove = bulkRemove;

@@ -14,7 +14,7 @@ async function increment(collectionId, itemId, propertyName, value, options) {
         let editedModify = { propertyName, value };
         if (suppressHooks != true) {
             const modifiedParams = await (0, hook_manager_1.runDataHook)(collectionId, "beforeIncrement", [{ propertyName, value }, context]).catch((err) => {
-                throw Error(`WeivData - beforeIncrement Hook Failure ${err}`);
+                throw new Error(`beforeIncrement Hook Failure ${err}`);
             });
             if (modifiedParams) {
                 editedModify = modifiedParams;
@@ -25,7 +25,7 @@ async function increment(collectionId, itemId, propertyName, value, options) {
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterIncrement", [item, context]).catch((err) => {
-                    throw Error(`WeivData - afterIncrement Hook Failure ${err}`);
+                    throw new Error(`afterIncrement Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
                     return modifiedResult;
@@ -38,7 +38,7 @@ async function increment(collectionId, itemId, propertyName, value, options) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when incrementing a filed in an item: ${err}`);
+        throw new Error(`WeivData - Error when incrementing a filed in an item: ${err}`);
     }
 }
 exports.increment = increment;

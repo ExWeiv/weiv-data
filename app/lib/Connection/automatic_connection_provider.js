@@ -24,7 +24,7 @@ async function setupClient(uri, role) {
                 return connection;
             }
             else {
-                throw Error(`There is a problem with client caching and it's a important problem please report it! This will directly impact to all operations`);
+                throw new Error(`there is a problem with client caching and it's a important problem please report it! This will directly impact to all operations`);
             }
         }
         else {
@@ -32,7 +32,7 @@ async function setupClient(uri, role) {
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when connecting to MongoDB Client via setupClient: ${err}`);
+        throw new Error(`Error when connecting to MongoDB Client via setupClient: ${err}`);
     }
 }
 const createNewClient = async (uri, role) => {
@@ -64,11 +64,11 @@ const createNewClient = async (uri, role) => {
             return connection;
         }
         else {
-            throw Error(`WeivData - Failed to connect to a MongoClient: connection: ${newMongoClient}`);
+            throw new Error(`Failed to connect to a MongoClient: connection: ${newMongoClient}`);
         }
     }
     catch (err) {
-        throw Error(`WeivData - Error when creating a new MongoDB client: ${err}`);
+        throw new Error(`Error when creating a new MongoDB client: ${err}`);
     }
 };
 const listenersMap = new Map();
@@ -90,7 +90,7 @@ const connectClient = async (client, uri) => {
             const handleError = async () => {
                 clientCache.del(uri.slice(0, 20));
                 statusCache.set(uri.slice(0, 20), false);
-                throw Error(`WeivData - Error when trying to connect client (connection error): ${uri}`);
+                throw new Error(`when trying to connect client (connection error): ${uri}`);
             };
             client.on('close', handleClose);
             client.on('error', handleError);
@@ -102,7 +102,7 @@ const connectClient = async (client, uri) => {
         return connectedClient;
     }
     catch (err) {
-        throw Error(`WeivData - Unexpected error: ${err}`);
+        throw new Error(`Unexpected error: ${err}`);
     }
 };
 async function useClient(suppressAuth = false) {
@@ -112,7 +112,7 @@ async function useClient(suppressAuth = false) {
         return { pool, memberId };
     }
     catch (err) {
-        throw Error(`WeivData - Error when connecting to cached MongoClient via useClient: ${err}`);
+        throw new Error(`when connecting to cached MongoClient via useClient: ${err}`);
     }
 }
 exports.useClient = useClient;
