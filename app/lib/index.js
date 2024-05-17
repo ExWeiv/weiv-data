@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listCollections = exports.renameCollection = exports.deleteCollection = exports.createCollection = exports.pull = exports.push = exports.increment = exports.multiply = exports.getAndUpdate = exports.getAndReplace = exports.getAndRemove = exports.findOne = exports.replace = exports.native = exports.flushCache = exports.idConverter = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.aggregate = exports.filter = exports.query = void 0;
+exports.listCollections = exports.renameCollection = exports.deleteCollection = exports.createCollection = exports.pull = exports.push = exports.increment = exports.multiply = exports.getAndUpdate = exports.getAndReplace = exports.getAndRemove = exports.findOne = exports.replace = exports.native = exports.flushCache = exports.convertId = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.aggregate = exports.filter = exports.query = void 0;
 const data_aggregate_1 = require("./Aggregate/data_aggregate");
 const data_filter_1 = require("./Filter/data_filter");
 const data_query_1 = require("./Query/data_query");
@@ -34,8 +34,8 @@ const truncate_1 = require("./Functions/truncate");
 Object.defineProperty(exports, "truncate", { enumerable: true, get: function () { return truncate_1.truncate; } });
 const update_1 = require("./Functions/update");
 Object.defineProperty(exports, "update", { enumerable: true, get: function () { return update_1.update; } });
-const idConverter_1 = require("./Functions/idConverter");
-Object.defineProperty(exports, "idConverter", { enumerable: true, get: function () { return idConverter_1.idConverter; } });
+const convertId_1 = require("./Functions/convertId");
+Object.defineProperty(exports, "convertId", { enumerable: true, get: function () { return convertId_1.convertId; } });
 const flushCache_1 = require("./Functions/flushCache");
 Object.defineProperty(exports, "flushCache", { enumerable: true, get: function () { return flushCache_1.flushCache; } });
 const native_1 = require("./Functions/native");
@@ -91,7 +91,7 @@ exports.default = {
     save: save_1.save,
     truncate: truncate_1.truncate,
     update: update_1.update,
-    idConverter: idConverter_1.idConverter,
+    convertId: convertId_1.convertId,
     flushCache: flushCache_1.flushCache,
     native: native_1.native,
     replace: replace_1.replace,
