@@ -1,11 +1,9 @@
 import { memoize } from 'lodash';
 import { convertStringId } from '../Helpers/item_helpers';
+import type { Document } from 'mongodb/mongodb';
 
 export class WeivDataFilter {
-    /** @internal */
-    filters: { [key: string]: any } = {} = {};
-
-    /** @internal */
+    private filters: { [key: string]: any } = {};
     constructor() { }
 
     and(query: WeivDataFilter): WeivDataFilter {
@@ -13,7 +11,6 @@ export class WeivDataFilter {
             this.filters["$and"] = [];
         }
         this.filters["$and"].push(query.filters);
-
         return this;
     }
 
@@ -27,7 +24,6 @@ export class WeivDataFilter {
                 });
             })
         }
-
         this.memoizedBetween(propertyName, rangeStart, rangeEnd);
         return this;
     }
@@ -42,7 +38,6 @@ export class WeivDataFilter {
                 });
             })
         }
-
         this.memoizedContains(propertyName, string);
         return this;
     }
@@ -57,7 +52,6 @@ export class WeivDataFilter {
                 });
             })
         }
-
         this.memoizedEndsWith(propertyName, string);
         return this;
     }
@@ -77,7 +71,6 @@ export class WeivDataFilter {
                 });
             })
         }
-
         this.memoizedEq(propertyName, value);
         return this;
     }
@@ -89,7 +82,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $gte: value, });
             })
         }
-
         this.memoizedGe(propertyName, value);
         return this;
     }
@@ -101,7 +93,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $gt: value, });
             })
         }
-
         this.memoizedGt(propertyName, value);
         return this;
     }
@@ -117,7 +108,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $all: value, });
             })
         }
-
         this.memoizedHasAll(propertyName, value);
         return this;
     }
@@ -133,7 +123,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $in: value, });
             })
         }
-
         this.memoizedHasSome(propertyName, value);
         return this;
     }
@@ -145,7 +134,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $exists: false, });
             })
         }
-
         this.memoizedIsEmpty(propertyName);
         return this;
     }
@@ -157,7 +145,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $exists: true, });
             })
         }
-
         this.memoizedIsNotEmpty(propertyName);
         return this;
     }
@@ -169,7 +156,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $lte: value, });
             })
         }
-
         this.memoizedLe(propertyName, value);
         return this;
     }
@@ -181,7 +167,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $lt: value, });
             })
         }
-
         this.memoizedLt(propertyName, value);
         return this;
     }
@@ -193,7 +178,6 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $ne: value, });
             })
         }
-
         this.memoizedNe(propertyName, value);
         return this;
     }
@@ -203,7 +187,6 @@ export class WeivDataFilter {
             this.filters["$nor"] = [];
         }
         this.filters["$nor"].push(query.filters);
-
         return this;
     }
 
@@ -212,7 +195,6 @@ export class WeivDataFilter {
             this.filters["$or"] = [];
         }
         this.filters["$or"].push(query.filters);
-
         return this;
     }
 
@@ -226,17 +208,24 @@ export class WeivDataFilter {
                 });
             })
         }
-
         this.memoizedStartsWith(propertyName, string);
         return this;
     }
 
-    /** @internal */
+    // HELPER FUNCTIONS
     private addFilter(propertyName: string, newFilter: { [key: string]: any }) {
         this.filters[propertyName] = {
             ...this.filters[propertyName],
             ...newFilter
         }
         return this.filters;
+    }
+
+    get _filters(): { $match: Document } {
+        return {
+            $match: {
+                ...this.filters
+            }
+        }
     }
 }

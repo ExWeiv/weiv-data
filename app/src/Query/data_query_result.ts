@@ -2,7 +2,7 @@ import { Db, Collection } from "mongodb/mongodb";
 import { useClient } from '../Connection/automatic_connection_provider';
 import { isEmpty, size } from 'lodash';
 import NodeCache from "node-cache";
-import type { ConnectionHandlerResult } from "../Helpers/collection";
+import type { ConnectionHandlerResult } from "../Helpers/connection_helpers";
 import type { LookupObject, ReferenceLenghtObject } from "./data_query";
 import type { ReadConcern, Item, WeivDataQueryResult } from '@exweiv/weiv-data'
 
@@ -246,7 +246,7 @@ export class QueryResult {
         }
     }
 
-    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult<false>> {
+    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult> {
         try {
             const { pool, memberId } = await useClient(suppressAuth);
 
@@ -257,7 +257,7 @@ export class QueryResult {
             }
 
             const collection = this.db.collection(this.collectionName);
-            return { collection, memberId };
+            return { collection, memberId, database: this.db };
         } catch (err) {
             throw new Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);
         }

@@ -8,7 +8,7 @@ import NodeCache from 'node-cache';
 import type { CacheSelections } from '@exweiv/weiv-data';
 
 type CacheSelectionsObject = {
-    [Key in CacheSelections]: () => NodeCache; // Define the value type as a function returning any
+    [Key in CacheSelections as string]: () => NodeCache; // Define the value type as a function returning any
 };
 
 const cacheSelections: CacheSelectionsObject = {
@@ -32,14 +32,14 @@ export function flushCache(filters?: CacheSelections[]): void {
                     cachesToFlush.push(cacheValue);
                 }
             } else {
-                for (const key of Object.keys(cacheSelections)) { //@ts-ignore
+                for (const key of Object.keys(cacheSelections)) {
                     const cacheValue: NodeCache = cacheSelections[key]();
                     cachesToFlush.push(cacheValue);
                 }
             }
         }
 
-        for (const key of Object.keys(cacheSelections)) { //@ts-ignore
+        for (const key of Object.keys(cacheSelections)) {
             const cacheValue: NodeCache = cacheSelections[key]();
             cachesToFlush.push(cacheValue);
         }

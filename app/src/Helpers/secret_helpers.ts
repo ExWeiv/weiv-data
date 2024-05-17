@@ -1,6 +1,8 @@
 //@ts-ignore
-import { secrets } from "wix-secrets-backend.v2"; //@ts-ignore
+import { secrets } from "wix-secrets-backend.v2"; 
+//@ts-ignore
 import * as wixAuth from 'wix-auth';
+
 import NodeCache from 'node-cache';
 
 // Initialize a global cache instance

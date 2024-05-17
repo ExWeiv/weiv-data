@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.idConverter = void 0;
+exports.convertId = void 0;
 const item_helpers_1 = require("../Helpers/item_helpers");
-function idConverter(id, stringMethod) {
+function convertId(id, stringMethod) {
     try {
         if (typeof id === "string") {
             return (0, item_helpers_1.convertStringId)(id);
@@ -15,4 +15,4 @@ function idConverter(id, stringMethod) {
         throw new Error(`WeivData - Error when converting an ID: ${err}`);
     }
 }
-exports.idConverter = idConverter;
+exports.convertId = convertId;

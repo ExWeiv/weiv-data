@@ -195,7 +195,7 @@ class QueryResult {
                 this.db = pool.db("ExWeiv");
             }
             const collection = this.db.collection(this.collectionName);
-            return { collection, memberId };
+            return { collection, memberId, database: this.db };
         }
         catch (err) {
             throw new Error(`WeivData - Error when connecting to MongoDB Client via query function class: ${err}`);

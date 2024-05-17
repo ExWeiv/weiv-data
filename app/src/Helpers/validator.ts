@@ -283,7 +283,7 @@ function checkItemIds(params: { [key: string]: any }, func: FName): null {
     }
 }
 
-export function copyOwnPropsOnly(src: { [key: string | number]: any }): object {
+export function copyOwnPropsOnly(src: Document): Document {
     const result = Object.create(null);
     for (const key of Object.getOwnPropertyNames(src)) {
         if (key !== "__proto__") {

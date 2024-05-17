@@ -7,7 +7,7 @@ import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import type { WeivDataOptions, WeivDataOptionsCache, IncludeObject, WeivDataQueryResult } from '@exweiv/weiv-data';
-import type { ConnectionHandlerResult } from '../Helpers/collection';
+import type { ConnectionHandlerResult } from '../Helpers/connection_helpers';
 
 /** @internal */
 export type LookupObject = {
@@ -522,7 +522,7 @@ export class WeivDataQuery {
     }
 
     /** @internal */
-    private async connectionHandler(suppressAuth = false): Promise<ConnectionHandlerResult<false>> {
+    private async connectionHandler(suppressAuth = false): Promise<ConnectionHandlerResult> {
         const { pool, memberId } = await useClient(suppressAuth);
 
         if (this.dbName) {
@@ -532,6 +532,6 @@ export class WeivDataQuery {
         }
 
         const collection = this.db.collection(this.collectionName);
-        return { collection, memberId };
+        return { collection, memberId, database: this.db };
     }
 }

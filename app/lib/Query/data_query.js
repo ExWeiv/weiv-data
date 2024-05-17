@@ -402,7 +402,7 @@ class WeivDataQuery {
             this.db = pool.db("ExWeiv");
         }
         const collection = this.db.collection(this.collectionName);
-        return { collection, memberId };
+        return { collection, memberId, database: this.db };
     }
 }
 exports.WeivDataQuery = WeivDataQuery;

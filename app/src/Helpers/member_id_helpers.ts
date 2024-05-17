@@ -1,6 +1,8 @@
 //@ts-ignore
-import wixData from 'wix-data'; //@ts-ignore
+import wixData from 'wix-data'; 
+//@ts-ignore
 import { currentUser } from 'wix-users-backend';
+
 import type { WeivDataOptions } from '@exweiv/weiv-data'
 
 export async function getOwnerId(enableVisitorId: WeivDataOptions["enableVisitorId"] = false): Promise<string | null> {
