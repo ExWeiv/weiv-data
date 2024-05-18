@@ -42,6 +42,14 @@ declare module '@exweiv/weiv-data' {
          * Enable counting total items or not. Defaults to `false`.
          */
         countItems?: boolean
+
+        /**
+         * @description
+         * By default all referenced items are sorted via _createdDate field in ascending order (1) but you can customize that stage too!
+         */
+        sort?: {
+            [propertyName: string]: 1 | -1
+        }
     }
 
     /**
@@ -129,7 +137,14 @@ declare module '@exweiv/weiv-data' {
          * 
          * > For members you don't need this option to be true, weivData always knows the member ids.
          */
-        enableVisitorId?: boolean
+        enableVisitorId?: boolean,
+
+
+        /**
+         * @description
+         * By default this is true and you can disable it if you want, when it's disabled (false) we won't fetch the total count of the items.
+         */
+        omitTotalCount?: boolean
     }
 
     /**
@@ -788,7 +803,7 @@ declare module '@exweiv/weiv-data' {
          * @param options An object containing options to use when processing this operation.
          * @returns Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
          */
-        find(options?: WeivDataOptionsCache): Promise<WeivDataQueryResult>;
+        find(options?: WeivDataOptions): Promise<WeivDataQueryResult>;
 
         /**
          * @description
@@ -854,6 +869,18 @@ declare module '@exweiv/weiv-data' {
          * Returns the total number of pages the query produced.
          */
         readonly totalPages: number;
+
+        /**
+         * @description
+         * Filters applied to query.
+         */
+        readonly _filters: any;
+
+        /**
+         * @description
+         * Pipeline of aggregation if used if not undefined.
+         */
+        readonly _pipeline?: PipelineStage[];
 
         /**
          * @description

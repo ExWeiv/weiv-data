@@ -1,13 +1,13 @@
 import { isArray } from "lodash";
 import { WeivDataFilter } from "../Filter/data_filter";
 import { copyOwnPropsOnly } from "../Helpers/validator";
-import { Collection, Db, Document } from 'mongodb';
+import type { Collection, Db } from 'mongodb';
 import { CollectionID, Item, PipelineStage, WeivDataAggregateResult, WeivDataAggregateRunOptions } from "@exweiv/weiv-data";
 import { connectionHandler } from "../Helpers/connection_helpers";
 
 class Aggregate {
-    protected readonly _collectionId: string;
-    protected _pipeline: Document[] = new Array();
+    protected readonly _collectionId: CollectionID;
+    protected _pipeline: PipelineStage[] = new Array();
     protected _limitNumber: number = 50;
     protected _skipNumber: number = 0;
 
@@ -264,6 +264,9 @@ export class AggregateResult extends Aggregate {
 
     // Set CollectionID
     constructor(collectionId: CollectionID) {
+        if (!collectionId || typeof collectionId !== "string") {
+            throw new Error(`WeivData - CollectionID must be string and shouldn't be undefined or null!`);
+        }
         super(collectionId);
     }
 

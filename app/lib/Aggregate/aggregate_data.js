@@ -221,6 +221,9 @@ class AggregateResult extends Aggregate {
         }
     }
     constructor(collectionId) {
+        if (!collectionId || typeof collectionId !== "string") {
+            throw new Error(`WeivData - CollectionID must be string and shouldn't be undefined or null!`);
+        }
         super(collectionId);
         this._pageSize = 50;
         this._currentPage = 1;

@@ -2,7 +2,6 @@ import { getPermissionsCache } from '../Connection/permission_helpers';
 import { getGetCache } from '../Functions/get';
 import { getIsReferencedCache } from '../Functions/isReferenced';
 import { getHelperSecretsCache } from '../Helpers/secret_helpers';
-import { getQueryCache } from '../Query/data_query_result';
 import { getClientCache } from '../Connection/automatic_connection_provider';
 import NodeCache from 'node-cache';
 import type { CacheSelections } from '@exweiv/weiv-data';
@@ -15,7 +14,6 @@ const cacheSelections: CacheSelectionsObject = {
     "permissions": getPermissionsCache,
     "get": getGetCache,
     "isreferenced": getIsReferencedCache,
-    "query": getQueryCache,
     "helpersecrets": getHelperSecretsCache,
     "connectionclients": getClientCache,
     "secrets": getHelperSecretsCache

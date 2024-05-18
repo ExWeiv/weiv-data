@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports._version = exports.listCollections = exports.renameCollection = exports.deleteCollection = exports.createCollection = exports.pull = exports.push = exports.increment = exports.multiply = exports.getAndUpdate = exports.getAndReplace = exports.getAndRemove = exports.findOne = exports.replace = exports.native = exports.flushCache = exports.convertId = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.aggregate = exports.filter = exports.query = void 0;
 const aggregate_data_1 = require("./Aggregate/aggregate_data");
 const data_filter_1 = require("./Filter/data_filter");
-const data_query_1 = require("./Query/data_query");
+const query_data_1 = require("./Query/query_data");
 const queryReferenced_1 = require("./Functions/QueryReferenced/queryReferenced");
 Object.defineProperty(exports, "queryReferenced", { enumerable: true, get: function () { return queryReferenced_1.queryReferenced; } });
 const bulkInsert_1 = require("./Functions/bulkInsert");
@@ -72,7 +72,7 @@ Object.defineProperty(exports, "listCollections", { enumerable: true, get: funct
 const package_json_1 = __importDefault(require("../package.json"));
 const aggregate = (collectionId) => new aggregate_data_1.AggregateResult(collectionId);
 exports.aggregate = aggregate;
-const query = (collectionId) => new data_query_1.WeivDataQuery(collectionId);
+const query = (collectionId) => new query_data_1.QueryResult(collectionId);
 exports.query = query;
 const filter = () => new data_filter_1.WeivDataFilter();
 exports.filter = filter;

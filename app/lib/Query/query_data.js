@@ -1,182 +1,141 @@
-import { CollectionID, IncludeObject, Item, PipelineStage, WeivDataOptions, WeivDataQueryResult } from "@exweiv/weiv-data";
-import { WeivDataFilter } from '../Filter/data_filter'
-import { isArray, merge } from "lodash";
-import { copyOwnPropsOnly } from "../Helpers/validator";
-import { connectionHandler } from "../Helpers/connection_helpers";
-import { Collection, Db } from "mongodb";
-import { prepareHookContext } from "../Helpers/hook_helpers";
-import { runDataHook } from "../Hooks/hook_manager";
-
-class Query extends WeivDataFilter {
-    protected readonly _collectionId: CollectionID;
-    protected _sort: Map<string, 1 | -1> = new Map();
-    protected _fields: string[] = new Array();
-    protected _includes: IncludeObject[] = new Array();
-
-    protected _limitNumber: number = 50;
-    protected _skipNumber: number = 0;
-    protected _isAggregate: boolean = false;
-
-    constructor(collectionId: CollectionID) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.QueryResult = void 0;
+const data_filter_1 = require("../Filter/data_filter");
+const lodash_1 = require("lodash");
+const validator_1 = require("../Helpers/validator");
+const connection_helpers_1 = require("../Helpers/connection_helpers");
+const hook_helpers_1 = require("../Helpers/hook_helpers");
+const hook_manager_1 = require("../Hooks/hook_manager");
+class Query extends data_filter_1.WeivDataFilter {
+    constructor(collectionId) {
         super();
+        this._sort = new Map();
+        this._fields = new Array();
+        this._includes = new Array();
+        this._limitNumber = 50;
+        this._skipNumber = 0;
+        this._isAggregate = false;
         this._collectionId = collectionId;
     }
-
-    ascending(...propertyName: string[]): Query {
-        if (!propertyName || !isArray(propertyName)) {
+    ascending(...propertyName) {
+        if (!propertyName || !(0, lodash_1.isArray)(propertyName)) {
             throw new Error(`WeivData - propertyName is not a valid value!`);
         }
-
-        // Save sort details with helper function
         this.__addSort__(1, propertyName);
         return this;
     }
-
-    descending(...propertyName: string[]): Query {
-        if (!propertyName || !isArray(propertyName)) {
+    descending(...propertyName) {
+        if (!propertyName || !(0, lodash_1.isArray)(propertyName)) {
             throw new Error(`WeivData - propertyName is not a valid value!`);
         }
-
-        // Save sort details with helper function
         this.__addSort__(-1, propertyName);
         return this;
     }
-
-    limit(limit: number): Query {
+    limit(limit) {
         if (typeof limit !== "number") {
             throw new Error(`WeivData - Unvalid value for limit it's either undefined or not a number!`);
-        } else {
+        }
+        else {
             this._limitNumber = limit;
             return this;
         }
     }
-
-    skip(skip: number): Query {
+    skip(skip) {
         if (typeof skip !== "number") {
             throw new Error(`WeivData - Unvalid value for skip it's either undefined or not a number!`);
-        } else {
+        }
+        else {
             this._skipNumber = skip;
             return this;
         }
     }
-
-    fields(...propertyName: string[]): Query {
-        if (!propertyName || !isArray(propertyName)) {
+    fields(...propertyName) {
+        if (!propertyName || !(0, lodash_1.isArray)(propertyName)) {
             throw new Error(`WeivData - propertyName is not a valid value!`);
         }
-
-        // Iterate over all names and push them to fields arr
         for (const name of propertyName) {
             if (typeof name !== "string") {
                 throw new Error(`WeivData - propertyName doesn't contain value/s!`);
-            } else {
+            }
+            else {
                 this._fields.push(name);
             }
         }
-
-        // Mark aggregate enabled since we have run fields it means we need to run an aggregation instead of find
         this._isAggregate = true;
         return this;
     }
-
-    include(...includes: IncludeObject[]): Query {
-        if (!includes || !isArray(includes)) {
+    include(...includes) {
+        if (!includes || !(0, lodash_1.isArray)(includes)) {
             throw new Error(`WeivData - include is not a valid value!`);
         }
-
-        // Iterate over all includes and checks for values and types for required ones
         for (const include of includes) {
             if (typeof include !== "object") {
                 throw new Error(`WeivData - include values must be an object ${include} is not a valid value!`);
-            } else {
+            }
+            else {
                 if (!include["collectionName"] || !include["fieldName"] || typeof include["collectionName"] !== "string" || typeof include["fieldName"] !== "string") {
                     throw new Error(`WeivData - each include object must contain collectionName and fieldName values as string!`);
                 }
-
-                // Prototype pollution clearer
-                const safeInclude = copyOwnPropsOnly<IncludeObject>(include);
+                const safeInclude = (0, validator_1.copyOwnPropsOnly)(include);
                 this._includes.push(safeInclude);
             }
         }
-
-        // Mark aggreate enabled and return
         this._isAggregate = true;
         return this;
     }
-
-    // HELPER FUNCTIONS
-    private __addSort__(sort: 1 | -1, propertyName: string[]): void {
-        // Iterate over all names and save them with sort number
+    __addSort__(sort, propertyName) {
         for (const name of propertyName) {
             if (typeof name !== "string") {
                 throw new Error(`WeivData - propertyName doesn't contain valid value/s!`);
-            } else {
+            }
+            else {
                 this._sort.set(name, sort);
             }
         }
     }
 }
-
-export class QueryResult extends Query {
-    // Internal
-    private _collection!: Collection;
-    private _database!: Db;
-    private _currentPage: number = 1;
-
-    async count(options?: WeivDataOptions): Promise<number> {
+class QueryResult extends Query {
+    async count(options) {
         try {
-            const { suppressAuth, suppressHooks, readConcern } = copyOwnPropsOnly(options || {});
+            const { suppressAuth, suppressHooks, readConcern } = (0, validator_1.copyOwnPropsOnly)(options || {});
             await this._handleConnection_(suppressAuth);
-
-            const context = prepareHookContext(this._collectionId);
-            let editedQurey: QueryResult | undefined;
+            const context = (0, hook_helpers_1.prepareHookContext)(this._collectionId);
+            let editedQurey;
             if (suppressHooks != true) {
-                editedQurey = await runDataHook<'beforeCount'>(this._collectionId, "beforeCount", [this, context]).catch((err) => {
+                editedQurey = await (0, hook_manager_1.runDataHook)(this._collectionId, "beforeCount", [this, context]).catch((err) => {
                     throw new Error(`beforeCount Hook Failure ${err}`);
                 });
             }
-
             const totalCount = await this._collection.countDocuments(!editedQurey ? this._filters.$match : editedQurey._filters.$match, { readConcern });
-
             if (suppressHooks != true) {
-                let editedCount = await runDataHook<'afterCount'>(this._collectionId, "afterCount", [totalCount, context]).catch((err) => {
+                let editedCount = await (0, hook_manager_1.runDataHook)(this._collectionId, "afterCount", [totalCount, context]).catch((err) => {
                     throw new Error(`afterCount Hook Failure ${err}`);
                 });
-
                 if (editedCount) {
                     return editedCount;
                 }
             }
-
             return totalCount;
-        } catch (err) {
+        }
+        catch (err) {
             throw new Error(`WeivData - Error when using count with weivData.query: ${err}`);
         }
     }
-
-    async distnict(propertyName: string, options?: WeivDataOptions): Promise<WeivDataQueryResult> {
+    async distnict(propertyName, options) {
         try {
             if (!propertyName || typeof propertyName !== "string") {
                 throw new Error(`WeivData - propertyName is not string or not a valid value!`);
             }
-
-            // Clear prototype pollution
-            options = copyOwnPropsOnly(options || {});
-
+            options = (0, validator_1.copyOwnPropsOnly)(options || {});
             const { suppressAuth, readConcern } = options;
             await this._handleConnection_(suppressAuth);
-
-            // Create distnict aggregate pipeline with filters only
-            const pipeline: PipelineStage[] = [];
+            const pipeline = [];
             pipeline.push(this._filters);
             pipeline.push({ $group: { _id: `$${propertyName}` } });
             pipeline.push({ $project: { distnict: "$_id", _id: 0 } });
-
-            // Get distnict values as an array of objects
             const items = (await this._collection.aggregate(pipeline, { readConcern }).toArray()).map(i => i.distinct);
-            // Get the exact or estimated total count of collection
             const totalCount = await this.__getTotalCount__(options?.omitTotalCount || false);
-
             return {
                 items,
                 length: items.length,
@@ -196,68 +155,54 @@ export class QueryResult extends Query {
                 },
                 _filters: this._filters,
                 _pipeline: pipeline
-            }
-        } catch (err) {
+            };
+        }
+        catch (err) {
             throw new Error(`WeivData - Error when using distnict with weivData.query: ${err}`);
         }
     }
-
-    async find(options?: WeivDataOptions): Promise<WeivDataQueryResult> {
+    async find(options) {
         try {
-            // Clear prototype pollution
-            options = copyOwnPropsOnly(options || {});
+            options = (0, validator_1.copyOwnPropsOnly)(options || {});
             const { suppressAuth, suppressHooks, readConcern, omitTotalCount } = options;
             await this._handleConnection_(suppressAuth);
-
-            const context = prepareHookContext(this._collectionId);
-
+            const context = (0, hook_helpers_1.prepareHookContext)(this._collectionId);
             if (suppressHooks != true) {
-                await runDataHook<'beforeQuery'>(this._collectionId, "beforeQuery", [this, context]).catch((err) => {
+                await (0, hook_manager_1.runDataHook)(this._collectionId, "beforeQuery", [this, context]).catch((err) => {
                     throw new Error(`beforeQuery Hook Failure ${err}`);
                 });
             }
-
-            // Check if we need to run an aggregation or find is enough (both for performance and need)
-            let totalCount: number;
-            let items: Item[];
-
+            let totalCount;
+            let items;
             if (this._isAggregate) {
                 const pipeline = this.__createAggregationPipeline__();
                 items = await this._collection.aggregate(pipeline, { readConcern }).toArray();
                 totalCount = await this.__getTotalCount__(omitTotalCount || false);
-            } else {
+            }
+            else {
                 const findCursor = this._collection.find(this._filters.$match, { readConcern });
-
-                // Add sorts into find cursor
                 for (const [key, value] of this._sort.entries()) {
                     findCursor.sort(key, value);
                 }
-
-                // Add skip and limit numbers into find
                 findCursor.limit(this._limitNumber);
                 findCursor.skip(this._skipNumber || 0 + ((this._currentPage - 1) * this._limitNumber));
-
                 items = await findCursor.toArray();
                 totalCount = await this.__getTotalCount__(omitTotalCount || false);
             }
-
-            // Handle afterQuery hook and pass items array with new data if exist
             if (suppressHooks != true) {
                 const hookedItems = items.map(async (item, index) => {
-                    const editedItem = await runDataHook<'afterQuery'>(this._collectionId, "afterQuery", [item, context]).catch((err) => {
+                    const editedItem = await (0, hook_manager_1.runDataHook)(this._collectionId, "afterQuery", [item, context]).catch((err) => {
                         throw new Error(`afterQuery Hook Failure ${err} Item Index: ${index}`);
                     });
-
                     if (editedItem) {
                         return editedItem;
-                    } else {
+                    }
+                    else {
                         return item;
                     }
                 });
-
                 items = await Promise.all(hookedItems);
             }
-
             return {
                 items,
                 length: items.length,
@@ -277,54 +222,42 @@ export class QueryResult extends Query {
                 },
                 _filters: this._filters,
                 _pipeline: this._isAggregate ? this.__createAggregationPipeline__() : undefined
-            }
-        } catch (err) {
+            };
+        }
+        catch (err) {
             throw new Error(`WeivData - Error when using find with weivData.query: ${err}`);
         }
     }
-
-    constructor(collectionId: CollectionID) {
+    constructor(collectionId) {
         if (!collectionId || typeof collectionId !== "string") {
             throw new Error(`WeivData - CollectionID must be string and shouldn't be undefined or null!`);
         }
         super(collectionId);
+        this._currentPage = 1;
     }
-
-    // HELPER FUNCTIONS
-    private async _handleConnection_(suppressAuth?: boolean): Promise<void> {
+    async _handleConnection_(suppressAuth) {
         if (!this._collection || !this._database) {
-            const { collection, database } = await connectionHandler(this._collectionId, suppressAuth);
+            const { collection, database } = await (0, connection_helpers_1.connectionHandler)(this._collectionId, suppressAuth);
             this._database = database;
             this._collection = collection;
         }
     }
-
-    private __createAggregationPipeline__() {
-        // Define pipeline
-        const pipeline: PipelineStage[] = [];
-
-        // Add filters to pipeline!
+    __createAggregationPipeline__() {
+        const pipeline = [];
         pipeline.push(this._filters);
-
-        // Add all includes (joins / lookups)
         for (const include of this._includes) {
-            // Create lookup stage object with default sort
-            const lookUpObj: PipelineStage = {
+            const lookUpObj = {
                 $lookup: {
                     from: include.collectionName,
                     localField: include.fieldName,
                     foreignField: !include.foreignField ? "_id" : include.foreignField,
                     as: !include.as ? include.fieldName : include.as,
                     pipeline: [
-                        // Limit max numbers of joins (defaults to 50)
                         { $limit: include.maxItems || 50 },
-                        // Sort ascending by _createdDate
                         { $sort: this.__getSortFromInclude__(include) }
                     ]
                 }
-            }
-
-            // Add another stage before lookup to return the actual total number of references
+            };
             if (include.countItems) {
                 pipeline.push({
                     $addFields: {
@@ -338,12 +271,8 @@ export class QueryResult extends Query {
                     }
                 });
             }
-
-            // Push lookup stage
             pipeline.push(lookUpObj);
         }
-
-        // Add sorting options to aggregate
         for (const [key, value] of this._sort.entries()) {
             pipeline.push({
                 $sort: {
@@ -351,44 +280,36 @@ export class QueryResult extends Query {
                 }
             });
         }
-
-        // Add fields (project) into an object to handle everything in single stage
-        let fields: { [key: string]: 1 } = {};
+        let fields = {};
         for (const field of this._fields) {
-            merge(fields, { [field]: 1 });
+            (0, lodash_1.merge)(fields, { [field]: 1 });
         }
-
-        // Push included fields to pipeline with project
         pipeline.push({ $project: fields });
-
-        // Add skip and limit stages into pipeline
         pipeline.push({ $skip: this._skipNumber || 0 + ((this._currentPage - 1) * this._limitNumber) });
         pipeline.push({ $limit: this._limitNumber || 50 });
-
         return pipeline;
     }
-
-    private __getSortFromInclude__(includeObj: IncludeObject) {
+    __getSortFromInclude__(includeObj) {
         if (includeObj.sort) {
-            return copyOwnPropsOnly(includeObj.sort);
-        } else {
+            return (0, validator_1.copyOwnPropsOnly)(includeObj.sort);
+        }
+        else {
             return { _createdDate: 1 };
         }
     }
-
-    private __hasNext__(totalCount: number): boolean {
+    __hasNext__(totalCount) {
         return this._currentPage * this._limitNumber < totalCount;
     }
-
-    private __hasPrev__(): boolean {
+    __hasPrev__() {
         return this._currentPage > 1;
     }
-
-    private async __getTotalCount__(omitTotalCount: boolean) {
+    async __getTotalCount__(omitTotalCount) {
         if (omitTotalCount) {
             return await this._collection.estimatedDocumentCount();
-        } else {
+        }
+        else {
             return await this._collection.countDocuments();
         }
     }
 }
+exports.QueryResult = QueryResult;
