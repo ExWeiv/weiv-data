@@ -172,8 +172,11 @@ export class QueryResult extends Query {
             pipeline.push({ $group: { _id: `$${propertyName}` } });
             pipeline.push({ $project: { distnict: "$_id", _id: 0 } });
 
-            // Get distnict values as an array of objects
-            const items = (await this._collection.aggregate(pipeline, { readConcern }).toArray()).map(i => i.distinct);
+            const aggregationCursor = this._collection.aggregate(pipeline, { readConcern });
+
+            // Get distnict values as an array of objects (and check for hasNext)
+            const items = (await aggregationCursor.toArray()).map(i => i.distinct);
+            const hasNext = await aggregationCursor.hasNext();
             // Get the exact or estimated total count of collection
             const totalCount = await this.__getTotalCount__(options?.omitTotalCount || false);
 
@@ -184,7 +187,7 @@ export class QueryResult extends Query {
                 pageSize: this._limitNumber,
                 totalCount,
                 totalPages: Math.ceil(totalCount / this._limitNumber),
-                hasNext: () => this.__hasNext__(totalCount),
+                hasNext: () => hasNext,
                 hasPrev: () => this.__hasPrev__(),
                 next: async () => {
                     this._currentPage++;
@@ -220,10 +223,17 @@ export class QueryResult extends Query {
             // Check if we need to run an aggregation or find is enough (both for performance and need)
             let totalCount: number;
             let items: Item[];
+            let hasNext: boolean;
 
             if (this._isAggregate) {
                 const pipeline = this.__createAggregationPipeline__();
-                items = await this._collection.aggregate(pipeline, { readConcern }).toArray();
+                const aggregationCursor = this._collection.aggregate(pipeline, { readConcern });
+
+                // Get Items and check if there are at least 1 more item with hasNext
+                items = await aggregationCursor.toArray();
+                hasNext = await aggregationCursor.hasNext();
+
+                // Get the total count of the documents in the collection
                 totalCount = await this.__getTotalCount__(omitTotalCount || false);
             } else {
                 const findCursor = this._collection.find(this._filters.$match, { readConcern });
@@ -237,7 +247,11 @@ export class QueryResult extends Query {
                 findCursor.limit(this._limitNumber);
                 findCursor.skip(this._skipNumber || 0 + ((this._currentPage - 1) * this._limitNumber));
 
+                // Get items and check if there are at least one more item in the next query
                 items = await findCursor.toArray();
+                hasNext = await findCursor.hasNext();
+
+                // Get the total count of the documents in the collection
                 totalCount = await this.__getTotalCount__(omitTotalCount || false);
             }
 
@@ -265,7 +279,7 @@ export class QueryResult extends Query {
                 pageSize: this._limitNumber,
                 totalCount,
                 totalPages: Math.ceil(totalCount / this._limitNumber),
-                hasNext: () => this.__hasNext__(totalCount),
+                hasNext: () => hasNext,
                 hasPrev: () => this.__hasPrev__(),
                 next: async () => {
                     this._currentPage++;
@@ -376,10 +390,19 @@ export class QueryResult extends Query {
         }
     }
 
-    private __hasNext__(totalCount: number): boolean {
-        return this._currentPage * this._limitNumber < totalCount;
-    }
+    /**
+     * @deprecated
+     * we won't use it more probably...
+     */
+    // private __hasNext__(totalCount: number, items: Item[]): boolean {
+    //     if (items.length > (this._limitNumber - 1)) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
 
+    // Should return correct data in most cases!
     private __hasPrev__(): boolean {
         return this._currentPage > 1;
     }
