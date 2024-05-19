@@ -13,7 +13,7 @@ export async function createCollection(collectionId: CollectionID, options?: Wei
         );
 
         const { suppressAuth } = safeOptions || {};
-        const { database } = await connectionHandler<true>(collectionId, suppressAuth, true);
+        const { database } = await connectionHandler(collectionId, suppressAuth);
         const { collectionName } = splitCollectionId(collectionId);
         await database.createCollection(collectionName, safeCollectionOptions);
     } catch (err) {

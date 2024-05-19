@@ -3,7 +3,7 @@ import { getPipeline } from '../../Helpers/query_referenced_helpers';
 import { useClient } from '../../Connection/automatic_connection_provider';
 import { splitCollectionId } from '../../Helpers/name_helpers';
 import type { CollectionID, Item, WeivDataOptions, WeivDataQueryReferencedResult, WeivDataQueryReferencedOptions } from '@exweiv/weiv-data';
-import type { ConnectionHandlerResult } from '../../Helpers/collection';
+import type { ConnectionHandlerResult } from '../../Helpers/connection_helpers';
 
 export class QueryReferencedResult {
     private targetCollectionId: string;
@@ -116,7 +116,7 @@ export class QueryReferencedResult {
     }
 
     /**@internal */
-    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult<false>> {
+    private async connectionHandler(suppressAuth: boolean): Promise<ConnectionHandlerResult> {
         try {
             const { pool, memberId } = await useClient(suppressAuth);
 
@@ -127,7 +127,7 @@ export class QueryReferencedResult {
             }
 
             const collection = this.db.collection(this.collectionName);
-            return { collection, memberId };
+            return { collection, memberId, database: this.db };
         } catch (err) {
             throw new Error(`when connecting to MongoDB Client via queryReferencedResult class: ${err}`);
         }

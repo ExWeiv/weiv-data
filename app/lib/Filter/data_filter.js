@@ -5,7 +5,7 @@ const lodash_1 = require("lodash");
 const item_helpers_1 = require("../Helpers/item_helpers");
 class WeivDataFilter {
     constructor() {
-        this.filters = {} = {};
+        this.filters = {};
     }
     and(query) {
         if (!this.filters["$and"]) {
@@ -185,6 +185,13 @@ class WeivDataFilter {
             ...newFilter
         };
         return this.filters;
+    }
+    get _filters() {
+        return {
+            $match: {
+                ...this.filters
+            }
+        };
     }
 }
 exports.WeivDataFilter = WeivDataFilter;

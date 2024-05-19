@@ -7,7 +7,7 @@ async function listCollections(databaseName, options, filter, listOptions) {
     try {
         const { safeCollectionFilter, safeCollectionOptions, safeOptions } = await (0, validator_1.validateParams)({ databaseName, options, collectionFilter: filter, collectionOptions: listOptions }, ["databaseName"], "listCollections");
         const { suppressAuth } = safeOptions || {};
-        const { database } = await (0, connection_helpers_1.connectionHandler)(`${databaseName}/`, suppressAuth, true);
+        const { database } = await (0, connection_helpers_1.connectionHandler)(`${databaseName}/`, suppressAuth);
         return await database.listCollections(safeCollectionFilter, safeCollectionOptions).toArray();
     }
     catch (err) {

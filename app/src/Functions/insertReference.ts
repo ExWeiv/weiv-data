@@ -1,6 +1,7 @@
 import type { WeivDataOptions, CollectionID, ReferencedItem, ReferringItem } from '@exweiv/weiv-data';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { validateParams } from '../Helpers/validator';
+import { Document } from 'mongodb';
 
 export async function insertReference(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<void> {
     try {
@@ -17,7 +18,7 @@ export async function insertReference(collectionId: CollectionID, propertyName: 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { acknowledged, modifiedCount } = await collection.updateOne(
             { _id: itemId },
-            { $push: { [propertyName]: { $each: references } }, $set: { _updatedDate: new Date() } },
+            { $push: { [propertyName]: { $each: references } } as Document, $set: { _updatedDate: new Date() } },
             { readConcern: readConcern ? readConcern : "local" }
         );
 

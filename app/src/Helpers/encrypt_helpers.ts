@@ -1,5 +1,7 @@
-import crypto from 'crypto'; //@ts-ignore
+//@ts-ignore
 import { secrets } from 'wix-secrets-backend.v2';
+
+import crypto from 'crypto';
 import { getCachedSecret } from './secret_helpers';
 
 /**@internal */

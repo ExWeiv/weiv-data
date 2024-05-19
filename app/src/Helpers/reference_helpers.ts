@@ -14,7 +14,7 @@ export const getReferenceItemId = (referringItem: ReferringItem): ObjectId => {
                 if (!(referringItem as Item)._id) {
                     throw new Error(`when sending Item it must contain _id field in it with a valid value!`);
                 }
-                safeReferringItem = copyOwnPropsOnly(referringItem);
+                safeReferringItem = copyOwnPropsOnly<Item>(referringItem);
                 return convertStringId(safeReferringItem._id);
             } else {
                 if (typeof referringItem !== "string") {

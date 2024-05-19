@@ -8,7 +8,7 @@ async function createCollection(collectionId, options, createOptions) {
     try {
         const { safeCollectionOptions, safeOptions } = await (0, validator_1.validateParams)({ collectionId, collectionOptions: createOptions, options }, ["collectionId"], "createCollection");
         const { suppressAuth } = safeOptions || {};
-        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth, true);
+        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         await database.createCollection(collectionName, safeCollectionOptions);
     }
