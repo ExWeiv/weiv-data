@@ -390,10 +390,7 @@ export class QueryResult extends Query {
         }
     }
 
-    /**
-     * @deprecated
-     * we won't use it more probably...
-     */
+    // // we won't use it more probably...
     // private __hasNext__(totalCount: number, items: Item[]): boolean {
     //     if (items.length > (this._limitNumber - 1)) {
     //         return true;
