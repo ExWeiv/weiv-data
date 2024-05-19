@@ -133,8 +133,9 @@ declare module '@exweiv/weiv-data' {
          * An option to use visitorId. This option will try to get the id of current user on the site.
          * Even if it's a visitor and if that same visitor signs up to your site your _owner field data will be the same with the member id in Wix Members.
          * 
-         * > When enabled, function will make another extra call so it will be slower, defaults to false.
+         * *Created for new data inserts doesn't have any effect on read functions or update functions*
          * 
+         * > When enabled, function will make another extra call so it will be slower, defaults to false.
          * > For members you don't need this option to be true, weivData always knows the member ids.
          */
         enableVisitorId?: boolean,
