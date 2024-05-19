@@ -134,7 +134,9 @@ class QueryResult extends Query {
             pipeline.push(this._filters);
             pipeline.push({ $group: { _id: `$${propertyName}` } });
             pipeline.push({ $project: { distnict: "$_id", _id: 0 } });
-            const items = (await this._collection.aggregate(pipeline, { readConcern }).toArray()).map(i => i.distinct);
+            const aggregationCursor = this._collection.aggregate(pipeline, { readConcern });
+            const items = (await aggregationCursor.toArray()).map(i => i.distinct);
+            const hasNext = await aggregationCursor.hasNext();
             const totalCount = await this.__getTotalCount__(options?.omitTotalCount || false);
             return {
                 items,
@@ -143,7 +145,7 @@ class QueryResult extends Query {
                 pageSize: this._limitNumber,
                 totalCount,
                 totalPages: Math.ceil(totalCount / this._limitNumber),
-                hasNext: () => this.__hasNext__(totalCount),
+                hasNext: () => hasNext,
                 hasPrev: () => this.__hasPrev__(),
                 next: async () => {
                     this._currentPage++;
@@ -174,9 +176,12 @@ class QueryResult extends Query {
             }
             let totalCount;
             let items;
+            let hasNext;
             if (this._isAggregate) {
                 const pipeline = this.__createAggregationPipeline__();
-                items = await this._collection.aggregate(pipeline, { readConcern }).toArray();
+                const aggregationCursor = this._collection.aggregate(pipeline, { readConcern });
+                items = await aggregationCursor.toArray();
+                hasNext = await aggregationCursor.hasNext();
                 totalCount = await this.__getTotalCount__(omitTotalCount || false);
             }
             else {
@@ -187,6 +192,7 @@ class QueryResult extends Query {
                 findCursor.limit(this._limitNumber);
                 findCursor.skip(this._skipNumber || 0 + ((this._currentPage - 1) * this._limitNumber));
                 items = await findCursor.toArray();
+                hasNext = await findCursor.hasNext();
                 totalCount = await this.__getTotalCount__(omitTotalCount || false);
             }
             if (suppressHooks != true) {
@@ -210,7 +216,7 @@ class QueryResult extends Query {
                 pageSize: this._limitNumber,
                 totalCount,
                 totalPages: Math.ceil(totalCount / this._limitNumber),
-                hasNext: () => this.__hasNext__(totalCount),
+                hasNext: () => hasNext,
                 hasPrev: () => this.__hasPrev__(),
                 next: async () => {
                     this._currentPage++;
@@ -296,9 +302,6 @@ class QueryResult extends Query {
         else {
             return { _createdDate: 1 };
         }
-    }
-    __hasNext__(totalCount) {
-        return this._currentPage * this._limitNumber < totalCount;
     }
     __hasPrev__() {
         return this._currentPage > 1;
