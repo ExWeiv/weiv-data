@@ -1,6 +1,6 @@
-import { WeivDataAggregate } from "./Aggregate/data_aggregate";
+import { AggregateResult } from "./Aggregate/aggregate_data";
 import { WeivDataFilter } from "./Filter/data_filter";
-import { WeivDataQuery } from './Query/data_query';
+import { QueryResult } from './Query/query_data';
 import { queryReferenced } from './Functions/QueryReferenced/queryReferenced';
 import { bulkInsert } from './Functions/bulkInsert';
 import { bulkRemove } from './Functions/bulkRemove';
@@ -32,13 +32,15 @@ import { createCollection } from './Collections/createCollection';
 import { deleteCollection } from './Collections/deleteCollection';
 import { renameCollection } from './Collections/renameCollection';
 import { listCollections } from './Collections/listCollections';
+import npm from '../package.json';
 
 /**@internal */
 import { CollectionID } from "@exweiv/weiv-data";
 
-const aggregate = (collectionId: CollectionID) => new WeivDataAggregate(collectionId);
-const query = (collectionId: CollectionID) => new WeivDataQuery(collectionId);
+const aggregate = (collectionId: CollectionID) => new AggregateResult(collectionId);
+const query = (collectionId: CollectionID) => new QueryResult(collectionId);
 const filter = () => new WeivDataFilter();
+const _version = () => npm.version;
 
 export {
     query,
@@ -74,7 +76,8 @@ export {
     createCollection,
     deleteCollection,
     renameCollection,
-    listCollections
+    listCollections,
+    _version
 }
 
 export default {
@@ -111,5 +114,6 @@ export default {
     createCollection,
     deleteCollection,
     renameCollection,
-    listCollections
+    listCollections,
+    _version
 }

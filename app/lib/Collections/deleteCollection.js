@@ -8,7 +8,7 @@ async function deleteCollection(collectionId, options, deleteOptions) {
     try {
         const { safeCollectionOptions, safeOptions } = await (0, validator_1.validateParams)({ collectionId, collectionOptions: deleteOptions, options }, ["collectionId"], "deleteCollection");
         const { suppressAuth } = safeOptions || {};
-        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth, true);
+        const { database } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         return await database.dropCollection(collectionName, safeCollectionOptions);
     }

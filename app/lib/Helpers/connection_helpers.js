@@ -27,7 +27,7 @@ exports.getCustomCacheRules = exports.loadConnectionOptions = exports.connection
 const customConnectionOptions = __importStar(require("../../../../../../../../../user-code/backend/WeivData/connection-options"));
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("./name_helpers");
-async function connectionHandler(collectionId, suppressAuth = false, returnDb) {
+async function connectionHandler(collectionId, suppressAuth = false) {
     try {
         let db;
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
@@ -38,13 +38,7 @@ async function connectionHandler(collectionId, suppressAuth = false, returnDb) {
         else {
             db = pool.db("ExWeiv");
         }
-        if (returnDb === true && db) {
-            return { memberId, database: db };
-        }
-        else {
-            const collection = db.collection(collectionName);
-            return { collection, memberId, database: db };
-        }
+        return { memberId, database: db, collection: db.collection(collectionName) };
     }
     catch (err) {
         throw new Error(`when trying to connect to database via useClient and Mongo Client ${err}`);

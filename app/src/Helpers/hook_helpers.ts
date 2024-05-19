@@ -1,5 +1,6 @@
 //@ts-ignore
 import { currentUser } from 'wix-users-backend';
+
 import { splitCollectionId } from './name_helpers';
 import type { CollectionID } from '@exweiv/weiv-data';
 

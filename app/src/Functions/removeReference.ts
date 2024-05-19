@@ -1,6 +1,7 @@
 import type { CollectionID, WeivDataOptions, ReferringItem, ReferencedItem } from '@exweiv/weiv-data';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { validateParams } from '../Helpers/validator';
+import { Document } from 'mongodb';
 
 export async function removeReference(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<void> {
     try {
@@ -15,7 +16,7 @@ export async function removeReference(collectionId: CollectionID, propertyName: 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { acknowledged, modifiedCount } = await collection.updateOne(
             { _id: safeReferringItemId },
-            { $pull: { [propertyName]: { $in: safeReferencedItemIds } }, $set: { _updatedDate: new Date() } },
+            { $pull: { [propertyName]: { $in: safeReferencedItemIds } } as Document, $set: { _updatedDate: new Date() } },
             { readConcern: readConcern ? readConcern : "local" }
         );
 

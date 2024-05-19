@@ -13,7 +13,7 @@ export async function deleteCollection(collectionId: CollectionID, options?: Wei
         );
 
         const { suppressAuth } = safeOptions || {};
-        const { database } = await connectionHandler<true>(collectionId, suppressAuth, true);
+        const { database } = await connectionHandler(collectionId, suppressAuth);
         const { collectionName } = splitCollectionId(collectionId);
         return await database.dropCollection(collectionName, safeCollectionOptions);
     } catch (err) {

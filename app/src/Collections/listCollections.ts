@@ -12,7 +12,7 @@ export async function listCollections(databaseName: string, options?: WeivDataOp
         );
 
         const { suppressAuth } = safeOptions || {};
-        const { database } = await connectionHandler<true>(`${databaseName}/`, suppressAuth, true);
+        const { database } = await connectionHandler(`${databaseName}/`, suppressAuth);
         return await database.listCollections(safeCollectionFilter, safeCollectionOptions).toArray();
     } catch (err) {
         throw new Error(`WeivData - Error when listing all collections in a database, details: ${err}`);

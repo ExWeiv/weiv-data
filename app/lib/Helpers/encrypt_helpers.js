@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSecretKey = void 0;
-const crypto_1 = __importDefault(require("crypto"));
 const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
+const crypto_1 = __importDefault(require("crypto"));
 const secret_helpers_1 = require("./secret_helpers");
 async function getSecretKey() {
     try {

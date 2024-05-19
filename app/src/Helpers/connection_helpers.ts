@@ -1,13 +1,19 @@
 //@ts-ignore
 import * as customConnectionOptions from '../../../../../../../../../user-code/backend/WeivData/connection-options';
+
 import { useClient } from '../Connection/automatic_connection_provider';
 import { splitCollectionId } from './name_helpers';
-import type { Db, MongoClientOptions } from 'mongodb/mongodb';
-import type { ConnectionHandlerResult } from './collection';
+import type { Collection, Db, MongoClientOptions } from 'mongodb/mongodb';
 import type { CollectionID } from '@exweiv/weiv-data';
 import type { Options } from 'node-cache';
 
-export async function connectionHandler<T extends boolean = false>(collectionId: CollectionID, suppressAuth: boolean = false, returnDb?: T): Promise<ConnectionHandlerResult<T>> {
+export type ConnectionHandlerResult = {
+    memberId?: string,
+    collection: Collection,
+    database: Db
+}
+
+export async function connectionHandler(collectionId: CollectionID, suppressAuth: boolean = false): Promise<ConnectionHandlerResult> {
     try {
         let db: Db | undefined;
         const { dbName, collectionName } = splitCollectionId(collectionId);
@@ -19,12 +25,7 @@ export async function connectionHandler<T extends boolean = false>(collectionId:
             db = pool.db("ExWeiv");
         }
 
-        if (returnDb === true && db) {
-            return { memberId, database: db } as T extends true ? ConnectionHandlerResult<true> : ConnectionHandlerResult<false>;
-        } else {
-            const collection = db.collection(collectionName);
-            return { collection, memberId, database: db } as T extends true ? ConnectionHandlerResult<true> : ConnectionHandlerResult<false>;
-        }
+        return { memberId, database: db, collection: db.collection(collectionName) };
     } catch (err) {
         throw new Error(`when trying to connect to database via useClient and Mongo Client ${err}`);
     }

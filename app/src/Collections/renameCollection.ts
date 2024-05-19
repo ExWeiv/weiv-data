@@ -13,7 +13,7 @@ export async function renameCollection(collectionId: CollectionID, newCollection
         );
 
         const { suppressAuth } = safeOptions || {};
-        const { database } = await connectionHandler<true>(collectionId, suppressAuth, true);
+        const { database } = await connectionHandler(collectionId, suppressAuth);
         const { collectionName } = splitCollectionId(collectionId);
         await database.renameCollection(collectionName, newCollectionName, safeCollectionOptions);
     } catch (err) {

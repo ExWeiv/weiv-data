@@ -95,7 +95,7 @@ class QueryReferencedResult {
                 this.db = pool.db("ExWeiv");
             }
             const collection = this.db.collection(this.collectionName);
-            return { collection, memberId };
+            return { collection, memberId, database: this.db };
         }
         catch (err) {
             throw new Error(`when connecting to MongoDB Client via queryReferencedResult class: ${err}`);

@@ -2,16 +2,17 @@
 
 //@ts-ignore
 import * as data_hooks from '../../../../../../../../../user-code/backend/WeivData/data';
+
 import { splitCollectionId } from '../Helpers/name_helpers';
 import type { Item, ItemID, CollectionID, Hooks } from '@exweiv/weiv-data'
-import type { WeivDataQuery } from '../Query/data_query';
 import { prepareHookContext } from '../Helpers/hook_helpers';
+import { QueryResult } from '../Query/query_data';
 
 type HookArgs<HookName> =
     HookName extends 'beforeGet' ? [item: ItemID, context: Hooks.HookContext] :
-    HookName extends 'beforeCount' ? [item: WeivDataQuery, context: Hooks.HookContext] :
+    HookName extends 'beforeCount' ? [item: QueryResult, context: Hooks.HookContext] :
     HookName extends 'afterCount' ? [item: number, context: Hooks.HookContext] :
-    HookName extends 'beforeQuery' ? [item: WeivDataQuery, context: Hooks.HookContext] :
+    HookName extends 'beforeQuery' ? [item: QueryResult, context: Hooks.HookContext] :
     HookName extends 'beforeRemove' ? [item: ItemID, context: Hooks.HookContext] :
     HookName extends 'beforeFindOne' ? [item: { propertyName: string, value: any }, context: Hooks.HookContext] :
     HookName extends 'beforeGetAndRemove' ? [item: ItemID, context: Hooks.HookContext] :
@@ -23,9 +24,9 @@ type HookArgs<HookName> =
 
 type HooksResults<HookName> =
     HookName extends 'beforeGet' ? ItemID :
-    HookName extends 'beforeCount' ? WeivDataQuery :
+    HookName extends 'beforeCount' ? QueryResult :
     HookName extends 'afterCount' ? number :
-    HookName extends 'beforeQuery' ? WeivDataQuery :
+    HookName extends 'beforeQuery' ? QueryResult :
     HookName extends 'beforeRemove' ? ItemID :
     HookName extends 'beforeFindOne' ? { propertyName: string, value: any } :
     HookName extends 'beforeGetAndRemove' ? ItemID :

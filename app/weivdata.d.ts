@@ -42,6 +42,14 @@ declare module '@exweiv/weiv-data' {
          * Enable counting total items or not. Defaults to `false`.
          */
         countItems?: boolean
+
+        /**
+         * @description
+         * By default all referenced items are sorted via _createdDate field in ascending order (1) but you can customize that stage too!
+         */
+        sort?: {
+            [propertyName: string]: 1 | -1
+        }
     }
 
     /**
@@ -129,7 +137,14 @@ declare module '@exweiv/weiv-data' {
          * 
          * > For members you don't need this option to be true, weivData always knows the member ids.
          */
-        enableVisitorId?: boolean
+        enableVisitorId?: boolean,
+
+
+        /**
+         * @description
+         * By default this is true and you can disable it if you want, when it's disabled (false) we won't fetch the total count of the items.
+         */
+        omitTotalCount?: boolean
     }
 
     /**
@@ -165,6 +180,28 @@ declare module '@exweiv/weiv-data' {
      */
     type ReferencedItem = Item | ItemID | Item[] | ItemID[];
 
+    /**
+     * @description
+     * Expected aggregation stages for MongoDB
+     */
+    type PipelineStageKey = "$addFields" | "$bucket" | "$bucketAuto" | "$changeStream" | "$changeStreamSplitLargeEvent" | "$collStats" | "$count" | "$currentOp" |
+        "$densify" | "$documents" | "$facet" | "$fill" | "$geoNear" | "$graphLookup" | "$group" | "$indexStats" | "$limit" | "$listLocalSessions" | "$listSampledQueries" |
+        "$listSearchIndexes" | "$listSessions" | "$lookup" | "$match" | "$merge" | "$out" | "$planCacheStats" | "$project" | "$redact" | "$replaceRoot" | "$replaceWith" |
+        "$sample" | "$search" | "$searchMeta" | "$set" | "$setWindowFields" | "$shardedDataDistribution" | "$skip" | "$sort" | "$sortByCount" | "$unionWith" | "$unset" | "$unwind" | "$vectorSearch";
+
+    /**
+     * @description
+     * Possible pipeline stage object
+     */
+    type PipelineStage = { [K in PipelineStageKey]?: any };
+
+    /**
+     * @description
+     * Creates an aggregation.
+     * 
+     * @param collectionId The ID of the collection to run the aggregation on.
+     * @returns An aggregation cursor.
+     */
     function aggregate(collectionId: CollectionID): WeivDataAggregate;
 
     /**
@@ -173,6 +210,13 @@ declare module '@exweiv/weiv-data' {
      * 
      * Welcome to `weivData.aggregate` function of weiv-data library. This feature/function allows you to perform calculations on your database collections data.
      * You can use aggregate with any collection! Read documentation to learn from examples.
+     * 
+     * *Note:* Unlike wix-data in weiv-data order of methods matters, if you put filter method at the begining of aggregation it'll first filter the documents and then pass to next stage, if you pass filter method
+     * after grouping then it'll act like wix-data's having method and filter the results after grouping stage. There are some optimizations made about ordering for example .limit and .skip order doesn't matter
+     * but it's always better to keep the methods order in a meaningful way so you can control the aggregation more and even optimize it with this control.
+     * 
+     * **You can also use .addStage method to add any type of stage to aggregation that mongodb driver allows in this way you can mix the default methods which works similar/same with wix-data and also native
+     * methods that mongodb provides!**
      * 
      * @example
      * // Here is a quick example from our internal systems where we can calculate average CPU scores for each cluster location:
@@ -239,17 +283,6 @@ declare module '@exweiv/weiv-data' {
 
         /**
          * @description
-         * Filters out groups from being returned from an aggregation.
-         * 
-         * > Possible BUG!!
-         * 
-         * @param filter The filter to use to filter out groups from being returned from the aggregation.
-         * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
-         */
-        having(filter: WeivDataFilter): WeivDataAggregate;
-
-        /**
-         * @description
          * Limits the number of items or groups the aggregation returns.
          * 
          * @param limit The number of items or groups to return.
@@ -284,7 +317,7 @@ declare module '@exweiv/weiv-data' {
          * @param options Options to use when running an aggregation.
          * @returns Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
          */
-        run(options?: WeivDataAggregateRunOptions): WeivDataAggregateResult;
+        run(options?: WeivDataAggregateRunOptions): Promise<WeivDataAggregateResult>;
 
         /**
          * @description
@@ -303,7 +336,16 @@ declare module '@exweiv/weiv-data' {
          * @param projectedName The name of the property in the aggregation results containing the sum.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        sum(propertyName: string, projectedName: string): WeivDataAggregate;
+        sum(propertyName: string, projectedName?: string): WeivDataAggregate;
+
+        /**
+         * @description
+         * This method allows you to add one or more pipeline stages, and mix with other methods. Checkout MongoDB aggregation pipeline for more information.
+         * 
+         * @param pipelineStage 
+         * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
+         */
+        stage(...stage: PipelineStage[]): WeivDataAggregate;
     }
 
     interface WeivDataAggregateResult {
@@ -330,6 +372,12 @@ declare module '@exweiv/weiv-data' {
          * Retrieves the next page of aggregate results.
          */
         next(): Promise<WeivDataAggregateResult>;
+
+        /**
+         * @description
+         * Returns the pipeline created when performing the aggregation.
+         */
+        readonly pipeline: import('mongodb/mongodb').Document[];
     }
 
     type WeivDataAggregateRunOptions = {
@@ -337,6 +385,12 @@ declare module '@exweiv/weiv-data' {
         readConcern?: ReadConcern
     }
 
+    /**
+     * @description
+     * Creates a filter to be used with aggregations and some other methods.
+     * 
+     * @returns A filter object.
+     */
     function filter(): WeivDataFilter;
 
     interface WeivDataFilter {
@@ -507,6 +561,13 @@ declare module '@exweiv/weiv-data' {
         startsWith(propertyName: string, string: string): WeivDataFilter;
     }
 
+    /**
+     * @description
+     * Creates a query for retrieving items from a database collection.
+     * 
+     * @param collectionId The ID of the collection to run the query on.
+     * @returns A query object.
+     */
     function query(collectionId: CollectionID): WeivDataQuery;
 
     /**
@@ -742,7 +803,7 @@ declare module '@exweiv/weiv-data' {
          * @param options An object containing options to use when processing this operation.
          * @returns Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
          */
-        find(options?: WeivDataOptionsCache): Promise<WeivDataQueryResult>;
+        find(options?: WeivDataOptions): Promise<WeivDataQueryResult>;
 
         /**
          * @description
@@ -808,6 +869,18 @@ declare module '@exweiv/weiv-data' {
          * Returns the total number of pages the query produced.
          */
         readonly totalPages: number;
+
+        /**
+         * @description
+         * Filters applied to query.
+         */
+        readonly _filters: any;
+
+        /**
+         * @description
+         * Pipeline of aggregation if used if not undefined.
+         */
+        readonly _pipeline?: PipelineStage[];
 
         /**
          * @description
@@ -1413,7 +1486,6 @@ declare module '@exweiv/weiv-data' {
          */
         type HookName = 'afterCount' | 'afterGet' | 'afterInsert' | 'afterQuery' | 'afterRemove' | 'afterUpdate' |
             'beforeCount' | 'beforeGet' | 'beforeInsert' | 'beforeQuery' | 'beforeRemove' | 'beforeUpdate' | 'onFailure' |
-
             'beforeReplace' | 'afterReplace' | 'beforeFindOne' | 'afterFindOne' | 'beforeGetAndUpdate' |
             'afterGetAndUpdate' | 'beforeGetAndReplace' | 'afterGetAndReplace' | 'beforeGetAndRemove' | 'afterGetAndRemove' |
             'beforeIncrement' | 'afterIncrement' | 'beforeMultiply' | 'afterMultiply' | 'beforePush' | 'afterPush' |
@@ -1728,4 +1800,10 @@ declare module '@exweiv/weiv-data' {
          */
         function afterPull(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
     }
+
+    /**
+     * @description
+     * Returns the current version of WeivData, for developers.
+     */
+    function _version(): string;
 }
