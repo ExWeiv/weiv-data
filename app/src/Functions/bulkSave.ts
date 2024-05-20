@@ -32,8 +32,10 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
                     })
 
                     if (editedItem) {
+                        editedItem._id = convertStringId(editedItem._id);
                         return editedItem;
                     } else {
+                        item._id = convertStringId(item._id);
                         return item;
                     }
                 } else {
@@ -80,7 +82,7 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { insertedCount, modifiedCount, insertedIds, ok } = await collection.bulkWrite(
             bulkOperations,
-            { readConcern: readConcern ? readConcern : "local", ordered: true }
+            { readConcern }
         );
 
         if (ok) {

@@ -26,7 +26,7 @@ type ValidateParameters<FName> =
     FName extends 'replace' ? { collectionId: CollectionID, item: Item, options?: WeivDataOptions } :
     FName extends 'removeReference' ? { collectionId: CollectionID, options?: WeivDataOptions, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem } :
     FName extends 'remove' ? { collectionId: CollectionID, options?: WeivDataOptions, itemId: ItemID } :
-    FName extends 'push' ? { collectionId: CollectionID, options?: WeivDataOptions, itemId: ItemID, propertyName: string, value: any } :
+    FName extends 'push' ? { collectionId: CollectionID, options?: WeivDataOptions, itemId: ItemID, propertyName: string, value: any[] } :
     FName extends 'pull' ? { collectionId: CollectionID, options?: WeivDataOptions, itemId: ItemID, propertyName: string, value: any } :
     FName extends 'native' ? { collectionId: CollectionID } :
     FName extends 'multiply' ? { collectionId: CollectionID, options?: WeivDataOptions, itemId: ItemID, propertyName: string, value: number } :
@@ -158,12 +158,14 @@ export async function validateParams<T>(params: ValidateParameters<T>, requiredP
                     break;
                 }
                 case "value": {
-                    if (value && typeof value === "object") {
+                    if (value && typeof value === "object" && isPlainObject(value)) {
                         safeValue = copyOwnPropsOnly(value);
+                    } else {
+                        safeValue = value;
                     }
                     break;
                 }
-                case 'safeItems': {
+                case 'items': {
                     if (value) {
                         if (isArray(value)) {
                             // Fix Prototype Pollution (Works on ES6 or higher only which Wix already supports)

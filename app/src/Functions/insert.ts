@@ -35,7 +35,7 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { insertedId, acknowledged } = await collection.insertOne(
             !editedItem ? modifiedItem : editedItem,
-            { readConcern: readConcern ? readConcern : "local" }
+            { readConcern }
         );
 
         if (acknowledged) {

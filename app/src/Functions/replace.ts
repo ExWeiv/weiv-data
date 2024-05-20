@@ -3,7 +3,6 @@ import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { CollectionID, Item, WeivDataOptions } from '@exweiv/weiv-data';
-import { ObjectId } from 'mongodb';
 import { validateParams } from '../Helpers/validator';
 
 export async function replace(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<Item> {
@@ -22,14 +21,13 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
 
         const itemId = !editedItem ? convertStringId(safeItem._id) : convertStringId(editedItem._id);
         const replaceItem = !editedItem ? safeItem : editedItem;
-        const filter = !itemId ? { _id: new ObjectId() } : { _id: itemId };
         delete replaceItem._id;
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const value = await collection.findOneAndReplace(
-            filter,
-            { $set: { ...replaceItem, _updatedDate: new Date() } },
-            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
+            { _id: itemId },
+            { ...replaceItem, _updatedDate: new Date() },
+            { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (value) {

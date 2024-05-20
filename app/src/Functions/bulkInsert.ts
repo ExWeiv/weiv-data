@@ -48,7 +48,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { insertedIds, insertedCount, ok } = await collection.bulkWrite(
             writeOperations,
-            { readConcern: readConcern ? readConcern : "local", ordered: true }
+            { readConcern, ordered: true }
         );
 
         const insertedItemIds = Object.keys(insertedIds).map((key: any) => {

@@ -47,7 +47,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOne(
             { _id: newItemId },
-            { readConcern: readConcern ? readConcern : "local" }
+            { readConcern }
         );
 
         if (item) {

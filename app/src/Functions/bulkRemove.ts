@@ -45,7 +45,7 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { deletedCount, ok } = await collection.bulkWrite(
             writeOperations,
-            { readConcern: readConcern ? readConcern : "local", ordered: true }
+            { readConcern, ordered: true }
         );
 
         if (ok) {

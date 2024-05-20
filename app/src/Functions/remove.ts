@@ -27,7 +27,7 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndDelete(
             { _id: newItemId },
-            { readConcern: readConcern ? readConcern : "local", includeResultMetadata: false }
+            { readConcern, includeResultMetadata: false }
         );
 
         if (item) {

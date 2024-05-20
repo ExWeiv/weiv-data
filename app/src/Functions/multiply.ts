@@ -27,7 +27,7 @@ export async function multiply(collectionId: CollectionID, itemId: ItemID, prope
         const item = await collection.findOneAndUpdate(
             { _id: convertStringId(itemId) },
             { $mul: { [editedModify.propertyName]: editedModify.value } },
-            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {

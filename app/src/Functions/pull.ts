@@ -27,7 +27,7 @@ export async function pull(collectionId: CollectionID, itemId: ItemID, propertyN
         const item = await collection.findOneAndUpdate(
             { _id: convertStringId(itemId) },
             { $pull: { [editedModify.propertyName]: editedModify.value } },
-            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {

@@ -31,7 +31,7 @@ export async function increment(collectionId: CollectionID, itemId: ItemID, prop
         const item = await collection.findOneAndUpdate(
             { _id: convertStringId(itemId) },
             { $inc: { [editedModify.propertyName]: editedModify.value } },
-            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {

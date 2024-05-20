@@ -48,7 +48,7 @@ export async function bulkUpdate(collectionId: CollectionID, items: Item[], opti
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { modifiedCount, ok } = await collection.bulkWrite(
             bulkOperations,
-            { readConcern: readConcern ? readConcern : "local", ordered: true }
+            { readConcern, ordered: true }
         );
 
         if (ok) {
