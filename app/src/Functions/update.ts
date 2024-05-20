@@ -11,7 +11,7 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         const { safeItem, safeOptions } = await validateParams<"update">({ collectionId, item, options }, ["collectionId", "item"], "update");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = safeOptions || { suppressAuth: false, suppressHooks: false };
+        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
 
         let editedItem;
         if (suppressHooks != true) {
@@ -28,7 +28,7 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         const value = await collection.findOneAndUpdate(
             { _id: itemId },
             { $set: { ...updateItem, _updatedDate: new Date() } },
-            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (value) {
