@@ -140,7 +140,6 @@ declare module '@exweiv/weiv-data' {
          */
         enableVisitorId?: boolean,
 
-
         /**
          * @description
          * By default this is true and you can disable it if you want, when it's disabled (false) we won't fetch the total count of the items.
@@ -866,8 +865,9 @@ declare module '@exweiv/weiv-data' {
         readonly totalCount: number;
 
         /**
+         * @deprecated
          * @description
-         * Returns the total number of pages the query produced.
+         * Returns the total number of pages the query produced. (will be deleted in v5 doesn't work correctly)
          */
         readonly totalPages: number;
 
@@ -1207,7 +1207,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function multiply(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options: WeivDataOptions): Promise<Item | null>;
+    function multiply(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions): Promise<Item | null>;
 
     /**
      * @description
@@ -1233,7 +1233,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function pull(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options: WeivDataOptions): Promise<Item | null>;
+    function pull(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null>;
 
     /**
      * @description
@@ -1246,7 +1246,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options: WeivDataOptions): Promise<Item | null>;
+    function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null>;
 
     /**
      * @description
