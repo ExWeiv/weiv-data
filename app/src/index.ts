@@ -35,7 +35,7 @@ import { listCollections } from './Collections/listCollections';
 import npm from '../package.json';
 
 /**@internal */
-import { CollectionID } from "@exweiv/weiv-data";
+import type { CollectionID } from "@exweiv/weiv-data";
 
 const aggregate = (collectionId: CollectionID) => new AggregateResult(collectionId);
 const query = (collectionId: CollectionID) => new QueryResult(collectionId);
