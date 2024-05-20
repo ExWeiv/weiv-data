@@ -7,8 +7,15 @@ import { isArray } from 'lodash';
 export const getReferenceItemId = (referringItem: ReferringItem): ObjectId => {
     if (referringItem) {
         let safeReferringItem: ReferringItem;
+
         if (ObjectId.isValid(referringItem as any)) {
-            return referringItem as ObjectId;
+            if (typeof referringItem === "string") {
+                return new ObjectId(referringItem);
+            } else if (typeof referringItem === "object") {
+                return referringItem as ObjectId;
+            } else {
+                throw new Error(`ItemID is not a string or ObjectID so we can't convert it to ObjectID in any way`);
+            }
         } else {
             if (typeof referringItem === "object") {
                 if (!(referringItem as Item)._id) {
@@ -20,7 +27,7 @@ export const getReferenceItemId = (referringItem: ReferringItem): ObjectId => {
                 if (typeof referringItem !== "string") {
                     throw new Error(`ItemID must be ObjectId or StringId! It cannot be something else!`);
                 }
-                return convertStringId(referringItem);;
+                return convertStringId(referringItem);
             }
         }
     } else {
