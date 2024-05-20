@@ -22,7 +22,7 @@ async function remove(collectionId, itemId, options) {
             newItemId = (0, item_helpers_1.convertStringId)(editedItemId);
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOneAndDelete({ _id: newItemId }, { readConcern: readConcern ? readConcern : "local", includeResultMetadata: false });
+        const item = await collection.findOneAndDelete({ _id: newItemId }, { readConcern, includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterRemove', [item, context]).catch((err) => {

@@ -36,7 +36,7 @@ async function bulkRemove(collectionId, itemIds, options) {
             };
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { deletedCount, ok } = await collection.bulkWrite(writeOperations, { readConcern: readConcern ? readConcern : "local", ordered: true });
+        const { deletedCount, ok } = await collection.bulkWrite(writeOperations, { readConcern, ordered: true });
         if (ok) {
             return {
                 removed: deletedCount,

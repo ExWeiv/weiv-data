@@ -26,7 +26,7 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
         const references = safeReferencedItemIds;
         const itemId = safeReferringItemId;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const totalCount = await collection.countDocuments({ _id: itemId, [propertyName]: { $in: references } }, { readConcern: readConcern ? readConcern : "local" });
+        const totalCount = await collection.countDocuments({ _id: itemId, [propertyName]: { $in: references } }, { readConcern });
         if (totalCount > 0) {
             if (enableCache) {
                 cache.set(cacheKey, true, cacheTimeout || 15);

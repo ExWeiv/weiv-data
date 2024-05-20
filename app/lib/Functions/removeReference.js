@@ -8,7 +8,7 @@ async function removeReference(collectionId, propertyName, referringItem, refere
         const { safeOptions, safeReferencedItemIds, safeReferringItemId } = await (0, validator_1.validateParams)({ collectionId, propertyName, referringItem, referencedItem, options }, ["collectionId", "propertyName", "referringItem", "referencedItem"], "removeReference");
         const { suppressAuth, readConcern } = safeOptions || {};
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { acknowledged, modifiedCount } = await collection.updateOne({ _id: safeReferringItemId }, { $pull: { [propertyName]: { $in: safeReferencedItemIds } }, $set: { _updatedDate: new Date() } }, { readConcern: readConcern ? readConcern : "local" });
+        const { acknowledged, modifiedCount } = await collection.updateOne({ _id: safeReferringItemId }, { $pull: { [propertyName]: { $in: safeReferencedItemIds } }, $set: { _updatedDate: new Date() } }, { readConcern });
         if (!acknowledged || modifiedCount <= 0) {
             throw new Error(`acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }

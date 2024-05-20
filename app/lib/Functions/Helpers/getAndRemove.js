@@ -21,7 +21,7 @@ async function getAndRemove(collectionId, itemId, options) {
             }
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOneAndDelete({ _id: editedItemId }, { readConcern: readConcern ? readConcern : "local", includeResultMetadata: false });
+        const item = await collection.findOneAndDelete({ _id: editedItemId }, { readConcern, includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndRemove", [item, context]).catch((err) => {

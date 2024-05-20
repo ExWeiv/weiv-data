@@ -23,9 +23,11 @@ async function bulkSave(collectionId, items, options) {
                         throw new Error(`beforeUpdate (bulkSave) Hook Failure ${err}`);
                     });
                     if (editedItem) {
+                        editedItem._id = (0, item_helpers_1.convertStringId)(editedItem._id);
                         return editedItem;
                     }
                     else {
+                        item._id = (0, item_helpers_1.convertStringId)(item._id);
                         return item;
                     }
                 }
@@ -71,7 +73,7 @@ async function bulkSave(collectionId, items, options) {
             }
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { insertedCount, modifiedCount, insertedIds, ok } = await collection.bulkWrite(bulkOperations, { readConcern: readConcern ? readConcern : "local", ordered: true });
+        const { insertedCount, modifiedCount, insertedIds, ok } = await collection.bulkWrite(bulkOperations, { readConcern });
         if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {

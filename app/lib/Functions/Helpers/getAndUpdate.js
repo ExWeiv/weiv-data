@@ -21,7 +21,7 @@ async function getAndUpdate(collectionId, itemId, value, options) {
         }
         delete editedItem._id;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOneAndUpdate({ _id: safeItemId }, { $set: editedItem }, { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false });
+        const item = await collection.findOneAndUpdate({ _id: safeItemId }, { $set: editedItem }, { readConcern, returnDocument: "after", includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndUpdate", [item, context]).catch((err) => {

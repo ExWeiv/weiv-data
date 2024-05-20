@@ -36,7 +36,7 @@ async function findOne(collectionId, propertyName, value, options) {
             }
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOne({ [editedFilter.propertyName]: editedFilter.value }, { readConcern: readConcern ? readConcern : "local" });
+        const item = await collection.findOne({ [editedFilter.propertyName]: editedFilter.value }, { readConcern });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterFindOne", [item, context]).catch((err) => {

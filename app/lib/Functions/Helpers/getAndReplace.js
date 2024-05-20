@@ -21,7 +21,7 @@ async function getAndReplace(collectionId, itemId, value, options) {
         }
         delete editedItem._id;
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOneAndReplace({ _id: safeItemId }, editedItem, { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false });
+        const item = await collection.findOneAndReplace({ _id: safeItemId }, editedItem, { readConcern, returnDocument: "after", includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndReplace", [item, context]).catch((err) => {

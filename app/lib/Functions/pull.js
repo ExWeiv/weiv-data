@@ -21,7 +21,7 @@ async function pull(collectionId, itemId, propertyName, value, options) {
             }
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOneAndUpdate({ _id: (0, item_helpers_1.convertStringId)(itemId) }, { $pull: { [editedModify.propertyName]: editedModify.value } }, { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false });
+        const item = await collection.findOneAndUpdate({ _id: (0, item_helpers_1.convertStringId)(itemId) }, { $pull: { [editedModify.propertyName]: editedModify.value } }, { readConcern, returnDocument: "after", includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterPull", [item, context]).catch((err) => {

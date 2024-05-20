@@ -9,7 +9,15 @@ const getReferenceItemId = (referringItem) => {
     if (referringItem) {
         let safeReferringItem;
         if (mongodb_1.ObjectId.isValid(referringItem)) {
-            return referringItem;
+            if (typeof referringItem === "string") {
+                return new mongodb_1.ObjectId(referringItem);
+            }
+            else if (typeof referringItem === "object") {
+                return referringItem;
+            }
+            else {
+                throw new Error(`ItemID is not a string or ObjectID so we can't convert it to ObjectID in any way`);
+            }
         }
         else {
             if (typeof referringItem === "object") {
@@ -24,7 +32,6 @@ const getReferenceItemId = (referringItem) => {
                     throw new Error(`ItemID must be ObjectId or StringId! It cannot be something else!`);
                 }
                 return (0, item_helpers_1.convertStringId)(referringItem);
-                ;
             }
         }
     }

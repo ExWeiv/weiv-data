@@ -38,7 +38,7 @@ async function get(collectionId, itemId, options) {
             }
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: newItemId }, { readConcern: readConcern ? readConcern : "local" });
+        const item = await collection.findOne({ _id: newItemId }, { readConcern });
         if (item) {
             if (suppressHooks != true) {
                 let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterGet', [item, context]).catch((err) => {

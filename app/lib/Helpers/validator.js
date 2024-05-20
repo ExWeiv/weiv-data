@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.copyOwnPropsOnly = exports.validateParams = void 0;
-const mongodb_1 = require("mongodb");
 const reference_helpers_1 = require("./reference_helpers");
 const item_helpers_1 = require("./item_helpers");
 const lodash_1 = require("lodash");
@@ -18,8 +17,8 @@ async function validateParams(params, requiredParams, func) {
         let safeQueryOptions;
         let safeCollectionOptions;
         let safeCollectionFilter;
-        const keys = Object.entries(params);
-        for (const [key, value] of keys) {
+        const paramKeys = Object.entries(params);
+        for (const [key, value] of paramKeys) {
             switch (key) {
                 case "collectionId": {
                     if (value) {
@@ -27,6 +26,7 @@ async function validateParams(params, requiredParams, func) {
                             throw new Error(`type of collectionId is not string!`);
                         }
                     }
+                    break;
                 }
                 case "item": {
                     if (value) {
@@ -34,9 +34,11 @@ async function validateParams(params, requiredParams, func) {
                             throw new Error(`type of item is not object!`);
                         }
                         else {
+                            console.log("Before SafeItem:", value);
                             safeItem = copyOwnPropsOnly(value);
                         }
                     }
+                    break;
                 }
                 case "options": {
                     if (value) {
@@ -47,12 +49,15 @@ async function validateParams(params, requiredParams, func) {
                             safeOptions = copyOwnPropsOnly(value);
                         }
                     }
+                    break;
                 }
                 case "referringItem": {
                     safeReferringItemId = (0, reference_helpers_1.getReferenceItemId)(value);
+                    break;
                 }
                 case "referencedItem": {
                     safeReferencedItemIds = (0, reference_helpers_1.getReferencesItemIds)(value);
+                    break;
                 }
                 case "propertyName": {
                     if (value) {
@@ -60,26 +65,24 @@ async function validateParams(params, requiredParams, func) {
                             throw new Error(`propertyName must be string!`);
                         }
                     }
+                    break;
                 }
                 case "itemId": {
                     if (value) {
-                        if (mongodb_1.ObjectId.isValid(value)) {
-                            safeItemId = value;
-                        }
-                        else {
-                            if (typeof value !== "string") {
-                                throw new Error(`itemId must be string if not ObjectId`);
-                            }
-                            safeItemId = (0, item_helpers_1.convertStringId)(value);
-                        }
+                        safeItemId = (0, item_helpers_1.convertStringId)(value);
                     }
+                    break;
                 }
                 case "value": {
-                    if (value && typeof value === "object") {
+                    if (value && typeof value === "object" && isPlainObject(value)) {
                         safeValue = copyOwnPropsOnly(value);
                     }
+                    else {
+                        safeValue = value;
+                    }
+                    break;
                 }
-                case 'safeItems': {
+                case 'items': {
                     if (value) {
                         if ((0, lodash_1.isArray)(value)) {
                             safeItems = value.map((item) => {
@@ -90,26 +93,20 @@ async function validateParams(params, requiredParams, func) {
                             throw new Error(`type of items is not array!`);
                         }
                     }
+                    break;
                 }
                 case 'itemIds': {
                     if (value) {
                         if ((0, lodash_1.isArray)(value)) {
                             safeItemIds = value.map((itemId) => {
-                                if (mongodb_1.ObjectId.isValid(itemId)) {
-                                    return itemId;
-                                }
-                                else {
-                                    if (typeof itemId !== "string") {
-                                        throw new Error(`itemId must be string if not ObjectId`);
-                                    }
-                                    return (0, item_helpers_1.convertStringId)(itemId);
-                                }
+                                return (0, item_helpers_1.convertStringId)(itemId);
                             });
                         }
                         else {
                             throw new Error(`itemIds must be an array`);
                         }
                     }
+                    break;
                 }
                 case 'queryOptions': {
                     if (value) {
@@ -120,6 +117,7 @@ async function validateParams(params, requiredParams, func) {
                             safeQueryOptions = copyOwnPropsOnly(value);
                         }
                     }
+                    break;
                 }
                 case 'collectionOptions': {
                     if (value) {
@@ -130,6 +128,7 @@ async function validateParams(params, requiredParams, func) {
                             safeCollectionOptions = copyOwnPropsOnly(value);
                         }
                     }
+                    break;
                 }
                 case 'collectionFilter': {
                     if (value) {
@@ -140,6 +139,16 @@ async function validateParams(params, requiredParams, func) {
                             safeCollectionFilter = copyOwnPropsOnly(value);
                         }
                     }
+                    break;
+                }
+                case "suppressAuth": {
+                    if (typeof value !== "boolean") {
+                        throw new Error(`type of suppressAuth is not boolean!`);
+                    }
+                    break;
+                }
+                default: {
+                    break;
                 }
             }
             if (requiredParams.includes(key)) {
@@ -200,11 +209,31 @@ function checkItemIds(params, func) {
 }
 function copyOwnPropsOnly(src) {
     const result = Object.create(null);
+    function copyObject(value) {
+        if (isPlainObject(value)) {
+            return copyOwnPropsOnly(value);
+        }
+        else {
+            return value;
+        }
+    }
     for (const key of Object.getOwnPropertyNames(src)) {
-        if (key !== "__proto__") {
-            result[key] = src[key];
+        if (key !== "__proto__" || "constructor" || "prototype") {
+            if (typeof src[key] === "object") {
+                result[key] = copyObject(src[key]);
+            }
+            else {
+                result[key] = src[key];
+            }
         }
     }
     return result;
 }
 exports.copyOwnPropsOnly = copyOwnPropsOnly;
+function isPlainObject(value) {
+    if (typeof value !== 'object' || value === null)
+        return false;
+    if (Array.isArray(value))
+        return false;
+    return value.constructor === Object;
+}

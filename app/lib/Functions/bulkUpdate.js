@@ -38,7 +38,7 @@ async function bulkUpdate(collectionId, items, options) {
             };
         });
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { modifiedCount, ok } = await collection.bulkWrite(bulkOperations, { readConcern: readConcern ? readConcern : "local", ordered: true });
+        const { modifiedCount, ok } = await collection.bulkWrite(bulkOperations, { readConcern, ordered: true });
         if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
