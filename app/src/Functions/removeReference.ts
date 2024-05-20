@@ -17,7 +17,7 @@ export async function removeReference(collectionId: CollectionID, propertyName: 
         const { acknowledged, modifiedCount } = await collection.updateOne(
             { _id: safeReferringItemId },
             { $pull: { [propertyName]: { $in: safeReferencedItemIds } } as Document, $set: { _updatedDate: new Date() } },
-            { readConcern: readConcern ? readConcern : "local" }
+            { readConcern }
         );
 
         if (!acknowledged || modifiedCount <= 0) {
