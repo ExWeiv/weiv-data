@@ -32,7 +32,7 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
         const item = await collection.findOneAndReplace(
             { _id: safeItemId },
             editedItem,
-            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {

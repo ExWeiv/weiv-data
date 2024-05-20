@@ -30,7 +30,7 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndDelete(
             { _id: editedItemId },
-            { readConcern: readConcern ? readConcern : "local", includeResultMetadata: false }
+            { readConcern, includeResultMetadata: false }
         );
 
         if (item) {

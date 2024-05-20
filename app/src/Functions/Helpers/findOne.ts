@@ -44,7 +44,7 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOne(
             { [editedFilter.propertyName]: editedFilter.value },
-            { readConcern: readConcern ? readConcern : "local" }
+            { readConcern }
         );
 
         if (item) {
