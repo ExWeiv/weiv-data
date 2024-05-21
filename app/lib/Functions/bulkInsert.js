@@ -6,6 +6,7 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const validator_1 = require("../Helpers/validator");
+const item_helpers_1 = require("../Helpers/item_helpers");
 async function bulkInsert(collectionId, items, options) {
     try {
         const { safeItems, safeOptions } = await (0, validator_1.validateParams)({ collectionId, items, options }, ["collectionId", "items"], "bulkInsert");
@@ -37,11 +38,14 @@ async function bulkInsert(collectionId, items, options) {
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
         const { insertedIds, insertedCount, ok } = await collection.bulkWrite(writeOperations, { readConcern, ordered: true });
         const insertedItemIds = Object.keys(insertedIds).map((key) => {
-            return insertedIds[key];
+            return (0, item_helpers_1.convertObjectId)(insertedIds[key]);
         });
         if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
+                    if (item._id) {
+                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
+                    }
                     const editedInsertItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [item, context]).catch((err) => {
                         throw new Error(`afterInsert (bulkInsert) Hook Failure ${err}`);
                     });

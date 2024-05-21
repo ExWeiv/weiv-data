@@ -3,7 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AggregateResult = void 0;
 const lodash_1 = require("lodash");
 const validator_1 = require("../Helpers/validator");
+const mongodb_1 = require("mongodb");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
+const item_helpers_1 = require("../Helpers/item_helpers");
 class Aggregate {
     constructor(collectionId) {
         this._pipeline = new Array();
@@ -209,7 +211,12 @@ class AggregateResult extends Aggregate {
                 }
             };
             return {
-                items,
+                items: items.map((item) => {
+                    if (mongodb_1.ObjectId.isValid(item._id)) {
+                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
+                    }
+                    return item;
+                }),
                 length,
                 hasNext,
                 next,

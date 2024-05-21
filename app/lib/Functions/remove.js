@@ -37,10 +37,21 @@ async function remove(collectionId, itemId, options) {
                     throw new Error(`afterRemove Hook Failure ${err}`);
                 });
                 if (editedItem) {
+                    if (editedItem._id) {
+                        editedItem._id = (0, item_helpers_1.convertObjectId)(editedItem._id);
+                    }
                     return editedItem;
                 }
             }
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: (0, item_helpers_1.convertObjectId)(item._id)
+                };
+            }
+            else {
+                return item;
+            }
         }
         else {
             return null;

@@ -50,6 +50,9 @@ async function bulkUpdate(collectionId, items, options) {
         if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
+                    if (item._id) {
+                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
+                    }
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [item, context]).catch((err) => {
                         throw new Error(`afterUpdate (bulkUpdate) Hook Failure ${err}`);
                     });

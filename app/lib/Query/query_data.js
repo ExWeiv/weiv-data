@@ -7,6 +7,7 @@ const validator_1 = require("../Helpers/validator");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
+const item_helpers_1 = require("../Helpers/item_helpers");
 class Query extends data_filter_1.WeivDataFilter {
     constructor(collectionId) {
         super();
@@ -139,7 +140,12 @@ class QueryResult extends Query {
             const hasNext = await aggregationCursor.hasNext();
             const totalCount = await this.__getTotalCount__(options?.omitTotalCount || false);
             return {
-                items,
+                items: items.map((item) => {
+                    if (item._id) {
+                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
+                    }
+                    return item;
+                }),
                 length: items.length,
                 currentPage: this._currentPage,
                 pageSize: this._limitNumber,
@@ -210,7 +216,12 @@ class QueryResult extends Query {
                 items = await Promise.all(hookedItems);
             }
             return {
-                items,
+                items: items.map((item) => {
+                    if (item._id) {
+                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
+                    }
+                    return item;
+                }),
                 length: items.length,
                 currentPage: this._currentPage,
                 pageSize: this._limitNumber,

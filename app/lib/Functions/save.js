@@ -51,9 +51,15 @@ async function save(collectionId, item, options) {
                     throw new Error(`afterInsert Hook Failure ${err}`);
                 });
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = (0, item_helpers_1.convertObjectId)(editedResult._id);
+                    }
                     return { item: editedResult, upsertedId };
                 }
                 else {
+                    if (returnedItem._id) {
+                        returnedItem._id = (0, item_helpers_1.convertObjectId)(returnedItem._id);
+                    }
                     return { item: returnedItem, upsertedId };
                 }
             }
@@ -62,9 +68,15 @@ async function save(collectionId, item, options) {
                     throw new Error(`afterUpdate Hook Failure ${err}`);
                 });
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = (0, item_helpers_1.convertObjectId)(editedResult._id);
+                    }
                     return { item: editedResult };
                 }
                 else {
+                    if (returnedItem._id) {
+                        returnedItem._id = (0, item_helpers_1.convertObjectId)(returnedItem._id);
+                    }
                     return { item: returnedItem };
                 }
             }

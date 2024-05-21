@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.QueryReferencedResult = void 0;
 const query_referenced_helpers_1 = require("../../Helpers/query_referenced_helpers");
 const connection_helpers_1 = require("../../Helpers/connection_helpers");
+const item_helpers_1 = require("../../Helpers/item_helpers");
 class QueryReferencedResult {
     constructor(collectionId, targetCollectionId, itemId, propertyName, queryOptions, options) {
         this.currentPage = 0;
@@ -29,7 +30,12 @@ class QueryReferencedResult {
             const hasNext = await aggregate.hasNext();
             const { referencedItems, totalItems } = items[0];
             return {
-                items: referencedItems,
+                items: referencedItems.map((item) => {
+                    if (item._id) {
+                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
+                    }
+                    return item;
+                }),
                 totalCount: totalItems,
                 hasNext: () => hasNext,
                 hasPrev: () => this.currentPage > 0,

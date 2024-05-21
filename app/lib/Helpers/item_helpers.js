@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertStringId = void 0;
+exports.convertObjectId = exports.convertStringId = void 0;
 const mongodb_1 = require("mongodb");
 function convertStringId(_id, create = false) {
     if (!_id) {
@@ -30,3 +30,15 @@ function convertStringId(_id, create = false) {
     }
 }
 exports.convertStringId = convertStringId;
+function convertObjectId(_id) {
+    if (_id) {
+        if (typeof _id === "string") {
+            return _id;
+        }
+        return _id.toHexString();
+    }
+    else {
+        throw new Error(`WeivData - ObjectId -> String converter not working!`);
+    }
+}
+exports.convertObjectId = convertObjectId;

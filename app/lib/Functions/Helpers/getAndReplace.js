@@ -6,6 +6,7 @@ const hook_helpers_1 = require("../../Helpers/hook_helpers");
 const hook_manager_1 = require("../../Hooks/hook_manager");
 const validator_1 = require("../../Helpers/validator");
 const member_id_helpers_1 = require("../../Helpers/member_id_helpers");
+const item_helpers_1 = require("../../Helpers/item_helpers");
 async function getAndReplace(collectionId, itemId, value, options) {
     try {
         const { safeItemId, safeValue, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemId, value, options }, ["collectionId", "itemId", "value"], "getAndReplace");
@@ -36,10 +37,21 @@ async function getAndReplace(collectionId, itemId, value, options) {
                     throw new Error(`afterGetAndReplace Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = (0, item_helpers_1.convertObjectId)(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: (0, item_helpers_1.convertObjectId)(item._id)
+                };
+            }
+            else {
+                return item;
+            }
         }
         else {
             return undefined;

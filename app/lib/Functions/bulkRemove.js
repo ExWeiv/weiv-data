@@ -45,7 +45,7 @@ async function bulkRemove(collectionId, itemIds, options) {
         if (ok) {
             return {
                 removed: deletedCount,
-                removedItemIds: editedItemIds
+                removedItemIds: editedItemIds.map(id => (0, item_helpers_1.convertObjectId)(id))
             };
         }
         else {

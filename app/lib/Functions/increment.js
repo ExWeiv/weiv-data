@@ -28,10 +28,21 @@ async function increment(collectionId, itemId, propertyName, value, options) {
                     throw new Error(`afterIncrement Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = (0, item_helpers_1.convertObjectId)(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: (0, item_helpers_1.convertObjectId)(item._id)
+                };
+            }
+            else {
+                return item;
+            }
         }
         else {
             return null;

@@ -36,10 +36,21 @@ async function update(collectionId, item, options) {
                     throw new Error(`afterUpdate Hook Failure ${err}`);
                 });
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = (0, item_helpers_1.convertObjectId)(editedResult._id);
+                    }
                     return editedResult;
                 }
             }
-            return value;
+            if (value._id) {
+                return {
+                    ...value,
+                    _id: (0, item_helpers_1.convertObjectId)(value._id)
+                };
+            }
+            else {
+                return value;
+            }
         }
         else {
             throw new Error(`returned value has problem value: ${value}`);

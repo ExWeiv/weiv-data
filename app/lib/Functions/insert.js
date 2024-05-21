@@ -7,6 +7,7 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const validator_1 = require("../Helpers/validator");
+const item_helpers_1 = require("../Helpers/item_helpers");
 async function insert(collectionId, item, options) {
     try {
         const { safeItem, safeOptions } = await (0, validator_1.validateParams)({ collectionId, item, options }, ["collectionId", "item"], "insert");
@@ -32,10 +33,22 @@ async function insert(collectionId, item, options) {
                     throw new Error(`afterInsert Hook Failure ${err}`);
                 });
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = (0, item_helpers_1.convertObjectId)(editedResult._id);
+                    }
                     return editedResult;
                 }
             }
-            return { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
+            const item = { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: (0, item_helpers_1.convertObjectId)(item._id)
+                };
+            }
+            else {
+                return item;
+            }
         }
         else {
             throw new Error(`acknowledged: ${acknowledged}`);

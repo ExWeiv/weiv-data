@@ -9,6 +9,7 @@ const hook_helpers_1 = require("../../Helpers/hook_helpers");
 const hook_manager_1 = require("../../Hooks/hook_manager");
 const node_cache_1 = __importDefault(require("node-cache"));
 const validator_1 = require("../../Helpers/validator");
+const item_helpers_1 = require("../../Helpers/item_helpers");
 const cache = new node_cache_1.default({
     checkperiod: 5,
     useClones: false,
@@ -43,13 +44,31 @@ async function findOne(collectionId, propertyName, value, options) {
                     throw new Error(`afterFindOne Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = (0, item_helpers_1.convertObjectId)(modifiedResult._id);
+                    }
+                    if (enableCache) {
+                        cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, modifiedResult, cacheTimeout || 15);
+                    }
                     return modifiedResult;
                 }
             }
-            if (enableCache) {
-                cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, item, cacheTimeout || 15);
+            if (item._id) {
+                const _id = (0, item_helpers_1.convertObjectId)(item._id);
+                if (enableCache) {
+                    cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, { ...item, _id }, cacheTimeout || 15);
+                }
+                return {
+                    ...item,
+                    _id
+                };
             }
-            return item;
+            else {
+                if (enableCache) {
+                    cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, item, cacheTimeout || 15);
+                }
+                return item;
+            }
         }
         else {
             return undefined;
