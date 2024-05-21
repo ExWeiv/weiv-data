@@ -1,11 +1,13 @@
 import { connectionHandler } from '../../Helpers/connection_helpers';
-import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
+import type { CollectionID, Item, ItemID, WeivDataOptionsOwner } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../../Helpers/hook_helpers';
 import { runDataHook } from '../../Hooks/hook_manager';
-import { convertStringId } from '../../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../../Helpers/item_helpers';
 import { validateParams } from '../../Helpers/validator';
+import type { ObjectId } from 'mongodb';
+import { getOwnerId } from '../../Helpers/member_id_helpers';
 
-export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | undefined> {
+export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsOwner): Promise<Item | undefined> {
     try {
         const { safeItemId, safeOptions } = await validateParams<"getAndRemove">(
             { collectionId, itemId, options },
@@ -14,7 +16,7 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
 
         let editedItemId = safeItemId;
         if (suppressHooks != true) {
@@ -27,10 +29,18 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
             }
         }
 
+        const filter: { _id: ObjectId, _owner?: string } = { _id: editedItemId };
+        if (onlyOwner) {
+            const currentMemberId = await getOwnerId();
+            if (currentMemberId) {
+                filter._owner = currentMemberId;
+            }
+        }
+
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndDelete(
-            { _id: editedItemId },
-            { readConcern: readConcern ? readConcern : "local", includeResultMetadata: false }
+            filter,
+            { readConcern, includeResultMetadata: false }
         );
 
         if (item) {
@@ -40,11 +50,21 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
                 });
 
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = convertObjectId(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
 
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: convertObjectId(item._id)
+                }
+            } else {
+                return item;
+            }
         } else {
             return undefined;
         }

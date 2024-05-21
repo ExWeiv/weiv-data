@@ -1,11 +1,12 @@
-import { CollectionID, IncludeObject, Item, PipelineStage, WeivDataOptions, WeivDataQueryResult } from "@exweiv/weiv-data";
+import { CollectionID, IncludeObject, Item, PipelineStage, WeivDataOptions, WeivDataOptionsQuery, WeivDataQueryResult } from "@exweiv/weiv-data";
 import { WeivDataFilter } from '../Filter/data_filter'
-import { isArray, merge } from "lodash";
+import { isArray, isEmpty, merge } from "lodash";
 import { copyOwnPropsOnly } from "../Helpers/validator";
 import { connectionHandler } from "../Helpers/connection_helpers";
 import { Collection, Db } from "mongodb";
 import { prepareHookContext } from "../Helpers/hook_helpers";
 import { runDataHook } from "../Hooks/hook_manager";
+import { convertObjectId } from "../Helpers/item_helpers";
 
 class Query extends WeivDataFilter {
     protected readonly _collectionId: CollectionID;
@@ -154,7 +155,7 @@ export class QueryResult extends Query {
         }
     }
 
-    async distnict(propertyName: string, options?: WeivDataOptions): Promise<WeivDataQueryResult> {
+    async distnict(propertyName: string, options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult> {
         try {
             if (!propertyName || typeof propertyName !== "string") {
                 throw new Error(`WeivData - propertyName is not string or not a valid value!`);
@@ -181,7 +182,12 @@ export class QueryResult extends Query {
             const totalCount = await this.__getTotalCount__(options?.omitTotalCount || false);
 
             return {
-                items,
+                items: items.map((item) => {
+                    if (item._id) {
+                        item._id = convertObjectId(item._id);
+                    }
+                    return item;
+                }),
                 length: items.length,
                 currentPage: this._currentPage,
                 pageSize: this._limitNumber,
@@ -205,7 +211,7 @@ export class QueryResult extends Query {
         }
     }
 
-    async find(options?: WeivDataOptions): Promise<WeivDataQueryResult> {
+    async find(options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult> {
         try {
             // Clear prototype pollution
             options = copyOwnPropsOnly(options || {});
@@ -273,7 +279,12 @@ export class QueryResult extends Query {
             }
 
             return {
-                items,
+                items: items.map((item) => {
+                    if (item._id) {
+                        item._id = convertObjectId(item._id);
+                    }
+                    return item;
+                }),
                 length: items.length,
                 currentPage: this._currentPage,
                 pageSize: this._limitNumber,
@@ -293,7 +304,9 @@ export class QueryResult extends Query {
                 _pipeline: this._isAggregate ? this.__createAggregationPipeline__() : undefined
             }
         } catch (err) {
-            throw new Error(`WeivData - Error when using find with weivData.query: ${err}`);
+            console.error('WeivData - Error pipeline: ', this.__createAggregationPipeline__());
+            console.error('WeivData - Error query: ', this._filters);
+            throw new Error(`WeivData - Error when using find with weivData.query, details: ${err}`);
         }
     }
 
@@ -318,7 +331,9 @@ export class QueryResult extends Query {
         const pipeline: PipelineStage[] = [];
 
         // Add filters to pipeline!
-        pipeline.push(this._filters);
+        if (!isEmpty(this._filters.$match)) {
+            pipeline.push(this._filters);
+        }
 
         // Add all includes (joins / lookups)
         for (const include of this._includes) {
@@ -373,7 +388,9 @@ export class QueryResult extends Query {
         }
 
         // Push included fields to pipeline with project
-        pipeline.push({ $project: fields });
+        if (!isEmpty(fields)) {
+            pipeline.push({ $project: fields });
+        }
 
         // Add skip and limit stages into pipeline
         pipeline.push({ $skip: this._skipNumber || 0 + ((this._currentPage - 1) * this._limitNumber) });

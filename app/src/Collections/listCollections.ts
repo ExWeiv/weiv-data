@@ -1,17 +1,15 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { WeivDataOptions } from '@exweiv/weiv-data';
 import type { Document, ListCollectionsOptions, CollectionInfo } from 'mongodb/mongodb';
 import { validateParams } from '../Helpers/validator';
 
-export async function listCollections(databaseName: string, options?: WeivDataOptions, filter?: Document, listOptions?: ListCollectionsOptions): Promise<CollectionInfo[]> {
+export async function listCollections(databaseName: string, suppressAuth?: boolean, filter?: Document, listOptions?: ListCollectionsOptions): Promise<CollectionInfo[]> {
     try {
-        const { safeCollectionFilter, safeCollectionOptions, safeOptions } = await validateParams<"listCollections">(
-            { databaseName, options, collectionFilter: filter, collectionOptions: listOptions },
+        const { safeCollectionFilter, safeCollectionOptions } = await validateParams<"listCollections">(
+            { databaseName, suppressAuth, collectionFilter: filter, collectionOptions: listOptions },
             ["databaseName"],
             "listCollections"
         );
 
-        const { suppressAuth } = safeOptions || {};
         const { database } = await connectionHandler(`${databaseName}/`, suppressAuth);
         return await database.listCollections(safeCollectionFilter, safeCollectionOptions).toArray();
     } catch (err) {

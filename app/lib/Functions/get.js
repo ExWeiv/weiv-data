@@ -38,20 +38,38 @@ async function get(collectionId, itemId, options) {
             }
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOne({ _id: newItemId }, { readConcern: readConcern ? readConcern : "local" });
+        const item = await collection.findOne({ _id: newItemId }, { readConcern });
         if (item) {
             if (suppressHooks != true) {
                 let editedItem = await (0, hook_manager_1.runDataHook)(collectionId, 'afterGet', [item, context]).catch((err) => {
                     throw new Error(`afterGet Hook Failure ${err}`);
                 });
                 if (editedItem) {
+                    if (editedItem._id) {
+                        editedItem._id = (0, item_helpers_1.convertObjectId)(editedItem._id);
+                    }
+                    if (enableCache) {
+                        cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, editedItem, cacheTimeout || 15);
+                    }
                     return editedItem;
                 }
             }
-            if (enableCache) {
-                cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
+            if (item._id) {
+                const _id = (0, item_helpers_1.convertObjectId)(item._id);
+                if (enableCache) {
+                    cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, { ...item, _id }, cacheTimeout || 15);
+                }
+                return {
+                    ...item,
+                    _id
+                };
             }
-            return item;
+            else {
+                if (enableCache) {
+                    cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
+                }
+                return item;
+            }
         }
         else {
             return null;

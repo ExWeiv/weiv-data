@@ -4,6 +4,7 @@ import { prepareHookContext } from '../../Helpers/hook_helpers';
 import { runDataHook } from '../../Hooks/hook_manager';
 import NodeCache from 'node-cache';
 import { validateParams } from '../../Helpers/validator';
+import { convertObjectId } from '../../Helpers/item_helpers';
 
 const cache = new NodeCache({
     checkperiod: 5,
@@ -44,7 +45,7 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOne(
             { [editedFilter.propertyName]: editedFilter.value },
-            { readConcern: readConcern ? readConcern : "local" }
+            { readConcern }
         );
 
         if (item) {
@@ -54,15 +55,36 @@ export async function findOne(collectionId: CollectionID, propertyName: string, 
                 });
 
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = convertObjectId(modifiedResult._id);
+                    }
+
+                    if (enableCache) {
+                        cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, modifiedResult, cacheTimeout || 15);
+                    }
+
                     return modifiedResult;
                 }
             }
 
-            if (enableCache) {
-                cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, item, cacheTimeout || 15);
-            }
+            if (item._id) {
+                const _id = convertObjectId(item._id);
 
-            return item;
+                if (enableCache) {
+                    cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, { ...item, _id }, cacheTimeout || 15);
+                }
+
+                return {
+                    ...item,
+                    _id
+                }
+            } else {
+                if (enableCache) {
+                    cache.set(`${collectionId}-${editedFilter.propertyName}-${editedFilter.value ? JSON.stringify(editedFilter.value) : "{}"}`, item, cacheTimeout || 15);
+                }
+
+                return item;
+            }
         } else {
             return undefined;
         }

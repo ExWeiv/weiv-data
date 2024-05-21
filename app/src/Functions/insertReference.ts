@@ -19,7 +19,7 @@ export async function insertReference(collectionId: CollectionID, propertyName: 
         const { acknowledged, modifiedCount } = await collection.updateOne(
             { _id: itemId },
             { $push: { [propertyName]: { $each: references } } as Document, $set: { _updatedDate: new Date() } },
-            { readConcern: readConcern ? readConcern : "local" }
+            { readConcern }
         );
 
         if (!acknowledged || modifiedCount <= 0) {

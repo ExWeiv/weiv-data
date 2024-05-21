@@ -7,6 +7,7 @@ const validator_1 = require("../Helpers/validator");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
+const item_helpers_1 = require("../Helpers/item_helpers");
 class Query extends data_filter_1.WeivDataFilter {
     constructor(collectionId) {
         super();
@@ -139,7 +140,12 @@ class QueryResult extends Query {
             const hasNext = await aggregationCursor.hasNext();
             const totalCount = await this.__getTotalCount__(options?.omitTotalCount || false);
             return {
-                items,
+                items: items.map((item) => {
+                    if (item._id) {
+                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
+                    }
+                    return item;
+                }),
                 length: items.length,
                 currentPage: this._currentPage,
                 pageSize: this._limitNumber,
@@ -210,7 +216,12 @@ class QueryResult extends Query {
                 items = await Promise.all(hookedItems);
             }
             return {
-                items,
+                items: items.map((item) => {
+                    if (item._id) {
+                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
+                    }
+                    return item;
+                }),
                 length: items.length,
                 currentPage: this._currentPage,
                 pageSize: this._limitNumber,
@@ -231,7 +242,9 @@ class QueryResult extends Query {
             };
         }
         catch (err) {
-            throw new Error(`WeivData - Error when using find with weivData.query: ${err}`);
+            console.error('WeivData - Error pipeline: ', this.__createAggregationPipeline__());
+            console.error('WeivData - Error query: ', this._filters);
+            throw new Error(`WeivData - Error when using find with weivData.query, details: ${err}`);
         }
     }
     constructor(collectionId) {
@@ -250,7 +263,9 @@ class QueryResult extends Query {
     }
     __createAggregationPipeline__() {
         const pipeline = [];
-        pipeline.push(this._filters);
+        if (!(0, lodash_1.isEmpty)(this._filters.$match)) {
+            pipeline.push(this._filters);
+        }
         for (const include of this._includes) {
             const lookUpObj = {
                 $lookup: {
@@ -290,7 +305,9 @@ class QueryResult extends Query {
         for (const field of this._fields) {
             (0, lodash_1.merge)(fields, { [field]: 1 });
         }
-        pipeline.push({ $project: fields });
+        if (!(0, lodash_1.isEmpty)(fields)) {
+            pipeline.push({ $project: fields });
+        }
         pipeline.push({ $skip: this._skipNumber || 0 + ((this._currentPage - 1) * this._limitNumber) });
         pipeline.push({ $limit: this._limitNumber || 50 });
         return pipeline;

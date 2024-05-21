@@ -2,8 +2,7 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
-import { convertStringId } from '../Helpers/item_helpers';
-import { isArray } from 'lodash';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { validateParams } from '../Helpers/validator';
 
 export async function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null> {
@@ -27,8 +26,8 @@ export async function push(collectionId: CollectionID, itemId: ItemID, propertyN
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndUpdate(
             { _id: convertStringId(itemId) },
-            { $push: { [editedModify.propertyName]: isArray(editedModify.value) ? { $each: editedModify.value } : editedModify.value } },
-            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
+            { $push: { [editedModify.propertyName]: editedModify.value } },
+            { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {
@@ -38,11 +37,21 @@ export async function push(collectionId: CollectionID, itemId: ItemID, propertyN
                 });
 
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = convertObjectId(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
 
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: convertObjectId(item._id)
+                }
+            } else {
+                return item;
+            }
         } else {
             return null;
         }

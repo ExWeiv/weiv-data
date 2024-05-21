@@ -3,10 +3,11 @@ import { getOwnerId } from '../Helpers/member_id_helpers';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import type { CollectionID, Item, WeivDataOptions } from '@exweiv/weiv-data';
+import type { CollectionID, Item, WeivDataOptionsWrite } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
+import { convertObjectId } from '../Helpers/item_helpers';
 
-export async function insert(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<Item> {
+export async function insert(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWrite): Promise<Item> {
     try {
         const { safeItem, safeOptions } = await validateParams<"insert">(
             { collectionId, item, options },
@@ -35,7 +36,7 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { insertedId, acknowledged } = await collection.insertOne(
             !editedItem ? modifiedItem : editedItem,
-            { readConcern: readConcern ? readConcern : "local" }
+            { readConcern }
         );
 
         if (acknowledged) {
@@ -45,11 +46,23 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
                 });
 
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = convertObjectId(editedResult._id);
+                    }
                     return editedResult;
                 }
             }
 
-            return { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
+            const item = { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
+
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: convertObjectId(item._id)
+                }
+            } else {
+                return item;
+            }
         } else {
             throw new Error(`acknowledged: ${acknowledged}`);
         }

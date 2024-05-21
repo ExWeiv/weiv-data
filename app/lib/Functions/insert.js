@@ -7,6 +7,7 @@ const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const validator_1 = require("../Helpers/validator");
+const item_helpers_1 = require("../Helpers/item_helpers");
 async function insert(collectionId, item, options) {
     try {
         const { safeItem, safeOptions } = await (0, validator_1.validateParams)({ collectionId, item, options }, ["collectionId", "item"], "insert");
@@ -25,17 +26,29 @@ async function insert(collectionId, item, options) {
             });
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { insertedId, acknowledged } = await collection.insertOne(!editedItem ? modifiedItem : editedItem, { readConcern: readConcern ? readConcern : "local" });
+        const { insertedId, acknowledged } = await collection.insertOne(!editedItem ? modifiedItem : editedItem, { readConcern });
         if (acknowledged) {
             if (suppressHooks != true) {
                 const editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [{ ...!editedItem ? modifiedItem : editedItem, _id: insertedId }, context]).catch((err) => {
                     throw new Error(`afterInsert Hook Failure ${err}`);
                 });
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = (0, item_helpers_1.convertObjectId)(editedResult._id);
+                    }
                     return editedResult;
                 }
             }
-            return { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
+            const item = { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: (0, item_helpers_1.convertObjectId)(item._id)
+                };
+            }
+            else {
+                return item;
+            }
         }
         else {
             throw new Error(`acknowledged: ${acknowledged}`);

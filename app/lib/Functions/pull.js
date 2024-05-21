@@ -21,17 +21,28 @@ async function pull(collectionId, itemId, propertyName, value, options) {
             }
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOneAndUpdate({ _id: (0, item_helpers_1.convertStringId)(itemId) }, { $pull: { [editedModify.propertyName]: editedModify.value } }, { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false });
+        const item = await collection.findOneAndUpdate({ _id: (0, item_helpers_1.convertStringId)(itemId) }, { $pull: { [editedModify.propertyName]: editedModify.value } }, { readConcern, returnDocument: "after", includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterPull", [item, context]).catch((err) => {
                     throw new Error(`afterPull Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = (0, item_helpers_1.convertObjectId)(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: (0, item_helpers_1.convertObjectId)(item._id)
+                };
+            }
+            else {
+                return item;
+            }
         }
         else {
             return null;

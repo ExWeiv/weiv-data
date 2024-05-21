@@ -1,22 +1,24 @@
-import type { CollectionID, Item, SaveResult, WeivDataOptions } from '@exweiv/weiv-data';
+import type { CollectionID, Item, SaveResult, WeivDataOptionsWriteOwner } from '@exweiv/weiv-data';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { ObjectId } from 'mongodb';
 import { validateParams } from '../Helpers/validator';
+import { getOwnerId } from '../Helpers/member_id_helpers';
 
-export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<SaveResult> {
+export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWriteOwner): Promise<SaveResult> {
     try {
         // Validate Params
         const { safeOptions, safeItem } = await validateParams<"save">({ collectionId, item, options }, ["collectionId", "item"], "save");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId } = safeOptions || {};
 
         // Convert ID to ObjectId if exist
         let editedItem;
         if (safeItem._id && typeof safeItem._id === "string") {
+            // Update
             safeItem._id = convertStringId(safeItem._id);
 
             if (suppressHooks != true) {
@@ -25,6 +27,9 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 });
             }
         } else {
+            // Insert
+            safeItem._owner = await getOwnerId(enableVisitorId);
+
             if (suppressHooks != true) {
                 editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [safeItem, context]).catch((err) => {
                     throw new Error(`beforeInsert (save) Hook Failure ${err}`);
@@ -37,11 +42,21 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
             ...editedItem
         }
 
+        // For updates
+        let filter: { _id: ObjectId, _owner?: string } | undefined;
+        if (safeItem._id && typeof safeItem._id === "string" && onlyOwner) {
+            filter = { _id: editedItem._id };
+            const currentMemberId = await getOwnerId(enableVisitorId);
+            if (currentMemberId) {
+                filter._owner = currentMemberId;
+            }
+        }
+
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { upsertedId, acknowledged } = await collection.updateOne(
-            editedItem._id ? { _id: editedItem._id } : { _id: new ObjectId() },
+            filter ? filter : { _id: new ObjectId() },
             { $set: { ...editedItem, _updatedDate: new Date() }, $setOnInsert: !editedItem._createdDate ? { _createdDate: new Date() } : {} },
-            { readConcern: readConcern ? readConcern : "local", upsert: true }
+            { readConcern, upsert: true }
         );
 
         const returnedItem = { ...editedItem, _id: editedItem._id }
@@ -55,8 +70,16 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 });
 
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = convertObjectId(editedResult._id);
+                    }
+
                     return { item: editedResult, upsertedId };
                 } else {
+                    if (returnedItem._id) {
+                        returnedItem._id = convertObjectId(returnedItem._id);
+                    }
+
                     return { item: returnedItem, upsertedId };
                 }
             } else {
@@ -66,8 +89,16 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 });
 
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = convertObjectId(editedResult._id);
+                    }
+
                     return { item: editedResult };
                 } else {
+                    if (returnedItem._id) {
+                        returnedItem._id = convertObjectId(returnedItem._id);
+                    }
+
                     return { item: returnedItem };
                 }
             }

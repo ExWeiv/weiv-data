@@ -1,10 +1,13 @@
 import { connectionHandler } from '../../Helpers/connection_helpers';
-import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
+import type { CollectionID, Item, ItemID, WeivDataOptionsOwner } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../../Helpers/hook_helpers';
 import { runDataHook } from '../../Hooks/hook_manager';
 import { validateParams } from '../../Helpers/validator';
+import type { ObjectId } from 'mongodb';
+import { getOwnerId } from '../../Helpers/member_id_helpers';
+import { convertObjectId } from '../../Helpers/item_helpers';
 
-export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptions): Promise<Item | undefined> {
+export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined> {
     try {
         const { safeItemId, safeValue, safeOptions } = await validateParams<"getAndUpdate">(
             { collectionId, itemId, value, options },
@@ -13,7 +16,7 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
 
         let editedItem = safeValue;
         if (suppressHooks != true) {
@@ -28,11 +31,19 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
 
         delete editedItem._id;
 
+        const filter: { _id: ObjectId, _owner?: string } = { _id: safeItemId };
+        if (onlyOwner) {
+            const currentMemberId = await getOwnerId();
+            if (currentMemberId) {
+                filter._owner = currentMemberId;
+            }
+        }
+
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndUpdate(
-            { _id: safeItemId },
+            filter,
             { $set: editedItem },
-            { readConcern: readConcern ? readConcern : "local", returnDocument: "after", includeResultMetadata: false }
+            { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {
@@ -42,11 +53,21 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
                 });
 
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = convertObjectId(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
 
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: convertObjectId(item._id)
+                }
+            } else {
+                return item;
+            }
         } else {
             return undefined;
         }

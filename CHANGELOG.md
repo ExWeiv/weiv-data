@@ -1,8 +1,25 @@
-# CHANGELOG of weiv-data
+# CHANGELOG of WeivData
 
 In this file you can find what's changed in each version. (Versions with -dev, -test tags can contain BUG/s and errors don't use them in production)
 
 ---
+
+### 4.1.0
+
+- Documentation is updated with new informations and better TS support.
+- TS internal system is changed and now auto-complete works better.
+- Validation system added for almost all functions, with some security checks.
+- NPM packages versions updated.
+- Error messages changed a bit.
+- Aggregation system is replaced with new one, now order of methods matters and there are more updates about aggregate function.
+- Some internal updates to WeivDataFilter.
+- New function added to get the current version of the package.
+- Query system is replaced with new one, now it's better and a bit faster.
+- All ids are returned as string from now. Any objectid is converted to string just before return.
+- onlyOwner flag added for some functions to enable permission of `Member Author` just like in WixData.
+- mongodb version updated to 6.6.2
+- BUG fixes and general performance improvements.
+- v4 is first skeleton version of WeivData.
 
 ### 3.0.4
 
@@ -180,7 +197,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 ### 1.5.3
 
 - TS Updates
-- We have started working for a Discord Server and documentation page built with weiv-data.
+- We have started working for a Discord Server and documentation page built with WeivData.
 
 ### 1.5.2
 
@@ -194,7 +211,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ### 1.5.0
 
-- All data hooks are available to use and now data hooks are implemented into weiv-data.
+- All data hooks are available to use and now data hooks are implemented into WeivData.
 - onFailure hook is still not available.
 - We have started to test data hooks if they are working as expected.
 

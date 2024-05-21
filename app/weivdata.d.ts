@@ -127,25 +127,6 @@ declare module '@exweiv/weiv-data' {
          * An option to choose a consistency level when reading data from MongoDB Clusters.
          */
         readConcern?: "local" | "majority" | "linearizable" | "available" | "snapshot",
-
-        /**
-         * @description
-         * An option to use visitorId. This option will try to get the id of current user on the site.
-         * Even if it's a visitor and if that same visitor signs up to your site your _owner field data will be the same with the member id in Wix Members.
-         * 
-         * *Created for new data inserts doesn't have any effect on read functions or update functions*
-         * 
-         * > When enabled, function will make another extra call so it will be slower, defaults to false.
-         * > For members you don't need this option to be true, weivData always knows the member ids.
-         */
-        enableVisitorId?: boolean,
-
-
-        /**
-         * @description
-         * By default this is true and you can disable it if you want, when it's disabled (false) we won't fetch the total count of the items.
-         */
-        omitTotalCount?: boolean
     }
 
     /**
@@ -166,6 +147,54 @@ declare module '@exweiv/weiv-data' {
          */
         cacheTimeout?: number
     } & WeivDataOptions;
+
+    /**
+     * @description
+     * WeivData options only for some write functions like insert. Where you can insert new data into collection.
+     */
+    type WeivDataOptionsWrite = {
+        /**
+         * @description
+         * An option to use visitorId. This option will try to get the id of current user on the site.
+         * Even if it's a visitor and if that same visitor signs up to your site your _owner field data will be the same with the member id in Wix Members.
+         * *Created for new data inserts doesn't have any effect on read functions or update functions*
+         * 
+         * > When enabled, function will make another extra call so it will be slower, defaults to false.
+         * > For members you don't need this option to be true, weivData always knows the member ids.
+         **/
+        enableVisitorId?: boolean,
+    } & WeivDataOptions;
+
+    /**
+     * @description
+     * WeivData options only for query function.
+     */
+    type WeivDataOptionsQuery = {
+        /**
+         * @description
+         * By default this is true and you can disable it if you want, when it's disabled (false) we won't fetch the total count of the items.
+         */
+        omitTotalCount?: boolean
+    } & WeivDataOptions;
+
+    /**
+     * @description
+     * WeivData options where onlyOwner is possible.
+     */
+    type WeivDataOptionsOwner = {
+        /**
+         * @description
+         * When sert to true WeivData will add another filter and check if _owner field of the item matches with current member id.
+         * This will make it possible to take action only if current member is the owner of the data.
+         */
+        onlyOwner?: boolean
+    } & WeivDataOptions;
+
+    /**
+     * @description
+     * WeivData options where onlyOwner is possible with enableVisitorId.
+     */
+    type WeivDataOptionsWriteOwner = WeivDataOptionsOwner & WeivDataOptionsWrite;
 
     /**
      * @description
@@ -804,7 +833,7 @@ declare module '@exweiv/weiv-data' {
          * @param options An object containing options to use when processing this operation.
          * @returns Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
          */
-        find(options?: WeivDataOptions): Promise<WeivDataQueryResult>;
+        find(options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult>;
 
         /**
          * @description
@@ -866,8 +895,9 @@ declare module '@exweiv/weiv-data' {
         readonly totalCount: number;
 
         /**
+         * @deprecated
          * @description
-         * Returns the total number of pages the query produced.
+         * Returns the total number of pages the query produced. (will be deleted in v5 doesn't work correctly)
          */
         readonly totalPages: number;
 
@@ -921,7 +951,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The results of the bulk insert. Rejected - The error that caused the rejection.
      */
-    function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptions): Promise<BulkInsertResult>;
+    function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWrite): Promise<BulkInsertResult>;
 
     type BulkInsertResult = {
         /**
@@ -932,9 +962,9 @@ declare module '@exweiv/weiv-data' {
 
         /**
          * @description
-         * Needs some fixes!!!
+         * Item ids as string objectId
          */
-        insertedItemIds: unknown
+        insertedItemIds: string[]
 
         /**
          * @description
@@ -952,7 +982,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
      */
-    function bulkRemove(collectionId: CollectionID, itemsIds: ItemID[], options?: WeivDataOptions): Promise<BulkRemoveResult>;
+    function bulkRemove(collectionId: CollectionID, itemsIds: ItemID[], options?: WeivDataOptionsOwner): Promise<BulkRemoveResult>;
 
     type BulkRemoveResult = {
         /**
@@ -963,9 +993,9 @@ declare module '@exweiv/weiv-data' {
 
         /**
          * @description
-         * Needs some fixes!!!
+         * Removed item ids as string objectId
          */
-        removedItemIds: unknown
+        removedItemIds: string[]
     }
 
     /**
@@ -976,7 +1006,7 @@ declare module '@exweiv/weiv-data' {
      * @param items The items to insert or update.
      * @param options An object containing options to use when processing this operation.
      */
-    function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptions): Promise<BulkSaveResult>;
+    function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWriteOwner): Promise<BulkSaveResult>;
 
     type BulkSaveResult = {
         /**
@@ -987,9 +1017,9 @@ declare module '@exweiv/weiv-data' {
 
         /**
          * @description
-         * Insert item ids.
+         * Inserted item ids as string objectid
          */
-        insertedItemIds: ItemID[],
+        insertedItemIds: string[],
 
         /**
          * @description
@@ -1013,7 +1043,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
      */
-    function bulkUpdate(collectionId: CollectionID, items: Item[], options?: WeivDataOptions): Promise<BulkUpdateResult>;
+    function bulkUpdate(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWriteOwner): Promise<BulkUpdateResult>;
 
     type BulkUpdateResult = {
         /**
@@ -1089,7 +1119,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Removed item. Rejected - The error caused the rejection.
      */
-    function getAndRemove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | undefined>;
+    function getAndRemove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsOwner): Promise<Item | undefined>;
 
     /**
      * @description
@@ -1101,7 +1131,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function getAndReplace(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptions): Promise<Item | undefined>;
+    function getAndReplace(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined>;
 
     /**
      * @description
@@ -1113,7 +1143,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function getAndUpdate(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptions): Promise<Item | undefined>;
+    function getAndUpdate(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined>;
 
     /**
      * @description
@@ -1147,7 +1177,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The item that was added. Rejected - The error that caused the rejection.
      */
-    function insert(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<Item>;
+    function insert(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWrite): Promise<Item>;
 
     /**
      * @description
@@ -1207,7 +1237,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function multiply(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options: WeivDataOptions): Promise<Item | null>;
+    function multiply(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions): Promise<Item | null>;
 
     /**
      * @description
@@ -1233,7 +1263,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function pull(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options: WeivDataOptions): Promise<Item | null>;
+    function pull(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null>;
 
     /**
      * @description
@@ -1246,7 +1276,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options: WeivDataOptions): Promise<Item | null>;
+    function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null>;
 
     /**
      * @description
@@ -1333,7 +1363,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The removed item, or null if the item was not found. Rejected - The error that caused the rejection.
      */
-    function remove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | null>;
+    function remove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsOwner): Promise<Item | null>;
 
     /**
      * @description
@@ -1375,7 +1405,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The item that was replaced. Rejected - The error that caused the rejection.
      */
-    function replace(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<Item>;
+    function replace(collectionId: CollectionID, item: Item, options?: WeivDataOptionsOwner): Promise<Item>;
 
     /**
      * @description
@@ -1404,7 +1434,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The item that was either inserted or updated, depending on whether it previously existed in the collection. Rejected - The error that caused the rejection.
      */
-    function save(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<SaveResult>;
+    function save(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWriteOwner): Promise<SaveResult>;
 
     type SaveResult = {
         /**
@@ -1441,7 +1471,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The object that was updated. Rejected - The error that caused the rejection.
      */
-    function update(collectionId: CollectionID, item: Item, options?: WeivDataOptions): Promise<Item>;
+    function update(collectionId: CollectionID, item: Item, options?: WeivDataOptionsOwner): Promise<Item>;
 
     /**
      * Hooks are just like in wix-data but we have some notes for you:

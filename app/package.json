@@ -1,6 +1,6 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "4.0.0-beta",
+  "version": "4.1.0",
   "description": "Custom API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
   "main": "./lib/index.js",
   "files": [
@@ -33,7 +33,7 @@
   "dependencies": {
     "crypto-js": "^4.2.0",
     "lodash": "^4.17.21",
-    "mongodb": "^6.6.1",
+    "mongodb": "^6.6.2",
     "mongodb-schema": "^12.1.1",
     "node-cache": "^5.1.2",
     "typescript": "^5.4.5",

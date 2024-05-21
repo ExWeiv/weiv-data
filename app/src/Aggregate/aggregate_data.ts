@@ -1,9 +1,10 @@
 import { isArray } from "lodash";
 import { WeivDataFilter } from "../Filter/data_filter";
 import { copyOwnPropsOnly } from "../Helpers/validator";
-import type { Collection, Db } from 'mongodb';
+import { ObjectId, type Collection, type Db } from 'mongodb';
 import { CollectionID, Item, PipelineStage, WeivDataAggregateResult, WeivDataAggregateRunOptions } from "@exweiv/weiv-data";
 import { connectionHandler } from "../Helpers/connection_helpers";
+import { convertObjectId } from "../Helpers/item_helpers";
 
 class Aggregate {
     protected readonly _collectionId: CollectionID;
@@ -251,7 +252,13 @@ export class AggregateResult extends Aggregate {
             }
 
             return {
-                items,
+                items: items.map((item) => {
+                    // _id field can be special in aggregations so we check first if it's an objectId
+                    if (ObjectId.isValid(item._id)) {
+                        item._id = convertObjectId(item._id);
+                    }
+                    return item;
+                }),
                 length,
                 hasNext,
                 next,

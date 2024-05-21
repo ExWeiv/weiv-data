@@ -32,7 +32,7 @@ export async function isReferenced(collectionId: CollectionID, propertyName: str
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const totalCount = await collection.countDocuments(
             { _id: itemId, [propertyName]: { $in: references } },
-            { readConcern: readConcern ? readConcern : "local" }
+            { readConcern }
         );
 
         if (totalCount > 0) {

@@ -1,4 +1,4 @@
-# weiv-data Node.js APIs
+# WeivData Node.js APIs
 
 <br>
 

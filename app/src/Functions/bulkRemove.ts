@@ -1,12 +1,13 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
-import { ObjectId } from 'mongodb/mongodb';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
+import type { ObjectId } from 'mongodb/mongodb';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import type { CollectionID, ItemID, WeivDataOptions, BulkRemoveResult } from '@exweiv/weiv-data';
+import type { CollectionID, ItemID, WeivDataOptionsOwner, BulkRemoveResult } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
+import { getOwnerId } from '../Helpers/member_id_helpers';
 
-export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], options?: WeivDataOptions): Promise<BulkRemoveResult> {
+export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], options?: WeivDataOptionsOwner): Promise<BulkRemoveResult> {
     try {
         const { safeItemIds, safeOptions } = await validateParams<"bulkRemove">(
             { collectionId, itemIds, options },
@@ -15,7 +16,12 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], 
         )
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+
+        let currentMemberId: string | null;
+        if (onlyOwner) {
+            currentMemberId = await getOwnerId();
+        }
 
         let editedItemIds: ObjectId[] | Promise<ObjectId>[] = safeItemIds.map(async (itemId) => {
             if (suppressHooks != true) {
@@ -34,24 +40,26 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], 
         })
 
         editedItemIds = await Promise.all(editedItemIds);
-        const writeOperations = await editedItemIds.map((itemId) => {
-            return {
-                deleteOne: {
-                    filter: { _id: itemId },
-                }
+
+        const writeOperations = editedItemIds.map((itemId) => {
+            const filter: { _id: ObjectId, _owner?: string } = { _id: itemId };
+            if (onlyOwner && currentMemberId) {
+                filter._owner = currentMemberId;
             }
+
+            return { deleteOne: { filter } }
         });
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { deletedCount, ok } = await collection.bulkWrite(
             writeOperations,
-            { readConcern: readConcern ? readConcern : "local", ordered: true }
+            { readConcern, ordered: true }
         );
 
         if (ok) {
             return {
                 removed: deletedCount,
-                removedItemIds: editedItemIds
+                removedItemIds: editedItemIds.map(id => convertObjectId(id))
             }
         } else {
             throw new Error(`removed: ${deletedCount}, ok: ${ok}`)
