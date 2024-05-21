@@ -1,11 +1,36 @@
 <!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>WeivData API Reference | ExWeiv Apps</title><meta name="description" content="Documentation for WeivData API Reference | ExWeiv Apps"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script><link rel="icon" href="https://static.wixstatic.com/media/510eca_9c4238093ad44527867402ae5fc8d7dd~mv2.png" />
-</head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">WeivData API Reference | ExWeiv Apps</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h2>WeivData API Reference | ExWeiv Apps</h2></div><div class="tsd-panel tsd-typography"><p>This is the official documentation page for weiv-data APIs powered by <strong>ExWeiv Apps</strong>, we have built an API library for you to use with your Wix sites. This package is designed to work in Wix websites with Velo and JS and mainly focused to developers not basic users but anyone can use it for free! Before we start here are the advantages and disadvantages of weiv-data when compared to wix-data.</p>
+</head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">WeivData API Reference | ExWeiv Apps</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h2>WeivData API Reference | ExWeiv Apps</h2></div><div class="tsd-panel tsd-typography"><p>Contents:</p>
+<ul>
+<li>Difference Between WixData and WeivData (Which One to Choose?)</li>
+<li>General Overview of WeivData and FAQs</li>
+<li>How to Setup for WeivData</li>
+<li>Security in WeivData and MongoDB</li>
+<li>About Data Hooks in WeivData</li>
+<li>Cold Start of WeivData</li>
+<li>Help</li>
+</ul>
+<hr>
+<a id="md:wixdata-and-weivdata-differences-which-one-to-choose" class="tsd-anchor"></a><h2><a href="#md:wixdata-and-weivdata-differences-which-one-to-choose">WixData and WeivData Differences, Which One to Choose?</a></h2><p>WixData is the integrated database system of Wix websites (aka CMS in Wix) which you can create collections with a predefined schema and use a NoSQL database in your Wix website, just like WeivData WixData is also using MongoDB but there are differences between each system.</p>
+<p>-&gt; WixData is not only an API library for developers it provides some extra features outside of coding. <br>
+-&gt; WixData is also designed for basic users who doesn&#39;t know much about database systems. <br>
+-&gt; WixData is fully integrated with Wix business solutions and has some advantages.</p>
+<p>-&gt; WeivData is an API library built top of MongoDB NodeJS driver. <br>
+-&gt; WeivData is not designed for basic users, it&#39;s designed for developers. <br>
+-&gt; WeivData is not fully integrated with Wix business solutions.</p>
+<p>Of course there are more difference between each system and let&#39;s take a look at some important differences between each system;</p>
+<a id="md:weivdata-mongodb" class="tsd-anchor"></a><h3><a href="#md:weivdata-mongodb">WeivData (MongoDB)</a></h3><p>WeivData is not a standalone product like WixData instead it&#39;s an API library that&#39;s designed to work just like WixData but faster with more features (more APIs, more customization etc.). The main goal of WeivData is to provide similar system to WixData in terms of coding experience and make it easy for Velo developers to take advantage of external database system without WixData limits and long learning processes.</p>
+<p>There isn&#39;t any limit that belongs to WeivData but there are limits which will be defined by you when you choose your cluster in MongoDB. WeivData uses MongoDB Atlas in the background so you will need an account in MongoDB and create an <a href="https://www.mongodb.com/atlas">Atlas</a> cluster which is a product of MongoDB.</p>
+<a id="md:wixdata-mongodb" class="tsd-anchor"></a><h3><a href="#md:wixdata-mongodb">WixData (MongoDB)</a></h3><p>WixData is also using MongoDB in the background but everything is managed by Wix and not by MongoDB itself like in Atlas. And there are some limits based on your Wix premium plan, database size, write and read request limits or index counts etc. You can learn more about <a href="https://dev.wix.com/docs/develop-websites/articles/coding-with-velo/limits-and-optimization/data-features">WixData limits</a> at Wix&#39;s website.</p>
+<p><strong>Let&#39;s compare some important limits in both;</strong></p>
+<blockquote>
+<p>M0 Cluster is the free cluster of MongoDB Atlas which is not for production or large traffic websites.</p>
+</blockquote>
 <table>
 <thead>
 <tr>
 <th>Feature</th>
-<th>weiv-data (M0 Cluster)</th>
-<th>wix-data (Basic Plan)</th>
+<th>WeivData (M0 Cluster)</th>
+<th>WixData (Basic Plan)</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -34,11 +59,6 @@
 <td>Moderate</td>
 </tr>
 <tr>
-<td>Consistency</td>
-<td>8/10</td>
-<td>9/10</td>
-</tr>
-<tr>
 <td>Read Limits</td>
 <td>100/sec</td>
 <td>1500/min</td>
@@ -55,8 +75,8 @@
 </tr>
 <tr>
 <td>Index Limits</td>
-<td>3 Index in Total</td>
-<td>1 Index in Total</td>
+<td>3 Index</td>
+<td>1 Index</td>
 </tr>
 <tr>
 <td>Collection Limit</td>
@@ -66,12 +86,12 @@
 <tr>
 <td>Database Limit</td>
 <td>100 Databases</td>
-<td>1 Database (Auto Generated)</td>
+<td>1 Database (Auto Integrated)</td>
 </tr>
 <tr>
 <td>Storage Limit</td>
 <td>512MB</td>
-<td>1500 Items/Rows</td>
+<td>1500 Items/Documents</td>
 </tr>
 <tr>
 <td>Item Size Limit</td>
@@ -91,7 +111,12 @@
 <tr>
 <td>Visual Dashboard</td>
 <td>Yes (Not Integrated to Wix)</td>
-<td>Yes (Also Integrated with Wix)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Dynamic Pages in Wix</td>
+<td>No (Has Workaround)</td>
+<td>Yes</td>
 </tr>
 <tr>
 <td>Datasets (Connecting Data Visually)</td>
@@ -100,8 +125,8 @@
 </tr>
 <tr>
 <td>Pricing</td>
-<td>Free, Monthly, Hourly</td>
-<td>Free, Monthly (Starting from 12€/m)</td>
+<td>Free</td>
+<td>Monthly (12€/m)</td>
 </tr>
 <tr>
 <td>Multicloud</td>
@@ -109,37 +134,56 @@
 <td>Yes</td>
 </tr>
 <tr>
+<td>Multi Region</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
 <td>RAM</td>
 <td>Shared RAM</td>
-<td>400MB (1 Micro Container)</td>
+<td>400MB</td>
 </tr>
 <tr>
 <td>CPU</td>
 <td>Shared vCPU</td>
-<td>1vCPU (1 Micro Container)</td>
-</tr>
-<tr>
-<td>Security</td>
-<td>Very Good</td>
-<td>Much More Better</td>
+<td>1vCPU</td>
 </tr>
 </tbody></table>
+<p>There are some general details about both system and probably there are more you can think about if you know what you need. But M0 cluster is not recommended and designed for production enviroments so you can also compare features of M10 cluster with another plan of Wix.</p>
+<p><em>It&#39;s also important to mention that WixData is multi region by default so basically you don&#39;t need to do anything about it, you will have servers around the world. But in WeivData it all depends on your cluster at MongoDB, if you want to setup the similar system you can use global clusters in MongoDB Atlas.</em></p>
+<a id="md:when-to-choose-weivdata" class="tsd-anchor"></a><h3><a href="#md:when-to-choose-weivdata">When to Choose WeivData?</a></h3><p>When you want to build something more complex you may want to choose WeivData over WixData but if you are not planning to build something complex you can go with WixData, it also depends on your future plans with your app. You wouldn&#39;t want to pick the wrong database system. And don&#39;t forget WeivData is a NoSQL database just like WixData so if you need an SQL database or something else you may want to look for other database systems and maybe integrate it with WixData using external database connections.</p>
+<a id="md:general-overview-of-weivdata-amp-faqs" class="tsd-anchor"></a><h2><a href="#md:general-overview-of-weivdata-amp-faqs">General Overview of WeivData &amp; FAQs</a></h2><p>WeivData creates a similar/same syntax of WixData and converts it to a form where mongodb driver can understand. It also handles the authorization so you can set permissions for user, member and admin level. This permission system is working with Wix Members in the background via <code>wix-members</code> and/or <code>wix-users</code> APIs.</p>
+<p>If you are already familiar with MongoDB you can also use <strong>.native</strong> function to use any collection feature of MongoDB NodeJS driver.</p>
+<a id="md:faqs" class="tsd-anchor"></a><h3><a href="#md:faqs">FAQs</a></h3><a id="md:how-do-we-define-permissions-for-each-level-and-how-it-works" class="tsd-anchor"></a><h4><a href="#md:how-do-we-define-permissions-for-each-level-and-how-it-works"><strong>How do we define permissions for each level and how it works?</strong></a></h4><p>You define the permissions at MongoDB dashboard where you create database users and set permissions for each user. You can create three different user (Visitor, Member, Admin) and assign required permissions for each database and/or collection for these users. And then you can use these users with WeivData. WeivData will know if the current user is a Visitor, Member or Admin.</p>
+<a id="md:how-can-we-create-site-member-author-permission-in-weivdata" class="tsd-anchor"></a><h4><a href="#md:how-can-we-create-site-member-author-permission-in-weivdata"><strong>How can we create Site Member Author permission in WeivData?</strong></a></h4><p>There isn&#39;t any specific user or a permission for this in WeivData but there is a very simple workaround you can apply. If you need a collection where members can only update and delete their own data you can enable a flag in WeivData when passing options which called as <code>onlyOwner</code> if you set this to true WeivData will check if searched item&#39;s _owner field mathes with current member id. If so it will apply the action if not it will return undefined.</p>
+<a id="md:is-syntax-of-weivdata-same-with-wixdata" class="tsd-anchor"></a><h4><a href="#md:is-syntax-of-weivdata-same-with-wixdata"><strong>Is syntax of WeivData same with WixData?</strong></a></h4><p>For some functions yes it&#39;s almost the same or directly same but for some other functions it&#39;s different a little. For example aggregate function in WixData is not order sensitive, so basically the order of methods won&#39;t have any effect on the returned data. But in WeivData it matters and order of your method calls after aggregate function will effect the returned data. Another difference for aggregate function you have a method called <code>stage</code> where you can add custom pipeline stages, this allows you to mixin native MongoDB pipeline stages with predefined methods.</p>
+<a id="md:what-is-cold-start-and-can-we-optimize-it" class="tsd-anchor"></a><h4><a href="#md:what-is-cold-start-and-can-we-optimize-it"><strong>What is cold start, and can we optimize it?</strong></a></h4><p>Cold start is the first time you call WeivData in your code, when you call any function of WeivData that makes request/s to database it&#39;ll first connect to MongoDB and for this it&#39;ll require some extra time usually around 800ms-2s and this will add some extra delay to your first function call. After that first cold connected MongoClient will be cached and this won&#39;t happen again until the container killed by Wix.</p>
+<p>Every Wix website runs inside of a container and these containers are killed each 5 minutes (rare but sometimes 6min). So every 5 minutes WeivData will need to connect again, and this will require a cold start which will add some delay for first function/s call/s.</p>
+<p>To optimize this you can&#39;t do much because you don&#39;t have any control over how these containers killed, it would be better if Wix would keep the containers alive if there are live visitors but this is not the case. What you can do is use a plugin of WeivData to setup a basic API endpoint in your Wix website and regulary make calls to that POST API endpoint (each 4/5min). This will keep your Wix site warm and make the connection ready for most users.</p>
 <blockquote>
-<p>In MongoDB M0 Cluster you WON&#39;T have 100/sec limit for each class of operation you have 100/sec for any class of operation. So read/write/update/delete... sahres the same limit of 100/sec which is 6000/min</p>
+<p>In WixData you don&#39;t directly interact with database instead you are talking with another server and this makes it possible to create a system where you don&#39;t have cold starts.</p>
 </blockquote>
-<p><strong>We have compared the limits and other things based on the lowest leves. M0 Cluster for MongoDB (Free) and Basic Plan for Wix Studio (12€/m).</strong></p>
-<a id="md:summary" class="tsd-anchor"></a><h3><a href="#md:summary">Summary</a></h3><p>There are still more things we can consider between each library and don&#39;t forget that our library is not a platform it&#39;s just converting mongodb into similar syntax and adding some features top of it so you can code like in wix-data using weiv-data. What this means is we are actually comparing MongoDB Atlas and wix-data.</p>
-<p>And when you have the freedom of upgrading your own MongoDB clusters it&#39;s very hard for wix-data to be better because you can upgrade to highest level of dedicated cluster and probably your setup will be better.</p>
-<p>But when we compare the lowest levels in each platform you can see that there some cons and pros. Remember there is no one size fits all so consider your app/website and decide which library to use. If you don&#39;t need speed and if you are building something simple there is no need to use weiv-data in general. But if you are building something more complex and that needs speed than you can go with weiv-data.</p>
-<p>Also keep in mind that we didn&#39;t list every single detail about each library/platform we recommend you to take a look at MongoDB M0 Cluster limits and Wix Studio Basic plan limits to let you even understand better the limits and features.</p>
-<a id="md:using-m0-cluster-for-production" class="tsd-anchor"></a><h3><a href="#md:using-m0-cluster-for-production">Using M0 Cluster for Production</a></h3><p>When we have test the M0 Cluster it was quite well for begining if your application is not expecting a lot of users you can just start with free version which is M0 then you can upgrade to M2 or M5 or even to a dedicated clusters which is M10 or higher you can also enable multi-cloud and auto-scale features in dedicated clusters.</p>
-<p>So <em>we think</em> it&#39;s okay to start with M0 and then upgrade if there is a need for an upgrade. Monitor your functions using Wix Monitoring tools and see if you really need a higher version.</p>
+<a id="md:how-can-i-switch-from-wixdata" class="tsd-anchor"></a><h4><a href="#md:how-can-i-switch-from-wixdata"><strong>How can I switch from WixData?</strong></a></h4><p>If you already use WixData and has a lot of data currently it won&#39;t be easy to switch to WeivData because for now WeivData doesn&#39;t support string based IDs instead we use ObjectIds and because of that you&#39;ll need to convert each string id to ObjectId and this won&#39;t be eacy for big amounts of data. But soon it&#39;ll be possible for you to use string ids and when this happens you can do the following:</p>
+<ol>
+<li>Create the same collections in a database.</li>
+<li>Export data from Wix collections as CSV files.</li>
+<li>Import these CSV files to your MongoDB collections carefully.</li>
+<li>You are ready to go.</li>
+</ol>
 <blockquote>
-<p>Before upgrading directly remember you can optimize your code and collections using related features such as indexes.</p>
+<p>This should be an easy way to import data to MongoDB when you don&#39;t have too many data.</p>
 </blockquote>
-<a id="md:setup-your-env" class="tsd-anchor"></a><h2><a href="#md:setup-your-env">Setup Your Env</a></h2><p>Let&#39;s start by setting up our environment for weiv-data and make things ready. Follow the steps and you will be ready to go in 1-3mins:</p>
+<a id="md:are-there-any-feature-of-wixdata-that-doesn39t-supported-by-weivdata" class="tsd-anchor"></a><h4><a href="#md:are-there-any-feature-of-wixdata-that-doesn39t-supported-by-weivdata"><strong>Are there any feature of WixData that doesn&#39;t supported by WeivData?</strong></a></h4><p>Yes there are some features we don&#39;t support and these are:</p>
+<ul>
+<li>Dynamic Pages (has a workaround)</li>
+<li>Datasets</li>
+<li>Frontend Support</li>
+<li>onFailure Hook</li>
+</ul>
+<a id="md:i-already-know-mongodb-can-i-use-native-syntax-of-mongodb-with-weivdata" class="tsd-anchor"></a><h4><a href="#md:i-already-know-mongodb-can-i-use-native-syntax-of-mongodb-with-weivdata"><strong>I already know MongoDB can I use native syntax of MongoDB with WeivData?</strong></a></h4><p>Yes this is possible via .native function where you can get a collection cursor and work with this cursor that&#39;s returned by MongoDB NodeJS driver.</p>
+<a id="md:how-to-setup-for-weivdata" class="tsd-anchor"></a><h2><a href="#md:how-to-setup-for-weivdata">How to Setup for WeivData</a></h2><p>Follow this step by step guide to setup your Wix website for WeivData:</p>
 <blockquote>
-<p>If you haven&#39;t created a MongoDB account yet go ahead and create one!</p>
+<p>We assume that you have already created a MongoDB account and a Atlas cluster so your MongoDB database is ready. If not please fo it first.</p>
 </blockquote>
 <ol>
 <li>We assume that you have created your database setup and created your cluster in MongoDB.</li>
@@ -149,143 +193,66 @@
 </ol>
 </li>
 <li>When you are done with creating custom roles go back to <code>Database Users</code> tab and create three different users.<ol>
-<li>Create a user for each role we have created before and name them as you want but we suggest naming them as Admin, Member and Visitor.</li>
-<li>When you create your users create <a href="https://randomkeygen.com/">strong passwords</a> for your users too because this will be important for security.</li>
-<li>Create passwords that contains numbers, upper and lowercase letters and symbols and make sure that it&#39;s longer than 17 characters.</li>
-<li>After you create each user save passwords to somewhere because you will need these later.</li>
+<li>Create a user for each role we have created before and name them as you want (use secure usernames don&#39;t use usernames like admin, member or visitor).</li>
+<li>When you create your users create <a href="https://randomkeygen.com/">strong passwords</a> for your users too.</li>
+<li>Create passwords that contains numbers, upper and lowercase letters also symbols and make sure that it&#39;s longer than 17 characters.</li>
+<li>After you create each user save passwords to somewhere because you will need these later and MongoDB won&#39;t show passwords to you again. (Use paper and pencil)</li>
 </ol>
 </li>
 <li>When you complete the 3rd step go to <code>Network Access</code> page from the MongoDB dashboard.<ol>
 <li>Remove any IP address in <code>IP Access List</code> tab.</li>
-<li>Add new IP address and click <code>Allow Access From Anywhere</code>. In this way Wix servers will be able to access your database (also any other server).</li>
-<li>Keep in mind that you can setup custom IP addresses if you want.</li>
+<li>Add new IP address and click <code>Allow Access From Anywhere</code>. In this way Wix servers will be able to access your database (also any other device!!).</li>
 </ol>
 </li>
 <li>When you complete the 4th step. You are now ready to switch to your Wix Studio Dashboard.<ol>
 <li>Open up the Wix dashboard and go to <code>Developer Tools -&gt; Secrets Manager</code></li>
 <li>You will create a single secret for all users you&#39;ve created in MongoDB. Create a secret named as <code>WeivDataURIs</code>.</li>
-<li>After you create the secret you will paste the URIs in JSON format like below:</li>
+<li>After you create the secret you will paste the URIs in stringified JSON format like below:</li>
 </ol>
 </li>
 </ol>
-<pre><code class="language-json"><span class="hl-0">{</span><br/><span class="hl-0">  </span><span class="hl-1">&quot;visitor&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;&lt;visitor-uri&gt;&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">  </span><span class="hl-1">&quot;member&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;&lt;member-uri&gt;&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">  </span><span class="hl-1">&quot;admin&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;&lt;admin-uri&gt;&quot;</span><br/><span class="hl-0">}</span>
+<pre><code class="language-json"><span class="hl-0">&quot;{</span><br/><span class="hl-0">  &quot;</span><span class="hl-1">visitor</span><span class="hl-0">&quot;: &quot;</span><span class="hl-1">&lt;visitor-uri&gt;</span><span class="hl-0">&quot;,</span><br/><span class="hl-0">  &quot;</span><span class="hl-1">member</span><span class="hl-0">&quot;: &quot;</span><span class="hl-1">&lt;member-uri&gt;</span><span class="hl-0">&quot;,</span><br/><span class="hl-0">  &quot;</span><span class="hl-1">admin</span><span class="hl-0">&quot;: &quot;</span><span class="hl-1">&lt;admin-uri&gt;</span><span class="hl-0">&quot;</span><br/><span class="hl-0">}&quot;</span>
 </code><button>Copy</button></pre>
 <ol start="6">
 <li>You are done with Secrets Manager now go to CMS from your Wix Dashboard.<ol>
 <li>Create a collection and name it as <code>WeivOwnerID</code>. This collection will be used to get visitor ids when you enable it for each operation.</li>
 <li>You don&#39;t need to create any field just create the collection and leave it as it is. weiv-data will remove any data it creates.</li>
-<li>Also set the collection permissions to Anyone for each operation. So anyone should be able to do all operations for that collection.</li>
 </ol>
 </li>
-<li>Now it&#39;s time to install the <code>weiv-data</code> library.<ol>
-<li>Go to your Wix Studio Editor and enable coding features (Velo). (Click the code icon = { })</li>
-<li>Go to <code>Packages &amp; Apps</code>. You will see npm click <code>+</code> button. And search for &quot;@exweiv&quot;.</li>
-<li>You will see the <code>@exweiv/weiv-data</code> npm package install that package.</li>
-<li>You may also want to install <code>mongodb</code> package since you will deal with <code>ObjectIDs</code>.</li>
-<li>Search for &quot;mongodb&quot; and click the three dots. Select choose version and install the 5.9.2</li>
-<li>You can import ObjectId like that: <code>import { ObjectId } from &#39;mongodb&#39;;</code>. (More examples below and can only be used in backend).</li>
-</ol>
-</li>
-<li>For the last step go to your Wix Studio editor and open up the <code>Public &amp; Backend</code> section.<ol>
-<li>Create a folder named <code>WeivData</code> in your backend section of your site.</li>
+<li>Now it&#39;s time to install the <code>weiv-data</code> library. Install <code>@exweiv/weiv-data</code> package from NPM.</li>
+<li>For the last step go to your backend directory.<ol>
+<li>Create a folder named <code>WeivData</code> in your backend section of your site. (backend/WeivData)</li>
 <li>Inside of this folder create a JS file named <code>connection-options.js</code> and <code>data.js</code>. These are required even if you don&#39;t set any data hooks or custom connection options.</li>
 </ol>
 </li>
+</ol>
+<pre><code><span class="hl-2">backend</span><span class="hl-1">/</span><br/><span class="hl-1">├── </span><span class="hl-2">WeivData</span><span class="hl-1">/</span><br/><span class="hl-1">│   ├── </span><span class="hl-2">connection</span><span class="hl-1">-</span><span class="hl-2">options</span><span class="hl-1">.</span><span class="hl-2">js</span><br/><span class="hl-1">│   └── </span><span class="hl-2">data</span><span class="hl-1">.</span><span class="hl-2">js</span><br/><span class="hl-1">└──</span>
+</code><button>Copy</button></pre>
+<ol start="9">
 <li>You should be good to go!</li>
 </ol>
-<p><strong>Even if you won&#39;t setup any custom connection settings or data hooks create <code>WeivData</code> folder in your backend and create two .js files <code>data.js</code> and <code>connection-options.js</code>. This is important and must have to let library work.`</strong></p>
-<blockquote>
-<p>We also explain how you use X.509 instead of username and password authentication method.</p>
-</blockquote>
-<a id="md:finding-connection-uristring-in-mongodb" class="tsd-anchor"></a><h3><a href="#md:finding-connection-uristring-in-mongodb">Finding Connection URI/String in MongoDB:</a></h3><p><strong>Click to connect button in your cluster.</strong></p>
-<img src="https://static.wixstatic.com/media/510eca_04dddb376fd348079791a884d06f18e4~mv2.png" height="400px" alt="Connect Button in MongoDB Databases Page">
-
-<p><strong>Then you will see an example of connection uri/string.</strong></p>
-<img src="https://static.wixstatic.com/media/510eca_053a1b7c7ec74c6599f9ff7c6fcde265~mv2.png" height="400px" alt="Connection URI/String">
-
-<pre><code class="language-js"><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">username</span><span class="hl-0"> = </span><span class="hl-2">&quot;Admin&quot;</span><span class="hl-0">;</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">password</span><span class="hl-0"> = </span><span class="hl-2">&quot;StrongPassword.26.34.61&quot;</span><span class="hl-0">;</span><br/><br/><span class="hl-5">// Replace username, password and rest of the URL with your own!</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">uriExample</span><span class="hl-0"> = </span><span class="hl-2">`mongodb+srv://</span><span class="hl-3">${</span><span class="hl-6">username</span><span class="hl-3">}</span><span class="hl-2">:</span><span class="hl-3">${</span><span class="hl-6">password</span><span class="hl-3">}</span><span class="hl-2">@testingcluster.luecqd2.mongodb.net/`</span><span class="hl-0">;</span>
-</code><button>Copy</button></pre>
-<a id="md:ip-address-and-security" class="tsd-anchor"></a><h3><a href="#md:ip-address-and-security">IP Address and Security</a></h3><p>Currently we don&#39;t have any tutorial about how you can setup IP Address within Wix. Instead we allow any IP address and use strong passwords. We are working on different type of authentication methods that&#39;s available in MongoDB and also possible with Wix.</p>
-<a id="md:objectid-based-itemids" class="tsd-anchor"></a><h3><a href="#md:objectid-based-itemids">ObjectID Based ItemIDs</a></h3><p>In weiv-data unlike wix-data we don&#39;t use string based item ids. Instead we use <code>ObjectId</code> based item ids. We use ObjectId for better speed and performance. You can learn more about ObjectId via a magical tool called <code>Google</code>, <code>Gemini</code>, <code>Chat-GPT</code> etc. 😊</p>
-<p>Currently we are optimizing our code to return ObjectID in every case right now in some cases our library returns string instead of ObjectID. (This will be fixed asap.)</p>
-<p>Note: You can use a custom function in our library to convert strings into ObjectId or ObjectIds to string.</p>
-<pre><code class="language-js"><span class="hl-7">import</span><span class="hl-0"> { </span><span class="hl-6">idConverter</span><span class="hl-0"> } </span><span class="hl-7">from</span><span class="hl-0"> </span><span class="hl-2">&quot;@exweiv/weiv-data&quot;</span><span class="hl-0">;</span><br/><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">stringId</span><span class="hl-0"> = </span><span class="hl-2">&quot;...&quot;</span><span class="hl-0">;</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">objectId</span><span class="hl-0"> = </span><span class="hl-2">&quot;...&quot;</span><span class="hl-0">;</span><br/><br/><span class="hl-8">idConverter</span><span class="hl-0">(</span><span class="hl-6">stringId</span><span class="hl-0">); </span><span class="hl-5">// returns objectid</span><br/><span class="hl-8">idConverter</span><span class="hl-0">(</span><span class="hl-6">objectId</span><span class="hl-0">); </span><span class="hl-5">// returns stringid</span>
-</code><button>Copy</button></pre>
-<a id="md:creating-custom-options" class="tsd-anchor"></a><h3><a href="#md:creating-custom-options">Creating Custom Options</a></h3><p>Here is a direct example for advanced users to let them understand it directly.</p>
-<blockquote>
-<p>Example shows a path but you can also use buffer data with <code>key</code> field in options. See MongoDB docs for more.</p>
-</blockquote>
-<pre><code class="language-js"><span class="hl-5">// In your `backend/WeivData/connection-options.js` file.</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-8">defaultOptions</span><span class="hl-0"> = () </span><span class="hl-3">=&gt;</span><span class="hl-0"> {</span><br/><span class="hl-0">  </span><span class="hl-7">return</span><span class="hl-0"> {</span><br/><span class="hl-0">    </span><span class="hl-6">maxPoolSize:</span><span class="hl-0"> </span><span class="hl-9">50</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-6">minPoolSize:</span><span class="hl-0"> </span><span class="hl-9">5</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-6">maxIdleTimeMS:</span><span class="hl-0"> </span><span class="hl-9">30000</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-6">tls:</span><span class="hl-0"> </span><span class="hl-3">true</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-6">authMechanism:</span><span class="hl-0"> </span><span class="hl-2">&quot;MONGODB-X509&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">  };</span><br/><span class="hl-0">};</span><br/><br/><span class="hl-5">// Defined as a function (can be async)</span><br/><span class="hl-7">export</span><span class="hl-0"> </span><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-8">adminClientOptions</span><span class="hl-0"> = () </span><span class="hl-3">=&gt;</span><span class="hl-0"> {</span><br/><span class="hl-0">  </span><span class="hl-7">return</span><span class="hl-0"> {</span><br/><span class="hl-0">    ...</span><span class="hl-8">defaultOptions</span><span class="hl-0">(),</span><br/><span class="hl-0">    </span><span class="hl-6">tlsCertificateKeyFile:</span><span class="hl-0"> </span><span class="hl-2">&quot;../../../../../../../../../user-code/backend/WeivData/admin.pem&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">  };</span><br/><span class="hl-0">};</span><br/><br/><span class="hl-5">// Defined as a function (can be async)</span><br/><span class="hl-7">export</span><span class="hl-0"> </span><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-8">memberClientOptions</span><span class="hl-0"> = () </span><span class="hl-3">=&gt;</span><span class="hl-0"> {</span><br/><span class="hl-0">  </span><span class="hl-7">return</span><span class="hl-0"> {</span><br/><span class="hl-0">    ...</span><span class="hl-8">defaultOptions</span><span class="hl-0">(),</span><br/><span class="hl-0">    </span><span class="hl-6">tlsCertificateKeyFile:</span><span class="hl-0"> </span><span class="hl-2">&quot;../../../../../../../../../user-code/backend/WeivData/member.pem&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">  };</span><br/><span class="hl-0">};</span><br/><br/><span class="hl-5">// Defined as a function (can be async)</span><br/><span class="hl-7">export</span><span class="hl-0"> </span><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-8">visitorClientOptions</span><span class="hl-0"> = () </span><span class="hl-3">=&gt;</span><span class="hl-0"> {</span><br/><span class="hl-0">  </span><span class="hl-7">return</span><span class="hl-0"> {</span><br/><span class="hl-0">    ...</span><span class="hl-8">defaultOptions</span><span class="hl-0">(),</span><br/><span class="hl-0">    </span><span class="hl-6">tlsCertificateKeyFile:</span><span class="hl-0"> </span><span class="hl-2">&quot;../../../../../../../../../user-code/backend/WeivData/visitor.pem&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">  };</span><br/><span class="hl-0">};</span>
-</code><button>Copy</button></pre>
-<p>Let&#39;s talk about how it works. Basically you can create three different client options for each role and export them named as above example. And export them in that js file.</p>
-<p><code>adminClientOptions</code> function will be used for admins. <code>memberClientOptions</code> function will be used for members. <code>visitorClientOptions</code> function will be used for visitors.</p>
-<p>In this way you can assign different certificates or options for each role.</p>
-<blockquote>
-<p>If you don&#39;t create only one or two of these options defaults will be used for the one/s you didn&#39;t specify.</p>
-</blockquote>
-<p><a href="https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/connection/connection-options/">More About Connection Options in MongoDB</a></p>
-<p><a href="https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/connection/tls/">More About TLS</a></p>
-<p><a href="https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/authentication/">More About Auth Options</a></p>
-<a id="md:using-atlas-managed-x509" class="tsd-anchor"></a><h3><a href="#md:using-atlas-managed-x509">Using Atlas Managed X.509</a></h3><p>You can still use username and password method (SCRAM) which will be fine if you have strong passwords but if you want to use X.509 here is how. Username and password method (SCRAM) is easier and secure. Just create strong passwords!</p>
-<p>Let us explain how does weiv-data works when connecting to clusters so you can better understand which options you can use for authentication.</p>
-<blockquote>
-<p>You can also check our GitHub so you can understand how it works even create pull requests.</p>
-</blockquote>
-<ul>
-<li>Our connection provider gets the URI from the secret you create in your Wix secrets manager.</li>
-<li>We use secrets manager for URIs but for connection options (<code>MongoClientOptions</code>) we use a JS file you create in your Wix backend. As we explain above.</li>
-</ul>
-<p>In this way you can manage connection uris/strings as well as connection options.</p>
-<p>If you want to create users thats using X.509 method follow the steps:</p>
+<a id="md:security-in-weivdata-and-mongodb" class="tsd-anchor"></a><h2><a href="#md:security-in-weivdata-and-mongodb">Security in WeivData and MongoDB</a></h2><p>There are not very much to do with security side when you use MongoDB Atlas since it&#39;s already managed by MongoDB they will handle the most of the security features. But you should be careful about these steps:</p>
 <ol>
-<li>Go to your MongoDB dashboard and create a new user.</li>
-<li>When creating a user select <code>certificate</code> option above.</li>
-<li>Give a name to your user <em>(CN)</em> and enable download switch.</li>
-<li>Set an expire date for your certificate.</li>
-<li>Add permissions and create the user (certificate will be downloaded automatically)</li>
-<li>Open the downloaded .pem file and copy the content of file.</li>
-<li>Create a .pem file in your Wix backend and paste the content in that file.</li>
-<li>In your <code>connection-options.js</code> file assign the path of file. <strong>(Read below)</strong></li>
-<li>You should be good to go!</li>
+<li>Use secure usernames and passwords for your database users.</li>
+<li>Don&#39;t add unrequired roles/permissions to your users, just add minimal permissions (only what is required).</li>
+<li>Follow secure coding practices and keep your code secure.</li>
 </ol>
-<p>When you are pasting the path of .pem file in your backend use the following directory as reference:</p>
-<pre><code class="language-js"><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">pathToBackend</span><span class="hl-0"> = </span><span class="hl-2">&quot;../../../../../../../../../user-code/backend/&quot;</span><span class="hl-0">;</span>
-</code><button>Copy</button></pre>
-<p>This is the path to your Wix backend. Yes it&#39;s different than what you have in your codes. But this one is the working one. Use this path to access your backend folder. You can also check the example code above.</p>
+<p>And you should be fine in most cases.</p>
 <blockquote>
-<p>You can probably also access to other folders like public, pages etc. Just let you know not needed for our library.</p>
+<p>WeivData is already checking things like data types or prototype pollution and throws errors in some cases where you send wrong data. But always follow the secure coding practices.</p>
 </blockquote>
-<blockquote>
-<p>You can also use Buffer data of your .pem files which is probably what you&#39;ll prefer in production. You can store your .pem files in cloud providers and get signed URLs after that you can use that signed URLs to create a Buffer data via axios. And then you can use that Buffer data for X.509 method.</p>
-</blockquote>
-<a id="md:how-to-create-hooks" class="tsd-anchor"></a><h3><a href="#md:how-to-create-hooks">How to Create Hooks</a></h3><p>Using hooks in weiv-data and wix-data has similar way. We are currently not providing a hook for errors. But rest of the hooks are available like in wix-data. To create a hook you need to create a folder in your backend named <code>WeivData</code> and then you also need to create a .js file (.js file now .jsw or .web.js) inside of that folder.</p>
-<p>-&gt; backend/WeivData/data.js</p>
-<p>Then you will create your hooks as functions like in wix-data. Here is an example for afterGet hook:</p>
-<pre><code class="language-js"><span class="hl-5">// In backend/WeivData/data.js file</span><br/><br/><span class="hl-7">export</span><span class="hl-0"> </span><span class="hl-3">async</span><span class="hl-0"> </span><span class="hl-3">function</span><span class="hl-0"> </span><span class="hl-8">dbname_collectionname_afterGet</span><span class="hl-0">(</span><span class="hl-6">item</span><span class="hl-0">, </span><span class="hl-6">context</span><span class="hl-0">) {</span><br/><span class="hl-0">  </span><span class="hl-7">if</span><span class="hl-0"> (</span><span class="hl-6">item</span><span class="hl-0">.</span><span class="hl-6">number</span><span class="hl-0"> &gt; </span><span class="hl-9">5</span><span class="hl-0">) {</span><br/><span class="hl-0">    </span><span class="hl-7">return</span><span class="hl-0"> </span><span class="hl-3">true</span><span class="hl-0">;</span><br/><span class="hl-0">  } </span><span class="hl-7">else</span><span class="hl-0"> {</span><br/><span class="hl-0">    </span><span class="hl-7">return</span><span class="hl-0"> </span><span class="hl-3">false</span><span class="hl-0">;</span><br/><span class="hl-0">  }</span><br/><span class="hl-0">}</span>
-</code><button>Copy</button></pre>
-<p>You need to name your functions correctly to let hooks work. The syntax is like that:
-<code>&lt;database-name&gt;_&lt;collection-name&gt;_&lt;hook-name&gt;</code></p>
-<blockquote>
-<p>Both database name and collection name should be all lowercase.</p>
-</blockquote>
-<a id="md:manual-or-automatic-pool-management" class="tsd-anchor"></a><h3><a href="#md:manual-or-automatic-pool-management">Manual or Automatic Pool Management</a></h3><p>If you want to use automatic pool management do not set min or max pool size in your custom connection options. In this way it will be handled by MongoDB driver and weiv-data library won&#39;t connect to cluster manually instead it will return a not connected MongoClient and driver will handle the connection when an operation starts.</p>
-<p>If you want to manually configure it you can set min or max (or both) pool size in custom connection options. In this way our library will call the .connect method and it will return a connected client when performing operations.</p>
-<p>MongoClients are cached and saved so after cold start it will be cached for 5 min. (Wix Container Time)</p>
-<br>
-
-<hr>
-<p>Ask for help, give feedback or anything else? <a href="mailto:info@apps.exweiv.com">info@apps.exweiv.com</a></p>
-<ul>
-<li><a href="https://weiv-data.apps.exweiv.com/">API Reference</a></li>
-<li><a href="https://www.npmjs.com/package/@exweiv/weiv-data">Install - NPM</a></li>
-<li><a href="https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md">Changelog</a></li>
-</ul>
+<a id="md:about-data-hooks-in-weivdata" class="tsd-anchor"></a><h2><a href="#md:about-data-hooks-in-weivdata">About Data Hooks in WeivData</a></h2><p>Just like in WixData you can also define data hooks in WeivData too, hooks will make it possible for you to manipulate the data on the fly that&#39;s sent to MongoDB or data returned by the function. There are more hooks in WeivData because WeivData has more functions than WixData and you can learn about these in the <a href="https://weiv-data.apps.exweiv.com/">documentation of WeivData</a>.</p>
+<p>You will use <code>data.js</code> file inside <code>backend/WeivData</code> folder. You can define your hooks inside there.</p>
+<a id="md:help" class="tsd-anchor"></a><h2><a href="#md:help">Help</a></h2><p>Ask for help, give feedback or anything else? <a href="mailto:info@apps.exweiv.com">info@apps.exweiv.com</a></p>
+<p><a href="https://weiv-data.apps.exweiv.com/">API Reference</a> <br>
+<a href="https://www.npmjs.com/package/@exweiv/weiv-data">Install - NPM</a> <br>
+<a href="https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md">Changelog</a></p>
 <hr>
 <p><a href="https://medium.com/the-optimists-daily/kolay-gelsin-a-turkish-expression-we-should-all-know-and-use-83fc1207ae5d">Kolay Gelsin</a> 💜</p>
-<img src="https://static.wixstatic.com/media/510eca_399a582544de4cb2b958ce934578097f~mv2.png"></div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-index-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><h4 class="uppercase">Member Visibility</h4><form><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></form></div><div class="tsd-theme-toggle"><h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><ul><li><a href="#md:summary"><span>Summary</span></a></li><li><a href="#md:using-m0-cluster-for-production"><span>Using <wbr/>M0 <wbr/>Cluster for <wbr/>Production</span></a></li></ul><a href="#md:setup-your-env"><span>Setup <wbr/>Your <wbr/>Env</span></a><ul><li><a href="#md:finding-connection-uristring-in-mongodb"><span>Finding <wbr/>Connection URI/<wbr/>String in <wbr/>MongoDB:</span></a></li><li><a href="#md:ip-address-and-security"><span>IP <wbr/>Address and <wbr/>Security</span></a></li><li><a href="#md:objectid-based-itemids"><span>ObjectID <wbr/>Based <wbr/>ItemIDs</span></a></li><li><a href="#md:creating-custom-options"><span>Creating <wbr/>Custom <wbr/>Options</span></a></li><li><a href="#md:using-atlas-managed-x509"><span>Using <wbr/>Atlas <wbr/>Managed <wbr/>X.509</span></a></li><li><a href="#md:how-to-create-hooks"><span>How to <wbr/>Create <wbr/>Hooks</span></a></li><li><a href="#md:manual-or-automatic-pool-management"><span>Manual or <wbr/>Automatic <wbr/>Pool <wbr/>Management</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="assets/icons.svg#icon-1"></use></svg><span>WeivData API Reference | ExWeiv Apps</span></a><ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="."><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a><br>
+<img src="https://static.wixstatic.com/media/510eca_399a582544de4cb2b958ce934578097f~mv2.png"></div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-index-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><h4 class="uppercase">Member Visibility</h4><form><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></form></div><div class="tsd-theme-toggle"><h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#md:wixdata-and-weivdata-differences-which-one-to-choose"><span>Wix<wbr/>Data and <wbr/>Weiv<wbr/>Data <wbr/>Differences, <wbr/>Which <wbr/>One to <wbr/>Choose?</span></a><ul><li><a href="#md:weivdata-mongodb"><span>Weiv<wbr/>Data (<wbr/>MongoDB)</span></a></li><li><a href="#md:wixdata-mongodb"><span>Wix<wbr/>Data (<wbr/>MongoDB)</span></a></li><li><a href="#md:when-to-choose-weivdata"><span>When to <wbr/>Choose <wbr/>Weiv<wbr/>Data?</span></a></li></ul><a href="#md:general-overview-of-weivdata-amp-faqs"><span>General <wbr/>Overview of <wbr/>Weiv<wbr/>Data &amp; FAQs</span></a><ul><li><a href="#md:faqs"><span>FAQs</span></a></li><li><ul><li><a href="#md:how-do-we-define-permissions-for-each-level-and-how-it-works"><span>How do we define permissions for each level and how it works?</span></a></li><li><a href="#md:how-can-we-create-site-member-author-permission-in-weivdata"><span>How can we create <wbr/>Site <wbr/>Member <wbr/>Author permission in <wbr/>Weiv<wbr/>Data?</span></a></li><li><a href="#md:is-syntax-of-weivdata-same-with-wixdata"><span>Is syntax of <wbr/>Weiv<wbr/>Data same with <wbr/>Wix<wbr/>Data?</span></a></li><li><a href="#md:what-is-cold-start-and-can-we-optimize-it"><span>What is cold start, and can we optimize it?</span></a></li><li><a href="#md:how-can-i-switch-from-wixdata"><span>How can <wbr/>I switch from <wbr/>Wix<wbr/>Data?</span></a></li><li><a href="#md:are-there-any-feature-of-wixdata-that-doesn39t-supported-by-weivdata"><span>Are there any feature of <wbr/>Wix<wbr/>Data that doesn&#39;t supported by <wbr/>Weiv<wbr/>Data?</span></a></li><li><a href="#md:i-already-know-mongodb-can-i-use-native-syntax-of-mongodb-with-weivdata"><span>I already know <wbr/>MongoDB can <wbr/>I use native syntax of <wbr/>MongoDB with <wbr/>Weiv<wbr/>Data?</span></a></li></ul></li></ul><a href="#md:how-to-setup-for-weivdata"><span>How to <wbr/>Setup for <wbr/>Weiv<wbr/>Data</span></a><a href="#md:security-in-weivdata-and-mongodb"><span>Security in <wbr/>Weiv<wbr/>Data and <wbr/>MongoDB</span></a><a href="#md:about-data-hooks-in-weivdata"><span>About <wbr/>Data <wbr/>Hooks in <wbr/>Weiv<wbr/>Data</span></a><a href="#md:help"><span>Help</span></a></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="assets/icons.svg#icon-1"></use></svg><span>WeivData API Reference | ExWeiv Apps</span></a><ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="."><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a><br>
             <span id="generation-date"></span>
             <script>
-                window.GENERATION_DATE = 1716238040894;
+                window.GENERATION_DATE = 1716307852036;
 
                 (() => {
                     

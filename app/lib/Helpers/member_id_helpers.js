@@ -12,7 +12,7 @@ async function getOwnerId(enableVisitorId = false) {
             return wix_users_backend_1.currentUser.id;
         }
         else if (enableVisitorId === true) {
-            const { _owner, _id } = await wix_data_1.default.insert("WeivOwnerID", {});
+            const { _owner, _id } = await wix_data_1.default.insert("WeivOwnerID", {}, { supressAuth: true });
             wix_data_1.default.remove("WeivOwnerID", _id, { suppressAuth: true });
             return _owner;
         }

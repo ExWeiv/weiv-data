@@ -11,7 +11,8 @@ async function bulkSave(collectionId, items, options) {
     try {
         const { safeItems, safeOptions } = await (0, validator_1.validateParams)({ collectionId, items, options }, ["collectionId", "items"], "bulkSave");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, onlyOwner } = safeOptions || {};
+        const currentMemberId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         let editedItems = safeItems.map(async (item) => {
             if (!item._owner) {
@@ -37,6 +38,7 @@ async function bulkSave(collectionId, items, options) {
                 }
             }
             else {
+                item._owner = currentMemberId;
                 if (suppressHooks != true) {
                     const editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [item, context]).catch((err) => {
                         throw new Error(`beforeInsert (bulkSave) Hook Failure ${err}`);
@@ -56,9 +58,15 @@ async function bulkSave(collectionId, items, options) {
         editedItems = await Promise.all(editedItems);
         const bulkOperations = editedItems.map((item) => {
             if (item._id) {
+                const filter = { _id: item._id };
+                if (onlyOwner) {
+                    if (currentMemberId) {
+                        filter._owner = currentMemberId;
+                    }
+                }
                 return {
                     updateOne: {
-                        filter: { _id: item._id },
+                        filter,
                         update: { $set: { ...item, _updatedDate: new Date() }, $setOnInsert: !item._createdDate ? { _createdDate: new Date() } : {} },
                         upsert: true
                     }

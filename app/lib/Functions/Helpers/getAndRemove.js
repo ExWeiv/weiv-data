@@ -6,11 +6,12 @@ const hook_helpers_1 = require("../../Helpers/hook_helpers");
 const hook_manager_1 = require("../../Hooks/hook_manager");
 const item_helpers_1 = require("../../Helpers/item_helpers");
 const validator_1 = require("../../Helpers/validator");
+const member_id_helpers_1 = require("../../Helpers/member_id_helpers");
 async function getAndRemove(collectionId, itemId, options) {
     try {
         const { safeItemId, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemId, options }, ["collectionId", "itemId"], "getAndRemove");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
         let editedItemId = safeItemId;
         if (suppressHooks != true) {
             const modifiedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndRemove", [safeItemId, context]).catch((err) => {
@@ -20,8 +21,15 @@ async function getAndRemove(collectionId, itemId, options) {
                 editedItemId = (0, item_helpers_1.convertStringId)(modifiedItemId);
             }
         }
+        const filter = { _id: editedItemId };
+        if (onlyOwner) {
+            const currentMemberId = await (0, member_id_helpers_1.getOwnerId)();
+            if (currentMemberId) {
+                filter._owner = currentMemberId;
+            }
+        }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const item = await collection.findOneAndDelete({ _id: editedItemId }, { readConcern, includeResultMetadata: false });
+        const item = await collection.findOneAndDelete(filter, { readConcern, includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
                 const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndRemove", [item, context]).catch((err) => {
