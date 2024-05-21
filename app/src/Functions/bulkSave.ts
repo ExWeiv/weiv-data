@@ -3,10 +3,11 @@ import { getOwnerId } from '../Helpers/member_id_helpers';
 import { convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
-import type { CollectionID, Item, WeivDataOptions, BulkSaveResult } from '@exweiv/weiv-data';
+import type { CollectionID, Item, BulkSaveResult, WeivDataOptionsWriteOwner } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
+import type { ObjectId } from 'mongodb';
 
-export async function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptions): Promise<BulkSaveResult> {
+export async function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWriteOwner): Promise<BulkSaveResult> {
     try {
         const { safeItems, safeOptions } = await validateParams<"bulkSave">(
             { collectionId, items, options },
@@ -15,7 +16,8 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, onlyOwner } = safeOptions || {};
+        const currentMemberId = await getOwnerId(enableVisitorId);
 
         let ownerId = await getOwnerId(enableVisitorId);
         let editedItems: Item[] | Promise<Item[]>[] = safeItems.map(async (item) => {
@@ -44,6 +46,8 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
                 }
             } else {
                 // Run beforeInsert hook for that item.
+                // Save owner id into item
+                item._owner = currentMemberId;
                 if (suppressHooks != true) {
                     const editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [item, context]).catch((err) => {
                         throw new Error(`beforeInsert (bulkSave) Hook Failure ${err}`);
@@ -63,9 +67,16 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
         editedItems = await Promise.all(editedItems);
         const bulkOperations = editedItems.map((item) => {
             if (item._id) {
+                const filter: { _id: ObjectId, _owner?: string } = { _id: item._id };
+                if (onlyOwner) {
+                    if (currentMemberId) {
+                        filter._owner = currentMemberId;
+                    }
+                }
+
                 return {
                     updateOne: {
-                        filter: { _id: item._id },
+                        filter,
                         update: { $set: { ...item, _updatedDate: new Date() }, $setOnInsert: !item._createdDate ? { _createdDate: new Date() } : {} },
                         upsert: true
                     }
