@@ -1,4 +1,4 @@
-# CHANGELOG of weiv-data
+# CHANGELOG of WeivData
 
 In this file you can find what's changed in each version. (Versions with -dev, -test tags can contain BUG/s and errors don't use them in production)
 
@@ -180,7 +180,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 ### 1.5.3
 
 - TS Updates
-- We have started working for a Discord Server and documentation page built with weiv-data.
+- We have started working for a Discord Server and documentation page built with WeivData.
 
 ### 1.5.2
 
@@ -194,7 +194,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ### 1.5.0
 
-- All data hooks are available to use and now data hooks are implemented into weiv-data.
+- All data hooks are available to use and now data hooks are implemented into WeivData.
 - onFailure hook is still not available.
 - We have started to test data hooks if they are working as expected.
 
