@@ -1,281 +1,205 @@
-This is the official documentation page for weiv-data APIs powered by **ExWeiv Apps**, we have built an API library for you to use with your Wix sites. This package is designed to work in Wix websites with Velo and JS and mainly focused to developers not basic users but anyone can use it for free! Before we start here are the advantages and disadvantages of weiv-data when compared to wix-data.
+Contents:
 
-| Feature                             | weiv-data (M0 Cluster)      | wix-data (Basic Plan)               |
-| ----------------------------------- | --------------------------- | ----------------------------------- |
-| Database Type                       | NoSQL - MongoDB             | NoSQL - MongoDB                     |
-| Frontend Support                    | Only Backend                | Frontend Supported                  |
-| Performance/Speed                   | 8.5/10                      | 6.5/10                              |
-| Cold Start Time                     | Extra 1000-1500ms           | No Cold Start                       |
-| Scalability (General)               | Very High                   | Moderate                            |
-| Consistency                         | 8/10                        | 9/10                                |
-| Read Limits                         | 100/sec                     | 1500/min                            |
-| Write Limits                        | 100/sec                     | 100/min                             |
-| Request Timeout                     | 30sec/request               | 5sec/request                        |
-| Index Limits                        | 3 Index in Total            | 1 Index in Total                    |
-| Collection Limit                    | 500 Collections             | 15 Collections                      |
-| Database Limit                      | 100 Databases               | 1 Database (Auto Generated)         |
-| Storage Limit                       | 512MB                       | 1500 Items/Rows                     |
-| Item Size Limit                     | 16MB                        | 512KB                               |
-| Automatic Backup                    | No Automatic Backup         | 1 Per Month                         |
-| Manual Backup                       | Yes                         | Yes                                 |
-| Visual Dashboard                    | Yes (Not Integrated to Wix) | Yes (Also Integrated with Wix)      |
-| Datasets (Connecting Data Visually) | Not Available               | Available                           |
-| Pricing                             | Free, Monthly, Hourly       | Free, Monthly (Starting from 12€/m) |
-| Multicloud                          | No                          | Yes                                 |
-| RAM                                 | Shared RAM                  | 400MB (1 Micro Container)           |
-| CPU                                 | Shared vCPU                 | 1vCPU (1 Micro Container)           |
-| Security                            | Very Good                   | Much More Better                    |
+- Difference Between WixData and WeivData (Which One to Choose?)
+- General Overview of WeivData and FAQs
+- How to Setup for WeivData
+- Security in WeivData and MongoDB
+- About Data Hooks in WeivData
+- Cold Start of WeivData
+- Help
 
-> In MongoDB M0 Cluster you WON'T have 100/sec limit for each class of operation you have 100/sec for any class of operation. So read/write/update/delete... sahres the same limit of 100/sec which is 6000/min
+---
 
-**We have compared the limits and other things based on the lowest leves. M0 Cluster for MongoDB (Free) and Basic Plan for Wix Studio (12€/m).**
+## WixData and WeivData Differences, Which One to Choose?
 
-### Summary
+WixData is the integrated database system of Wix websites (aka CMS in Wix) which you can create collections with a predefined schema and use a NoSQL database in your Wix website, just like WeivData WixData is also using MongoDB but there are differences between each system.
 
-There are still more things we can consider between each library and don't forget that our library is not a platform it's just converting mongodb into similar syntax and adding some features top of it so you can code like in wix-data using weiv-data. What this means is we are actually comparing MongoDB Atlas and wix-data.
+-> WixData is not only an API library for developers it provides some extra features outside of coding. <br>
+-> WixData is also designed for basic users who doesn't know much about database systems. <br>
+-> WixData is fully integrated with Wix business solutions and has some advantages.
 
-And when you have the freedom of upgrading your own MongoDB clusters it's very hard for wix-data to be better because you can upgrade to highest level of dedicated cluster and probably your setup will be better.
+-> WeivData is an API library built top of MongoDB NodeJS driver. <br>
+-> WeivData is not designed for basic users, it's designed for developers. <br>
+-> WeivData is not fully integrated with Wix business solutions.
 
-But when we compare the lowest levels in each platform you can see that there some cons and pros. Remember there is no one size fits all so consider your app/website and decide which library to use. If you don't need speed and if you are building something simple there is no need to use weiv-data in general. But if you are building something more complex and that needs speed than you can go with weiv-data.
+Of course there are more difference between each system and let's take a look at some important differences between each system;
 
-Also keep in mind that we didn't list every single detail about each library/platform we recommend you to take a look at MongoDB M0 Cluster limits and Wix Studio Basic plan limits to let you even understand better the limits and features.
+### WeivData (MongoDB)
 
-### Using M0 Cluster for Production
+WeivData is not a standalone product like WixData instead it's an API library that's designed to work just like WixData but faster with more features (more APIs, more customization etc.). The main goal of WeivData is to provide similar system to WixData in terms of coding experience and make it easy for Velo developers to take advantage of external database system without WixData limits and long learning processes.
 
-When we have test the M0 Cluster it was quite well for begining if your application is not expecting a lot of users you can just start with free version which is M0 then you can upgrade to M2 or M5 or even to a dedicated clusters which is M10 or higher you can also enable multi-cloud and auto-scale features in dedicated clusters.
+There isn't any limit that belongs to WeivData but there are limits which will be defined by you when you choose your cluster in MongoDB. WeivData uses MongoDB Atlas in the background so you will need an account in MongoDB and create an [Atlas](https://www.mongodb.com/atlas) cluster which is a product of MongoDB.
 
-So _we think_ it's okay to start with M0 and then upgrade if there is a need for an upgrade. Monitor your functions using Wix Monitoring tools and see if you really need a higher version.
+### WixData (MongoDB)
 
-> Before upgrading directly remember you can optimize your code and collections using related features such as indexes.
+WixData is also using MongoDB in the background but everything is managed by Wix and not by MongoDB itself like in Atlas. And there are some limits based on your Wix premium plan, database size, write and read request limits or index counts etc. You can learn more about [WixData limits](https://dev.wix.com/docs/develop-websites/articles/coding-with-velo/limits-and-optimization/data-features) at Wix's website.
 
-## Setup Your Env
+**Let's compare some important limits in both;**
 
-Let's start by setting up our environment for weiv-data and make things ready. Follow the steps and you will be ready to go in 1-3mins:
+> M0 Cluster is the free cluster of MongoDB Atlas which is not for production or large traffic websites.
 
-> If you haven't created a MongoDB account yet go ahead and create one!
+| Feature                             | WeivData (M0 Cluster)       | WixData (Basic Plan)         |
+| ----------------------------------- | --------------------------- | ---------------------------- |
+| Database Type                       | NoSQL - MongoDB             | NoSQL - MongoDB              |
+| Frontend Support                    | Only Backend                | Frontend Supported           |
+| Performance/Speed                   | 8.5/10                      | 6.5/10                       |
+| Cold Start Time                     | Extra 1000-1500ms           | No Cold Start                |
+| Scalability (General)               | Very High                   | Moderate                     |
+| Read Limits                         | 100/sec                     | 1500/min                     |
+| Write Limits                        | 100/sec                     | 100/min                      |
+| Request Timeout                     | 30sec/request               | 5sec/request                 |
+| Index Limits                        | 3 Index                     | 1 Index                      |
+| Collection Limit                    | 500 Collections             | 15 Collections               |
+| Database Limit                      | 100 Databases               | 1 Database (Auto Integrated) |
+| Storage Limit                       | 512MB                       | 1500 Items/Documents         |
+| Item Size Limit                     | 16MB                        | 512KB                        |
+| Automatic Backup                    | No Automatic Backup         | 1 Per Month                  |
+| Manual Backup                       | Yes                         | Yes                          |
+| Visual Dashboard                    | Yes (Not Integrated to Wix) | Yes                          |
+| Dynamic Pages in Wix                | No (Has Workaround)         | Yes                          |
+| Datasets (Connecting Data Visually) | Not Available               | Available                    |
+| Pricing                             | Free                        | Monthly (12€/m)              |
+| Multicloud                          | No                          | Yes                          |
+| Multi Region                        | No                          | Yes                          |
+| RAM                                 | Shared RAM                  | 400MB                        |
+| CPU                                 | Shared vCPU                 | 1vCPU                        |
+
+There are some general details about both system and probably there are more you can think about if you know what you need. But M0 cluster is not recommended and designed for production enviroments so you can also compare features of M10 cluster with another plan of Wix.
+
+_It's also important to mention that WixData is multi region by default so basically you don't need to do anything about it, you will have servers around the world. But in WeivData it all depends on your cluster at MongoDB, if you want to setup the similar system you can use global clusters in MongoDB Atlas._
+
+### When to Choose WeivData?
+
+When you want to build something more complex you may want to choose WeivData over WixData but if you are not planning to build something complex you can go with WixData, it also depends on your future plans with your app. You wouldn't want to pick the wrong database system. And don't forget WeivData is a NoSQL database just like WixData so if you need an SQL database or something else you may want to look for other database systems and maybe integrate it with WixData using external database connections.
+
+## General Overview of WeivData & FAQs
+
+WeivData creates a similar/same syntax of WixData and converts it to a form where mongodb driver can understand. It also handles the authorization so you can set permissions for user, member and admin level. This permission system is working with Wix Members in the background via `wix-members` and/or `wix-users` APIs.
+
+If you are already familiar with MongoDB you can also use **.native** function to use any collection feature of MongoDB NodeJS driver.
+
+### FAQs
+
+#### **How do we define permissions for each level and how it works?**
+
+You define the permissions at MongoDB dashboard where you create database users and set permissions for each user. You can create three different user (Visitor, Member, Admin) and assign required permissions for each database and/or collection for these users. And then you can use these users with WeivData. WeivData will know if the current user is a Visitor, Member or Admin.
+
+#### **How can we create Site Member Author permission in WeivData?**
+
+There isn't any specific user or a permission for this in WeivData but there is a very simple workaround you can apply. If you need a collection where members can only update and delete their own data you can enable a flag in WeivData when passing options which called as `onlyOwner` if you set this to true WeivData will check if searched item's \_owner field mathes with current member id. If so it will apply the action if not it will return undefined.
+
+#### **Is syntax of WeivData same with WixData?**
+
+For some functions yes it's almost the same or directly same but for some other functions it's different a little. For example aggregate function in WixData is not order sensitive, so basically the order of methods won't have any effect on the returned data. But in WeivData it matters and order of your method calls after aggregate function will effect the returned data. Another difference for aggregate function you have a method called `stage` where you can add custom pipeline stages, this allows you to mixin native MongoDB pipeline stages with predefined methods.
+
+#### **What is cold start, and can we optimize it?**
+
+Cold start is the first time you call WeivData in your code, when you call any function of WeivData that makes request/s to database it'll first connect to MongoDB and for this it'll require some extra time usually around 800ms-2s and this will add some extra delay to your first function call. After that first cold connected MongoClient will be cached and this won't happen again until the container killed by Wix.
+
+Every Wix website runs inside of a container and these containers are killed each 5 minutes (rare but sometimes 6min). So every 5 minutes WeivData will need to connect again, and this will require a cold start which will add some delay for first function/s call/s.
+
+To optimize this you can't do much because you don't have any control over how these containers killed, it would be better if Wix would keep the containers alive if there are live visitors but this is not the case. What you can do is use a plugin of WeivData to setup a basic API endpoint in your Wix website and regulary make calls to that POST API endpoint (each 4/5min). This will keep your Wix site warm and make the connection ready for most users.
+
+> In WixData you don't directly interact with database instead you are talking with another server and this makes it possible to create a system where you don't have cold starts.
+
+#### **How can I switch from WixData?**
+
+If you already use WixData and has a lot of data currently it won't be easy to switch to WeivData because for now WeivData doesn't support string based IDs instead we use ObjectIds and because of that you'll need to convert each string id to ObjectId and this won't be eacy for big amounts of data. But soon it'll be possible for you to use string ids and when this happens you can do the following:
+
+1. Create the same collections in a database.
+2. Export data from Wix collections as CSV files.
+3. Import these CSV files to your MongoDB collections carefully.
+4. You are ready to go.
+
+> This should be an easy way to import data to MongoDB when you don't have too many data.
+
+#### **Are there any feature of WixData that doesn't supported by WeivData?**
+
+Yes there are some features we don't support and these are:
+
+- Dynamic Pages (has a workaround)
+- Datasets
+- Frontend Support
+- onFailure Hook
+
+#### **I already know MongoDB can I use native syntax of MongoDB with WeivData?**
+
+Yes this is possible via .native function where you can get a collection cursor and work with this cursor that's returned by MongoDB NodeJS driver.
+
+## How to Setup for WeivData
+
+Follow this step by step guide to setup your Wix website for WeivData:
+
+> We assume that you have already created a MongoDB account and a Atlas cluster so your MongoDB database is ready. If not please fo it first.
 
 1. We assume that you have created your database setup and created your cluster in MongoDB.
 2. Go to database access from the MongoDB dashboard.
    1. Go to `Custom Roles` tab and create three different roles: `Admin`, `Member` and `Visitor`.
    2. Add related databases, collections and permissions to each role.
 3. When you are done with creating custom roles go back to `Database Users` tab and create three different users.
-   1. Create a user for each role we have created before and name them as you want but we suggest naming them as Admin, Member and Visitor.
-   2. When you create your users create [strong passwords](https://randomkeygen.com/) for your users too because this will be important for security.
-   3. Create passwords that contains numbers, upper and lowercase letters and symbols and make sure that it's longer than 17 characters.
-   4. After you create each user save passwords to somewhere because you will need these later.
+   1. Create a user for each role we have created before and name them as you want (use secure usernames don't use usernames like admin, member or visitor).
+   2. When you create your users create [strong passwords](https://randomkeygen.com/) for your users too.
+   3. Create passwords that contains numbers, upper and lowercase letters also symbols and make sure that it's longer than 17 characters.
+   4. After you create each user save passwords to somewhere because you will need these later and MongoDB won't show passwords to you again. (Use paper and pencil)
 4. When you complete the 3rd step go to `Network Access` page from the MongoDB dashboard.
    1. Remove any IP address in `IP Access List` tab.
-   2. Add new IP address and click `Allow Access From Anywhere`. In this way Wix servers will be able to access your database (also any other server).
-   3. Keep in mind that you can setup custom IP addresses if you want.
+   2. Add new IP address and click `Allow Access From Anywhere`. In this way Wix servers will be able to access your database (also any other device!!).
 5. When you complete the 4th step. You are now ready to switch to your Wix Studio Dashboard.
    1. Open up the Wix dashboard and go to `Developer Tools -> Secrets Manager`
    2. You will create a single secret for all users you've created in MongoDB. Create a secret named as `WeivDataURIs`.
-   3. After you create the secret you will paste the URIs in JSON format like below:
+   3. After you create the secret you will paste the URIs in stringified JSON format like below:
 
 ```json
-{
+"{
   "visitor": "<visitor-uri>",
   "member": "<member-uri>",
   "admin": "<admin-uri>"
-}
+}"
 ```
 
 6. You are done with Secrets Manager now go to CMS from your Wix Dashboard.
    1. Create a collection and name it as `WeivOwnerID`. This collection will be used to get visitor ids when you enable it for each operation.
    2. You don't need to create any field just create the collection and leave it as it is. weiv-data will remove any data it creates.
-   3. Also set the collection permissions to Anyone for each operation. So anyone should be able to do all operations for that collection.
-7. Now it's time to install the `weiv-data` library.
-   1. Go to your Wix Studio Editor and enable coding features (Velo). (Click the code icon = { })
-   2. Go to `Packages & Apps`. You will see npm click `+` button. And search for "@exweiv".
-   3. You will see the `@exweiv/weiv-data` npm package install that package.
-   4. You may also want to install `mongodb` package since you will deal with `ObjectIDs`.
-   5. Search for "mongodb" and click the three dots. Select choose version and install the 5.9.2
-   6. You can import ObjectId like that: `import { ObjectId } from 'mongodb';`. (More examples below and can only be used in backend).
-8. For the last step go to your Wix Studio editor and open up the `Public & Backend` section.
-   1. Create a folder named `WeivData` in your backend section of your site.
+7. Now it's time to install the `weiv-data` library. Install `@exweiv/weiv-data` package from NPM.
+8. For the last step go to your backend directory.
+   1. Create a folder named `WeivData` in your backend section of your site. (backend/WeivData)
    2. Inside of this folder create a JS file named `connection-options.js` and `data.js`. These are required even if you don't set any data hooks or custom connection options.
+
+```
+backend/
+├── WeivData/
+│   ├── connection-options.js
+│   └── data.js
+└──
+```
+
 9. You should be good to go!
 
-**Even if you won't setup any custom connection settings or data hooks create `WeivData` folder in your backend and create two .js files `data.js` and `connection-options.js`. This is important and must have to let library work.`**
+## Security in WeivData and MongoDB
 
-> We also explain how you use X.509 instead of username and password authentication method.
+There are not very much to do with security side when you use MongoDB Atlas since it's already managed by MongoDB they will handle the most of the security features. But you should be careful about these steps:
 
-### Finding Connection URI/String in MongoDB:
+1. Use secure usernames and passwords for your database users.
+2. Don't add unrequired roles/permissions to your users, just add minimal permissions (only what is required).
+3. Follow secure coding practices and keep your code secure.
 
-**Click to connect button in your cluster.**
+And you should be fine in most cases.
 
-<img src="https://static.wixstatic.com/media/510eca_04dddb376fd348079791a884d06f18e4~mv2.png" height="400px" alt="Connect Button in MongoDB Databases Page">
+> WeivData is already checking things like data types or prototype pollution and throws errors in some cases where you send wrong data. But always follow the secure coding practices.
 
-**Then you will see an example of connection uri/string.**
+## About Data Hooks in WeivData
 
-<img src="https://static.wixstatic.com/media/510eca_053a1b7c7ec74c6599f9ff7c6fcde265~mv2.png" height="400px" alt="Connection URI/String">
+Just like in WixData you can also define data hooks in WeivData too, hooks will make it possible for you to manipulate the data on the fly that's sent to MongoDB or data returned by the function. There are more hooks in WeivData because WeivData has more functions than WixData and you can learn about these in the [documentation of WeivData](https://weiv-data.apps.exweiv.com/).
 
-```js
-const username = "Admin";
-const password = "StrongPassword.26.34.61";
+You will use `data.js` file inside `backend/WeivData` folder. You can define your hooks inside there.
 
-// Replace username, password and rest of the URL with your own!
-const uriExample = `mongodb+srv://${username}:${password}@testingcluster.luecqd2.mongodb.net/`;
-```
-
-### IP Address and Security
-
-Currently we don't have any tutorial about how you can setup IP Address within Wix. Instead we allow any IP address and use strong passwords. We are working on different type of authentication methods that's available in MongoDB and also possible with Wix.
-
-### ObjectID Based ItemIDs
-
-In weiv-data unlike wix-data we don't use string based item ids. Instead we use `ObjectId` based item ids. We use ObjectId for better speed and performance. You can learn more about ObjectId via a magical tool called `Google`, `Gemini`, `Chat-GPT` etc. 😊
-
-Currently we are optimizing our code to return ObjectID in every case right now in some cases our library returns string instead of ObjectID. (This will be fixed asap.)
-
-Note: You can use a custom function in our library to convert strings into ObjectId or ObjectIds to string.
-
-```js
-import { idConverter } from "@exweiv/weiv-data";
-
-const stringId = "...";
-const objectId = "...";
-
-idConverter(stringId); // returns objectid
-idConverter(objectId); // returns stringid
-```
-
-### Creating Custom Options
-
-Here is a direct example for advanced users to let them understand it directly.
-
-> Example shows a path but you can also use buffer data with `key` field in options. See MongoDB docs for more.
-
-```js
-// In your `backend/WeivData/connection-options.js` file.
-const defaultOptions = () => {
-  return {
-    maxPoolSize: 50,
-    minPoolSize: 5,
-    maxIdleTimeMS: 30000,
-    tls: true,
-    authMechanism: "MONGODB-X509",
-  };
-};
-
-// Defined as a function (can be async)
-export const adminClientOptions = () => {
-  return {
-    ...defaultOptions(),
-    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/admin.pem",
-  };
-};
-
-// Defined as a function (can be async)
-export const memberClientOptions = () => {
-  return {
-    ...defaultOptions(),
-    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/member.pem",
-  };
-};
-
-// Defined as a function (can be async)
-export const visitorClientOptions = () => {
-  return {
-    ...defaultOptions(),
-    tlsCertificateKeyFile: "../../../../../../../../../user-code/backend/WeivData/visitor.pem",
-  };
-};
-```
-
-Let's talk about how it works. Basically you can create three different client options for each role and export them named as above example. And export them in that js file.
-
-`adminClientOptions` function will be used for admins. `memberClientOptions` function will be used for members. `visitorClientOptions` function will be used for visitors.
-
-In this way you can assign different certificates or options for each role.
-
-> If you don't create only one or two of these options defaults will be used for the one/s you didn't specify.
-
-[More About Connection Options in MongoDB](https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/connection/connection-options/)
-
-[More About TLS](https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/connection/tls/)
-
-[More About Auth Options](https://www.mongodb.com/docs/drivers/node/v5.9/fundamentals/authentication/)
-
-### Using Atlas Managed X.509
-
-You can still use username and password method (SCRAM) which will be fine if you have strong passwords but if you want to use X.509 here is how. Username and password method (SCRAM) is easier and secure. Just create strong passwords!
-
-Let us explain how does weiv-data works when connecting to clusters so you can better understand which options you can use for authentication.
-
-> You can also check our GitHub so you can understand how it works even create pull requests.
-
-- Our connection provider gets the URI from the secret you create in your Wix secrets manager.
-- We use secrets manager for URIs but for connection options (`MongoClientOptions`) we use a JS file you create in your Wix backend. As we explain above.
-
-In this way you can manage connection uris/strings as well as connection options.
-
-If you want to create users thats using X.509 method follow the steps:
-
-1. Go to your MongoDB dashboard and create a new user.
-2. When creating a user select `certificate` option above.
-3. Give a name to your user _(CN)_ and enable download switch.
-4. Set an expire date for your certificate.
-5. Add permissions and create the user (certificate will be downloaded automatically)
-6. Open the downloaded .pem file and copy the content of file.
-7. Create a .pem file in your Wix backend and paste the content in that file.
-8. In your `connection-options.js` file assign the path of file. **(Read below)**
-9. You should be good to go!
-
-When you are pasting the path of .pem file in your backend use the following directory as reference:
-
-```js
-const pathToBackend = "../../../../../../../../../user-code/backend/";
-```
-
-This is the path to your Wix backend. Yes it's different than what you have in your codes. But this one is the working one. Use this path to access your backend folder. You can also check the example code above.
-
-> You can probably also access to other folders like public, pages etc. Just let you know not needed for our library.
-
-> You can also use Buffer data of your .pem files which is probably what you'll prefer in production. You can store your .pem files in cloud providers and get signed URLs after that you can use that signed URLs to create a Buffer data via axios. And then you can use that Buffer data for X.509 method.
-
-### How to Create Hooks
-
-Using hooks in weiv-data and wix-data has similar way. We are currently not providing a hook for errors. But rest of the hooks are available like in wix-data. To create a hook you need to create a folder in your backend named `WeivData` and then you also need to create a .js file (.js file now .jsw or .web.js) inside of that folder.
-
--> backend/WeivData/data.js
-
-Then you will create your hooks as functions like in wix-data. Here is an example for afterGet hook:
-
-```js
-// In backend/WeivData/data.js file
-
-export async function dbname_collectionname_afterGet(item, context) {
-  if (item.number > 5) {
-    return true;
-  } else {
-    return false;
-  }
-}
-```
-
-You need to name your functions correctly to let hooks work. The syntax is like that:
-`<database-name>_<collection-name>_<hook-name>`
-
-> Both database name and collection name should be all lowercase.
-
-### Manual or Automatic Pool Management
-
-If you want to use automatic pool management do not set min or max pool size in your custom connection options. In this way it will be handled by MongoDB driver and weiv-data library won't connect to cluster manually instead it will return a not connected MongoClient and driver will handle the connection when an operation starts.
-
-If you want to manually configure it you can set min or max (or both) pool size in custom connection options. In this way our library will call the .connect method and it will return a connected client when performing operations.
-
-MongoClients are cached and saved so after cold start it will be cached for 5 min. (Wix Container Time)
-
-<br>
-
----
+## Help
 
 Ask for help, give feedback or anything else? info@apps.exweiv.com
 
-- [API Reference](https://weiv-data.apps.exweiv.com/)
-- [Install - NPM](https://www.npmjs.com/package/@exweiv/weiv-data)
-- [Changelog](https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md)
+[API Reference](https://weiv-data.apps.exweiv.com/) <br>
+[Install - NPM](https://www.npmjs.com/package/@exweiv/weiv-data) <br>
+[Changelog](https://github.com/ExWeiv/weiv-data/blob/main/CHANGELOG.md)
 
 ---
 

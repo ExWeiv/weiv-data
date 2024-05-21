@@ -127,24 +127,6 @@ declare module '@exweiv/weiv-data' {
          * An option to choose a consistency level when reading data from MongoDB Clusters.
          */
         readConcern?: "local" | "majority" | "linearizable" | "available" | "snapshot",
-
-        /**
-         * @description
-         * An option to use visitorId. This option will try to get the id of current user on the site.
-         * Even if it's a visitor and if that same visitor signs up to your site your _owner field data will be the same with the member id in Wix Members.
-         * 
-         * *Created for new data inserts doesn't have any effect on read functions or update functions*
-         * 
-         * > When enabled, function will make another extra call so it will be slower, defaults to false.
-         * > For members you don't need this option to be true, weivData always knows the member ids.
-         */
-        enableVisitorId?: boolean,
-
-        /**
-         * @description
-         * By default this is true and you can disable it if you want, when it's disabled (false) we won't fetch the total count of the items.
-         */
-        omitTotalCount?: boolean
     }
 
     /**
@@ -165,6 +147,54 @@ declare module '@exweiv/weiv-data' {
          */
         cacheTimeout?: number
     } & WeivDataOptions;
+
+    /**
+     * @description
+     * WeivData options only for some write functions like insert. Where you can insert new data into collection.
+     */
+    type WeivDataOptionsWrite = {
+        /**
+         * @description
+         * An option to use visitorId. This option will try to get the id of current user on the site.
+         * Even if it's a visitor and if that same visitor signs up to your site your _owner field data will be the same with the member id in Wix Members.
+         * *Created for new data inserts doesn't have any effect on read functions or update functions*
+         * 
+         * > When enabled, function will make another extra call so it will be slower, defaults to false.
+         * > For members you don't need this option to be true, weivData always knows the member ids.
+         **/
+        enableVisitorId?: boolean,
+    } & WeivDataOptions;
+
+    /**
+     * @description
+     * WeivData options only for query function.
+     */
+    type WeivDataOptionsQuery = {
+        /**
+         * @description
+         * By default this is true and you can disable it if you want, when it's disabled (false) we won't fetch the total count of the items.
+         */
+        omitTotalCount?: boolean
+    } & WeivDataOptions;
+
+    /**
+     * @description
+     * WeivData options where onlyOwner is possible.
+     */
+    type WeivDataOptionsOwner = {
+        /**
+         * @description
+         * When sert to true WeivData will add another filter and check if _owner field of the item matches with current member id.
+         * This will make it possible to take action only if current member is the owner of the data.
+         */
+        onlyOwner?: boolean
+    } & WeivDataOptions;
+
+    /**
+     * @description
+     * WeivData options where onlyOwner is possible with enableVisitorId.
+     */
+    type WeivDataOptionsWriteOwner = WeivDataOptionsOwner & WeivDataOptionsWrite;
 
     /**
      * @description
