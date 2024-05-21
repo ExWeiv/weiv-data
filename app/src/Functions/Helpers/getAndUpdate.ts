@@ -5,6 +5,7 @@ import { runDataHook } from '../../Hooks/hook_manager';
 import { validateParams } from '../../Helpers/validator';
 import type { ObjectId } from 'mongodb';
 import { getOwnerId } from '../../Helpers/member_id_helpers';
+import { convertObjectId } from '../../Helpers/item_helpers';
 
 export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined> {
     try {
@@ -52,11 +53,21 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
                 });
 
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = convertObjectId(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
 
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: convertObjectId(item._id)
+                }
+            } else {
+                return item;
+            }
         } else {
             return undefined;
         }

@@ -1,6 +1,6 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { getOwnerId } from '../Helpers/member_id_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import type { CollectionID, Item, BulkSaveResult, WeivDataOptionsWriteOwner } from '@exweiv/weiv-data';
@@ -100,6 +100,9 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
                     if (item._id) {
+                        // Convert to string
+                        item._id = convertObjectId(item._id);
+
                         // Run afterUpdate hook for that item.
                         const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
                             throw new Error(`afterUpdate (bulkSave) Hook Failure ${err}`);
@@ -127,9 +130,9 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
                 editedItems = await Promise.all(editedItems);
             }
 
-            const editedInsertedIds = Object.keys(insertedIds).map((key: any) => {
-                return insertedIds[key];
-            })
+            const editedInsertedIds: string[] = Object.keys(insertedIds).map((key) => {
+                return convertObjectId(insertedIds[key as any]);
+            });
 
             return {
                 insertedItemIds: editedInsertedIds,

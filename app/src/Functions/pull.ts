@@ -1,7 +1,7 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import type { CollectionID, ItemID, WeivDataOptions, Item } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
 
@@ -37,11 +37,21 @@ export async function pull(collectionId: CollectionID, itemId: ItemID, propertyN
                 });
 
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = convertObjectId(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
 
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: convertObjectId(item._id)
+                }
+            } else {
+                return item;
+            }
         } else {
             return null;
         }

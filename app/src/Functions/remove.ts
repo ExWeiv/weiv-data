@@ -1,5 +1,5 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import type { CollectionID, Item, ItemID, WeivDataOptionsOwner } from '@exweiv/weiv-data';
@@ -47,11 +47,21 @@ export async function remove(collectionId: CollectionID, itemId: ItemID, options
                 });
 
                 if (editedItem) {
+                    if (editedItem._id) {
+                        editedItem._id = convertObjectId(editedItem._id);
+                    }
                     return editedItem;
                 }
             }
 
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: convertObjectId(item._id)
+                }
+            } else {
+                return item;
+            }
         } else {
             return null;
         }

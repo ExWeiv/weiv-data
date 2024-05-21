@@ -35,13 +35,13 @@ type ValidateParameters<FName> =
     FName extends 'multiply' ? { collectionId: CollectionID, options?: WeivDataOptions, itemId: ItemID, propertyName: string, value: number } :
     FName extends 'isReferenced' ? { collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptionsCache } :
     FName extends 'insertReference' ? { collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptionsCache } :
-    FName extends 'insert' ? { collectionId: CollectionID, item: Item, options?: WeivDataOptionsCache } :
+    FName extends 'insert' ? { collectionId: CollectionID, item: Item, options?: WeivDataOptionsWrite } :
     FName extends 'increment' ? { collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions } :
     FName extends 'get' ? { collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsCache } :
     FName extends 'bulkUpdate' ? { collectionId: CollectionID, items: Item[], options?: WeivDataOptionsOwner } :
     FName extends 'bulkSave' ? { collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWriteOwner } :
     FName extends 'bulkRemove' ? { collectionId: CollectionID, itemIds: ItemID[], options?: WeivDataOptionsOwner } :
-    FName extends 'bulkInsert' ? { collectionId: CollectionID, items: Item[], options?: WeivDataOptions } :
+    FName extends 'bulkInsert' ? { collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWrite } :
     FName extends 'queryReferenced' ? { collectionId: CollectionID, targetCollectionId: string, itemId: ItemID, propertyName: string, queryOptions?: WeivDataQueryReferencedOptions, options?: WeivDataOptions } :
     FName extends 'findOne' ? { collectionId: CollectionID, propertyName: string, value: any, options?: WeivDataOptionsCache } :
     FName extends 'getAndRemove' ? { collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsOwner } :
@@ -67,13 +67,13 @@ type ValidateResponse<FName> =
     FName extends 'multiply' ? { safeOptions?: WeivDataOptions } :
     FName extends 'isReferenced' ? { safeOptions?: WeivDataOptionsCache, safeReferringItemId: ObjectId, safeReferencedItemIds: ObjectId[] } :
     FName extends 'insertReference' ? { safeOptions?: WeivDataOptionsCache, safeReferringItemId: ObjectId, safeReferencedItemIds: ObjectId[] } :
-    FName extends 'insert' ? { safeOptions?: WeivDataOptions, safeItem: Item } :
+    FName extends 'insert' ? { safeOptions?: WeivDataOptionsWrite, safeItem: Item } :
     FName extends 'increment' ? { safeOptions?: WeivDataOptions } :
     FName extends 'get' ? { safeOptions?: WeivDataOptionsCache, safeItemId: ObjectId } :
     FName extends 'bulkUpdate' ? { safeOptions?: WeivDataOptionsOwner, safeItems: Item[] } :
     FName extends 'bulkSave' ? { safeOptions?: WeivDataOptionsWriteOwner, safeItems: Item[] } :
     FName extends 'bulkRemove' ? { safeOptions?: WeivDataOptionsOwner, safeItemIds: ObjectId[] } :
-    FName extends 'bulkInsert' ? { safeOptions?: WeivDataOptions, safeItems: Item[] } :
+    FName extends 'bulkInsert' ? { safeOptions?: WeivDataOptionsWrite, safeItems: Item[] } :
     FName extends 'queryReferenced' ? { safeOptions?: WeivDataOptionsCache, safeItemId: ObjectId, safeQueryOptions?: WeivDataQueryReferencedOptions } :
     FName extends 'findOne' ? { safeOptions?: WeivDataOptionsCache, safeValue: any } :
     FName extends 'getAndRemove' ? { safeOptions?: WeivDataOptionsOwner, safeItemId: ObjectId } :

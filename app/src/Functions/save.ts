@@ -1,6 +1,6 @@
 import type { CollectionID, Item, SaveResult, WeivDataOptionsWriteOwner } from '@exweiv/weiv-data';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { ObjectId } from 'mongodb';
@@ -70,8 +70,16 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 });
 
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = convertObjectId(editedResult._id);
+                    }
+
                     return { item: editedResult, upsertedId };
                 } else {
+                    if (returnedItem._id) {
+                        returnedItem._id = convertObjectId(returnedItem._id);
+                    }
+
                     return { item: returnedItem, upsertedId };
                 }
             } else {
@@ -81,8 +89,16 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 });
 
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = convertObjectId(editedResult._id);
+                    }
+
                     return { item: editedResult };
                 } else {
+                    if (returnedItem._id) {
+                        returnedItem._id = convertObjectId(returnedItem._id);
+                    }
+
                     return { item: returnedItem };
                 }
             }

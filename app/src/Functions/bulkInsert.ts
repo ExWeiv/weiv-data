@@ -3,10 +3,11 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import type { Document } from 'mongodb/mongodb';
-import type { CollectionID, Item, WeivDataOptions, BulkInsertResult } from '@exweiv/weiv-data';
+import type { CollectionID, Item, BulkInsertResult, WeivDataOptionsWrite } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
+import { convertObjectId } from '../Helpers/item_helpers';
 
-export async function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptions): Promise<BulkInsertResult> {
+export async function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWrite): Promise<BulkInsertResult> {
     try {
         const { safeItems, safeOptions } = await validateParams<"bulkInsert">(
             { collectionId, items, options },
@@ -51,13 +52,17 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
             { readConcern, ordered: true }
         );
 
-        const insertedItemIds = Object.keys(insertedIds).map((key: any) => {
-            return insertedIds[key];
+        const insertedItemIds = Object.keys(insertedIds).map((key) => {
+            return convertObjectId(insertedIds[key as any]);
         })
 
         if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
+                    if (item._id) {
+                        item._id = convertObjectId(item._id);
+                    }
+
                     const editedInsertItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
                         throw new Error(`afterInsert (bulkInsert) Hook Failure ${err}`);
                     });

@@ -1,5 +1,5 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import type { CollectionID, Item, WeivDataOptionsOwner, BulkUpdateResult } from '@exweiv/weiv-data';
@@ -64,6 +64,10 @@ export async function bulkUpdate(collectionId: CollectionID, items: Item[], opti
         if (ok) {
             if (suppressHooks != true) {
                 editedItems = editedItems.map(async (item) => {
+                    if (item._id) {
+                        item._id = convertObjectId(item._id);
+                    }
+
                     const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
                         throw new Error(`afterUpdate (bulkUpdate) Hook Failure ${err}`);
                     });

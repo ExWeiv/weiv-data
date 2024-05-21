@@ -1,7 +1,8 @@
 import { ObjectId, Db, Collection } from 'mongodb/mongodb';
 import { getPipeline } from '../../Helpers/query_referenced_helpers';
-import type { CollectionID, WeivDataOptions, WeivDataQueryReferencedResult, WeivDataQueryReferencedOptions } from '@exweiv/weiv-data';
+import type { CollectionID, WeivDataOptions, WeivDataQueryReferencedResult, WeivDataQueryReferencedOptions, Item } from '@exweiv/weiv-data';
 import { connectionHandler } from '../../Helpers/connection_helpers';
+import { convertObjectId } from '../../Helpers/item_helpers';
 
 export class QueryReferencedResult {
     private targetCollectionId: string;
@@ -45,7 +46,12 @@ export class QueryReferencedResult {
             const { referencedItems, totalItems } = items[0];
 
             return {
-                items: referencedItems,
+                items: (referencedItems as Item[]).map((item: Item) => {
+                    if (item._id) {
+                        item._id = convertObjectId(item._id);
+                    }
+                    return item;
+                }),
                 totalCount: totalItems,
                 hasNext: () => hasNext,
                 hasPrev: () => this.currentPage > 0,

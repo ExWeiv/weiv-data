@@ -2,7 +2,7 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { validateParams } from '../Helpers/validator';
 
 export async function increment(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions): Promise<Item | null> {
@@ -41,11 +41,21 @@ export async function increment(collectionId: CollectionID, itemId: ItemID, prop
                 });
 
                 if (modifiedResult) {
+                    if (modifiedResult._id) {
+                        modifiedResult._id = convertObjectId(modifiedResult._id);
+                    }
                     return modifiedResult;
                 }
             }
 
-            return item;
+            if (item._id) {
+                return {
+                    ...item,
+                    _id: convertObjectId(item._id)
+                }
+            } else {
+                return item;
+            }
         } else {
             return null;
         }

@@ -1,5 +1,5 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { CollectionID, Item, WeivDataOptionsOwner } from '@exweiv/weiv-data';
@@ -47,11 +47,21 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
                 });
 
                 if (editedResult) {
+                    if (editedResult._id) {
+                        editedResult._id = convertObjectId(editedResult._id);
+                    }
                     return editedResult;
                 }
             }
 
-            return value;
+            if (value._id) {
+                return {
+                    ...value,
+                    _id: convertObjectId(value._id)
+                }
+            } else {
+                return value;
+            }
         } else {
             throw new Error(`returned value has problem value: ${value}`);
         }

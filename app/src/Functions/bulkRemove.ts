@@ -1,5 +1,5 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import type { ObjectId } from 'mongodb/mongodb';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
@@ -59,7 +59,7 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], 
         if (ok) {
             return {
                 removed: deletedCount,
-                removedItemIds: editedItemIds
+                removedItemIds: editedItemIds.map(id => convertObjectId(id))
             }
         } else {
             throw new Error(`removed: ${deletedCount}, ok: ${ok}`)

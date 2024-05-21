@@ -1,5 +1,5 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertStringId } from '../Helpers/item_helpers';
+import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import NodeCache from "node-cache";
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
@@ -57,15 +57,36 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
                 });
 
                 if (editedItem) {
+                    if (editedItem._id) {
+                        editedItem._id = convertObjectId(editedItem._id);
+                    }
+
+                    if (enableCache) {
+                        cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, editedItem, cacheTimeout || 15);
+                    }
+
                     return editedItem;
                 }
             }
 
-            if (enableCache) {
-                cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
-            }
+            if (item._id) {
+                const _id = convertObjectId(item._id)
 
-            return item;
+                if (enableCache) {
+                    cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, { ...item, _id }, cacheTimeout || 15);
+                }
+
+                return {
+                    ...item,
+                    _id
+                }
+            } else {
+                if (enableCache) {
+                    cache.set(`${collectionId}-${safeItemId.toHexString()}-${options ? JSON.stringify(options) : "{}"}`, item, cacheTimeout || 15);
+                }
+
+                return item;
+            }
         } else {
             return null;
         }

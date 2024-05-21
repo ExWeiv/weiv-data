@@ -24,3 +24,15 @@ export function convertStringId(_id: string | ObjectId, create = false): ObjectI
         throw new Error(`Invalid _id type for convertStringId method, itemIds should be string or ObjectId!`);
     }
 }
+
+export function convertObjectId(_id: ObjectId | string): string {
+    if (_id) {
+        // If it's a string directly return it
+        if (typeof _id === "string") {
+            return _id;
+        }
+        return _id.toHexString();
+    } else {
+        throw new Error(`WeivData - ObjectId -> String converter not working!`);
+    }
+}
