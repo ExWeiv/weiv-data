@@ -4,8 +4,9 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
-### 4.1.2
+### 4.1.4
 
+- General BUG Fixes
 - Documentation updated/fixed for custom connection options.
 
 ### 4.1.0

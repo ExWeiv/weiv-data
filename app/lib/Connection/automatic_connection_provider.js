@@ -42,7 +42,7 @@ const createNewClient = async (uri, role) => {
             manual = true;
         }
         const newMongoClient = new mongodb_1.MongoClient(uri, options);
-        clientCache.set(uri.slice(0, 20), newMongoClient);
+        clientCache.set(uri.slice(14, 40), newMongoClient);
         let connection = newMongoClient;
         if (manual) {
             connection = await connectClient(newMongoClient, uri);
@@ -74,31 +74,31 @@ const createNewClient = async (uri, role) => {
 const listenersMap = new Map();
 const connectClient = async (client, uri) => {
     try {
-        const status = statusCache.get(uri.slice(0, 20));
-        const cachedClient = clientCache.get(uri.slice(0, 20));
+        const status = statusCache.get(uri.slice(14, 40));
+        const cachedClient = clientCache.get(uri.slice(14, 40));
         if (status === true) {
             if (cachedClient) {
                 return cachedClient;
             }
         }
         let connectedClient;
-        if (!listenersMap.has(uri.slice(0, 20))) {
+        if (!listenersMap.has(uri.slice(14, 40))) {
             const handleClose = async () => {
-                clientCache.del(uri.slice(0, 20));
-                statusCache.set(uri.slice(0, 20), false);
+                clientCache.del(uri.slice(14, 40));
+                statusCache.set(uri.slice(14, 40), false);
             };
             const handleError = async () => {
-                clientCache.del(uri.slice(0, 20));
-                statusCache.set(uri.slice(0, 20), false);
+                clientCache.del(uri.slice(14, 40));
+                statusCache.set(uri.slice(14, 40), false);
                 throw new Error(`when trying to connect client (connection error): ${uri}`);
             };
             client.on('close', handleClose);
             client.on('error', handleError);
-            listenersMap.set(uri.slice(0, 20), true);
+            listenersMap.set(uri.slice(14, 40), true);
         }
         connectedClient = await client.connect();
-        clientCache.set(uri.slice(0, 20), connectedClient);
-        statusCache.set(uri.slice(0, 20), true);
+        clientCache.set(uri.slice(14, 40), connectedClient);
+        statusCache.set(uri.slice(14, 40), true);
         return connectedClient;
     }
     catch (err) {

@@ -47,7 +47,7 @@ const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<Mo
         }
 
         const newMongoClient = new MongoClient(uri, options);
-        clientCache.set<MongoClient>(uri.slice(0, 20), newMongoClient);
+        clientCache.set<MongoClient>(uri.slice(14, 40), newMongoClient);
 
         // Use connect function to connect to cluster using newly created client 
         let connection = newMongoClient;
@@ -84,8 +84,8 @@ const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<Mo
 const listenersMap: Map<string, boolean> = new Map();
 const connectClient = async (client: MongoClient, uri: string): Promise<MongoClient> => {
     try {
-        const status = statusCache.get<boolean>(uri.slice(0, 20));
-        const cachedClient = clientCache.get<MongoClient>(uri.slice(0, 20));
+        const status = statusCache.get<boolean>(uri.slice(14, 40));
+        const cachedClient = clientCache.get<MongoClient>(uri.slice(14, 40));
 
         // Check if a connection for the given URI exists in the cache
         if (status === true) {
@@ -97,28 +97,28 @@ const connectClient = async (client: MongoClient, uri: string): Promise<MongoCli
         // Create a new client if not cached
         let connectedClient: MongoClient;
 
-        if (!listenersMap.has(uri.slice(0, 20))) {
+        if (!listenersMap.has(uri.slice(14, 40))) {
             const handleClose = async () => {
-                clientCache.del(uri.slice(0, 20));
-                statusCache.set<boolean>(uri.slice(0, 20), false);
+                clientCache.del(uri.slice(14, 40));
+                statusCache.set<boolean>(uri.slice(14, 40), false);
             };
 
             const handleError = async () => {
-                clientCache.del(uri.slice(0, 20));
-                statusCache.set<boolean>(uri.slice(0, 20), false);
+                clientCache.del(uri.slice(14, 40));
+                statusCache.set<boolean>(uri.slice(14, 40), false);
                 throw new Error(`when trying to connect client (connection error): ${uri}`); // Rethrow with URI for context
             };
 
             client.on('close', handleClose);
             client.on('error', handleError);
 
-            listenersMap.set(uri.slice(0, 20), true);
+            listenersMap.set(uri.slice(14, 40), true);
         }
 
         // Connect and return connection
         connectedClient = await client.connect();
-        clientCache.set<MongoClient>(uri.slice(0, 20), connectedClient);
-        statusCache.set<boolean>(uri.slice(0, 20), true);
+        clientCache.set<MongoClient>(uri.slice(14, 40), connectedClient);
+        statusCache.set<boolean>(uri.slice(14, 40), true);
         return connectedClient;
     } catch (err) {
         throw new Error(`Unexpected error: ${err}`); // Handle unexpected errors gracefully
