@@ -118,7 +118,6 @@ export async function validateParams<T>(params: ValidateParameters<T>, requiredP
                             throw new Error(`type of item is not object!`);
                         } else {
                             // Fix Prototype Pollution (Works on ES6 or higher only which Wix already supports)
-                            console.log("Before SafeItem:", value);
                             safeItem = copyOwnPropsOnly(value);
                         }
                     }
