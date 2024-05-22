@@ -4,6 +4,10 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.1.1
+
+- Documentation updated for custom connection options.
+
 ### 4.1.0
 
 - Documentation is updated with new informations and better TS support.
