@@ -34,7 +34,6 @@ async function validateParams(params, requiredParams, func) {
                             throw new Error(`type of item is not object!`);
                         }
                         else {
-                            console.log("Before SafeItem:", value);
                             safeItem = copyOwnPropsOnly(value);
                         }
                     }
