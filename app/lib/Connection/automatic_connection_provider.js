@@ -14,7 +14,7 @@ let listeners = false;
 let manual = false;
 async function setupClient(uri, role) {
     try {
-        const cachedClient = clientCache.get(uri.slice(0, 20));
+        const cachedClient = clientCache.get(uri.slice(14, 40));
         if (cachedClient) {
             let connection = cachedClient;
             if (manual) {
