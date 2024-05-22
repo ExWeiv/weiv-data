@@ -1841,21 +1841,24 @@ declare module '@exweiv/weiv-data' {
     namespace ConnectionOptionsJS {
         /**
          * @description
-         * Inside the `backend/WeivData/connection-options.js` file you can define three different variable and export them.
-         * These variables can be used to customize each role's MongoClient connection options like connection pool settings etc.
+         * Inside the `backend/WeivData/connection-options.js` file you can define three different factory function and export them.
+         * These factory functions can be used to customize each role's MongoClient connection options like connection pool settings etc.
          * 
          * @example
          * ```js
-         * export const adminClientOptions = {
+         * export const adminClientOptions = () => {
          *      // ... custom admin options here
+         *      return;
          * }
          * 
-         * export const memberClientOptions = {
+         * export const memberClientOptions = () => {
          *      // ... custom member options here
+         *      return;
          * }
          * 
-         * export const visitorClientOptions = {
+         * export const visitorClientOptions = () => {
          *      // ... custom visitor options here
+         *      return;
          * }
          * ```
          * 
@@ -1863,10 +1866,13 @@ declare module '@exweiv/weiv-data' {
          * 
          * @example
          * ```js
-         * export const clientCacheRules = {
+         * export const clientCacheRules = () => {
          *      // ... custom client cache rules
+         *      return;
          * }
          * ```
+         * 
+         * > You can create async functions too (in case you need to fetch something before setting up things).
          */
         interface Options {
             /**
@@ -1875,7 +1881,7 @@ declare module '@exweiv/weiv-data' {
              * 
              * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
              */
-            adminClientOptions: import('mongodb').MongoClientOptions;
+            adminClientOptions: () => import('mongodb').MongoClientOptions | Promise<import('mongodb').MongoClientOptions>;
 
             /**
              * @description
@@ -1883,7 +1889,7 @@ declare module '@exweiv/weiv-data' {
              * 
              * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
              */
-            memberClientOptions: import('mongodb').MongoClientOptions;
+            memberClientOptions: () => import('mongodb').MongoClientOptions | Promise<import('mongodb').MongoClientOptions>;
 
             /**
              * @description
@@ -1891,7 +1897,7 @@ declare module '@exweiv/weiv-data' {
              * 
              * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
              */
-            visitorClientOptions: import('mongodb').MongoClientOptions;
+            visitorClientOptions: () => import('mongodb').MongoClientOptions | Promise<import('mongodb').MongoClientOptions>;
 
             /**
              * @description
@@ -1899,7 +1905,7 @@ declare module '@exweiv/weiv-data' {
              * 
              * [Read more about NodeCache.Options](https://github.com/node-cache/node-cache/blob/master/index.d.ts#L149)
              */
-            clientCacheRules: import('node-cache').Options;
+            clientCacheRules: () => import('node-cache').Options | Promise<import('node-cache').Options>;
         }
     }
 }
