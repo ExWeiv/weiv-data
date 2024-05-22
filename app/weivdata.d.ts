@@ -1837,4 +1837,69 @@ declare module '@exweiv/weiv-data' {
      * Returns the current version of WeivData, for developers.
      */
     function _version(): string;
+
+    namespace ConnectionOptionsJS {
+        /**
+         * @description
+         * Inside the `backend/WeivData/connection-options.js` file you can define three different variable and export them.
+         * These variables can be used to customize each role's MongoClient connection options like connection pool settings etc.
+         * 
+         * @example
+         * ```js
+         * export const adminClientOptions = {
+         *      // ... custom admin options here
+         * }
+         * 
+         * export const memberClientOptions = {
+         *      // ... custom member options here
+         * }
+         * 
+         * export const visitorClientOptions = {
+         *      // ... custom visitor options here
+         * }
+         * ```
+         * 
+         * You can also define custom cache options for all clients. These cache options define how to cache these clients. In most cases you don't need to play with this.
+         * 
+         * @example
+         * ```js
+         * export const clientCacheRules = {
+         *      // ... custom client cache rules
+         * }
+         * ```
+         */
+        interface Options {
+            /**
+             * @description
+             * This is the same MongoClientOptions just like in MongoDB NodeJS driver, you can customize the admin MongoClient options.
+             * 
+             * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
+             */
+            adminClientOptions: import('mongodb').MongoClientOptions;
+
+            /**
+             * @description
+             * This is the same MongoClientOptions just like in MongoDB NodeJS driver, you can customize the member MongoClient options.
+             * 
+             * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
+             */
+            memberClientOptions: import('mongodb').MongoClientOptions;
+
+            /**
+             * @description
+             * This is the same MongoClientOptions just like in MongoDB NodeJS driver, you can customize the visitor MongoClient options.
+             * 
+             * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
+             */
+            visitorClientOptions: import('mongodb').MongoClientOptions;
+
+            /**
+             * @description
+             * This is general cache rules for all MongoClients you can define `node-cache` options here. These options will apply to all roles clients.
+             * 
+             * [Read more about NodeCache.Options](https://github.com/node-cache/node-cache/blob/master/index.d.ts#L149)
+             */
+            clientCacheRules: import('node-cache').Options;
+        }
+    }
 }

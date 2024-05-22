@@ -15,7 +15,7 @@ let manual = false;
 async function setupClient(uri: string, role: CustomOptionsRole): Promise<MongoClient> {
     try {
         // Return existing client in cache
-        const cachedClient = clientCache.get<MongoClient>(uri.slice(0, 20));
+        const cachedClient = clientCache.get<MongoClient>(uri.slice(14, 40));
         if (cachedClient) {
             let connection = cachedClient;
 
