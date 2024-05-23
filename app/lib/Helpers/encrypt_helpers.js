@@ -10,7 +10,7 @@ const secret_helpers_1 = require("./secret_helpers");
 const log_helpers_1 = require("./log_helpers");
 async function getSecretKey() {
     try {
-        await (0, log_helpers_1.logMessage)(`getSecretKey is called and now we will get the secret key to encrypt or decrypt connection URIs when saving them to cache for better security`);
+        (0, log_helpers_1.logMessage)(`getSecretKey is called and now we will get the secret key to encrypt or decrypt connection URIs when saving them to cache for better security`);
         const cachedSecret = await (0, secret_helpers_1.getCachedSecret)("WeivDataURIEncryptSecret");
         if (cachedSecret) {
             return cachedSecret;

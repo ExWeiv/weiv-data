@@ -6,7 +6,7 @@ async function logMessage(message, details) {
     try {
         const { logs } = await (0, weiv_data_config_1.getWeivDataConfigs)();
         if (logs) {
-            console.info('WeivData Developer Log - ', message, details);
+            console.log('WeivData DevLog:', message, details);
         }
     }
     catch (err) {

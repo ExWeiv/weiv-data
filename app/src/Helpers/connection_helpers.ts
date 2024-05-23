@@ -20,7 +20,7 @@ export async function connectionHandler(collectionId: CollectionID, suppressAuth
             throw new Error(`WeivData - Error when trying to connect to MongoClient, collectionId must be a string!`);
         }
 
-        await logMessage(`Connection Handler called via this collectionId: ${collectionId} and suppressAuth: ${suppressAuth}`);
+        logMessage(`Connection Handler called via this collectionId: ${collectionId} and suppressAuth: ${suppressAuth}`);
 
         let db: Db | undefined;
         const { dbName, collectionName } = splitCollectionId(collectionId);
@@ -45,14 +45,14 @@ export async function loadConnectionOptions(role: CustomOptionsRole): Promise<Mo
             throw new Error("type of role is not string!");
         }
 
-        await logMessage(`Loading custom connection options for MongoClient for role ${role}`);
+        logMessage(`Loading custom connection options for MongoClient for role ${role}`);
 
         const customOptions: (() => MongoClientOptions | Promise<MongoClientOptions>) | undefined = customConnectionOptions[role];
         if (customOptions) {
-            await logMessage(`There are some custom options so loading them! for role ${role}`);
+            logMessage(`There are some custom options so loading them! for role ${role}`);
             return await customOptions();
         } else {
-            await logMessage(`There isn't any custom option loading default options for role ${role}`);
+            logMessage(`There isn't any custom option loading default options for role ${role}`);
             return {
                 tls: true,
             };
@@ -64,14 +64,14 @@ export async function loadConnectionOptions(role: CustomOptionsRole): Promise<Mo
 
 export async function getCustomCacheRules() {
     try {
-        await logMessage(`Getting custom cache rules for MongoClient caching via Node-Cache`);
+        logMessage(`Getting custom cache rules for MongoClient caching via Node-Cache`);
         const cacheRules: (() => Options | Promise<Options>) | undefined = customConnectionOptions["clientCacheRules"];
         if (cacheRules) {
             const loadedCacheRules = await cacheRules();
-            await logMessage(`There are some custom cache rules so loading them`, loadedCacheRules);
+            logMessage(`There are some custom cache rules so loading them`, loadedCacheRules);
             return loadedCacheRules;
         } else {
-            await logMessage(`There isn't any custom cache rule so loading default rules`);
+            logMessage(`There isn't any custom cache rule so loading default rules`);
             return { useClones: false };
         }
     } catch (err) {
