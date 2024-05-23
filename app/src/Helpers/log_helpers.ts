@@ -5,7 +5,7 @@ export async function logMessage(message: string, details?: any): Promise<void> 
         const { logs } = await getWeivDataConfigs();
 
         if (logs) {
-            console.info('WeivData Developer Log - ', message, details);
+            console.log('WeivData DevLog:', message, details);
         }
     } catch (err) {
         throw new Error(`WeivData - Error for logger, ${err}`);

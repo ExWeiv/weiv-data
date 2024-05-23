@@ -15,28 +15,28 @@ let manual = false;
 
 async function setupClient(uri: string, role: CustomOptionsRole): Promise<MongoClient> {
     try {
-        await logMessage(`Setting up a new or existing MongoClient for database a operation, for role: ${role} with URI: ${uri.slice(14, 40)} (URI is sliced for security reasons)`);
+        logMessage(`Setting up a new or existing MongoClient for database a operation, for role: ${role} with URI: ${uri.slice(14, 40)} (URI is sliced for security reasons)`);
 
         // Return existing client from cache
         const cachedClient = clientCache.get<MongoClient>(uri.slice(14, 40));
         if (cachedClient) {
-            await logMessage(`We have found a cached MongoClient so we will use it instead of creating new one!`, cachedClient);
+            logMessage(`We have found a cached MongoClient so we will use it instead of creating new one!`, cachedClient);
             let connection = cachedClient;
 
             if (manual) {
-                await logMessage(`Since there are some custom connection options that effects to connection pool we will call connectClient to be safe, manual: ${manual}`, connection);
+                logMessage(`Since there are some custom connection options that effects to connection pool we will call connectClient to be safe, manual: ${manual}`, connection);
                 connection = await connectClient(cachedClient, uri);
             }
 
             if (connection) {
-                await logMessage(`Connection of MongoClient is ready and now returned with setupClient function`, connection);
+                logMessage(`Connection of MongoClient is ready and now returned with setupClient function`, connection);
                 return connection;
             } else {
                 throw new Error(`there is a problem with client caching and it's a important problem please report it! This will directly impact to all operations`);
             }
         } else {
             // If there are no clients in cache create new one and return
-            await logMessage(`No cached MongoClients found so we are creating new MongoClient for role: ${role} with URI: ${uri.slice(14, 40)}`);
+            logMessage(`No cached MongoClients found so we are creating new MongoClient for role: ${role} with URI: ${uri.slice(14, 40)}`);
             return createNewClient(uri, role);
         }
     } catch (err) {
@@ -46,29 +46,29 @@ async function setupClient(uri: string, role: CustomOptionsRole): Promise<MongoC
 
 const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<MongoClient> => {
     try {
-        await logMessage(`Creating new MongoClient for URI: ${uri.slice(14, 40)} with role: ${role}`);
+        logMessage(`Creating new MongoClient for URI: ${uri.slice(14, 40)} with role: ${role}`);
 
         // Create a client and save it to cache
         const options = await loadConnectionOptions(role);
 
         if (options.minPoolSize || options.maxPoolSize) {
-            await logMessage(`There are some options for MongoClient (either minPoolSize or maxPoolSize) that effects to connection pool so we set manual to true`, options);
+            logMessage(`There are some options for MongoClient (either minPoolSize or maxPoolSize) that effects to connection pool so we set manual to true`, options);
             manual = true;
         }
 
         const newMongoClient = new MongoClient(uri, options);
         clientCache.set<MongoClient>(uri.slice(14, 40), newMongoClient);
-        await logMessage(`New MongoClient created with selected options and URI`, newMongoClient);
+        logMessage(`New MongoClient created with selected options and URI`, newMongoClient);
 
         // Use connect function to connect to cluster using newly created client 
         let connection = newMongoClient;
         if (manual) {
-            await logMessage(`Since manual is enabled we will connect to MongoDB so we are calling connectClient`, connection);
+            logMessage(`Since manual is enabled we will connect to MongoDB so we are calling connectClient`, connection);
             connection = await connectClient(newMongoClient, uri);
         }
 
         if (!listeners) {
-            await logMessage(`We didn't set any listerners for MongoClient to clear event listeners so we are setting event listeners, value: ${!listeners}`);
+            logMessage(`We didn't set any listerners for MongoClient to clear event listeners so we are setting event listeners, value: ${!listeners}`);
 
             clientCache.on('expire', async (_key: string, client: MongoClient) => {
                 client.removeAllListeners();
@@ -86,7 +86,7 @@ const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<Mo
         }
 
         if (connection) {
-            await logMessage(`Newly created and connected MongoClient is now returned with createNewClient function!`, connection);
+            logMessage(`Newly created and connected MongoClient is now returned with createNewClient function!`, connection);
             return connection;
         } else {
             throw new Error(`Failed to connect to a MongoClient: connection: ${newMongoClient}`);
@@ -99,24 +99,24 @@ const createNewClient = async (uri: string, role: CustomOptionsRole): Promise<Mo
 const listenersMap: Map<string, boolean> = new Map();
 const connectClient = async (client: MongoClient, uri: string): Promise<MongoClient> => {
     try {
-        await logMessage(`connectClient function is called with this URI: ${uri.slice(14, 40)}`, client);
+        logMessage(`connectClient function is called with this URI: ${uri.slice(14, 40)}`, client);
 
         const status = statusCache.get<boolean>(uri.slice(14, 40));
         const cachedClient = clientCache.get<MongoClient>(uri.slice(14, 40));
 
         // Check if a connection for the given URI exists in the cache
         if (status === true) {
-            await logMessage(`Status cache is filled so it's true`);
+            logMessage(`Status cache is filled so it's true`);
             if (cachedClient) {
-                await logMessage(`There is also cached MongoClient so it's also true and we are returning the cached MongoClient`);
+                logMessage(`There is also cached MongoClient so it's also true and we are returning the cached MongoClient`);
                 return cachedClient;
             }
         }
 
-        await logMessage(`Creating new MongoClient inside connectClient function since we don't have any in cache`);
+        logMessage(`Creating new MongoClient inside connectClient function since we don't have any in cache`);
 
         if (!listenersMap.has(uri.slice(14, 40))) {
-            await logMessage(`Setting up MongoClient event listeners for close and error events`);
+            logMessage(`Setting up MongoClient event listeners for close and error events`);
 
             const handleClose = async () => {
                 clientCache.del(uri.slice(14, 40));
@@ -137,11 +137,11 @@ const connectClient = async (client: MongoClient, uri: string): Promise<MongoCli
 
         // Connect and return connection
         await client.connect();
-        await logMessage(`We have now connected to MongoClient via .connect method`, client);
+        logMessage(`We have now connected to MongoClient via .connect method`, client);
 
         clientCache.set<MongoClient>(uri.slice(14, 40), client);
         statusCache.set<boolean>(uri.slice(14, 40), true);
-        await logMessage(`We have saved client and status to cache so we won't create new MongoClient/s for each call. And we return the connectedClient`, { clientCache, statusCache });
+        logMessage(`We have saved client and status to cache so we won't create new MongoClient/s for each call. And we return the connectedClient`, { clientCache, statusCache });
 
         return client;
     } catch (err) {
@@ -151,10 +151,10 @@ const connectClient = async (client: MongoClient, uri: string): Promise<MongoCli
 
 export async function useClient(suppressAuth: boolean = false): Promise<{ pool: MongoClient, memberId?: string }> {
     try {
-        await logMessage(`useClient function is called and now we will first get the connection URI and then setup the MongoClient via setupClient, permission bypass is: ${suppressAuth}`);
+        logMessage(`useClient function is called and now we will first get the connection URI and then setup the MongoClient via setupClient, permission bypass is: ${suppressAuth}`);
         const { uri, memberId, role } = await getMongoURI(suppressAuth);
         const pool = await setupClient(uri, role);
-        await logMessage(`useClient job has completed and now we return the MongoClient and memberId is exists`, { memberId, client: pool });
+        logMessage(`useClient job has completed and now we return the MongoClient and memberId is exists`, { memberId, client: pool });
         return { pool, memberId };
     } catch (err) {
         throw new Error(`when connecting to cached MongoClient via useClient: ${err}`);

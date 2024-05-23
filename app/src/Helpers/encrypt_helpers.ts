@@ -8,7 +8,7 @@ import { logMessage } from './log_helpers';
 /**@internal */
 export async function getSecretKey(): Promise<string> {
     try {
-        await logMessage(`getSecretKey is called and now we will get the secret key to encrypt or decrypt connection URIs when saving them to cache for better security`);
+        logMessage(`getSecretKey is called and now we will get the secret key to encrypt or decrypt connection URIs when saving them to cache for better security`);
         const cachedSecret: string = await getCachedSecret("WeivDataURIEncryptSecret");
         if (cachedSecret) {
             return cachedSecret;
