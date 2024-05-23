@@ -26,13 +26,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getWeivDataConfigs = void 0;
 const weivDataConfigs = __importStar(require("../../../../../../../../../user-code/backend/WeivData/config"));
 let savedConfigs;
-async function getWeivDataConfigs() {
+function getWeivDataConfigs() {
     try {
         const configs = weivDataConfigs["config"];
         if (configs && !savedConfigs) {
-            savedConfigs = await configs();
+            savedConfigs = configs();
         }
-        else {
+        else if (!savedConfigs) {
             savedConfigs = {
                 logs: false
             };
