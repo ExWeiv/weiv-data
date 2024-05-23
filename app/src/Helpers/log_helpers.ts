@@ -1,13 +1,16 @@
 import { getWeivDataConfigs } from '../Config/weiv_data_config';
 
-export async function logMessage(message: string, details?: any): Promise<void> {
+export function logMessage(message: string, details?: any): void {
     try {
-        const { logs } = await getWeivDataConfigs();
+        const { logs } = getWeivDataConfigs();
 
         if (logs) {
             console.log('WeivData DevLog:', message, details);
         }
+
+        return;
     } catch (err) {
-        throw new Error(`WeivData - Error for logger, ${err}`);
+        console.error('WeivData - Error for logger:', err);
+        return;
     }
 }
