@@ -13,14 +13,13 @@ const clientCache = new node_cache_1.default({ useClones: false });
 let nodeCacheListeners = false;
 async function setupClient(uri, role) {
     try {
-        (0, log_helpers_1.logMessage)(`Setting up a new or existing MongoClient for database a operation, for role: ${role} with URI: ${uri.slice(14, 40)} (URI is sliced for security reasons)`);
         const cachedClient = clientCache.get(uri.slice(14, 40));
         if (cachedClient) {
-            (0, log_helpers_1.logMessage)(`Connection of MongoClient is ready and now returned with setupClient function`, cachedClient);
+            (0, log_helpers_1.logMessage)("There is a cached MongoClient so we are returning this MongoClient.");
             return cachedClient;
         }
         else {
-            (0, log_helpers_1.logMessage)(`No cached MongoClients found so we are creating new MongoClient for role: ${role} with URI: ${uri.slice(14, 40)}`);
+            (0, log_helpers_1.logMessage)("There isn't any cached MongoClient, we will create new one now.");
             return createNewClient(uri, role);
         }
     }
@@ -33,10 +32,9 @@ const createNewClient = async (uri, role) => {
         (0, log_helpers_1.logMessage)(`Creating new MongoClient for URI: ${uri.slice(14, 40)} with role: ${role}`);
         const options = await (0, connection_helpers_1.loadConnectionOptions)(role);
         const newMongoClient = new mongodb_1.MongoClient(uri, options);
-        (0, log_helpers_1.logMessage)(`New MongoClient created with selected options and URI`, newMongoClient);
         await connectClient(newMongoClient, uri);
         if (!nodeCacheListeners) {
-            (0, log_helpers_1.logMessage)(`We didn't set any listerners for MongoClient to clear event listeners so we are setting event listeners, value: ${!nodeCacheListeners}`);
+            (0, log_helpers_1.logMessage)("We didn't set any NodeCache listeners before so we will create event listeners for NodeCache expire/deletion.");
             clientCache.on('expire', async (_key, client) => {
                 client.removeAllListeners();
                 await client.close();
@@ -49,6 +47,7 @@ const createNewClient = async (uri, role) => {
             });
             nodeCacheListeners = true;
         }
+        (0, log_helpers_1.logMessage)("New MongoClient is created and now returned with createNewClient function", { uri: uri.slice(14, 40), role });
         return newMongoClient;
     }
     catch (err) {
@@ -58,9 +57,9 @@ const createNewClient = async (uri, role) => {
 const listenersMap = new Map();
 const connectClient = async (client, uri) => {
     try {
-        (0, log_helpers_1.logMessage)(`connectClient function is called with this URI: ${uri.slice(14, 40)}`, client);
+        (0, log_helpers_1.logMessage)("connectClient function is called to connect created MongoClient");
         if (!listenersMap.has(uri.slice(14, 40))) {
-            (0, log_helpers_1.logMessage)(`Setting up MongoClient event listeners for close and error events`);
+            (0, log_helpers_1.logMessage)("Setting up MongoClient event listeners for close/error events, (for this specific MongoClient).");
             const handleClose = async () => {
                 clientCache.del(uri.slice(14, 40));
             };
@@ -73,9 +72,8 @@ const connectClient = async (client, uri) => {
             listenersMap.set(uri.slice(14, 40), true);
         }
         await client.connect();
-        (0, log_helpers_1.logMessage)(`We have now connected to MongoClient via .connect method`, client);
         clientCache.set(uri.slice(14, 40), client);
-        (0, log_helpers_1.logMessage)(`We have saved client and status to cache so we won't create new MongoClient/s for each call. And we return the connectedClient`, clientCache);
+        (0, log_helpers_1.logMessage)("We have now connected to a node via .connect method of existing MongoClient that sent via params to connectClient function. And client is returned.");
         return client;
     }
     catch (err) {
@@ -84,10 +82,8 @@ const connectClient = async (client, uri) => {
 };
 async function useClient(suppressAuth = false) {
     try {
-        (0, log_helpers_1.logMessage)(`useClient function is called and now we will first get the connection URI and then setup the MongoClient via setupClient, permission bypass is: ${suppressAuth}`);
         const { uri, memberId, role } = await (0, permission_helpers_1.getMongoURI)(suppressAuth);
         const pool = await setupClient(uri, role);
-        (0, log_helpers_1.logMessage)(`useClient job has completed and now we return the MongoClient and memberId is exists`, { memberId, client: pool });
         return { pool, memberId };
     }
     catch (err) {
@@ -96,7 +92,6 @@ async function useClient(suppressAuth = false) {
 }
 exports.useClient = useClient;
 function getClientCache() {
-    (0, log_helpers_1.logMessage)(`MongoClient cache is requested`, clientCache);
     return clientCache;
 }
 exports.getClientCache = getClientCache;

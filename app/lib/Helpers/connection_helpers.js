@@ -43,6 +43,7 @@ async function connectionHandler(collectionId, suppressAuth = false) {
         else {
             db = pool.db("ExWeiv");
         }
+        (0, log_helpers_1.logMessage)("Connection handler retirivied the MongoClient and connected to the required database and collection");
         return { memberId, database: db, collection: db.collection(collectionName) };
     }
     catch (err) {

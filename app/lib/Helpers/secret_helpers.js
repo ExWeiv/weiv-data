@@ -40,9 +40,8 @@ async function getCachedSecret(secretName, parse) {
         }
         let secret = cache.get(secretName);
         if (secret === undefined) {
-            (0, log_helpers_1.logMessage)(`getCachedSecret function is called and as we check the cache we found nothing so we will get secret from the Wix Secret Manager`, secret);
+            (0, log_helpers_1.logMessage)("getCachedSecret function is called and as we check the cache we found nothing so we will get secret from the Wix Secret Manager", secretName);
             const { value } = await getSecretValue(secretName);
-            (0, log_helpers_1.logMessage)(`We got the secret value from secret manager here it's first 3 char: ${value.slice(0, 3)}`);
             if (parse === true) {
                 let objectSecret;
                 try {
@@ -61,9 +60,10 @@ async function getCachedSecret(secretName, parse) {
             else {
                 secret = value;
             }
-            (0, log_helpers_1.logMessage)(`We are now saving found secret into cache so we don't need to get it from secret manager again and again`);
+            (0, log_helpers_1.logMessage)("Secret value is saved to cache", secretName);
             cache.set(secretName, secret, 60 * 6);
         }
+        (0, log_helpers_1.logMessage)("We have fetched the secret value and now returning it.", secretName);
         return secret;
     }
     catch (err) {
@@ -72,7 +72,6 @@ async function getCachedSecret(secretName, parse) {
 }
 exports.getCachedSecret = getCachedSecret;
 function getHelperSecretsCache() {
-    (0, log_helpers_1.logMessage)(`getHelperSecretsCache function is called and now we are returning secret cache`);
     return cache;
 }
 exports.getHelperSecretsCache = getHelperSecretsCache;

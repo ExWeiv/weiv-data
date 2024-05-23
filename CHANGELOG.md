@@ -4,6 +4,10 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.3.1
+
+- logMessage changes. (BUG Fix)
+
 ### 4.3.0
 
 - Performance optimization for cold starts and general MongoClient cache system.

@@ -7,10 +7,8 @@ exports.getSecretKey = void 0;
 const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
 const crypto_1 = __importDefault(require("crypto"));
 const secret_helpers_1 = require("./secret_helpers");
-const log_helpers_1 = require("./log_helpers");
 async function getSecretKey() {
     try {
-        (0, log_helpers_1.logMessage)(`getSecretKey is called and now we will get the secret key to encrypt or decrypt connection URIs when saving them to cache for better security`);
         const cachedSecret = await (0, secret_helpers_1.getCachedSecret)("WeivDataURIEncryptSecret");
         if (cachedSecret) {
             return cachedSecret;

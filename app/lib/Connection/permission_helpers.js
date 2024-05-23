@@ -13,7 +13,7 @@ const log_helpers_1 = require("../Helpers/log_helpers");
 const cache = new node_cache_1.default({ useClones: false, deleteOnExpire: true });
 async function getMongoURI(suppressAuth = false) {
     try {
-        (0, log_helpers_1.logMessage)(`getMongoURI function is called, now we will find the required MongoDB connection uri and return it for current request, either frmo cache or secrets, permission bypass: ${suppressAuth}`);
+        (0, log_helpers_1.logMessage)("getMongoURI function called to get required connection uri based on visitor role");
         if (suppressAuth != true) {
             if (wix_users_backend_1.currentUser.loggedIn === true) {
                 return getMemberURI();
@@ -36,7 +36,6 @@ const getVisitorURI = async () => {
         (0, log_helpers_1.logMessage)(`We are searching connection uri for visitors`);
         const cachedEncryptedVisitorURI = cache.get("VisitorMongoDB_URI");
         if (cachedEncryptedVisitorURI) {
-            (0, log_helpers_1.logMessage)(`We have found cached URI (visitors) so we are returning it`);
             const cachedVisitorURI = await decryptURI(cachedEncryptedVisitorURI);
             return { uri: cachedVisitorURI, role: "visitorClientOptions" };
         }
@@ -44,7 +43,6 @@ const getVisitorURI = async () => {
         if (secret) {
             const encryptedURI = await encryptURI(secret);
             cache.set("VisitorMongoDB_URI", encryptedURI, 60 * 5);
-            (0, log_helpers_1.logMessage)(`We didn't find any connection URI in cache so we got it from secrets manager and now we are returning it (visitors)`);
             return { uri: secret, role: "visitorClientOptions" };
         }
         else {
@@ -61,7 +59,6 @@ const getAdminURI = async () => {
         const cachedEncryptedAdminURI = cache.get("AdminMongoDB_URI");
         if (cachedEncryptedAdminURI) {
             const cachedAdminURI = await decryptURI(cachedEncryptedAdminURI);
-            (0, log_helpers_1.logMessage)(`We have found cached URI (admins) so we are returning it`);
             return {
                 uri: cachedAdminURI,
                 memberId: wix_users_backend_1.currentUser.id,
@@ -72,7 +69,6 @@ const getAdminURI = async () => {
         if (secret) {
             const encryptedURI = await encryptURI(secret);
             cache.set("AdminMongoDB_URI", encryptedURI, 60 * 5);
-            (0, log_helpers_1.logMessage)(`We didn't find any connection URI in cache so we got it from secrets manager and now we are returning it (admins)`);
             return {
                 uri: secret,
                 memberId: wix_users_backend_1.currentUser.id,
@@ -103,32 +99,28 @@ const getMemberURI = async () => {
         (0, log_helpers_1.logMessage)(`We are now checking member roles to see if this member is an Admin?`);
         const cachedRole = cache.get(`MemberRoles${wix_users_backend_1.currentUser.id}`);
         if (cachedRole) {
-            (0, log_helpers_1.logMessage)(`We found cached role for this member, cached role: ${cachedRole}`);
             if (cachedRole === "Admin") {
-                (0, log_helpers_1.logMessage)(`Member is Admin so we are getting admin URI not member URI for MongoDB`);
+                (0, log_helpers_1.logMessage)(`Member is Admin so we are getting admin URI not member URI`);
                 return getAdminURI();
             }
         }
-        (0, log_helpers_1.logMessage)(`We didn't find any roles in cache so we are searching in Wix Members area via wix-users-backend APIs`);
         const roles = await wix_users_backend_1.currentUser.getRoles();
         if (roles.length > 0) {
-            (0, log_helpers_1.logMessage)(`There are some roles belongs to current member so we are saving them to cache`, roles);
             cache.set(`MemberRoles${wix_users_backend_1.currentUser.id}`, roles[0].name, 60 * 5);
             const isAdmin = roles.filter((role) => {
                 return role.name === "Admin";
             }).length > 0;
             if (isAdmin) {
-                (0, log_helpers_1.logMessage)(`Member is Admin so we are getting admin URI not member URI for MongoDB, (role is searched via API)`);
+                (0, log_helpers_1.logMessage)(`Member is Admin so we are getting admin URI not member URI, (role fetched via APIs)`);
                 return getAdminURI();
             }
         }
         else {
-            (0, log_helpers_1.logMessage)(`We didn't find any roles belongs to this user so we save this user as a normal member`, roles);
+            (0, log_helpers_1.logMessage)("We didn't find any specific (admin) role for this member, so we will return member URI.");
             cache.set(`MemberRoles${wix_users_backend_1.currentUser.id}`, "Member", 60 * 5);
         }
         const secret = await getSecretURI("member");
         if (secret) {
-            (0, log_helpers_1.logMessage)(`We got the connection URI via getSecretURI function and now we are saving it to cache and returning it`);
             const encryptedURI = await encryptURI(secret);
             cache.set(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`, encryptedURI, 60 * 5);
             return {
