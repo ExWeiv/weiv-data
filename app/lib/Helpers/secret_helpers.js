@@ -30,6 +30,7 @@ exports.getHelperSecretsCache = exports.getCachedSecret = void 0;
 const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
 const wixAuth = __importStar(require("wix-auth"));
 const node_cache_1 = __importDefault(require("node-cache"));
+const log_helpers_1 = require("./log_helpers");
 const cache = new node_cache_1.default();
 const getSecretValue = wixAuth.elevate(wix_secrets_backend_v2_1.secrets.getSecretValue);
 async function getCachedSecret(secretName, parse) {
@@ -39,7 +40,9 @@ async function getCachedSecret(secretName, parse) {
         }
         let secret = cache.get(secretName);
         if (secret === undefined) {
+            (0, log_helpers_1.logMessage)(`getCachedSecret function is called and as we check the cache we found nothing so we will get secret from the Wix Secret Manager`, secret);
             const { value } = await getSecretValue(secretName);
+            (0, log_helpers_1.logMessage)(`We got the secret value from secret manager here it's first 3 char: ${value.slice(0, 3)}`);
             if (parse === true) {
                 let objectSecret;
                 try {
@@ -58,6 +61,7 @@ async function getCachedSecret(secretName, parse) {
             else {
                 secret = value;
             }
+            (0, log_helpers_1.logMessage)(`We are now saving found secret into cache so we don't need to get it from secret manager again and again`);
             cache.set(secretName, secret, 60 * 6);
         }
         return secret;
@@ -68,6 +72,7 @@ async function getCachedSecret(secretName, parse) {
 }
 exports.getCachedSecret = getCachedSecret;
 function getHelperSecretsCache() {
+    (0, log_helpers_1.logMessage)(`getHelperSecretsCache function is called and now we are returning secret cache`);
     return cache;
 }
 exports.getHelperSecretsCache = getHelperSecretsCache;

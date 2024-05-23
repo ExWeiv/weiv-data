@@ -163,13 +163,14 @@ Follow this step by step guide to setup your Wix website for WeivData:
 7. Now it's time to install the `weiv-data` library. Install `@exweiv/weiv-data` package from NPM.
 8. For the last step go to your backend directory.
    1. Create a folder named `WeivData` in your backend section of your site. (backend/WeivData)
-   2. Inside of this folder create a JS file named `connection-options.js` and `data.js`. These are required even if you don't set any data hooks or custom connection options.
+   2. Inside of this folder create a JS file named `connection-options.js`, `data.js` and `config.js`. These are required even if you don't set any data hooks, config settings or custom connection options.
 
 ```
 backend/
 ├── WeivData/
 │   ├── connection-options.js
-│   └── data.js
+│   ├── data.js
+│   └── config.js
 └──
 ```
 

@@ -1838,7 +1838,11 @@ declare module '@exweiv/weiv-data' {
      */
     function _version(): string;
 
-    namespace ConnectionOptionsJS {
+    /**
+     * @description
+     * Customizable options for WeivData library.
+     */
+    namespace CustomOptions {
         /**
          * @description
          * Inside the `backend/WeivData/connection-options.js` file you can define three different factory function and export them.
@@ -1874,7 +1878,7 @@ declare module '@exweiv/weiv-data' {
          * 
          * > You can create async functions too (in case you need to fetch something before setting up things).
          */
-        interface Options {
+        interface ConnectionOptions {
             /**
              * @description
              * This is the same MongoClientOptions just like in MongoDB NodeJS driver, you can customize the admin MongoClient options.
@@ -1906,6 +1910,42 @@ declare module '@exweiv/weiv-data' {
              * [Read more about NodeCache.Options](https://github.com/node-cache/node-cache/blob/master/index.d.ts#L149)
              */
             clientCacheRules: () => import('node-cache').Options | Promise<import('node-cache').Options>;
+        }
+
+        /**
+         * @description
+         * WeivData config object with required and optional flags.
+         */
+        type WeivDataConfig = {
+            /**
+             * @description
+             * If set to true (false by default) some details will be logged to console. Useful for testing things or getting info about what's happening.
+             */
+            logs?: boolean;
+        }
+
+        /**
+         * @description
+         * Config options file (`backend/WeivData/config.js`) used for getting configs of WeivData, it's optional and not required so you don't have to define the function but you must create the config.js file.
+         */
+        interface ConfigOptions {
+            /**
+             * @description
+             * `config` function which should be exported inside `backend/WeivData/config.js` file, is exporting the config object of WeivData to play with settings of the library.
+             * 
+             * @example
+             * ```js
+             * // Enable console logging (example)
+             * export const config = () => {
+             *      return {
+             *          logs: true
+             *      }
+             * }
+             * ```
+             * 
+             * > async is possible for config function.
+             */
+            config: () => CustomOptions.WeivDataConfig | Promise<CustomOptions.WeivDataConfig>;
         }
     }
 }

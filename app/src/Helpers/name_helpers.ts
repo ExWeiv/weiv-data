@@ -1,5 +1,6 @@
 import { memoize } from 'lodash';
 import type { CollectionID } from '@exweiv/weiv-data'
+import { logMessage } from './log_helpers';
 
 export const splitCollectionId = memoize(splitCollectionIdMain);
 function splitCollectionIdMain(collectionId: CollectionID): { dbName: string, collectionName: string } {
@@ -13,5 +14,6 @@ function splitCollectionIdMain(collectionId: CollectionID): { dbName: string, co
         return { dbName: "ExWeiv", collectionName: dbName };
     }
 
+    logMessage(`splitCollectionIdMain function is called and here is the result for collectionName: ${collectionName} and dbName: ${dbName}`, collectionId);
     return { dbName, collectionName };
 }

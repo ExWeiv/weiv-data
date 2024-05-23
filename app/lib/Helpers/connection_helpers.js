@@ -27,8 +27,13 @@ exports.getCustomCacheRules = exports.loadConnectionOptions = exports.connection
 const customConnectionOptions = __importStar(require("../../../../../../../../../user-code/backend/WeivData/connection-options"));
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("./name_helpers");
+const log_helpers_1 = require("./log_helpers");
 async function connectionHandler(collectionId, suppressAuth = false) {
     try {
+        if (!collectionId || typeof collectionId !== "string") {
+            throw new Error(`WeivData - Error when trying to connect to MongoClient, collectionId must be a string!`);
+        }
+        (0, log_helpers_1.logMessage)(`Connection Handler called via this collectionId: ${collectionId} and suppressAuth: ${suppressAuth}`);
         let db;
         const { dbName, collectionName } = (0, name_helpers_1.splitCollectionId)(collectionId);
         const { pool, memberId } = await (0, automatic_connection_provider_1.useClient)(suppressAuth);
@@ -47,14 +52,17 @@ async function connectionHandler(collectionId, suppressAuth = false) {
 exports.connectionHandler = connectionHandler;
 async function loadConnectionOptions(role) {
     try {
-        if (typeof role !== "string") {
+        if (role !== "adminClientOptions" && role !== "memberClientOptions" && role !== "visitorClientOptions") {
             throw new Error("type of role is not string!");
         }
+        (0, log_helpers_1.logMessage)(`Loading custom connection options for MongoClient for role ${role}`);
         const customOptions = customConnectionOptions[role];
         if (customOptions) {
+            (0, log_helpers_1.logMessage)(`There are some custom options so loading them! for role ${role}`);
             return await customOptions();
         }
         else {
+            (0, log_helpers_1.logMessage)(`There isn't any custom option loading default options for role ${role}`);
             return {
                 tls: true,
             };
@@ -67,12 +75,16 @@ async function loadConnectionOptions(role) {
 exports.loadConnectionOptions = loadConnectionOptions;
 async function getCustomCacheRules() {
     try {
+        (0, log_helpers_1.logMessage)(`Getting custom cache rules for MongoClient caching via Node-Cache`);
         const cacheRules = customConnectionOptions["clientCacheRules"];
         if (cacheRules) {
-            return await cacheRules();
+            const loadedCacheRules = await cacheRules();
+            (0, log_helpers_1.logMessage)(`There are some custom cache rules so loading them`, loadedCacheRules);
+            return loadedCacheRules;
         }
         else {
-            return { useClones: false, stdTTL: 5 * 60, deleteOnExpire: true };
+            (0, log_helpers_1.logMessage)(`There isn't any custom cache rule so loading default rules`);
+            return { useClones: false };
         }
     }
     catch (err) {
