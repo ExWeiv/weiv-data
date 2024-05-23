@@ -4,12 +4,11 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
-### 4.2.0
+### 4.2.1
 
 - New feature `config.js` for WeivData customization.
 - BUG fixes
 - Documentation updates and fixes
-
 
 ### 4.1.4
 

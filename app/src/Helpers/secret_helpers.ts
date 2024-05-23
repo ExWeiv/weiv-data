@@ -23,11 +23,11 @@ export async function getCachedSecret<URI>(secretName: string, parse?: boolean):
 
 
         if (secret === undefined) {
-            logMessage(`getCachedSecret function is called and as we check the cache we found nothing so we will get secret from the Wix Secret Manager`, secret);
+            await logMessage(`getCachedSecret function is called and as we check the cache we found nothing so we will get secret from the Wix Secret Manager`, secret);
             // If not in cache, fetch from the API
             const { value } = await getSecretValue(secretName);
 
-            logMessage(`We got the secret value from secret manager here it's first 3 char: ${value.slice(0, 3)}`);
+            await logMessage(`We got the secret value from secret manager here it's first 3 char: ${value.slice(0, 3)}`);
 
             if (parse === true) {
                 // Parse the JSON safely
@@ -47,7 +47,7 @@ export async function getCachedSecret<URI>(secretName: string, parse?: boolean):
                 secret = value;
             }
 
-            logMessage(`We are now saving found secret into cache so we don't need to get it from secret manager again and again`);
+            await logMessage(`We are now saving found secret into cache so we don't need to get it from secret manager again and again`);
             // Set the secret in the cache with a specific TTL (e.g., 1 hour)
             cache.set(secretName, secret, 60 * 6);
         }
