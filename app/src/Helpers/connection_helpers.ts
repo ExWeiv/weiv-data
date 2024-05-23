@@ -6,6 +6,7 @@ import { splitCollectionId } from './name_helpers';
 import type { Collection, Db, MongoClientOptions } from 'mongodb/mongodb';
 import type { CollectionID } from '@exweiv/weiv-data';
 import type { Options } from 'node-cache';
+import { logMessage } from './log_helpers';
 
 export type ConnectionHandlerResult = {
     memberId?: string,
@@ -15,6 +16,12 @@ export type ConnectionHandlerResult = {
 
 export async function connectionHandler(collectionId: CollectionID, suppressAuth: boolean = false): Promise<ConnectionHandlerResult> {
     try {
+        if (!collectionId || typeof collectionId !== "string") {
+            throw new Error(`WeivData - Error when trying to connect to MongoClient, collectionId must be a string!`);
+        }
+
+        logMessage(`Connection Handler called via this collectionId: ${collectionId} and suppressAuth: ${suppressAuth}`);
+
         let db: Db | undefined;
         const { dbName, collectionName } = splitCollectionId(collectionId);
         const { pool, memberId } = await useClient(suppressAuth);
@@ -34,14 +41,18 @@ export async function connectionHandler(collectionId: CollectionID, suppressAuth
 export type CustomOptionsRole = "adminClientOptions" | "memberClientOptions" | "visitorClientOptions";
 export async function loadConnectionOptions(role: CustomOptionsRole): Promise<MongoClientOptions> {
     try {
-        if (typeof role !== "string") {
+        if (role !== "adminClientOptions" && role !== "memberClientOptions" && role !== "visitorClientOptions") {
             throw new Error("type of role is not string!");
         }
 
+        logMessage(`Loading custom connection options for MongoClient for role ${role}`);
+
         const customOptions: (() => MongoClientOptions | Promise<MongoClientOptions>) | undefined = customConnectionOptions[role];
         if (customOptions) {
+            logMessage(`There are some custom options so loading them! for role ${role}`);
             return await customOptions();
         } else {
+            logMessage(`There isn't any custom option loading default options for role ${role}`);
             return {
                 tls: true,
             };
@@ -53,11 +64,15 @@ export async function loadConnectionOptions(role: CustomOptionsRole): Promise<Mo
 
 export async function getCustomCacheRules() {
     try {
+        logMessage(`Getting custom cache rules for MongoClient caching via Node-Cache`);
         const cacheRules: (() => Options | Promise<Options>) | undefined = customConnectionOptions["clientCacheRules"];
         if (cacheRules) {
-            return await cacheRules();
+            const loadedCacheRules = await cacheRules();
+            logMessage(`There are some custom cache rules so loading them`, loadedCacheRules);
+            return loadedCacheRules;
         } else {
-            return { useClones: false, stdTTL: 5 * 60, deleteOnExpire: true };
+            logMessage(`There isn't any custom cache rule so loading default rules`);
+            return { useClones: false };
         }
     } catch (err) {
         throw new Error(`when loading custom cache rules for MongoClient connections, err: ${err}`);
