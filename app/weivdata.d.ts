@@ -1943,9 +1943,9 @@ declare module '@exweiv/weiv-data' {
              * }
              * ```
              * 
-             * > async is possible for config function.
+             * > async is not allowed for config.
              */
-            config: () => CustomOptions.WeivDataConfig | Promise<CustomOptions.WeivDataConfig>;
+            config: () => CustomOptions.WeivDataConfig;
         }
     }
 }

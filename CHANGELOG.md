@@ -4,6 +4,10 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.2.4
+
+- BUG Fixes + Documentation Updates
+
 ### 4.2.3
 
 - New feature `config.js` for WeivData customization. (can contain BUGs due to Wix's env)
