@@ -125,7 +125,7 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
         logMessage(`We are searching connection uri for members`);
 
         //Direct Member (logged in)
-        const cachedEncryptedMemberURI = cache.get<CryptoJS.lib.CipherParams>(`MemberMongoDB_URI${currentUser.id}`);
+        const cachedEncryptedMemberURI = cache.get<CryptoJS.lib.CipherParams>(`MemberURI${currentUser.id}`);
         if (cachedEncryptedMemberURI) {
             const cachedMemberURI = await decryptURI(cachedEncryptedMemberURI);
             logMessage(`We have found cached URI (members) so we are returning it`);
@@ -166,7 +166,7 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
         const secret = await getSecretURI("member");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
-            cache.set<CryptoJS.lib.CipherParams>(`MemberMongoDB_URI${currentUser.id}`, encryptedURI, 60 * 5);
+            cache.set<CryptoJS.lib.CipherParams>(`MemberURI${currentUser.id}`, encryptedURI, 60 * 5);
 
             return {
                 uri: secret,

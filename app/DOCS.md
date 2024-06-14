@@ -43,7 +43,7 @@ WixData is also using MongoDB in the background but everything is managed by Wix
 | Database Type                       | NoSQL - MongoDB             | NoSQL - MongoDB              |
 | Frontend Support                    | Only Backend                | Frontend Supported           |
 | Performance/Speed                   | 8.5/10                      | 6.5/10                       |
-| Cold Start Time                     | Extra 1000-1500ms           | No Cold Start                |
+| Cold Start Time                     | Extra 800-2000ms           | No Cold Start                |
 | Scalability (General)               | Very High                   | Moderate                     |
 | Read Limits                         | 100/sec                     | 1500/min                     |
 | Write Limits                        | 100/sec                     | 100/min                      |
