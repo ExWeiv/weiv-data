@@ -4,6 +4,12 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.3.2-B
+
+- security updates
+- small change to caching uris
+- unused packages are removed
+
 ### 4.3.1
 
 - logMessage changes. (BUG Fix)
