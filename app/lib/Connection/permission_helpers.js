@@ -86,7 +86,7 @@ const getAdminURI = async () => {
 const getMemberURI = async () => {
     try {
         (0, log_helpers_1.logMessage)(`We are searching connection uri for members`);
-        const cachedEncryptedMemberURI = cache.get(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`);
+        const cachedEncryptedMemberURI = cache.get(`MemberURI${wix_users_backend_1.currentUser.id}`);
         if (cachedEncryptedMemberURI) {
             const cachedMemberURI = await decryptURI(cachedEncryptedMemberURI);
             (0, log_helpers_1.logMessage)(`We have found cached URI (members) so we are returning it`);
@@ -122,7 +122,7 @@ const getMemberURI = async () => {
         const secret = await getSecretURI("member");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
-            cache.set(`MemberMongoDB_URI${wix_users_backend_1.currentUser.id}`, encryptedURI, 60 * 5);
+            cache.set(`MemberURI${wix_users_backend_1.currentUser.id}`, encryptedURI, 60 * 5);
             return {
                 uri: secret,
                 memberId: wix_users_backend_1.currentUser.id,
