@@ -42,6 +42,12 @@ const query = (collectionId: CollectionID) => new QueryResult(collectionId);
 const filter = () => new WeivDataFilter();
 const _version = () => npm.version;
 
+import { onMemberCreated, onMemberDeleted, onMemberUpdated } from "./Apps/wix_members";
+
+const SyncWixApps = {
+    wixMembers: { onMemberCreated, onMemberUpdated, onMemberDeleted }
+};
+
 export {
     query,
     filter,
@@ -78,7 +84,8 @@ export {
     deleteCollection,
     renameCollection,
     listCollections,
-    _version
+    _version,
+    SyncWixApps
 }
 
 export default {
@@ -117,5 +124,6 @@ export default {
     deleteCollection,
     renameCollection,
     listCollections,
-    _version
+    _version,
+    SyncWixApps
 }

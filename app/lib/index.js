@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._version = exports.listCollections = exports.renameCollection = exports.deleteCollection = exports.createCollection = exports.pull = exports.push = exports.increment = exports.multiply = exports.getAndUpdate = exports.getAndReplace = exports.getAndRemove = exports.findOne = exports.replace = exports.native = exports.flushCache = exports.convertIdToString = exports.convertIdToObjectId = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.aggregate = exports.filter = exports.query = void 0;
+exports.SyncWixApps = exports._version = exports.listCollections = exports.renameCollection = exports.deleteCollection = exports.createCollection = exports.pull = exports.push = exports.increment = exports.multiply = exports.getAndUpdate = exports.getAndReplace = exports.getAndRemove = exports.findOne = exports.replace = exports.native = exports.flushCache = exports.convertIdToString = exports.convertIdToObjectId = exports.update = exports.truncate = exports.save = exports.replaceReferences = exports.removeReference = exports.remove = exports.isReferenced = exports.insertReference = exports.insert = exports.get = exports.bulkUpdate = exports.bulkSave = exports.bulkRemove = exports.bulkInsert = exports.queryReferenced = exports.aggregate = exports.filter = exports.query = void 0;
 const aggregate_data_1 = require("./Aggregate/aggregate_data");
 const data_filter_1 = require("./Filter/data_filter");
 const query_data_1 = require("./Query/query_data");
@@ -79,6 +79,11 @@ const filter = () => new data_filter_1.WeivDataFilter();
 exports.filter = filter;
 const _version = () => package_json_1.default.version;
 exports._version = _version;
+const wix_members_1 = require("./Apps/wix_members");
+const SyncWixApps = {
+    wixMembers: { onMemberCreated: wix_members_1.onMemberCreated, onMemberUpdated: wix_members_1.onMemberUpdated, onMemberDeleted: wix_members_1.onMemberDeleted }
+};
+exports.SyncWixApps = SyncWixApps;
 exports.default = {
     query,
     filter,
@@ -115,5 +120,6 @@ exports.default = {
     deleteCollection: deleteCollection_1.deleteCollection,
     renameCollection: renameCollection_1.renameCollection,
     listCollections: listCollections_1.listCollections,
-    _version
+    _version,
+    SyncWixApps
 };

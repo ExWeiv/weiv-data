@@ -1933,7 +1933,14 @@ declare module '@exweiv/weiv-data' {
          * @description
          * WeivData config object with required and optional flags. For now there isn't any option to change.
          */
-        type WeivDataConfig = {}
+        type WeivDataConfig = {
+            /**
+             * @description
+             * 
+             * This is the name of the database that you want to use to insert the data of Wix app collections. It can be any database you want.
+             */
+            syncDatabase?: string
+        }
 
         /**
          * @description
@@ -2130,6 +2137,86 @@ declare module '@exweiv/weiv-data' {
              * This error is related with .aggregate function in WeivData.
              */
             "00023": "Aggegration Error"
+
+            /**
+             * @description
+             * 
+             * First of all Wix apps are firing events delayed time to time, and even if it's very rare you may have problems with events. This is how Wix app collections works right now.
+             * For example, after you update a product the update event may run after 5 minutes. Yes it can be delayed that long time, and only thing you can do is contact Wix support and report this issue.
+             * 
+             * If there is an error with sync operation you will see all logs in a custom database called WeivDataWixAppsSyncLogs in this database you will see collections for each Wix application and logs with required information.
+             * 
+             * Example data in collections:
+             * 
+             * ```json
+             * {
+             *  "message": "Item couldn't be updated, due to error",
+             *  "entityId": "09b39848-a4eb-4798-bee7-d9463474f812",
+             *  "metadata": {}
+             * }
+             * ```
+             */
+            "00024": "Wix Application Sync Error"
+        }
+    }
+
+    /**
+     * @description
+     * 
+     * Plugins are helper functions/features.
+     */
+    namespace Plugins {
+
+        /**
+         * @description
+         * 
+         * This plugin helps you to sync Wix application collections directly with your MongoDB database, in this way you can perform lookup operations easily.
+         * 
+         * > Currently this feature is experimental and BUG fixes will be added in the future. And right now only available app is Wix Members.
+         * 
+         * ### How it Works?
+         * 
+         * For specific tasks you have pre-built functions that you can use to sync Wix app collections. For example for Wix Members you have created, updated and deleted events where you define it inside the events.js file.
+         * In this events.js file you will define these events but you will use pre-built functions from WeivData library to sync the data.
+         * 
+         * Example code:
+         * ```js
+         * import { SyncWixApps } from '@exweiv/weiv-data';
+         * const { wixMembers } = SyncWixApps;
+         * 
+         * export const wixMembers_onMemberCreated = (event) => wixMembers.onMemberCreated(event);
+         * ```
+         * 
+         * In the example code above you can understand how it works with a single line of code. You can also add your own logic like this:
+         * 
+         * ```js
+         * import { SyncWixApps } from '@exweiv/weiv-data';
+         * const { wixMembers } = SyncWixApps;
+         * 
+         * export const wixMembers_onMemberCreated = (event) => {
+         *      // Sync Data (no await needed because sync functions are void and doesn't return any value)
+         *      wixMembers.onMemberCreated(event);
+         * 
+         *      // Your Own Logic
+         * }
+         * ```
+         * 
+         * ### Logs of Sync Errors
+         * 
+         * In case of an error you can find logs in `WeivDataWixAppsSyncLogs` database in your MongoDB cluster. In this database you will have multiple collections to collect logs about each individual application.
+         * You can find error logs and it's details there. Plugin only save unexpected error logs not any other logs.
+         */
+        namespace SyncWixApps {
+            /**
+             * @description
+             * 
+             * Includes functions to sync Wix Members collections.
+             */
+            interface wixMembers {
+                onMemberCreated: Function
+                onMemberUpdated: Function
+                onMemberDeleted: Function
+            }
         }
     }
 }
