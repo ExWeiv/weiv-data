@@ -48,9 +48,9 @@ async function onMemberUpdated(event) {
         const { readyFullData, readyPrivateData, readyPublicData } = await getMemberData(memberId);
         const find = { "entityId": { $eq: memberId } };
         Promise.all([
-            (await (0, native_1.native)(`${syncDatabase}/WixMembersPublicData`, true)).updateOne(find, readyPublicData, { retryWrites: true }),
-            (await (0, native_1.native)(`${syncDatabase}/WixMembersPrivateData`, true)).updateOne(find, readyPrivateData, { retryWrites: true }),
-            (await (0, native_1.native)(`${syncDatabase}/WixMembersFullData`, true)).updateOne(find, readyFullData, { retryWrites: true }),
+            (await (0, native_1.native)(`${syncDatabase}/WixMembersPublicData`, true)).updateOne(find, { $set: readyPublicData }, { retryWrites: true }),
+            (await (0, native_1.native)(`${syncDatabase}/WixMembersPrivateData`, true)).updateOne(find, { $set: readyPrivateData }, { retryWrites: true }),
+            (await (0, native_1.native)(`${syncDatabase}/WixMembersFullData`, true)).updateOne(find, { $set: readyFullData }, { retryWrites: true }),
         ]);
     }
     catch (err) {
