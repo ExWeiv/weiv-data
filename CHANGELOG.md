@@ -4,6 +4,10 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.5.1
+
+- BUG Fixes and TS type fixes. For Wix Members sync plug-in.
+
 ### 4.5.0
 
 - New plug-in, sync Wix Members collection into your MongoDB databae to perform lookups easily with your own custom collections.
