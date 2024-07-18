@@ -61,9 +61,9 @@ export async function onMemberUpdated(event: Document): Promise<void> {
 
         // Insert to MongoDB (fire and forget)
         Promise.all([
-            (await native(`${syncDatabase}/WixMembersPublicData`, true)).updateOne(find, readyPublicData, { retryWrites: true }),
-            (await native(`${syncDatabase}/WixMembersPrivateData`, true)).updateOne(find, readyPrivateData, { retryWrites: true }),
-            (await native(`${syncDatabase}/WixMembersFullData`, true)).updateOne(find, readyFullData, { retryWrites: true }),
+            (await native(`${syncDatabase}/WixMembersPublicData`, true)).updateOne(find, { $set: readyPublicData }, { retryWrites: true }),
+            (await native(`${syncDatabase}/WixMembersPrivateData`, true)).updateOne(find, { $set: readyPrivateData }, { retryWrites: true }),
+            (await native(`${syncDatabase}/WixMembersFullData`, true)).updateOne(find, { $set: readyFullData }, { retryWrites: true }),
         ]);
     } catch (err) {
         // Log Error (fire and forget)

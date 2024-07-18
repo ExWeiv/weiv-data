@@ -4,7 +4,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
-### 4.5.1
+### 4.5.1, 4.5.2
 
 - BUG Fixes and TS type fixes. For Wix Members sync plug-in.
 
