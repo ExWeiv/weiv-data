@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.copyOwnPropsOnly = exports.validateParams = void 0;
+exports.validateParams = validateParams;
+exports.copyOwnPropsOnly = copyOwnPropsOnly;
 const reference_helpers_1 = require("./reference_helpers");
-const item_helpers_1 = require("./item_helpers");
 const lodash_1 = require("lodash");
+const id_converters_1 = require("../Functions/id_converters");
 async function validateParams(params, requiredParams, func) {
     try {
         let safeItem;
@@ -68,7 +69,7 @@ async function validateParams(params, requiredParams, func) {
                 }
                 case "itemId": {
                     if (value) {
-                        safeItemId = (0, item_helpers_1.convertStringId)(value);
+                        safeItemId = (0, id_converters_1.convertIdToObjectId)(value);
                     }
                     break;
                 }
@@ -98,7 +99,7 @@ async function validateParams(params, requiredParams, func) {
                     if (value) {
                         if ((0, lodash_1.isArray)(value)) {
                             safeItemIds = value.map((itemId) => {
-                                return (0, item_helpers_1.convertStringId)(itemId);
+                                return (0, id_converters_1.convertIdToObjectId)(itemId);
                             });
                         }
                         else {
@@ -182,7 +183,6 @@ async function validateParams(params, requiredParams, func) {
         throw new Error(`Validation Error!, ${err}`);
     }
 }
-exports.validateParams = validateParams;
 function checkItemIds(params, func) {
     try {
         const bulkFunctions = [
@@ -207,28 +207,32 @@ function checkItemIds(params, func) {
     }
 }
 function copyOwnPropsOnly(src) {
-    const result = Object.create(null);
-    function copyObject(value) {
-        if (isPlainObject(value)) {
-            return copyOwnPropsOnly(value);
-        }
-        else {
-            return value;
-        }
-    }
-    for (const key of Object.getOwnPropertyNames(src)) {
-        if (key !== "__proto__" || "constructor" || "prototype") {
-            if (typeof src[key] === "object") {
-                result[key] = copyObject(src[key]);
+    try {
+        const result = Object.create(null);
+        function copyObject(value) {
+            if (isPlainObject(value)) {
+                return copyOwnPropsOnly(value);
             }
             else {
-                result[key] = src[key];
+                return value;
             }
         }
+        for (const key of Object.getOwnPropertyNames(src)) {
+            if (key !== "__proto__" || "constructor" || "prototype") {
+                if (typeof src[key] === "object") {
+                    result[key] = copyObject(src[key]);
+                }
+                else {
+                    result[key] = src[key];
+                }
+            }
+        }
+        return result;
     }
-    return result;
+    catch (err) {
+        throw new Error(`copyOwnPropsOnly function failed! Details: ${err}`);
+    }
 }
-exports.copyOwnPropsOnly = copyOwnPropsOnly;
 function isPlainObject(value) {
     if (typeof value !== 'object' || value === null)
         return false;

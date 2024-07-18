@@ -2,6 +2,7 @@ import type { CollectionID, WeivDataOptions, ReferringItem, ReferencedItem } fro
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { validateParams } from '../Helpers/validator';
 import { Document } from 'mongodb';
+import { kaptanLogar } from '../Errors/error_manager';
 
 export async function removeReference(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<void> {
     try {
@@ -21,9 +22,9 @@ export async function removeReference(collectionId: CollectionID, propertyName: 
         );
 
         if (!acknowledged || modifiedCount <= 0) {
-            throw new Error(`acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
+            kaptanLogar("00017", `could not remove references, MongoDB acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when removing references: ${err}`);
+        kaptanLogar("00017", `when removing references: ${err}`);
     }
 }

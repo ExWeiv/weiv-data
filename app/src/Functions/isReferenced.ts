@@ -2,6 +2,7 @@ import type { CollectionID, WeivDataOptionsCache, ReferringItem, ReferencedItem 
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { validateParams } from '../Helpers/validator';
 import NodeCache from "node-cache";
+import { kaptanLogar } from '../Errors/error_manager';
 
 const cache = new NodeCache({
     checkperiod: 5,
@@ -47,7 +48,7 @@ export async function isReferenced(collectionId: CollectionID, propertyName: str
             return false;
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when checking if item is referenced: ${err}`);
+        kaptanLogar("00017", `when checking if item is referenced: ${err}`);
     }
 }
 

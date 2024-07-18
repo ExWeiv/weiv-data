@@ -1,10 +1,10 @@
 import { getPermissionsCache } from '../Connection/permission_helpers';
-import { getGetCache } from '../Functions/get';
 import { getIsReferencedCache } from '../Functions/isReferenced';
 import { getHelperSecretsCache } from '../Helpers/secret_helpers';
 import { getClientCache } from '../Connection/automatic_connection_provider';
 import NodeCache from 'node-cache';
 import type { CacheSelections } from '@exweiv/weiv-data';
+import { kaptanLogar } from '../Errors/error_manager';
 
 type CacheSelectionsObject = {
     [Key in CacheSelections as string]: () => NodeCache; // Define the value type as a function returning any
@@ -12,7 +12,6 @@ type CacheSelectionsObject = {
 
 const cacheSelections: CacheSelectionsObject = {
     "permissions": getPermissionsCache,
-    "get": getGetCache,
     "isreferenced": getIsReferencedCache,
     "helpersecrets": getHelperSecretsCache,
     "connectionclients": getClientCache,
@@ -47,6 +46,6 @@ export function flushCache(filters?: CacheSelections[]): void {
             cacheData.flushAll();
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when flushing caches! ${err}`);
+        kaptanLogar("00019", `${err}`);
     }
 }

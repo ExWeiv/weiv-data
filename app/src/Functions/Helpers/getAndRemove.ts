@@ -2,10 +2,12 @@ import { connectionHandler } from '../../Helpers/connection_helpers';
 import type { CollectionID, Item, ItemID, WeivDataOptionsOwner } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../../Helpers/hook_helpers';
 import { runDataHook } from '../../Hooks/hook_manager';
-import { convertObjectId, convertStringId } from '../../Helpers/item_helpers';
 import { validateParams } from '../../Helpers/validator';
 import type { ObjectId } from 'mongodb';
 import { getOwnerId } from '../../Helpers/member_id_helpers';
+import { kaptanLogar } from '../../Errors/error_manager';
+import { convertDocumentIDs } from '../../Helpers/internal_id_converter';
+import { convertIdToObjectId } from '../id_converters';
 
 export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsOwner): Promise<Item | undefined> {
     try {
@@ -16,16 +18,16 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
 
         let editedItemId = safeItemId;
         if (suppressHooks != true) {
             const modifiedItemId = await runDataHook<'beforeGetAndRemove'>(collectionId, "beforeGetAndRemove", [safeItemId, context]).catch((err) => {
-                throw new Error(`beforeGetAndRemove Hook Failure ${err}`);
+                kaptanLogar("00002", `beforeGetAndRemove Hook Failure ${err}`);
             });
 
             if (modifiedItemId) {
-                editedItemId = convertStringId(modifiedItemId);
+                editedItemId = convertIdToObjectId(modifiedItemId);
             }
         }
 
@@ -45,30 +47,20 @@ export async function getAndRemove(collectionId: CollectionID, itemId: ItemID, o
 
         if (item) {
             if (suppressHooks != true) {
-                const modifiedResult = await runDataHook<'afterGetAndRemove'>(collectionId, "afterGetAndRemove", [item, context]).catch((err) => {
-                    throw new Error(`afterGetAndRemove Hook Failure ${err}`);
+                const modifiedResult = await runDataHook<'afterGetAndRemove'>(collectionId, "afterGetAndRemove", [convertIds ? convertDocumentIDs(item) : item, context]).catch((err) => {
+                    kaptanLogar("00003", `afterGetAndRemove Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
-                    if (modifiedResult._id) {
-                        modifiedResult._id = convertObjectId(modifiedResult._id);
-                    }
-                    return modifiedResult;
+                    return convertIds ? convertDocumentIDs(modifiedResult) : modifiedResult;
                 }
             }
 
-            if (item._id) {
-                return {
-                    ...item,
-                    _id: convertObjectId(item._id)
-                }
-            } else {
-                return item;
-            }
+            return convertIds ? convertDocumentIDs(item) : item;
         } else {
             return undefined;
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when removing an item from collection (getAndRemove): ${err}`);
+        kaptanLogar("00016", `when removing an item from collection (getAndRemove): ${err}`);
     }
 }

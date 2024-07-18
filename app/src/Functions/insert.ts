@@ -5,7 +5,8 @@ import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import type { CollectionID, Item, WeivDataOptionsWrite } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
-import { convertObjectId } from '../Helpers/item_helpers';
+import { kaptanLogar } from '../Errors/error_manager';
+import { convertDocumentIDs, convertToStringId } from '../Helpers/internal_id_converter';
 
 export async function insert(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWrite): Promise<Item> {
     try {
@@ -16,7 +17,7 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = safeOptions || {};
         const defaultValues: { [key: string]: any } = {
             _updatedDate: new Date(),
             _createdDate: new Date(),
@@ -29,7 +30,7 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
         let editedItem;
         if (suppressHooks != true) {
             editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [modifiedItem, context]).catch((err) => {
-                throw new Error(`beforeInsert Hook Failure ${err}`);
+                kaptanLogar("00002", `beforeInsert Hook Failure ${err}`);
             });
         }
 
@@ -41,32 +42,26 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
 
         if (acknowledged) {
             if (suppressHooks != true) {
-                const editedResult = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [{ ...!editedItem ? modifiedItem : editedItem, _id: insertedId }, context]).catch((err) => {
-                    throw new Error(`afterInsert Hook Failure ${err}`);
+                const item = {
+                    ...!editedItem ? modifiedItem : editedItem,
+                    _id: convertIds ? convertToStringId(insertedId) : insertedId
+                }
+
+                const editedResult = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
+                    kaptanLogar("00003", `afterInsert Hook Failure ${err}`);
                 });
 
                 if (editedResult) {
-                    if (editedResult._id) {
-                        editedResult._id = convertObjectId(editedResult._id);
-                    }
-                    return editedResult;
+                    return convertIds ? convertDocumentIDs(editedResult) : editedResult;
                 }
             }
 
             const item = { ...!editedItem ? modifiedItem : editedItem, _id: insertedId };
-
-            if (item._id) {
-                return {
-                    ...item,
-                    _id: convertObjectId(item._id)
-                }
-            } else {
-                return item;
-            }
+            return convertIds ? convertDocumentIDs(item) : item;
         } else {
-            throw new Error(`acknowledged: ${acknowledged}`);
+            kaptanLogar("00016", `acknowledged value returned from MongoDB is not true`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when inserting an item into a collection: ${err}`);
+        kaptanLogar("00016", `when inserting an item into a collection: ${err}`);
     }
 }

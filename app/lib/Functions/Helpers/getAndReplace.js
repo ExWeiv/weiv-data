@@ -1,21 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAndReplace = void 0;
+exports.getAndReplace = getAndReplace;
 const connection_helpers_1 = require("../../Helpers/connection_helpers");
 const hook_helpers_1 = require("../../Helpers/hook_helpers");
 const hook_manager_1 = require("../../Hooks/hook_manager");
 const validator_1 = require("../../Helpers/validator");
 const member_id_helpers_1 = require("../../Helpers/member_id_helpers");
-const item_helpers_1 = require("../../Helpers/item_helpers");
+const error_manager_1 = require("../../Errors/error_manager");
+const internal_id_converter_1 = require("../../Helpers/internal_id_converter");
 async function getAndReplace(collectionId, itemId, value, options) {
     try {
         const { safeItemId, safeValue, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemId, value, options }, ["collectionId", "itemId", "value"], "getAndReplace");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
         let editedItem = safeValue;
         if (suppressHooks != true) {
             const modifiedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndReplace", [safeValue, context]).catch((err) => {
-                throw new Error(`beforeGetAndReplace Hook Failure ${err}`);
+                (0, error_manager_1.kaptanLogar)("00002", `beforeGetAndReplace Hook Failure ${err}`);
             });
             if (modifiedItem) {
                 editedItem = modifiedItem;
@@ -33,32 +34,20 @@ async function getAndReplace(collectionId, itemId, value, options) {
         const item = await collection.findOneAndReplace(filter, editedItem, { readConcern, returnDocument: "after", includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
-                const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndReplace", [item, context]).catch((err) => {
-                    throw new Error(`afterGetAndReplace Hook Failure ${err}`);
+                const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndReplace", [convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(item) : item, context]).catch((err) => {
+                    (0, error_manager_1.kaptanLogar)("00003", `afterGetAndReplace Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
-                    if (modifiedResult._id) {
-                        modifiedResult._id = (0, item_helpers_1.convertObjectId)(modifiedResult._id);
-                    }
-                    return modifiedResult;
+                    return convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(modifiedResult) : modifiedResult;
                 }
             }
-            if (item._id) {
-                return {
-                    ...item,
-                    _id: (0, item_helpers_1.convertObjectId)(item._id)
-                };
-            }
-            else {
-                return item;
-            }
+            return convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(item) : item;
         }
         else {
             return undefined;
         }
     }
     catch (err) {
-        throw new Error(`WeivData - Error when replacing an item from collection (getAndReplace): ${err}`);
+        (0, error_manager_1.kaptanLogar)("00016", `when replacing an item from collection (getAndReplace): ${err}`);
     }
 }
-exports.getAndReplace = getAndReplace;

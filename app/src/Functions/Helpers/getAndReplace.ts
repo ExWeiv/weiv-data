@@ -5,7 +5,8 @@ import { runDataHook } from '../../Hooks/hook_manager';
 import { validateParams } from '../../Helpers/validator';
 import type { ObjectId } from 'mongodb';
 import { getOwnerId } from '../../Helpers/member_id_helpers';
-import { convertObjectId } from '../../Helpers/item_helpers';
+import { kaptanLogar } from '../../Errors/error_manager';
+import { convertDocumentIDs } from '../../Helpers/internal_id_converter';
 
 export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined> {
     try {
@@ -16,12 +17,12 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
 
         let editedItem = safeValue;
         if (suppressHooks != true) {
             const modifiedItem = await runDataHook<'beforeGetAndReplace'>(collectionId, "beforeGetAndReplace", [safeValue, context]).catch((err) => {
-                throw new Error(`beforeGetAndReplace Hook Failure ${err}`);
+                kaptanLogar("00002", `beforeGetAndReplace Hook Failure ${err}`);
             });
 
             if (modifiedItem) {
@@ -48,30 +49,20 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
 
         if (item) {
             if (suppressHooks != true) {
-                const modifiedResult = await runDataHook<'afterGetAndReplace'>(collectionId, "afterGetAndReplace", [item, context]).catch((err) => {
-                    throw new Error(`afterGetAndReplace Hook Failure ${err}`);
+                const modifiedResult = await runDataHook<'afterGetAndReplace'>(collectionId, "afterGetAndReplace", [convertIds ? convertDocumentIDs(item) : item, context]).catch((err) => {
+                    kaptanLogar("00003", `afterGetAndReplace Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
-                    if (modifiedResult._id) {
-                        modifiedResult._id = convertObjectId(modifiedResult._id);
-                    }
-                    return modifiedResult;
+                    return convertIds ? convertDocumentIDs(modifiedResult) : modifiedResult;
                 }
             }
 
-            if (item._id) {
-                return {
-                    ...item,
-                    _id: convertObjectId(item._id)
-                }
-            } else {
-                return item;
-            }
+            return convertIds ? convertDocumentIDs(item) : item;
         } else {
             return undefined;
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when replacing an item from collection (getAndReplace): ${err}`);
+        kaptanLogar("00016", `when replacing an item from collection (getAndReplace): ${err}`);
     }
 }

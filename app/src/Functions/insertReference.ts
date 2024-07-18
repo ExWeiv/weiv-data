@@ -2,6 +2,7 @@ import type { WeivDataOptions, CollectionID, ReferencedItem, ReferringItem } fro
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { validateParams } from '../Helpers/validator';
 import { Document } from 'mongodb';
+import { kaptanLogar } from '../Errors/error_manager';
 
 export async function insertReference(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<void> {
     try {
@@ -23,9 +24,9 @@ export async function insertReference(collectionId: CollectionID, propertyName: 
         );
 
         if (!acknowledged || modifiedCount <= 0) {
-            throw new Error(`acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
+            kaptanLogar("00017", `could not insert references, MongoDB acknowledged: ${acknowledged}, modifiedCount: ${modifiedCount}`);
         }
     } catch (err) {
-        throw new Error(`Error when inserting a reference item into an item: ${err}`);
+        kaptanLogar("00017", `when inserting a reference item into an item: ${err}`);
     }
 }

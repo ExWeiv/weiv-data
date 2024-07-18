@@ -1,11 +1,13 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { getOwnerId } from '../Helpers/member_id_helpers';
-import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import type { CollectionID, Item, BulkSaveResult, WeivDataOptionsWriteOwner } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
 import type { ObjectId } from 'mongodb';
+import { kaptanLogar } from '../Errors/error_manager';
+import { convertToStringId, recursivelyConvertIds } from '../Helpers/internal_id_converter';
+import { convertIdToObjectId } from './id_converters';
 
 export async function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWriteOwner): Promise<BulkSaveResult> {
     try {
@@ -16,7 +18,7 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, onlyOwner, convertIds } = safeOptions || {};
         const currentMemberId = await getOwnerId(enableVisitorId);
 
         let ownerId = await getOwnerId(enableVisitorId);
@@ -30,18 +32,15 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
                 // Run beforeUpdate hook for that item.
                 if (suppressHooks != true) {
                     const editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [item, context]).catch((err) => {
-                        throw new Error(`beforeUpdate (bulkSave) Hook Failure ${err}`);
+                        kaptanLogar("00002", `beforeUpdate (bulkSave) Hook Failure ${err}`);
                     })
 
                     if (editedItem) {
-                        editedItem._id = convertStringId(editedItem._id);
                         return editedItem;
                     } else {
-                        item._id = convertStringId(item._id);
                         return item;
                     }
                 } else {
-                    item._id = convertStringId(item._id);
                     return item;
                 }
             } else {
@@ -50,7 +49,7 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
                 item._owner = currentMemberId;
                 if (suppressHooks != true) {
                     const editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [item, context]).catch((err) => {
-                        throw new Error(`beforeInsert (bulkSave) Hook Failure ${err}`);
+                        kaptanLogar("00002", `beforeInsert (bulkSave) Hook Failure ${err}`);
                     });
 
                     if (editedItem) {
@@ -67,7 +66,8 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
         editedItems = await Promise.all(editedItems);
         const bulkOperations = editedItems.map((item) => {
             if (item._id) {
-                const filter: { _id: ObjectId, _owner?: string } = { _id: item._id };
+                const filter: { _id: ObjectId, _owner?: string } = { _id: convertIdToObjectId(item._id) };
+
                 if (onlyOwner) {
                     if (currentMemberId) {
                         filter._owner = currentMemberId;
@@ -88,24 +88,23 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
                     }
                 }
             }
-        })
+        });
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const { insertedCount, modifiedCount, insertedIds, ok } = await collection.bulkWrite(
             bulkOperations,
-            { readConcern }
+            { readConcern, ordered: true }
         );
 
         if (ok) {
             if (suppressHooks != true) {
+                editedItems = convertIds ? recursivelyConvertIds(editedItems) : editedItems;
+
                 editedItems = editedItems.map(async (item) => {
                     if (item._id) {
-                        // Convert to string
-                        item._id = convertObjectId(item._id);
-
                         // Run afterUpdate hook for that item.
                         const editedItem = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [item, context]).catch((err) => {
-                            throw new Error(`afterUpdate (bulkSave) Hook Failure ${err}`);
+                            kaptanLogar("00003", `afterUpdate (bulkSave) Hook Failure ${err}`);
                         });
 
                         if (editedItem) {
@@ -116,7 +115,7 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
                     } else {
                         // Run afterInsert hook for that item.
                         const editedItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
-                            throw new Error(`afterInsert Hook Failure ${err}`);
+                            kaptanLogar("00003", `afterInsert Hook Failure ${err}`);
                         });
 
                         if (editedItem) {
@@ -125,25 +124,25 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
                             return item;
                         }
                     }
-                })
+                });
 
                 editedItems = await Promise.all(editedItems);
             }
 
             const editedInsertedIds: string[] = Object.keys(insertedIds).map((key) => {
-                return convertObjectId(insertedIds[key as any]);
+                return convertToStringId(insertedIds[key as any]);
             });
 
             return {
                 insertedItemIds: editedInsertedIds,
                 inserted: insertedCount,
                 updated: modifiedCount,
-                savedItems: editedItems
+                savedItems: convertIds ? recursivelyConvertIds(editedItems) : editedItems
             }
         } else {
-            throw new Error(`inserted: ${insertedCount}, updated: ${modifiedCount}, ok: ${ok}`);
+            kaptanLogar("00016", `one or more saves failed to complete.`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when saving items using bulkSave: ${err}`);
+        kaptanLogar("00016", `when saving items using bulkSave: ${err}`);
     }
 }

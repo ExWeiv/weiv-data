@@ -2,11 +2,11 @@
 
 //@ts-ignore
 import * as data_hooks from '../../../../../../../../../user-code/backend/WeivData/data';
-
 import { splitCollectionId } from '../Helpers/name_helpers';
 import type { Item, ItemID, CollectionID, Hooks } from '@exweiv/weiv-data'
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { QueryResult } from '../Query/query_data';
+import { kaptanLogar } from '../Errors/error_manager';
 
 type HookArgs<HookName> =
     HookName extends 'beforeGet' ? [item: ItemID, context: Hooks.HookContext] :
@@ -39,7 +39,7 @@ type HooksResults<HookName> =
 
 function hookExist(collectionId: CollectionID, hookName: Hooks.HookName): Function | undefined {
     if (typeof hookName !== "string") {
-        throw new Error("type of hook name is not string!");
+        kaptanLogar("00008");
     }
 
     const { collectionName, dbName } = splitCollectionId(collectionId);
@@ -53,8 +53,12 @@ function hookExist(collectionId: CollectionID, hookName: Hooks.HookName): Functi
 
 export async function runDataHook<R>(collectionId: CollectionID, hookName: Hooks.HookName, args: HookArgs<R>): Promise<HooksResults<R> | undefined> {
     try {
-        if (typeof hookName !== "string" && typeof collectionId !== "string") {
-            throw new Error("type of hook name or collection id is not string!");
+        if (typeof hookName !== "string") {
+            kaptanLogar("00008");
+        }
+
+        if (typeof collectionId !== "string") {
+            kaptanLogar("00007");
         }
 
         const hookFunction = hookExist(collectionId, hookName);

@@ -16,7 +16,7 @@ import { replaceReferences } from './Functions/replaceReferences';
 import { save } from './Functions/save';
 import { truncate } from './Functions/truncate';
 import { update } from './Functions/update';
-import { convertId } from './Functions/convertId';
+import { convertIdToObjectId, convertIdToString } from './Functions/id_converters';
 import { flushCache } from './Functions/flushCache';
 import { native } from './Functions/native';
 import { replace } from './Functions/replace';
@@ -61,7 +61,8 @@ export {
     save,
     truncate,
     update,
-    convertId,
+    convertIdToObjectId,
+    convertIdToString,
     flushCache,
     native,
     replace,
@@ -99,7 +100,8 @@ export default {
     save,
     truncate,
     update,
-    convertId,
+    convertIdToObjectId,
+    convertIdToString,
     flushCache,
     native,
     replace,

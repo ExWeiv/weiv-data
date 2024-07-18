@@ -2,6 +2,7 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import type { CollectionID } from '@exweiv/weiv-data';
 import { Collection } from 'mongodb/mongodb';
 import { validateParams } from '../Helpers/validator';
+import { kaptanLogar } from '../Errors/error_manager';
 
 export async function native(collectionId: CollectionID, suppressAuth?: boolean): Promise<Collection> {
     try {
@@ -9,6 +10,6 @@ export async function native(collectionId: CollectionID, suppressAuth?: boolean)
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         return collection;
     } catch (err) {
-        throw new Error(`WeivData - Error when returning native collection cursor from mongodb driver: ${err}`);
+        kaptanLogar("00018", `when returning native collection cursor from mongodb driver: ${err}`);
     }
 }

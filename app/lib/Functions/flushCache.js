@@ -1,14 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.flushCache = void 0;
+exports.flushCache = flushCache;
 const permission_helpers_1 = require("../Connection/permission_helpers");
-const get_1 = require("../Functions/get");
 const isReferenced_1 = require("../Functions/isReferenced");
 const secret_helpers_1 = require("../Helpers/secret_helpers");
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
+const error_manager_1 = require("../Errors/error_manager");
 const cacheSelections = {
     "permissions": permission_helpers_1.getPermissionsCache,
-    "get": get_1.getGetCache,
     "isreferenced": isReferenced_1.getIsReferencedCache,
     "helpersecrets": secret_helpers_1.getHelperSecretsCache,
     "connectionclients": automatic_connection_provider_1.getClientCache,
@@ -40,7 +39,6 @@ function flushCache(filters) {
         }
     }
     catch (err) {
-        throw new Error(`WeivData - Error when flushing caches! ${err}`);
+        (0, error_manager_1.kaptanLogar)("00019", `${err}`);
     }
 }
-exports.flushCache = flushCache;

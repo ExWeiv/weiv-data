@@ -1,12 +1,11 @@
 //@ts-ignore
 import { currentUser } from "wix-users-backend";
-
 import { getCachedSecret } from '../Helpers/secret_helpers';
 import NodeCache from 'node-cache';
 import type { CustomOptionsRole } from '../Helpers/connection_helpers';
 import CryptoJS from 'crypto-js';
 import { getSecretKey } from '../Helpers/encrypt_helpers';
-import { logMessage } from "../Helpers/log_helpers";
+import { kaptanLogar } from "../Errors/error_manager";
 
 /**@internal */
 export type GetMongoURIResult = {
@@ -27,8 +26,6 @@ const cache = new NodeCache({ useClones: false, deleteOnExpire: true });
  */
 export async function getMongoURI(suppressAuth: boolean = false): Promise<GetMongoURIResult> {
     try {
-        logMessage("getMongoURI function called to get required connection uri based on visitor role");
-
         if (suppressAuth != true) {
             if (currentUser.loggedIn === true) {
                 //Direct Member (logged in)
@@ -42,7 +39,7 @@ export async function getMongoURI(suppressAuth: boolean = false): Promise<GetMon
             return getAdminURI();
         }
     } catch (err) {
-        throw new Error(`Error on getting URI for MongoDB based on permission of current user: ${err}`);
+        kaptanLogar("00009", `on getting URI for MongoDB based on permission of current user: ${err}`);
     }
 }
 
@@ -54,8 +51,6 @@ export async function getMongoURI(suppressAuth: boolean = false): Promise<GetMon
  */
 const getVisitorURI = async (): Promise<GetMongoURIResult> => {
     try {
-        logMessage(`We are searching connection uri for visitors`);
-
         //Direct Visitor (not logged in)
         const cachedEncryptedVisitorURI = cache.get<CryptoJS.lib.CipherParams>("VisitorMongoDB_URI");
         if (cachedEncryptedVisitorURI) {
@@ -69,10 +64,10 @@ const getVisitorURI = async (): Promise<GetMongoURIResult> => {
             cache.set<CryptoJS.lib.CipherParams>("VisitorMongoDB_URI", encryptedURI, 60 * 5);
             return { uri: secret, role: "visitorClientOptions" }
         } else {
-            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            kaptanLogar("00009", `WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
-        throw new Error(`Error when getting VisitorURI: ${err}`);
+        kaptanLogar("00009", `when getting VisitorURI: ${err}`);
     }
 }
 
@@ -84,8 +79,6 @@ const getVisitorURI = async (): Promise<GetMongoURIResult> => {
  */
 const getAdminURI = async (): Promise<GetMongoURIResult> => {
     try {
-        logMessage(`We are searching connection uri for admins`);
-
         //Direct Admin (permission is bypassed)
         const cachedEncryptedAdminURI = cache.get<CryptoJS.lib.CipherParams>("AdminMongoDB_URI");
         if (cachedEncryptedAdminURI) {
@@ -107,10 +100,10 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
                 role: "adminClientOptions"
             }
         } else {
-            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            kaptanLogar("00009", `WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
-        throw new Error(`Error when getting AdminURI: ${err}`);
+        kaptanLogar("00009", `when getting AdminURI: ${err}`);
     }
 }
 
@@ -122,13 +115,10 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
  */
 const getMemberURI = async (): Promise<GetMongoURIResult> => {
     try {
-        logMessage(`We are searching connection uri for members`);
-
         //Direct Member (logged in)
         const cachedEncryptedMemberURI = cache.get<CryptoJS.lib.CipherParams>(`MemberURI${currentUser.id}`);
         if (cachedEncryptedMemberURI) {
             const cachedMemberURI = await decryptURI(cachedEncryptedMemberURI);
-            logMessage(`We have found cached URI (members) so we are returning it`);
             return {
                 uri: cachedMemberURI,
                 memberId: currentUser.id,
@@ -136,11 +126,9 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
             }
         }
 
-        logMessage(`We are now checking member roles to see if this member is an Admin?`);
         const cachedRole: string | undefined = cache.get(`MemberRoles${currentUser.id}`);
         if (cachedRole) {
             if (cachedRole === "Admin") {
-                logMessage(`Member is Admin so we are getting admin URI not member URI`);
                 return getAdminURI();
             }
         }
@@ -155,11 +143,9 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
             }).length > 0;
 
             if (isAdmin) {
-                logMessage(`Member is Admin so we are getting admin URI not member URI, (role fetched via APIs)`);
                 return getAdminURI();
             }
         } else {
-            logMessage("We didn't find any specific (admin) role for this member, so we will return member URI.");
             cache.set(`MemberRoles${currentUser.id}`, "Member", 60 * 5);
         }
 
@@ -174,10 +160,10 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
                 role: "memberClientOptions"
             }
         } else {
-            throw new Error(`WeivDataURIs Secret Not Found or Not Configured Correctly`);
+            kaptanLogar("00009", `WeivDataURIs Secret Not Found or Not Configured Correctly`);
         }
     } catch (err) {
-        throw new Error(`Error when getting MemberURI: ${err}`);
+        kaptanLogar("00009", `when getting MemberURI: ${err}`);
     }
 }
 
@@ -208,10 +194,9 @@ const decryptURI = async (encryptedURI: CryptoJS.lib.CipherParams) => {
 
 const getSecretURI = async (uri: "admin" | "member" | "visitor"): Promise<string> => {
     try {
-        logMessage(`getSecretURI working for ${uri}`);
         const secret = await getCachedSecret<"URI">("WeivDataURIs", true);
         return secret[uri];
     } catch (err) {
-        throw new Error(`WeivData - Error when getting connection URI from secret manager via getCachedSecret helper function, ${err}`);
+        kaptanLogar("00009", `when getting connection URI from secret manager via getCachedSecret helper function, ${err}`);
     }
 }

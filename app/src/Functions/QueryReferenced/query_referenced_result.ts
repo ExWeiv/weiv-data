@@ -1,8 +1,9 @@
 import { ObjectId, Db, Collection } from 'mongodb/mongodb';
 import { getPipeline } from '../../Helpers/query_referenced_helpers';
-import type { CollectionID, WeivDataOptions, WeivDataQueryReferencedResult, WeivDataQueryReferencedOptions, Item } from '@exweiv/weiv-data';
+import type { CollectionID, WeivDataOptions, WeivDataQueryReferencedResult, WeivDataQueryReferencedOptions } from '@exweiv/weiv-data';
 import { connectionHandler } from '../../Helpers/connection_helpers';
-import { convertObjectId } from '../../Helpers/item_helpers';
+import { kaptanLogar } from '../../Errors/error_manager';
+import { recursivelyConvertIds } from '../../Helpers/internal_id_converter';
 
 export class QueryReferencedResult {
     private targetCollectionId: string;
@@ -20,7 +21,7 @@ export class QueryReferencedResult {
 
     constructor(collectionId: CollectionID, targetCollectionId: string, itemId: ObjectId, propertyName: string, queryOptions: WeivDataQueryReferencedOptions, options: WeivDataOptions) {
         if (!collectionId || !targetCollectionId || !itemId || !propertyName || !queryOptions || !options) {
-            throw new Error(`one or more required param is undefined - Required Params: collectionId, targetCollectionId, propertyName, queryOptions, options, itemId`);
+            kaptanLogar("00017", `one or more required params are undefined when querying references`);
         }
 
         this._collectionId = collectionId;
@@ -34,7 +35,7 @@ export class QueryReferencedResult {
 
     async getResult(): Promise<WeivDataQueryReferencedResult> {
         try {
-            const { suppressAuth, readConcern } = this.options;
+            const { suppressAuth, readConcern, convertIds } = this.options;
             await this._handleConnection_(suppressAuth);
 
             const pipelineOptions = this.__getPipelineOptions__();
@@ -46,12 +47,7 @@ export class QueryReferencedResult {
             const { referencedItems, totalItems } = items[0];
 
             return {
-                items: (referencedItems as Item[]).map((item: Item) => {
-                    if (item._id) {
-                        item._id = convertObjectId(item._id);
-                    }
-                    return item;
-                }),
+                items: convertIds ? recursivelyConvertIds(referencedItems) : referencedItems,
                 totalCount: totalItems,
                 hasNext: () => hasNext,
                 hasPrev: () => this.currentPage > 0,
@@ -65,7 +61,7 @@ export class QueryReferencedResult {
                 }
             };
         } catch (err) {
-            throw new Error(`when running queryReferenced function: ${err}`);
+            kaptanLogar("00017", `when running queryReferenced function: ${err}`);
         }
     }
 

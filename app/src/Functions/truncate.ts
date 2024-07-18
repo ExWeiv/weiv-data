@@ -1,6 +1,7 @@
 import { CollectionID, WeivDataOptions } from '@exweiv/weiv-data';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { validateParams } from '../Helpers/validator';
+import { kaptanLogar } from '../Errors/error_manager';
 
 export async function truncate(collectionId: CollectionID, options?: WeivDataOptions): Promise<boolean> {
     try {
@@ -14,9 +15,9 @@ export async function truncate(collectionId: CollectionID, options?: WeivDataOpt
         if (acknowledged) {
             return true;
         } else {
-            throw new Error(`couldn't remove all items in the collection, acknowledged: ${acknowledged}`);
+            kaptanLogar("00016", `couldn't remove all items in the collection, acknowledged: ${acknowledged}`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when removing all items in a collection (truncate): ${err}`);
+        kaptanLogar("00016", `removing all items in a collection (truncate): ${err}`);
     }
 }

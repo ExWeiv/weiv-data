@@ -5,7 +5,8 @@ import { prepareHookContext } from '../Helpers/hook_helpers';
 import type { Document } from 'mongodb/mongodb';
 import type { CollectionID, Item, BulkInsertResult, WeivDataOptionsWrite } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
-import { convertObjectId } from '../Helpers/item_helpers';
+import { kaptanLogar } from '../Errors/error_manager';
+import { convertToStringId, recursivelyConvertIds } from '../Helpers/internal_id_converter';
 
 export async function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWrite): Promise<BulkInsertResult> {
     try {
@@ -16,7 +17,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = safeOptions || {};
 
         let ownerId = await getOwnerId(enableVisitorId);
         let editedItems: Document[] | Promise<Document>[] = safeItems.map(async (item) => {
@@ -26,7 +27,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
 
             if (suppressHooks != true) {
                 let editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [item, context]).catch((err) => {
-                    throw new Error(`beforeInsert (bulkInsert) Hook Failure ${err}`);
+                    kaptanLogar("00002", `beforeInsert (bulkInsert) Hook Failure ${err}`);
                 });
 
                 if (editedItem) {
@@ -53,18 +54,16 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
         );
 
         const insertedItemIds = Object.keys(insertedIds).map((key) => {
-            return convertObjectId(insertedIds[key as any]);
-        })
+            return convertToStringId(insertedIds[key as any]);
+        });
 
         if (ok) {
             if (suppressHooks != true) {
-                editedItems = editedItems.map(async (item) => {
-                    if (item._id) {
-                        item._id = convertObjectId(item._id);
-                    }
+                editedItems = convertIds ? recursivelyConvertIds(editedItems) : editedItems;
 
+                editedItems = editedItems.map(async (item) => {
                     const editedInsertItem = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [item, context]).catch((err) => {
-                        throw new Error(`afterInsert (bulkInsert) Hook Failure ${err}`);
+                        kaptanLogar("00003", `afterInsert (bulkInsert) Hook Failure ${err}`);
                     });
 
                     if (editedInsertItem) {
@@ -77,11 +76,15 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
                 editedItems = await Promise.all(editedItems);
             }
 
-            return { insertedItems: editedItems, insertedItemIds, inserted: insertedCount };
+            return {
+                insertedItems: convertIds ? recursivelyConvertIds(editedItems) : editedItems,
+                inserted: insertedCount,
+                insertedItemIds,
+            };
         } else {
-            throw new Error(`inserted: ${insertedCount}, ok: ${ok}`);
+            kaptanLogar("00016", `one or more items failed to be inserted`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when inserting items using bulkInsert: ${err}`);
+        kaptanLogar("00016", `when inserting items using bulkInsert: ${err}`);
     }
 }

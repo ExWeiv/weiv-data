@@ -1,27 +1,29 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { CollectionID, Item, WeivDataOptionsOwner } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import type { ObjectId } from 'mongodb/mongodb';
+import { kaptanLogar } from '../Errors/error_manager';
+import { convertDocumentIDs } from '../Helpers/internal_id_converter';
+import { convertIdToObjectId } from './id_converters';
 
 export async function replace(collectionId: CollectionID, item: Item, options?: WeivDataOptionsOwner): Promise<Item> {
     try {
         const { safeItem, safeOptions } = await validateParams<'replace'>({ collectionId, item, options }, ["collectionId", "item"], "replace");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
 
         let editedItem;
         if (suppressHooks != true) {
             editedItem = await runDataHook<'beforeReplace'>(collectionId, "beforeReplace", [safeItem, context]).catch((err) => {
-                throw new Error(`beforeReplace Hook Failure ${err}`);
+                kaptanLogar("00002", `beforeReplace Hook Failure ${err}`);
             });
         }
 
-        const itemId = !editedItem ? convertStringId(safeItem._id) : convertStringId(editedItem._id);
+        const itemId = !editedItem ? convertIdToObjectId(safeItem._id) : convertIdToObjectId(editedItem._id);
         const replaceItem = !editedItem ? safeItem : editedItem;
         delete replaceItem._id;
 
@@ -42,30 +44,20 @@ export async function replace(collectionId: CollectionID, item: Item, options?: 
 
         if (value) {
             if (suppressHooks != true) {
-                let editedResult = await runDataHook<'afterReplace'>(collectionId, "afterReplace", [value, context]).catch((err) => {
-                    throw new Error(`afterReplace Hook Failure ${err}`);
+                let editedResult = await runDataHook<'afterReplace'>(collectionId, "afterReplace", [convertIds ? convertDocumentIDs(value) : value, context]).catch((err) => {
+                    kaptanLogar("00003", `afterReplace Hook Failure ${err}`);
                 });
 
                 if (editedResult) {
-                    if (editedResult._id) {
-                        editedResult._id = convertObjectId(editedResult._id);
-                    }
-                    return editedResult;
+                    return convertIds ? convertDocumentIDs(editedResult) : editedResult;
                 }
             }
 
-            if (value._id) {
-                return {
-                    ...value,
-                    _id: convertObjectId(value._id)
-                }
-            } else {
-                return value;
-            }
+            return convertIds ? convertDocumentIDs(value) : value;
         } else {
-            throw new Error(`returned value has problem value: ${value}`);
+            kaptanLogar("00016", `returned value is null or undefined, the item you want to replace probably doesn't exist.`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when replacing an item: ${err}`);
+        throw kaptanLogar("00016", `when replacing an item: ${err}`);
     }
 }
