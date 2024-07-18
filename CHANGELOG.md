@@ -4,6 +4,12 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.5.0
+
+- New plug-in, sync Wix Members collection into your MongoDB databae to perform lookups easily with your own custom collections.
+- Sync Wix Applications feature is in beta and might not work as expected, we are testing the feature and BUG fixes will be added soon.
+- New config option `syncDatabase` to configure the database name for Wix application sync. This database name will be used when saving data from Wix apps to MongoDB.
+
 ### 4.4.0
 
 - convertId function removed in place now we have two different functions to convert an id either to string or ObjectId.

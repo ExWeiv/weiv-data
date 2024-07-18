@@ -24,7 +24,8 @@ export const errorsList: Errors.ErrorsList = {
     "00020": "Error with filtering methods, make sure you pass valid filter parameters in valid types",
     "00021": "Error on WeivData config object, make sure you pass correct config object",
     "00022": "Collection Manager Error",
-    "00023": "Aggegration Error"
+    "00023": "Aggegration Error",
+    "00024": "Wix Application Sync Error"
 }
 
 export default errorsList;
