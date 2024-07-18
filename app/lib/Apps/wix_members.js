@@ -46,7 +46,7 @@ async function onMemberUpdated(event) {
             (0, error_manager_1.kaptanLogar)("00024", "You didn't configure any database name to sync Wix apps data!");
         }
         const { readyFullData, readyPrivateData, readyPublicData } = await getMemberData(memberId);
-        const find = { "entityId": memberId };
+        const find = { "entityId": { $eq: memberId } };
         Promise.all([
             (await (0, native_1.native)(`${syncDatabase}/WixMembersPublicData`, true)).updateOne(find, readyPublicData, { retryWrites: true }),
             (await (0, native_1.native)(`${syncDatabase}/WixMembersPrivateData`, true)).updateOne(find, readyPrivateData, { retryWrites: true }),
@@ -70,7 +70,7 @@ async function onMemberDeleted(event) {
         if (!syncDatabase) {
             (0, error_manager_1.kaptanLogar)("00024", "You didn't configure any database name to sync Wix apps data!");
         }
-        const find = { "entityId": memberId };
+        const find = { "entityId": { $eq: memberId } };
         Promise.all([
             (await (0, native_1.native)(`${syncDatabase}/WixMembersPublicData`, true)).deleteMany(find, { retryWrites: true }),
             (await (0, native_1.native)(`${syncDatabase}/WixMembersPrivateData`, true)).deleteMany(find, { retryWrites: true }),

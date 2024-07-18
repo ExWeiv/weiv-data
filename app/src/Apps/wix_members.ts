@@ -57,7 +57,7 @@ export async function onMemberUpdated(event: Document): Promise<void> {
         }
 
         const { readyFullData, readyPrivateData, readyPublicData } = await getMemberData(memberId);
-        const find = { "entityId": memberId };
+        const find = { "entityId": { $eq: memberId } };
 
         // Insert to MongoDB (fire and forget)
         Promise.all([
@@ -88,7 +88,7 @@ export async function onMemberDeleted(event: Document): Promise<void> {
             kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
         }
 
-        const find = { "entityId": memberId };
+        const find = { "entityId": { $eq: memberId } };
 
         // Insert to MongoDB (fire and forget)
         Promise.all([
