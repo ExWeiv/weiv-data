@@ -7,7 +7,8 @@ const validator_1 = require("../Helpers/validator");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
-const item_helpers_1 = require("../Helpers/item_helpers");
+const error_manager_1 = require("../Errors/error_manager");
+const internal_id_converter_1 = require("../Helpers/internal_id_converter");
 class Query extends data_filter_1.WeivDataFilter {
     constructor(collectionId) {
         super();
@@ -21,43 +22,43 @@ class Query extends data_filter_1.WeivDataFilter {
     }
     ascending(...propertyName) {
         if (!propertyName || !(0, lodash_1.isArray)(propertyName)) {
-            throw new Error(`WeivData - propertyName is not a valid value!`);
+            (0, error_manager_1.kaptanLogar)("00001", "propertyName is not valid");
         }
         this.__addSort__(1, propertyName);
         return this;
     }
     descending(...propertyName) {
         if (!propertyName || !(0, lodash_1.isArray)(propertyName)) {
-            throw new Error(`WeivData - propertyName is not a valid value!`);
+            (0, error_manager_1.kaptanLogar)("00001", "propertyName is not valid");
         }
         this.__addSort__(-1, propertyName);
         return this;
     }
     limit(limit) {
         if (typeof limit !== "number") {
-            throw new Error(`WeivData - Unvalid value for limit it's either undefined or not a number!`);
+            this._limitNumber = this._limitNumber;
         }
         else {
             this._limitNumber = limit;
-            return this;
         }
+        return this;
     }
     skip(skip) {
         if (typeof skip !== "number") {
-            throw new Error(`WeivData - Unvalid value for skip it's either undefined or not a number!`);
+            this._skipNumber = this._skipNumber;
         }
         else {
             this._skipNumber = skip;
-            return this;
         }
+        return this;
     }
     fields(...propertyName) {
         if (!propertyName || !(0, lodash_1.isArray)(propertyName)) {
-            throw new Error(`WeivData - propertyName is not a valid value!`);
+            (0, error_manager_1.kaptanLogar)("00001", "propertyName is not valid");
         }
         for (const name of propertyName) {
             if (typeof name !== "string") {
-                throw new Error(`WeivData - propertyName doesn't contain value/s!`);
+                (0, error_manager_1.kaptanLogar)("00001", "propertyName is not valid");
             }
             else {
                 this._fields.push(name);
@@ -68,15 +69,15 @@ class Query extends data_filter_1.WeivDataFilter {
     }
     include(...includes) {
         if (!includes || !(0, lodash_1.isArray)(includes)) {
-            throw new Error(`WeivData - include is not a valid value!`);
+            (0, error_manager_1.kaptanLogar)("00001", "include is not valid");
         }
         for (const include of includes) {
             if (typeof include !== "object") {
-                throw new Error(`WeivData - include values must be an object ${include} is not a valid value!`);
+                (0, error_manager_1.kaptanLogar)("00001", `${include} is not valid`);
             }
             else {
                 if (!include["collectionName"] || !include["fieldName"] || typeof include["collectionName"] !== "string" || typeof include["fieldName"] !== "string") {
-                    throw new Error(`WeivData - each include object must contain collectionName and fieldName values as string!`);
+                    (0, error_manager_1.kaptanLogar)("00001", "each include object must contain collectionName and fieldName values as string");
                 }
                 const safeInclude = (0, validator_1.copyOwnPropsOnly)(include);
                 this._includes.push(safeInclude);
@@ -88,7 +89,7 @@ class Query extends data_filter_1.WeivDataFilter {
     __addSort__(sort, propertyName) {
         for (const name of propertyName) {
             if (typeof name !== "string") {
-                throw new Error(`WeivData - propertyName doesn't contain valid value/s!`);
+                (0, error_manager_1.kaptanLogar)("00001", "propertyName doesn't contain valid value/s!");
             }
             else {
                 this._sort.set(name, sort);
@@ -105,13 +106,13 @@ class QueryResult extends Query {
             let editedQurey;
             if (suppressHooks != true) {
                 editedQurey = await (0, hook_manager_1.runDataHook)(this._collectionId, "beforeCount", [this, context]).catch((err) => {
-                    throw new Error(`beforeCount Hook Failure ${err}`);
+                    (0, error_manager_1.kaptanLogar)("00002", `beforeCount Hook Failure ${err}`);
                 });
             }
             const totalCount = await this._collection.countDocuments(!editedQurey ? this._filters.$match : editedQurey._filters.$match, { readConcern });
             if (suppressHooks != true) {
                 let editedCount = await (0, hook_manager_1.runDataHook)(this._collectionId, "afterCount", [totalCount, context]).catch((err) => {
-                    throw new Error(`afterCount Hook Failure ${err}`);
+                    (0, error_manager_1.kaptanLogar)("00003", `afterCount Hook Failure ${err}`);
                 });
                 if (editedCount) {
                     return editedCount;
@@ -120,16 +121,16 @@ class QueryResult extends Query {
             return totalCount;
         }
         catch (err) {
-            throw new Error(`WeivData - Error when using count with weivData.query: ${err}`);
+            (0, error_manager_1.kaptanLogar)("00004", `${err}`);
         }
     }
     async distnict(propertyName, options) {
         try {
             if (!propertyName || typeof propertyName !== "string") {
-                throw new Error(`WeivData - propertyName is not string or not a valid value!`);
+                (0, error_manager_1.kaptanLogar)("00001", `propertyName is not string or not a valid value!`);
             }
             options = (0, validator_1.copyOwnPropsOnly)(options || {});
-            const { suppressAuth, readConcern } = options;
+            const { suppressAuth, readConcern, convertIds } = options;
             await this._handleConnection_(suppressAuth);
             const pipeline = [];
             pipeline.push(this._filters);
@@ -140,12 +141,7 @@ class QueryResult extends Query {
             const hasNext = await aggregationCursor.hasNext();
             const totalCount = await this.__getTotalCount__(options?.omitTotalCount || false);
             return {
-                items: items.map((item) => {
-                    if (item._id) {
-                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
-                    }
-                    return item;
-                }),
+                items: convertIds ? (0, internal_id_converter_1.recursivelyConvertIds)(items) : items,
                 length: items.length,
                 currentPage: this._currentPage,
                 pageSize: this._limitNumber,
@@ -166,18 +162,18 @@ class QueryResult extends Query {
             };
         }
         catch (err) {
-            throw new Error(`WeivData - Error when using distnict with weivData.query: ${err}`);
+            (0, error_manager_1.kaptanLogar)("00005", `${err}`);
         }
     }
     async find(options) {
         try {
             options = (0, validator_1.copyOwnPropsOnly)(options || {});
-            const { suppressAuth, suppressHooks, readConcern, omitTotalCount } = options;
+            const { suppressAuth, suppressHooks, readConcern, omitTotalCount, convertIds } = options;
             await this._handleConnection_(suppressAuth);
             const context = (0, hook_helpers_1.prepareHookContext)(this._collectionId);
             if (suppressHooks != true) {
                 await (0, hook_manager_1.runDataHook)(this._collectionId, "beforeQuery", [this, context]).catch((err) => {
-                    throw new Error(`beforeQuery Hook Failure ${err}`);
+                    (0, error_manager_1.kaptanLogar)("00002", `beforeQuery ${err}`);
                 });
             }
             let totalCount;
@@ -202,9 +198,9 @@ class QueryResult extends Query {
                 totalCount = await this.__getTotalCount__(omitTotalCount || false);
             }
             if (suppressHooks != true) {
-                const hookedItems = items.map(async (item, index) => {
-                    const editedItem = await (0, hook_manager_1.runDataHook)(this._collectionId, "afterQuery", [item, context]).catch((err) => {
-                        throw new Error(`afterQuery Hook Failure ${err} Item Index: ${index}`);
+                const hookedItems = items.map(async (item) => {
+                    const editedItem = await (0, hook_manager_1.runDataHook)(this._collectionId, "afterQuery", [convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(item) : item, context]).catch((err) => {
+                        (0, error_manager_1.kaptanLogar)("00003", `afterQuery ${err}`);
                     });
                     if (editedItem) {
                         return editedItem;
@@ -216,12 +212,7 @@ class QueryResult extends Query {
                 items = await Promise.all(hookedItems);
             }
             return {
-                items: items.map((item) => {
-                    if (item._id) {
-                        item._id = (0, item_helpers_1.convertObjectId)(item._id);
-                    }
-                    return item;
-                }),
+                items: convertIds ? (0, internal_id_converter_1.recursivelyConvertIds)(items) : items,
                 length: items.length,
                 currentPage: this._currentPage,
                 pageSize: this._limitNumber,
@@ -242,14 +233,12 @@ class QueryResult extends Query {
             };
         }
         catch (err) {
-            console.error('WeivData - Error pipeline: ', this.__createAggregationPipeline__());
-            console.error('WeivData - Error query: ', this._filters);
-            throw new Error(`WeivData - Error when using find with weivData.query, details: ${err}`);
+            (0, error_manager_1.kaptanLogar)("00006", `${err}`);
         }
     }
     constructor(collectionId) {
         if (!collectionId || typeof collectionId !== "string") {
-            throw new Error(`WeivData - CollectionID must be string and shouldn't be undefined or null!`);
+            (0, error_manager_1.kaptanLogar)("00007");
         }
         super(collectionId);
         this._currentPage = 1;

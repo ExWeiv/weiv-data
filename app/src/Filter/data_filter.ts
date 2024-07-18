@@ -1,7 +1,7 @@
 import { memoize } from 'lodash';
-import { convertStringId } from '../Helpers/item_helpers';
-import type { Document } from 'mongodb/mongodb';
 import { copyOwnPropsOnly } from '../Helpers/validator';
+import { kaptanLogar } from '../Errors/error_manager';
+import type { Document } from 'mongodb/mongodb';
 
 export class WeivDataFilter {
     private readonly filters: { [key: string]: any } = {};
@@ -9,7 +9,7 @@ export class WeivDataFilter {
 
     and(query: WeivDataFilter): WeivDataFilter {
         if (!query) {
-            throw new Error(`WeivData - query parameter must be valid to work with and method!`);
+            kaptanLogar("00020", `query parameter must be valid to work with and method!`);
         }
 
         if (!this.filters["$and"]) {
@@ -22,7 +22,7 @@ export class WeivDataFilter {
     private memoizedBetween!: Function;
     between(propertyName: string, rangeStart: any, rangeEnd: any): WeivDataFilter {
         if (!propertyName || typeof propertyName !== "string" || !rangeStart || !rangeEnd) {
-            throw new Error(`WeivData - propertyName, rangeStart and rangeEnd must have valid values to work with between method!`);
+            kaptanLogar("00020", `propertyName, rangeStart and rangeEnd must have valid values to work with between method!`);
         }
 
         if (!this.memoizedBetween) {
@@ -40,7 +40,7 @@ export class WeivDataFilter {
     private memoizedContains!: Function;
     contains(propertyName: string, string: string): WeivDataFilter {
         if (!propertyName || !string || typeof (propertyName || string) !== "string") {
-            throw new Error(`WeivData - propertyName and string parameter must be valid to work with contains method!`);
+            kaptanLogar("00020", `propertyName and string parameter must be valid to work with contains method!`);
         }
 
         if (!this.memoizedContains) {
@@ -58,7 +58,7 @@ export class WeivDataFilter {
     private memoizedEndsWith!: Function;
     endsWith(propertyName: string, string: string): WeivDataFilter {
         if (!propertyName || !string || typeof (propertyName || string) !== "string") {
-            throw new Error(`WeivData - propertyName and string parameter must be valid to work with endsWith method!`);
+            kaptanLogar("00020", `propertyName and string parameter must be valid to work with endsWith method!`);
         }
 
         if (!this.memoizedEndsWith) {
@@ -75,18 +75,12 @@ export class WeivDataFilter {
 
     private memoizedEq!: Function;
     eq(propertyName: string, value: any): WeivDataFilter {
-        if (!propertyName || !value || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName and value parameter must be valid to work with eq method!`);
+        if (!propertyName || value === undefined || typeof propertyName !== "string") {
+            kaptanLogar("00020", `propertyName and value parameter must be valid to work with eq method!`);
         }
 
         if (!this.memoizedEq) {
             this.memoizedEq = memoize((propertyName, value) => {
-                if (propertyName === "_id") {
-                    return this.addFilter(propertyName, {
-                        $eq: convertStringId(value),
-                    });
-                }
-
                 return this.addFilter(propertyName, {
                     $eq: value,
                 });
@@ -99,7 +93,7 @@ export class WeivDataFilter {
     private memoizedGe!: Function;
     ge(propertyName: string, value: any): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName and value parameter must be valid to work with ge method!`);
+            kaptanLogar("00020", `propertyName and value parameter must be valid to work with ge method!`);
         }
 
         if (!this.memoizedGe) {
@@ -114,7 +108,7 @@ export class WeivDataFilter {
     private memoizedGt!: Function;
     gt(propertyName: string, value: any): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName and value parameter must be valid to work with gt method!`);
+            kaptanLogar("00020", `propertyName and value parameter must be valid to work with gt method!`);
         }
 
         if (!this.memoizedGt) {
@@ -129,7 +123,7 @@ export class WeivDataFilter {
     private memoizedHasAll!: Function;
     hasAll(propertyName: string, value: any): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName and value parameter must be valid to work with hasAll method!`);
+            kaptanLogar("00020", `propertyName and value parameter must be valid to work with hasAll method!`);
         }
 
         if (!Array.isArray(value)) {
@@ -148,7 +142,7 @@ export class WeivDataFilter {
     private memoizedHasSome!: Function;
     hasSome(propertyName: string, value: any): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName and value parameter must be valid to work with hasSome method!`);
+            kaptanLogar("00020", `propertyName and value parameter must be valid to work with hasSome method!`);
         }
 
         if (!Array.isArray(value)) {
@@ -167,7 +161,7 @@ export class WeivDataFilter {
     private memoizedIsEmpty!: Function;
     isEmpty(propertyName: string): WeivDataFilter {
         if (!propertyName || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName parameter must be valid to work with isEmpty method!`);
+            kaptanLogar("00020", `propertyName parameter must be valid to work with isEmpty method!`);
         }
 
         if (!this.memoizedIsEmpty) {
@@ -182,7 +176,7 @@ export class WeivDataFilter {
     private memoizedIsNotEmpty!: Function;
     isNotEmpty(propertyName: string): WeivDataFilter {
         if (!propertyName || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName parameter must be valid to work with isNotEmpty method!`);
+            kaptanLogar("00020", `propertyName parameter must be valid to work with isNotEmpty method!`);
         }
 
         if (!this.memoizedIsNotEmpty) {
@@ -197,7 +191,7 @@ export class WeivDataFilter {
     private memoizedLe!: Function;
     le(propertyName: string, value: any): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName and value parameter must be valid to work with le method!`);
+            kaptanLogar("00020", `propertyName and value parameter must be valid to work with le method!`);
         }
 
         if (!this.memoizedLe) {
@@ -212,7 +206,7 @@ export class WeivDataFilter {
     private memoizedLt!: Function;
     lt(propertyName: string, value: any): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName and value parameter must be valid to work with lt method!`);
+            kaptanLogar("00020", `propertyName and value parameter must be valid to work with lt method!`);
         }
 
         if (!this.memoizedLt) {
@@ -226,8 +220,8 @@ export class WeivDataFilter {
 
     private memoizedNe!: Function;
     ne(propertyName: string, value: any): WeivDataFilter {
-        if (!propertyName || !value || typeof propertyName !== "string") {
-            throw new Error(`WeivData - propertyName and value parameter must be valid to work with ne method!`);
+        if (!propertyName || value === undefined || typeof propertyName !== "string") {
+            kaptanLogar("00020", `propertyName and value parameter must be valid to work with ne method!`);
         }
 
         if (!this.memoizedNe) {
@@ -241,7 +235,7 @@ export class WeivDataFilter {
 
     not(query: WeivDataFilter): WeivDataFilter {
         if (!query) {
-            throw new Error(`WeivData - query parameter must be valid to work with not method!`);
+            kaptanLogar("00020", `query parameter must be valid to work with not method!`);
         }
 
         if (!this.filters["$nor"]) {
@@ -253,7 +247,7 @@ export class WeivDataFilter {
 
     or(query: WeivDataFilter): WeivDataFilter {
         if (!query) {
-            throw new Error(`WeivData - query parameter must be valid to work with or method!`);
+            kaptanLogar("00020", `query parameter must be valid to work with or method!`);
         }
 
         if (!this.filters["$or"]) {
@@ -266,7 +260,7 @@ export class WeivDataFilter {
     private memoizedStartsWith!: Function;
     startsWith(propertyName: string, string: string): WeivDataFilter {
         if (!propertyName || !string || typeof (propertyName || string) !== "string") {
-            throw new Error(`WeivData - propertyName and string parameter must be valid to work with startsWith method!`);
+            kaptanLogar("00020", `propertyName and string parameter must be valid to work with startsWith method!`);
         }
 
         if (!this.memoizedStartsWith) {
@@ -294,7 +288,7 @@ export class WeivDataFilter {
     private sanitizeFilters(filters: { [key: string]: any }) {
         for (const key of Object.getOwnPropertyNames(filters)) {
             if (key === "__proto__" || key === "constructor" || key === "prototype") {
-                throw new Error(`Invalid filter key: ${key}`);
+                kaptanLogar("00020", `Invalid filter key: ${key}`);
             }
             if (typeof filters[key] === 'object' && filters[key] !== null) {
                 this.sanitizeFilters(filters[key]);

@@ -1,11 +1,13 @@
 import type { CollectionID, Item, SaveResult, WeivDataOptionsWriteOwner } from '@exweiv/weiv-data';
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { ObjectId } from 'mongodb';
 import { validateParams } from '../Helpers/validator';
 import { getOwnerId } from '../Helpers/member_id_helpers';
+import { kaptanLogar } from '../Errors/error_manager';
+import { convertDocumentIDs } from '../Helpers/internal_id_converter';
+import { convertIdToObjectId } from './id_converters';
 
 export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWriteOwner): Promise<SaveResult> {
     try {
@@ -13,17 +15,17 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         const { safeOptions, safeItem } = await validateParams<"save">({ collectionId, item, options }, ["collectionId", "item"], "save");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId, convertIds } = safeOptions || {};
 
         // Convert ID to ObjectId if exist
         let editedItem;
-        if (safeItem._id && typeof safeItem._id === "string") {
+        if (safeItem._id) {
             // Update
-            safeItem._id = convertStringId(safeItem._id);
+            safeItem._id = convertIdToObjectId(safeItem._id);
 
             if (suppressHooks != true) {
                 editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [safeItem, context]).catch((err) => {
-                    throw new Error(`beforeUpdate (save) Hook Failure ${err}`);
+                    kaptanLogar("00002", `beforeUpdate (save) Hook Failure ${err}`);
                 });
             }
         } else {
@@ -32,7 +34,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
 
             if (suppressHooks != true) {
                 editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [safeItem, context]).catch((err) => {
-                    throw new Error(`beforeInsert (save) Hook Failure ${err}`);
+                    kaptanLogar("00002", `beforeInsert (save) Hook Failure ${err}`);
                 });
             }
         }
@@ -59,53 +61,37 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
             { readConcern, upsert: true }
         );
 
-        const returnedItem = { ...editedItem, _id: editedItem._id }
+        const returnedItem = { ...editedItem, _id: editedItem._id };
 
         if (acknowledged) {
             // Hooks handling
             if (upsertedId) {
                 // Item Inserted
-                const editedResult = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [returnedItem, context]).catch((err) => {
-                    throw new Error(`afterInsert Hook Failure ${err}`);
+                const editedResult = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [convertIds ? convertDocumentIDs(returnedItem) : returnedItem, context]).catch((err) => {
+                    kaptanLogar("00003", `afterInsert Hook Failure ${err}`);
                 });
 
                 if (editedResult) {
-                    if (editedResult._id) {
-                        editedResult._id = convertObjectId(editedResult._id);
-                    }
-
-                    return { item: editedResult, upsertedId };
+                    return convertIds ? { item: convertDocumentIDs(editedResult) } : { item: editedResult };
                 } else {
-                    if (returnedItem._id) {
-                        returnedItem._id = convertObjectId(returnedItem._id);
-                    }
-
-                    return { item: returnedItem, upsertedId };
+                    return convertIds ? { item: convertDocumentIDs(returnedItem) } : { item: returnedItem };
                 }
             } else {
                 // Item Updated
-                const editedResult = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [returnedItem, context]).catch((err) => {
-                    throw new Error(`afterUpdate Hook Failure ${err}`);
+                const editedResult = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [convertIds ? convertDocumentIDs(returnedItem) : returnedItem, context]).catch((err) => {
+                    kaptanLogar("00003", `afterUpdate Hook Failure ${err}`);
                 });
 
                 if (editedResult) {
-                    if (editedResult._id) {
-                        editedResult._id = convertObjectId(editedResult._id);
-                    }
-
-                    return { item: editedResult };
+                    return convertIds ? { item: convertDocumentIDs(editedResult) } : { item: editedResult };
                 } else {
-                    if (returnedItem._id) {
-                        returnedItem._id = convertObjectId(returnedItem._id);
-                    }
-
-                    return { item: returnedItem };
+                    return convertIds ? { item: convertDocumentIDs(returnedItem) } : { item: returnedItem };
                 }
             }
         } else {
-            throw new Error(`acknowledged: ${acknowledged}`);
+            kaptanLogar("00016", `acknowledged is not true for (save function)`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when saving an item to collection: ${err}`);
+        kaptanLogar("00016", `when saving an item to collection: ${err}`);
     }
 }

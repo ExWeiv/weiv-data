@@ -1,23 +1,23 @@
-//@ts-ignore
-import * as weivDataConfigs from '../../../../../../../../../user-code/backend/WeivData/config';
-import type { CustomOptions } from '@exweiv/weiv-data';
+// //@ts-ignore
+// import * as weivDataConfigs from '../../../../../../../../../user-code/backend/WeivData/config';
+// import type { CustomOptions } from '@exweiv/weiv-data';
+// import { kaptanLogar } from '../Errors/error_manager';
 
-let savedConfigs: CustomOptions.WeivDataConfig;
+// var __weivDatasavedConfigs__: CustomOptions.WeivDataConfig = {
+//     _idType: "ObjectID"
+// };
 
-export function getWeivDataConfigs(): CustomOptions.WeivDataConfig {
-    try {
-        const configs: undefined | (() => CustomOptions.WeivDataConfig) = weivDataConfigs["config"];
+// export function getWeivDataConfigs(): CustomOptions.WeivDataConfig {
+//     try {
+//         const configs: undefined | (() => CustomOptions.WeivDataConfig) = weivDataConfigs["config"];
 
-        if (configs && !savedConfigs) {
-            savedConfigs = configs();
-        } else if (!savedConfigs) {
-            savedConfigs = {
-                logs: false
-            };
-        }
+//         if (configs && Object.keys(__weivDatasavedConfigs__).length === 0) {
+//             const userConfig = configs();
+//             __weivDatasavedConfigs__ = { ...__weivDatasavedConfigs__, ...userConfig };
+//         }
 
-        return savedConfigs;
-    } catch (err) {
-        throw new Error(`WeivData - Error while getting configs of WeivData library, ${err}`);
-    }
-}
+//         return __weivDatasavedConfigs__;
+//     } catch (err) {
+//         kaptanLogar("00021", `while getting configs of WeivData library, ${err}`);
+//     }
+// }

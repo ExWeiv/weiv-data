@@ -1,24 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAndRemove = void 0;
+exports.getAndRemove = getAndRemove;
 const connection_helpers_1 = require("../../Helpers/connection_helpers");
 const hook_helpers_1 = require("../../Helpers/hook_helpers");
 const hook_manager_1 = require("../../Hooks/hook_manager");
-const item_helpers_1 = require("../../Helpers/item_helpers");
 const validator_1 = require("../../Helpers/validator");
 const member_id_helpers_1 = require("../../Helpers/member_id_helpers");
+const error_manager_1 = require("../../Errors/error_manager");
+const internal_id_converter_1 = require("../../Helpers/internal_id_converter");
+const id_converters_1 = require("../id_converters");
 async function getAndRemove(collectionId, itemId, options) {
     try {
         const { safeItemId, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemId, options }, ["collectionId", "itemId"], "getAndRemove");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
         let editedItemId = safeItemId;
         if (suppressHooks != true) {
             const modifiedItemId = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndRemove", [safeItemId, context]).catch((err) => {
-                throw new Error(`beforeGetAndRemove Hook Failure ${err}`);
+                (0, error_manager_1.kaptanLogar)("00002", `beforeGetAndRemove Hook Failure ${err}`);
             });
             if (modifiedItemId) {
-                editedItemId = (0, item_helpers_1.convertStringId)(modifiedItemId);
+                editedItemId = (0, id_converters_1.convertIdToObjectId)(modifiedItemId);
             }
         }
         const filter = { _id: editedItemId };
@@ -32,32 +34,20 @@ async function getAndRemove(collectionId, itemId, options) {
         const item = await collection.findOneAndDelete(filter, { readConcern, includeResultMetadata: false });
         if (item) {
             if (suppressHooks != true) {
-                const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndRemove", [item, context]).catch((err) => {
-                    throw new Error(`afterGetAndRemove Hook Failure ${err}`);
+                const modifiedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterGetAndRemove", [convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(item) : item, context]).catch((err) => {
+                    (0, error_manager_1.kaptanLogar)("00003", `afterGetAndRemove Hook Failure ${err}`);
                 });
                 if (modifiedResult) {
-                    if (modifiedResult._id) {
-                        modifiedResult._id = (0, item_helpers_1.convertObjectId)(modifiedResult._id);
-                    }
-                    return modifiedResult;
+                    return convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(modifiedResult) : modifiedResult;
                 }
             }
-            if (item._id) {
-                return {
-                    ...item,
-                    _id: (0, item_helpers_1.convertObjectId)(item._id)
-                };
-            }
-            else {
-                return item;
-            }
+            return convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(item) : item;
         }
         else {
             return undefined;
         }
     }
     catch (err) {
-        throw new Error(`WeivData - Error when removing an item from collection (getAndRemove): ${err}`);
+        (0, error_manager_1.kaptanLogar)("00016", `when removing an item from collection (getAndRemove): ${err}`);
     }
 }
-exports.getAndRemove = getAndRemove;

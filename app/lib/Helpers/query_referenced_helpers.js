@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPipeline = void 0;
+exports.getPipeline = getPipeline;
 const name_helpers_1 = require("./name_helpers");
+const error_manager_1 = require("../Errors/error_manager");
 function getPipeline(itemId, targetCollectionId, propertyName, pipelineOptions) {
     if (typeof itemId !== "object" || typeof targetCollectionId !== "string" || typeof propertyName !== "string" || typeof pipelineOptions !== "object") {
-        throw new Error("one or multiple parameter type is wrong!");
+        (0, error_manager_1.kaptanLogar)("00012", "parameter type/s are invalid");
     }
     const { collectionName } = (0, name_helpers_1.splitCollectionId)(targetCollectionId);
     return [
@@ -63,4 +64,3 @@ function getPipeline(itemId, targetCollectionId, propertyName, pipelineOptions) 
         },
     ];
 }
-exports.getPipeline = getPipeline;

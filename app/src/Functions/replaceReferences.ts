@@ -1,6 +1,7 @@
 import type { CollectionID, WeivDataOptions, ReferringItem, ReferencedItem } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
 import { update } from './update';
+import { kaptanLogar } from '../Errors/error_manager';
 
 export async function replaceReferences(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptions): Promise<void> {
     try {
@@ -13,9 +14,9 @@ export async function replaceReferences(collectionId: CollectionID, propertyName
 
         const updated = await update(collectionId, { _id: safeReferringItemId, [propertyName]: safeReferencedItemIds }, safeOptions);
         if (!updated) {
-            throw new Error(`couldn't replace references: ${updated}`);
+            kaptanLogar("00017", `couldn't replace references: ${updated}`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when replacing references, ${err}`);
+        kaptanLogar("00017", `when replacing references, ${err}`);
     }
 }

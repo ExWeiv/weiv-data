@@ -2,20 +2,22 @@ import { connectionHandler } from '../Helpers/connection_helpers';
 import type { CollectionID, Item, ItemID, WeivDataOptions } from '@exweiv/weiv-data';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
-import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { validateParams } from '../Helpers/validator';
+import { kaptanLogar } from '../Errors/error_manager';
+import { convertDocumentIDs } from '../Helpers/internal_id_converter';
+import { convertIdToObjectId } from './id_converters';
 
 export async function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null> {
     try {
         const { safeValue, safeOptions } = await validateParams<"push">({ collectionId, itemId, propertyName, value, options }, ["collectionId", "itemId", "propertyName", "value"], "push");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, convertIds } = safeOptions || {};
 
         let editedModify = { propertyName, value: safeValue };
         if (suppressHooks != true) {
             const modifiedParams = await runDataHook<'beforePush'>(collectionId, "beforePush", [{ propertyName, value: safeValue }, context]).catch((err) => {
-                throw new Error(`beforePush Hook Failure ${err}`);
+                kaptanLogar("00002", `beforePush Hook Failure ${err}`);
             });
 
             if (modifiedParams) {
@@ -25,37 +27,27 @@ export async function push(collectionId: CollectionID, itemId: ItemID, propertyN
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
         const item = await collection.findOneAndUpdate(
-            { _id: convertStringId(itemId) },
+            { _id: convertIdToObjectId(itemId) },
             { $push: { [editedModify.propertyName]: editedModify.value } },
             { readConcern, returnDocument: "after", includeResultMetadata: false }
         );
 
         if (item) {
             if (suppressHooks != true) {
-                const modifiedResult = await runDataHook<'afterPush'>(collectionId, "afterPush", [item, context]).catch((err) => {
-                    throw new Error(`afterPush Hook Failure ${err}`);
+                const modifiedResult = await runDataHook<'afterPush'>(collectionId, "afterPush", [convertIds ? convertDocumentIDs(item) : item, context]).catch((err) => {
+                    kaptanLogar("00003", `afterPush Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
-                    if (modifiedResult._id) {
-                        modifiedResult._id = convertObjectId(modifiedResult._id);
-                    }
-                    return modifiedResult;
+                    return convertIds ? convertDocumentIDs(modifiedResult) : modifiedResult;
                 }
             }
 
-            if (item._id) {
-                return {
-                    ...item,
-                    _id: convertObjectId(item._id)
-                }
-            } else {
-                return item;
-            }
+            return convertIds ? convertDocumentIDs(item) : item;
         } else {
             return null;
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when inserting (pushing) new value/s into an array filed in an item: ${err}`);
+        kaptanLogar("00016", `when inserting (pushing) new value/s into an array filed in an item: ${err}`);
     }
 }

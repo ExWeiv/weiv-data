@@ -1,11 +1,13 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
-import type { ObjectId } from 'mongodb/mongodb';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import type { CollectionID, ItemID, WeivDataOptionsOwner, BulkRemoveResult } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
 import { getOwnerId } from '../Helpers/member_id_helpers';
+import { kaptanLogar } from '../Errors/error_manager';
+import { convertToStringId } from '../Helpers/internal_id_converter';
+import { ObjectId } from 'mongodb';
+import { convertIdToObjectId } from './id_converters';
 
 export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], options?: WeivDataOptionsOwner): Promise<BulkRemoveResult> {
     try {
@@ -16,33 +18,33 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], 
         )
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
 
         let currentMemberId: string | null;
         if (onlyOwner) {
             currentMemberId = await getOwnerId();
         }
 
-        let editedItemIds: ObjectId[] | Promise<ObjectId>[] = safeItemIds.map(async (itemId) => {
+        let editedItemIds: ItemID[] | Promise<ItemID>[] = safeItemIds.map(async (itemId) => {
             if (suppressHooks != true) {
                 const editedId = await runDataHook<'beforeRemove'>(collectionId, "beforeRemove", [itemId, context]).catch((err) => {
-                    throw new Error(`beforeRemove (bulkRemove) Hook Failure ${err}`);
+                    kaptanLogar("00002", `beforeRemove (bulkRemove) Hook Failure ${err}`);
                 });
 
                 if (editedId) {
-                    return convertStringId(editedId);
+                    return editedId;
                 } else {
-                    return convertStringId(itemId);
+                    return itemId;
                 }
             } else {
-                return convertStringId(itemId);
+                return itemId;
             }
-        })
+        });
 
         editedItemIds = await Promise.all(editedItemIds);
-
         const writeOperations = editedItemIds.map((itemId) => {
-            const filter: { _id: ObjectId, _owner?: string } = { _id: itemId };
+            const filter: { _id: ObjectId, _owner?: string } = { _id: convertIdToObjectId(itemId) };
+
             if (onlyOwner && currentMemberId) {
                 filter._owner = currentMemberId;
             }
@@ -59,12 +61,12 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], 
         if (ok) {
             return {
                 removed: deletedCount,
-                removedItemIds: editedItemIds.map(id => convertObjectId(id))
+                removedItemIds: convertIds ? editedItemIds.map(id => convertToStringId(id)) : editedItemIds
             }
         } else {
-            throw new Error(`removed: ${deletedCount}, ok: ${ok}`)
+            kaptanLogar("00016", `one or more items failed to be deleted`);
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when removing items using bulkRemove: ${err}`);
+        kaptanLogar("00016", `when removing items using bulkRemove: ${err}`);
     }
 }

@@ -1,10 +1,11 @@
 import { memoize } from 'lodash';
 import type { CollectionID } from '@exweiv/weiv-data'
+import { kaptanLogar } from '../Errors/error_manager';
 
 export const splitCollectionId = memoize(splitCollectionIdMain);
 function splitCollectionIdMain(collectionId: CollectionID): { dbName: string, collectionName: string } {
     if (!collectionId || typeof collectionId !== "string") {
-        throw new Error(`CollectionID is Required with this syntax: <database>/<collection> and it must be a string!`);
+        kaptanLogar("00007");
     }
 
     const [dbName, collectionName] = collectionId.split('/');

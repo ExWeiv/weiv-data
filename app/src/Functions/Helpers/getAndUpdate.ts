@@ -5,7 +5,8 @@ import { runDataHook } from '../../Hooks/hook_manager';
 import { validateParams } from '../../Helpers/validator';
 import type { ObjectId } from 'mongodb';
 import { getOwnerId } from '../../Helpers/member_id_helpers';
-import { convertObjectId } from '../../Helpers/item_helpers';
+import { kaptanLogar } from '../../Errors/error_manager';
+import { convertDocumentIDs } from '../../Helpers/internal_id_converter';
 
 export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined> {
     try {
@@ -16,12 +17,12 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
 
         let editedItem = safeValue;
         if (suppressHooks != true) {
             const modifiedItem = await runDataHook<'beforeGetAndUpdate'>(collectionId, "beforeGetAndUpdate", [safeValue, context]).catch((err) => {
-                throw new Error(`beforeGetAndUpdate Hook Failure ${err}`);
+                kaptanLogar("00002", `beforeGetAndUpdate Hook Failure ${err}`);
             });
 
             if (modifiedItem) {
@@ -48,30 +49,20 @@ export async function getAndUpdate(collectionId: CollectionID, itemId: ItemID, v
 
         if (item) {
             if (suppressHooks != true) {
-                const modifiedResult = await runDataHook<'afterGetAndUpdate'>(collectionId, "afterGetAndUpdate", [item, context]).catch((err) => {
-                    throw new Error(`afterGetAndUpdate Hook Failure ${err}`);
+                const modifiedResult = await runDataHook<'afterGetAndUpdate'>(collectionId, "afterGetAndUpdate", [convertIds ? convertDocumentIDs(item) : item, context]).catch((err) => {
+                    kaptanLogar("00003", `afterGetAndUpdate Hook Failure ${err}`);
                 });
 
                 if (modifiedResult) {
-                    if (modifiedResult._id) {
-                        modifiedResult._id = convertObjectId(modifiedResult._id);
-                    }
-                    return modifiedResult;
+                    return convertIds ? convertDocumentIDs(modifiedResult) : modifiedResult;
                 }
             }
 
-            if (item._id) {
-                return {
-                    ...item,
-                    _id: convertObjectId(item._id)
-                }
-            } else {
-                return item;
-            }
+            return convertIds ? convertDocumentIDs(item) : item;
         } else {
             return undefined;
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when updating an item from collection (getAndUpdate): ${err}`);
+        kaptanLogar("00016", `when updating an item from collection (getAndUpdate): ${err}`);
     }
 }

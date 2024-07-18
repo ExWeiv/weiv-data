@@ -11,10 +11,10 @@ import type {
     WeivDataOptionsOwner,
     WeivDataOptionsWriteOwner
 } from "@exweiv/weiv-data";
-import { type CreateCollectionOptions, ObjectId, type DropCollectionOptions, type ListCollectionsOptions, type Document, RenameOptions } from "mongodb";
+import { type CreateCollectionOptions, type DropCollectionOptions, type ListCollectionsOptions, type Document, RenameOptions, ObjectId } from "mongodb";
 import { getReferencesItemIds, getReferenceItemId } from "./reference_helpers";
-import { convertStringId } from "./item_helpers";
 import { isArray } from "lodash";
+import { convertIdToObjectId } from "../Functions/id_converters";
 
 type FName = 'update' | 'truncate' | 'save' | 'replaceReferences' | 'replace' | 'removeReference' |
     'remove' | 'push' | 'pull' | 'native' | 'multiply' | 'isReferenced' | 'insertReference' | 'insert' | 'increment' |
@@ -155,7 +155,7 @@ export async function validateParams<T>(params: ValidateParameters<T>, requiredP
                 }
                 case "itemId": {
                     if (value) {
-                        safeItemId = convertStringId(value as ItemID);
+                        safeItemId = convertIdToObjectId(value as ObjectId);
                     }
                     break;
                 }
@@ -184,7 +184,7 @@ export async function validateParams<T>(params: ValidateParameters<T>, requiredP
                     if (value) {
                         if (isArray(value)) {
                             safeItemIds = value.map((itemId) => {
-                                return convertStringId(itemId);
+                                return convertIdToObjectId(itemId);
                             });
                         } else {
                             throw new Error(`itemIds must be an array`);
@@ -298,27 +298,31 @@ function checkItemIds(params: { [key: string]: any }, func: FName): null {
 
 // Note: this function may create some problems and block some functions!!!
 export function copyOwnPropsOnly<R extends Document>(src: R): R {
-    const result = Object.create(null);
+    try {
+        const result = Object.create(null);
 
-    function copyObject(value: any) {
-        if (isPlainObject(value)) {
-            return copyOwnPropsOnly(value); // Plain object, call recursively
-        } else {
-            return value; // Not a plain object, copy as-is
-        }
-    }
-
-    for (const key of Object.getOwnPropertyNames(src)) {
-        if (key !== "__proto__" || "constructor" || "prototype") {
-            if (typeof src[key] === "object") {
-                result[key] = copyObject(src[key]);
+        function copyObject(value: any) {
+            if (isPlainObject(value)) {
+                return copyOwnPropsOnly(value); // Plain object, call recursively
             } else {
-                result[key] = src[key];
+                return value; // Not a plain object, copy as-is
             }
         }
-    }
 
-    return result as R;
+        for (const key of Object.getOwnPropertyNames(src)) {
+            if (key !== "__proto__" || "constructor" || "prototype") {
+                if (typeof src[key] === "object") {
+                    result[key] = copyObject(src[key]);
+                } else {
+                    result[key] = src[key];
+                }
+            }
+        }
+
+        return result as R;
+    } catch (err) {
+        throw new Error(`copyOwnPropsOnly function failed! Details: ${err}`);
+    }
 }
 
 // Helper function to check if a value is a plain object

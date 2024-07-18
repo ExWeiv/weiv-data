@@ -66,7 +66,7 @@ declare module '@exweiv/weiv-data' {
      * 
      * Using these within an array will filter which caches to flush.
      */
-    type CacheSelections = "permissions" | "secrets" | "get" | "isreferenced" | "query" | "helpersecrets" | "connectionclients";
+    type CacheSelections = "permissions" | "secrets" | "isreferenced" | "query" | "helpersecrets" | "connectionclients";
 
     /**
      * @description
@@ -127,6 +127,13 @@ declare module '@exweiv/weiv-data' {
          * An option to choose a consistency level when reading data from MongoDB Clusters.
          */
         readConcern?: "local" | "majority" | "linearizable" | "available" | "snapshot",
+
+        /**
+         * @description
+         * 
+         * When enabled we will convert all _id fields from ObjectId to String, if they are not in ObjectId type then we won't touch them. If not enabled we will return _id fields without modification.
+         */
+        convertIds?: boolean
     }
 
     /**
@@ -412,7 +419,8 @@ declare module '@exweiv/weiv-data' {
 
     type WeivDataAggregateRunOptions = {
         suppressAuth?: boolean,
-        readConcern?: ReadConcern
+        readConcern?: ReadConcern,
+        convertIds?: boolean
     }
 
     /**
@@ -995,7 +1003,7 @@ declare module '@exweiv/weiv-data' {
          * @description
          * Removed item ids as string objectId
          */
-        removedItemIds: string[]
+        removedItemIds: ItemID[]
     }
 
     /**
@@ -1147,13 +1155,22 @@ declare module '@exweiv/weiv-data' {
 
     /**
      * @description
-     * You can convert your string ids to ObjectIds or ObjectIds to string ids with this helper function integrated to this library.
+     * This function converts an id to string if it's an ObjectId, if not it'll return the given input.
+     * 
+     * @param id ID you want to convert, it can be string or a valid ObjectId
+     * @param encoding Optional converting method can be "base64" or "hex" defaults to "hex"
+     * @returns Fulfilled - String version of the id.
+     */
+    function convertIdToString(id: ItemID, encoding?: "base64" | "hex"): string;
+
+    /**
+     * @description
+     * This function converts an id to ObjectId if it's a string, if not it'll return the given input.
      * 
      * @param id ID you want to convert can be string or a valid ObjectId
-     * @param stringMethod Optional converting method can be "base64" or "hex" defaults to "hex"
-     * @returns Fulfilled - ObjectId or stringId reverse of the input. Rejected - The error caused the rejection.
+     * @returns Fulfilled - ObjectId version of the id.
      */
-    function convertId(id: ItemID, stringMethod?: "base64" | "hex"): ItemID;
+    function convertIdToObjectId(id: ItemID): import('mongodb').ObjectId;
 
     /**
      * @description
@@ -1914,15 +1931,9 @@ declare module '@exweiv/weiv-data' {
 
         /**
          * @description
-         * WeivData config object with required and optional flags.
+         * WeivData config object with required and optional flags. For now there isn't any option to change.
          */
-        type WeivDataConfig = {
-            /**
-             * @description
-             * If set to true (false by default) some details will be logged to console. Useful for testing things or getting info about what's happening.
-             */
-            logs?: boolean;
-        }
+        type WeivDataConfig = {}
 
         /**
          * @description
@@ -1946,6 +1957,179 @@ declare module '@exweiv/weiv-data' {
              * > async is not allowed for config.
              */
             config: () => CustomOptions.WeivDataConfig;
+        }
+    }
+
+    namespace Errors {
+        type ErrorsList = {
+            /**
+             * @description
+             * If you see this error, it means something is wrong and you should create a new issue on GitHub.
+             */
+            "00000": "No error message provided"
+
+            /**
+             * @description
+             * This error usually means a parameter or something similar is in invalid format. For example instead of a string you may pass undefined or a number. Make sure you pass correct value type.
+             */
+            "00001": "The value type your've provided is not valid, make sure you pass valid value."
+
+            /**
+             * @description
+             * There is something wrong in your `before` hook function.
+             */
+            "00002": "BeforeHook Error."
+
+            /**
+             * @description
+             * There is something wrong in your `after` hook function.
+             */
+            "00003": "AfterHook Error."
+
+            /**
+             * @description
+             * Count method of query class returned with an error. Something went wrong with count function in query.
+             */
+            "00004": "WeivData.Query.count error"
+
+            /**
+             * @description
+             * Distnict method of query class returned with an error. Something went wrong with distnict function in query.
+             */
+            "00005": "WeivData.Query.distnict error"
+
+            /**
+             * @description
+             * Find method of query class returned with an error. Something went wrong with find function in query.
+             */
+            "00006": "WeivData.Query.find error"
+
+            /**
+             * @description
+             * If you see this error it means you've entered an invalid CollectionID because our parser were not able to find the both db and collection names. Make sure your CollectionID is in correct format. See example below:
+             * 
+             * ```js
+             * const collectionId = "dbName/collectionName";
+             * ```
+             */
+            "00007": "CollectionID is not in valid format, it should be a string and must look like this: DatabaseName/CollectionName"
+
+            /**
+             * @description
+             * 
+             * If you see this it's more likely to be an internal error and not your fault.
+             */
+            "00008": "Hook name type is invalid"
+
+            /**
+             * @description
+             * 
+             * Error occurred in an internal function not directly in the function you called. See details in the log message for more information.
+             */
+            "00009": "Internal Error"
+
+            /**
+             * @description
+             * 
+             * There is something wrong when converting _id fields. This error is more likely to be an internal error and not your fault.
+             */
+            "00010": "Internal ID Converter Error"
+
+            /**
+             * @description
+             * 
+             * This error is more likely to be related with Wix APIs, function that throws this error is responsible for finding current user id, it can be an admin, member or a visitor ID.
+             */
+            "00011": "Error when trying to find the currently logged-in member/visitor id in Wix Members."
+
+            /**
+             * @description
+             * 
+             * This error is coming from a helper function which is responsible for returning aggregation pipeline for finding referenced documents via queryReferenced.
+             */
+            "00012": "Something is wrong with queryReferenced function internal pipeline."
+
+            /**
+             * @description
+             * 
+             * This error is related with reference functions like queryReferenced, insertReference etc. Make sure your items/documents contains _id field with a valid value.
+             */
+            "00013": "Error while trying to find the _id of referenced/referring document/s."
+
+            /**
+             * @description
+             * 
+             * This error is related with functions that's using Wix Secrets APIs to get the secret value from Secret Manager.
+             */
+            "00014": "Error with Secrets, something went wrong with Wix Secret Manager"
+
+            /**
+             * @description
+             * 
+             * Something went wrong with a function that's trying to update the document, see the log details.
+             */
+            "00015": "Update Error"
+
+            /**
+             * @description
+             * 
+             * These errors contains all required information in the log message. We will convert all of these errors to a more user-friendly format in the future.
+             */
+            "00016": "General Error"
+
+            /**
+             * @description
+             * 
+             * These errors belongs to functions that deals with references. These errors are more general errors and usually contains related details in the log message.
+             */
+            "00017": "Reference Function Error"
+
+            /**
+             * @description
+             * 
+             * This error is coming from .native function of WeivData which should return a colleciton cursor so user can work with original MongoDB driver directly.
+             */
+            "00018": "Native Function Error"
+
+            /**
+             * @description
+             * 
+             * Removing cached values of WeivData was not successful.
+             */
+            "00019": "Error while removing cached values of WeivData"
+
+            /**
+             * @description
+             * 
+             * When you use filtering features of .query, .aggregate and .filter functions in WeivData you will see this error if something is wrong.
+             */
+            "00020": "Error with filtering methods, make sure you pass valid filter parameters in valid types"
+
+            /**
+             * @description
+             * 
+             * This error is related with errors coming from config generator function.
+             */
+            "00021": "Error on WeivData config object, make sure you pass correct config object"
+
+            /**
+             * @description
+             * 
+             * This error is coming from functions that's handling collection related things:
+             * 
+             * - createCollection
+             * - deleteCollection
+             * - listCollections
+             * - renameCollection
+             */
+            "00022": "Collection Manager Error"
+
+            /**
+             * @description
+             * 
+             * This error is related with .aggregate function in WeivData.
+             */
+            "00023": "Aggegration Error"
         }
     }
 }

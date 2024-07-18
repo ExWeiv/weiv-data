@@ -26,21 +26,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getHelperSecretsCache = exports.getCachedSecret = void 0;
+exports.getCachedSecret = getCachedSecret;
+exports.getHelperSecretsCache = getHelperSecretsCache;
 const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
 const wixAuth = __importStar(require("wix-auth"));
 const node_cache_1 = __importDefault(require("node-cache"));
-const log_helpers_1 = require("./log_helpers");
+const error_manager_1 = require("../Errors/error_manager");
 const cache = new node_cache_1.default();
 const getSecretValue = wixAuth.elevate(wix_secrets_backend_v2_1.secrets.getSecretValue);
 async function getCachedSecret(secretName, parse) {
     try {
         if (typeof secretName !== "string") {
-            throw new Error(`secretName param is not string!`);
+            (0, error_manager_1.kaptanLogar)("00014", "secretName param is not string!");
         }
         let secret = cache.get(secretName);
         if (secret === undefined) {
-            (0, log_helpers_1.logMessage)("getCachedSecret function is called and as we check the cache we found nothing so we will get secret from the Wix Secret Manager", secretName);
             const { value } = await getSecretValue(secretName);
             if (parse === true) {
                 let objectSecret;
@@ -48,30 +48,26 @@ async function getCachedSecret(secretName, parse) {
                     objectSecret = JSON.parse(value);
                 }
                 catch (err) {
-                    throw new Error(`failed to parse JSON for secret '${secretName}': ${err}`);
+                    (0, error_manager_1.kaptanLogar)("00014", `failed to parse JSON for secret '${secretName}': ${err}`);
                 }
                 if (typeof objectSecret === 'object' && objectSecret !== null) {
                     secret = objectSecret;
                 }
                 else {
-                    throw new Error(`parsed JSON is not an object for secret '${secretName}'`);
+                    (0, error_manager_1.kaptanLogar)("00014", `parsed JSON is not an object for secret '${secretName}'`);
                 }
             }
             else {
                 secret = value;
             }
-            (0, log_helpers_1.logMessage)("Secret value is saved to cache", secretName);
             cache.set(secretName, secret, 60 * 6);
         }
-        (0, log_helpers_1.logMessage)("We have fetched the secret value and now returning it.", secretName);
         return secret;
     }
     catch (err) {
-        throw new Error(`Error on general cached secret helpers: ${err}`);
+        (0, error_manager_1.kaptanLogar)("00014", `unexpected, ${err}`);
     }
 }
-exports.getCachedSecret = getCachedSecret;
 function getHelperSecretsCache() {
     return cache;
 }
-exports.getHelperSecretsCache = getHelperSecretsCache;

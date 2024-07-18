@@ -23,13 +23,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runErrorHook = exports.runDataHook = void 0;
+exports.runDataHook = runDataHook;
+exports.runErrorHook = runErrorHook;
 const data_hooks = __importStar(require("../../../../../../../../../user-code/backend/WeivData/data"));
 const name_helpers_1 = require("../Helpers/name_helpers");
 const hook_helpers_1 = require("../Helpers/hook_helpers");
+const error_manager_1 = require("../Errors/error_manager");
 function hookExist(collectionId, hookName) {
     if (typeof hookName !== "string") {
-        throw new Error("type of hook name is not string!");
+        (0, error_manager_1.kaptanLogar)("00008");
     }
     const { collectionName, dbName } = (0, name_helpers_1.splitCollectionId)(collectionId);
     const hook = data_hooks[`${dbName.toLowerCase()}_${collectionName.toLowerCase()}_${hookName}`];
@@ -42,8 +44,11 @@ function hookExist(collectionId, hookName) {
 }
 async function runDataHook(collectionId, hookName, args) {
     try {
-        if (typeof hookName !== "string" && typeof collectionId !== "string") {
-            throw new Error("type of hook name or collection id is not string!");
+        if (typeof hookName !== "string") {
+            (0, error_manager_1.kaptanLogar)("00008");
+        }
+        if (typeof collectionId !== "string") {
+            (0, error_manager_1.kaptanLogar)("00007");
         }
         const hookFunction = hookExist(collectionId, hookName);
         if (hookFunction) {
@@ -60,7 +65,6 @@ async function runDataHook(collectionId, hookName, args) {
         throw new Error(`WeivData - Hook error: ${collectionId}, ${hookName}, err: ${err}`);
     }
 }
-exports.runDataHook = runDataHook;
 function runErrorHook(collectionId, err, context) {
     console.error(err.message);
     const errorHandlerFunction = hookExist(collectionId, "onFailure");
@@ -68,4 +72,3 @@ function runErrorHook(collectionId, err, context) {
         errorHandlerFunction(err, context);
     }
 }
-exports.runErrorHook = runErrorHook;

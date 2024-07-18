@@ -4,11 +4,20 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
-### 4.3.2-B
+### 4.4.0
 
-- security updates
-- small change to caching uris
-- unused packages are removed
+- convertId function removed in place now we have two different functions to convert an id either to string or ObjectId.
+- Now all returned _id fields are string if `convertIds` option is set to true. By default it's false.
+- Important BUG fixes.
+- General BUG fixes and improvements.
+- New error manager, this feature will be improved over time.
+
+### 4.3.2^-B
+
+- Security updates
+- Small change to caching uris
+- Unused packages are removed
+- BUG fixes
 
 ### 4.3.1
 

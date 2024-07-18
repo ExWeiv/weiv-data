@@ -1,10 +1,11 @@
-import { isArray } from "lodash";
 import { WeivDataFilter } from "../Filter/data_filter";
+import { isArray } from "lodash";
 import { copyOwnPropsOnly } from "../Helpers/validator";
-import { ObjectId, type Collection, type Db } from 'mongodb';
+import { type Collection, type Db } from 'mongodb';
 import { CollectionID, Item, PipelineStage, WeivDataAggregateResult, WeivDataAggregateRunOptions } from "@exweiv/weiv-data";
 import { connectionHandler } from "../Helpers/connection_helpers";
-import { convertObjectId } from "../Helpers/item_helpers";
+import { recursivelyConvertIds } from "../Helpers/internal_id_converter";
+import { kaptanLogar } from "../Errors/error_manager";
 
 class Aggregate {
     protected readonly _collectionId: CollectionID;
@@ -17,16 +18,20 @@ class Aggregate {
     }
 
     filter(filter: WeivDataFilter): Aggregate {
-        if (!filter || typeof filter !== "object") {
-            throw new Error(`WeivData - Filter is empty, please add a filter using weivData.filter method! (filter undefined or not valid)`);
-        } else {
-            // Clear Prototype Pollution
-            const filterClass = copyOwnPropsOnly(filter);
-            const filters = copyOwnPropsOnly(filterClass._filters);
+        try {
+            if (!filter || typeof filter !== "object") {
+                kaptanLogar("00023", `filter is empty, please add a filter using weivData.filter method! (filter undefined or not valid)`);
+            } else {
+                // Clear Prototype Pollution
+                // const filterClass = copyOwnPropsOnly(filter); IT WAS A BUG REASON
+                const filters = copyOwnPropsOnly(filter._filters);
 
-            // Add Filtering Stage to Agg Pipeline
-            this._pipeline.push(filters);
-            return this;
+                // Add Filtering Stage to Agg Pipeline
+                this._pipeline.push(filters);
+                return this;
+            }
+        } catch (err) {
+            kaptanLogar("00023", "while adding filter to aggregate pipeline");
         }
     }
 
@@ -42,7 +47,7 @@ class Aggregate {
 
     group(...propertyName: string[]): Aggregate {
         if (!propertyName || !isArray(propertyName)) {
-            throw new Error(`WeivData - At least one group property name is required! (propertyName is undefined or not valid)`);
+            kaptanLogar("00023", `at least one group property name is required! (propertyName is undefined or not valid)`);
         } else {
             // Loop all group values and save them here
             const groups: { [key: string]: string } = {};
@@ -50,7 +55,7 @@ class Aggregate {
                 if (typeof name === "string") {
                     groups[name] = `$${name}`;
                 } else {
-                    throw new Error(`WeivData - Property names must be a string, propertyName value is not valid!`);
+                    kaptanLogar("00023", `property names must be a string, propertyName value is not valid!`);
                 }
             }
 
@@ -85,20 +90,22 @@ class Aggregate {
 
     limit(limit: number): Aggregate {
         if (typeof limit !== "number") {
-            throw new Error(`WeivData - Unvalid value for limit it's either undefined or not a number!`);
+            this._limitNumber = this._limitNumber;
         } else {
             this._limitNumber = limit;
-            return this;
         }
+
+        return this;
     }
 
     skip(skip: number): Aggregate {
         if (typeof skip !== "number") {
-            throw new Error(`WeivData - Unvalid value for skip it's either undefined or not a number!`);
+            this._skipNumber = this._skipNumber;
         } else {
             this._skipNumber = skip;
-            return this;
         }
+
+        return this;
     }
 
     avg(propertyName: string, projectedName?: string): Aggregate {
@@ -122,6 +129,7 @@ class Aggregate {
             }
             return stage;
         });
+
         return this;
     }
 
@@ -139,7 +147,7 @@ class Aggregate {
 
     stage(...stages: PipelineStage[]): Aggregate {
         if (!stages || !isArray(stages)) {
-            throw new Error(`WeivData - Stage must be a valid stage!`);
+            kaptanLogar("00023", `each stage must be a valid stage object!`);
         } else {
             for (const stage of stages) {
                 const safeStage = copyOwnPropsOnly(stage);
@@ -152,7 +160,7 @@ class Aggregate {
     // HELPER FUNCTIONS
     private _addSort_(propertyName: string[], type: number): Aggregate {
         if (!propertyName || !isArray(propertyName)) {
-            throw new Error(`WeivData - At least one property name is required! (propertyName is undefined or not valid)`);
+            kaptanLogar("00023", `at least one property name is required! (propertyName is undefined or not valid)`);
         } else {
             // Loop All Sort Fields and Save
             const sort = {
@@ -166,7 +174,7 @@ class Aggregate {
                         [name]: type
                     }
                 } else {
-                    throw new Error(`WeivData - Property names must be a string, propertyName value is not valid!`);
+                    kaptanLogar("00023", `property names must be a string, propertyName value is not valid!`);
                 }
             }
 
@@ -178,7 +186,7 @@ class Aggregate {
 
     private _addCalculation_(propertyName: string, projectedName: string, type: string): Aggregate {
         if (!propertyName || typeof propertyName !== "string" || typeof projectedName !== "string") {
-            throw new Error(`WeivData - Unvalid value for propertyName projectedName or it's either undefined or not a string!`);
+            kaptanLogar("00023", `invalid value for propertyName projectedName or it's either undefined or not a string!`);
         } else {
             // Return current group stage of pipeline;
             let currentGroupStage = this._pipeline.filter(stage => "$group" in stage)[0];
@@ -224,7 +232,7 @@ export class AggregateResult extends Aggregate {
 
     async run(options: WeivDataAggregateRunOptions): Promise<WeivDataAggregateResult> {
         try {
-            const { readConcern, suppressAuth } = options || {};
+            const { readConcern, suppressAuth, convertIds } = options || {};
             await this._handleConnection_(suppressAuth);
 
             // Copy pipeline (not reference copy, deep copy)
@@ -247,32 +255,26 @@ export class AggregateResult extends Aggregate {
                     this._currentPage++;
                     return await this.run(options)
                 } catch (err) {
-                    throw new Error(`WeivData - Couldn't get the next page of the items!`);
+                    kaptanLogar("00023", `couldn't get the next page of the items!`);
                 }
             }
 
             return {
-                items: items.map((item) => {
-                    // _id field can be special in aggregations so we check first if it's an objectId
-                    if (ObjectId.isValid(item._id)) {
-                        item._id = convertObjectId(item._id);
-                    }
-                    return item;
-                }),
+                items: convertIds ? recursivelyConvertIds(items) : items,
                 length,
                 hasNext,
                 next,
                 pipeline
             }
         } catch (err) {
-            throw new Error(`WeivData - An error occured when running the aggregation pipeline! Pipeline: ${this._pipeline}, Details: ${err}`);
+            kaptanLogar("00023", `when running the aggregation pipeline! Pipeline: ${this._pipeline}, Details: ${err}`);
         }
     }
 
     // Set CollectionID
     constructor(collectionId: CollectionID) {
         if (!collectionId || typeof collectionId !== "string") {
-            throw new Error(`WeivData - CollectionID must be string and shouldn't be undefined or null!`);
+            kaptanLogar("00007");
         }
         super(collectionId);
     }

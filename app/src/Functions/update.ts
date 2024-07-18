@@ -1,11 +1,13 @@
 import { connectionHandler } from '../Helpers/connection_helpers';
-import { convertObjectId, convertStringId } from '../Helpers/item_helpers';
 import { runDataHook } from '../Hooks/hook_manager';
 import { prepareHookContext } from '../Helpers/hook_helpers';
 import { CollectionID, Item, WeivDataOptionsOwner } from '@exweiv/weiv-data';
 import { validateParams } from '../Helpers/validator';
 import { getOwnerId } from '../Helpers/member_id_helpers';
 import { ObjectId } from 'mongodb/mongodb';
+import { kaptanLogar } from '../Errors/error_manager';
+import { convertDocumentIDs } from '../Helpers/internal_id_converter';
+import { convertIdToObjectId } from './id_converters';
 
 export async function update(collectionId: CollectionID, item: Item, options?: WeivDataOptionsOwner): Promise<Item> {
     try {
@@ -13,16 +15,16 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
         const { safeItem, safeOptions } = await validateParams<"update">({ collectionId, item, options }, ["collectionId", "item"], "update");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
 
         let editedItem;
         if (suppressHooks != true) {
             editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [safeItem, context]).catch((err) => {
-                throw new Error(`beforeUpdate Hook Failure ${err}`);
+                kaptanLogar("00002", `beforeUpdate Hook Failure ${err}`);
             });
         }
 
-        const itemId = !editedItem ? convertStringId(safeItem._id) : convertStringId(editedItem._id);
+        const itemId = !editedItem ? convertIdToObjectId(safeItem._id) : convertIdToObjectId(editedItem._id);
         const updateItem = !editedItem ? safeItem : editedItem;
         delete updateItem._id;
 
@@ -43,30 +45,20 @@ export async function update(collectionId: CollectionID, item: Item, options?: W
 
         if (value) {
             if (suppressHooks != true) {
-                let editedResult = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [value, context]).catch((err) => {
-                    throw new Error(`afterUpdate Hook Failure ${err}`);
+                let editedResult = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [convertIds ? convertDocumentIDs(value) : value, context]).catch((err) => {
+                    kaptanLogar("00003", `afterUpdate Hook Failure ${err}`);
                 });
 
                 if (editedResult) {
-                    if (editedResult._id) {
-                        editedResult._id = convertObjectId(editedResult._id);
-                    }
-                    return editedResult;
+                    return convertIds ? convertDocumentIDs(editedResult) : editedResult;
                 }
             }
 
-            if (value._id) {
-                return {
-                    ...value,
-                    _id: convertObjectId(value._id)
-                }
-            } else {
-                return value;
-            }
+            return convertIds ? convertDocumentIDs(value) : value;
         } else {
-            throw new Error(`returned value has problem value: ${value}`);
+            kaptanLogar("00015", "item not found");
         }
     } catch (err) {
-        throw new Error(`WeivData - Error when updating an item: ${err}`);
+        kaptanLogar("00015", `${err}`);
     }
 }

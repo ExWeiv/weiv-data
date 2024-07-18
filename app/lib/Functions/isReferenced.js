@@ -3,10 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getIsReferencedCache = exports.isReferenced = void 0;
+exports.isReferenced = isReferenced;
+exports.getIsReferencedCache = getIsReferencedCache;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const validator_1 = require("../Helpers/validator");
 const node_cache_1 = __importDefault(require("node-cache"));
+const error_manager_1 = require("../Errors/error_manager");
 const cache = new node_cache_1.default({
     checkperiod: 5,
     useClones: false,
@@ -41,11 +43,9 @@ async function isReferenced(collectionId, propertyName, referringItem, reference
         }
     }
     catch (err) {
-        throw new Error(`WeivData - Error when checking if item is referenced: ${err}`);
+        (0, error_manager_1.kaptanLogar)("00017", `when checking if item is referenced: ${err}`);
     }
 }
-exports.isReferenced = isReferenced;
 function getIsReferencedCache() {
     return cache;
 }
-exports.getIsReferencedCache = getIsReferencedCache;
