@@ -1965,6 +1965,12 @@ declare module '@exweiv/weiv-data' {
              */
             config: () => CustomOptions.WeivDataConfig;
         }
+
+        /**@internal */
+        const WeivDataConfig: WeivDataConfig;
+
+        /**@internal */
+        const ConnectionOptions: ConnectionOptions;
     }
 
     namespace Errors {
@@ -2161,62 +2167,53 @@ declare module '@exweiv/weiv-data' {
     }
 
     /**
+     * @Plugin
      * @description
      * 
-     * Plugins are helper functions/features.
+     * This plugin helps you to sync Wix application collections directly with your MongoDB database, in this way you can perform lookup operations easily.
+     * 
+     * > Currently this feature is experimental and BUG fixes will be added in the future. And right now only available app is Wix Members.
+     * 
+     * ### How it Works?
+     * 
+     * For specific tasks you have pre-built functions that you can use to sync Wix app collections. For example for Wix Members you have created, updated and deleted events where you define it inside the events.js file.
+     * In this events.js file you will define these events but you will use pre-built functions from WeivData library to sync the data.
+     * 
+     * Example code:
+     * ```js
+     * import { SyncWixApps } from '@exweiv/weiv-data';
+     * const { wixMembers } = SyncWixApps;
+     * 
+     * export const wixMembers_onMemberCreated = (event) => wixMembers.onMemberCreated(event);
+     * ```
+     * 
+     * In the example code above you can understand how it works with a single line of code. You can also add your own logic like this:
+     * 
+     * ```js
+     * import { SyncWixApps } from '@exweiv/weiv-data';
+     * const { wixMembers } = SyncWixApps;
+     * 
+     * export const wixMembers_onMemberCreated = (event) => {
+     *      // Sync Data (no await needed because sync functions are void and doesn't return any value)
+     *      wixMembers.onMemberCreated(event);
+     * 
+     *      // Your Own Logic
+     * }
+     * ```
+     * 
+     * ### Logs of Sync Errors
+     * 
+     * In case of an error you can find logs in `WeivDataWixAppsSyncLogs` database in your MongoDB cluster. In this database you will have multiple collections to collect logs about each individual application.
+     * You can find error logs and it's details there. Plugin only save unexpected error logs not any other logs.
      */
-    namespace Plugins {
-
-        /**
-         * @description
-         * 
-         * This plugin helps you to sync Wix application collections directly with your MongoDB database, in this way you can perform lookup operations easily.
-         * 
-         * > Currently this feature is experimental and BUG fixes will be added in the future. And right now only available app is Wix Members.
-         * 
-         * ### How it Works?
-         * 
-         * For specific tasks you have pre-built functions that you can use to sync Wix app collections. For example for Wix Members you have created, updated and deleted events where you define it inside the events.js file.
-         * In this events.js file you will define these events but you will use pre-built functions from WeivData library to sync the data.
-         * 
-         * Example code:
-         * ```js
-         * import { SyncWixApps } from '@exweiv/weiv-data';
-         * const { wixMembers } = SyncWixApps;
-         * 
-         * export const wixMembers_onMemberCreated = (event) => wixMembers.onMemberCreated(event);
-         * ```
-         * 
-         * In the example code above you can understand how it works with a single line of code. You can also add your own logic like this:
-         * 
-         * ```js
-         * import { SyncWixApps } from '@exweiv/weiv-data';
-         * const { wixMembers } = SyncWixApps;
-         * 
-         * export const wixMembers_onMemberCreated = (event) => {
-         *      // Sync Data (no await needed because sync functions are void and doesn't return any value)
-         *      wixMembers.onMemberCreated(event);
-         * 
-         *      // Your Own Logic
-         * }
-         * ```
-         * 
-         * ### Logs of Sync Errors
-         * 
-         * In case of an error you can find logs in `WeivDataWixAppsSyncLogs` database in your MongoDB cluster. In this database you will have multiple collections to collect logs about each individual application.
-         * You can find error logs and it's details there. Plugin only save unexpected error logs not any other logs.
-         */
-        namespace SyncWixApps {
-            /**
-             * @description
-             * 
-             * Includes functions to sync Wix Members collections.
-             */
-            interface wixMembers {
-                onMemberCreated: Function
-                onMemberUpdated: Function
-                onMemberDeleted: Function
-            }
+    namespace SyncWixApps {
+        interface wixMembers {
+            onMemberCreated(event: any): void;
+            onMemberUpdated(event: any): void;
+            onMemberDeleted(event: any): void;
         }
+
+        /**@internal */
+        const wixMembers: wixMembers;
     }
 }
