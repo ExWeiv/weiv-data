@@ -7,6 +7,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 ### 4.7.1
 
 - Examples included in documentation.
+- BUG Fixes
 
 ### 4.7.0
 
