@@ -25,7 +25,9 @@ export const errorsList: Errors.ErrorsList = {
     "00021": "Error on WeivData config object, make sure you pass correct config object",
     "00022": "Collection Manager Error",
     "00023": "Aggegration Error",
-    "00024": "Wix Application Sync Error"
+    "00024": "Wix Application Sync Error",
+    "00025": "Wix Application Sync Error - Event data not found, don't forget to pass the event object from the Wix event function",
+    "00026": "You didn't configure any database name to sync Wix apps data!"
 }
 
 export default errorsList;

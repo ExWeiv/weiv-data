@@ -14,7 +14,7 @@ const logCollection = "WeivDataWixAppsSyncLogs/WixStores";
 export async function onProductCreated(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         await sleep(1000);
@@ -28,7 +28,7 @@ export async function onProductCreated(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const { readyInventoryData, readyProductData, readyVariantsData } = await getProductData(productId);
@@ -56,7 +56,7 @@ export async function onProductCreated(event: Document): Promise<void> {
 export async function onProductUpdated(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         await sleep(1000);
@@ -70,7 +70,7 @@ export async function onProductUpdated(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const { readyInventoryData, readyProductData, readyVariantsData } = await getProductData(productId);
@@ -114,7 +114,7 @@ export async function onProductUpdated(event: Document): Promise<void> {
 export async function onProductDeleted(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         // Get required information
@@ -126,13 +126,13 @@ export async function onProductDeleted(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const filter = { "productId": { $eq: productId } };
 
         Promise.all([
-            (await native(`${syncDatabase}/WixStoresProducts`, true)).deleteMany(filter, { ordered: false, retryWrites: true }),
+            (await native(`${syncDatabase}/WixStoresProducts`, true)).deleteMany({ "entityId": { $eq: productId } }, { ordered: false, retryWrites: true }),
             (await native(`${syncDatabase}/WixStoresVariants`, true)).deleteMany(filter, { ordered: false, retryWrites: true }),
             (await native(`${syncDatabase}/WixStoresInventoryItems`, true)).deleteMany(filter, { ordered: false, retryWrites: true })
         ]);
@@ -152,10 +152,11 @@ export async function onProductDeleted(event: Document): Promise<void> {
 export async function onCollectionCreated(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
-        await sleep(1000);
+        // Wix Stores Collections are Buggy
+        await sleep(4000);
 
         // Get required information
         const collectionId = event._id;
@@ -166,7 +167,7 @@ export async function onCollectionCreated(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const collection = await getCollectionData(collectionId);
@@ -186,7 +187,7 @@ export async function onCollectionCreated(event: Document): Promise<void> {
 export async function onCollectionUpdated(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         await sleep(1000);
@@ -200,7 +201,7 @@ export async function onCollectionUpdated(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const collection = await getCollectionData(collectionId);
@@ -221,7 +222,7 @@ export async function onCollectionUpdated(event: Document): Promise<void> {
 export async function onCollectionDeleted(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         // Get required information
@@ -233,7 +234,7 @@ export async function onCollectionDeleted(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const filter = { "entityId": { $eq: collectionId } };

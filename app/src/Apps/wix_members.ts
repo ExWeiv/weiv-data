@@ -13,7 +13,7 @@ const logCollection = "WeivDataWixAppsSyncLogs/WixMembers";
 export async function onMemberCreated(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         // Wait 1s before inserting (in case of data not inserted in Wix app collection yet)
@@ -28,7 +28,7 @@ export async function onMemberCreated(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const { readyFullData, readyPrivateData, readyPublicData } = await getMemberData(memberId);
@@ -55,7 +55,7 @@ export async function onMemberCreated(event: Document): Promise<void> {
 export async function onMemberUpdated(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         // Wait 1s before update (in case of data not updated in Wix app collection yet)
@@ -70,7 +70,7 @@ export async function onMemberUpdated(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const { readyFullData, readyPrivateData, readyPublicData } = await getMemberData(memberId);
@@ -98,7 +98,7 @@ export async function onMemberUpdated(event: Document): Promise<void> {
 export async function onMemberDeleted(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         // Get required information
@@ -110,7 +110,7 @@ export async function onMemberDeleted(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const find = { "entityId": { $eq: memberId } };
@@ -138,7 +138,7 @@ export async function onMemberDeleted(event: Document): Promise<void> {
 export async function onBadgeCreated(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         await sleep(1000);
@@ -152,7 +152,7 @@ export async function onBadgeCreated(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const readyBadgeData = await getBadgeData(badgeId);
@@ -172,7 +172,7 @@ export async function onBadgeCreated(event: Document): Promise<void> {
 export async function onBadgeUpdated(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         await sleep(1000);
@@ -186,7 +186,7 @@ export async function onBadgeUpdated(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const readyBadgeData = await getBadgeData(badgeId);
@@ -207,7 +207,7 @@ export async function onBadgeUpdated(event: Document): Promise<void> {
 export async function onBadgeDeleted(event: Document): Promise<void> {
     try {
         if (!event) {
-            kaptanLogar("00024", "Event data not found, don't forget to pass the event object from the Wix event function");
+            kaptanLogar("00025");
         }
 
         // Get required information
@@ -219,7 +219,7 @@ export async function onBadgeDeleted(event: Document): Promise<void> {
         }
 
         if (!syncDatabase) {
-            kaptanLogar("00024", "You didn't configure any database name to sync Wix apps data!");
+            kaptanLogar("00026");
         }
 
         const find = { "entityId": { $eq: badgeId } };
