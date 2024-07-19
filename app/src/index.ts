@@ -42,10 +42,12 @@ const query = (collectionId: CollectionID) => new QueryResult(collectionId);
 const filter = () => new WeivDataFilter();
 const _version = () => npm.version;
 
-import { onMemberCreated, onMemberDeleted, onMemberUpdated } from "./Apps/wix_members";
+import { onMemberCreated, onMemberUpdated, onMemberDeleted, onBadgeCreated, onBadgeUpdated, onBadgeDeleted } from "./Apps/wix_members";
+import { onCollectionCreated, onCollectionUpdated, onCollectionDeleted, onProductCreated, onProductUpdated, onProductDeleted } from "./Apps/wix_stores";
 
 const SyncWixApps = {
-    wixMembers: { onMemberCreated, onMemberUpdated, onMemberDeleted }
+    wixMembers: { onMemberCreated, onMemberUpdated, onMemberDeleted, onBadgeCreated, onBadgeUpdated, onBadgeDeleted },
+    wixStores: { onCollectionCreated, onCollectionUpdated, onCollectionDeleted, onProductCreated, onProductUpdated, onProductDeleted }
 };
 
 export {

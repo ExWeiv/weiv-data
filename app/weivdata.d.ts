@@ -1940,6 +1940,18 @@ declare module '@exweiv/weiv-data' {
              * This is the name of the database that you want to use to insert the data of Wix app collections. It can be any database you want.
              */
             syncDatabase?: string
+
+            /**
+             * @description
+             * 
+             * When enabled we will log information about sync operations (errors are always logged).
+             * 
+             * Example:
+             * ```curl
+             * Wix Members Created Runs - {entityId}
+             * ```
+             */
+            enableSyncLogs?: boolean
         }
 
         /**
@@ -2208,12 +2220,29 @@ declare module '@exweiv/weiv-data' {
      */
     namespace SyncWixApps {
         interface wixMembers {
-            onMemberCreated(event: any): void;
-            onMemberUpdated(event: any): void;
-            onMemberDeleted(event: any): void;
+            onMemberCreated(event: any): Promise<void>;
+            onMemberUpdated(event: any): Promise<void>;
+            onMemberDeleted(event: any): Promise<void>;
+
+            onBadgeCreated(event: any): Promise<void>;
+            onBadgeUpdated(event: any): Promise<void>;
+            onBadgeDeleted(event: any): Promise<void>;
+        }
+
+        interface wixStores {
+            onProductCreated(event: any): Promise<void>;
+            onProductUpdated(event: any): Promise<void>;
+            onProductDeleted(event: any): Promise<void>;
+
+            onCollectionCreated(event: any): Promise<void>;
+            onCollectionUpdated(event: any): Promise<void>;
+            onCollectionDeleted(event: any): Promise<void>;
         }
 
         /**@internal */
         const wixMembers: wixMembers;
+
+        /**@internal */
+        const wixStores: wixStores;
     }
 }
