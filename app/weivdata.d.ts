@@ -1940,6 +1940,18 @@ declare module '@exweiv/weiv-data' {
              * This is the name of the database that you want to use to insert the data of Wix app collections. It can be any database you want.
              */
             syncDatabase?: string
+
+            /**
+             * @description
+             * 
+             * When enabled we will log information about sync operations (errors are always logged).
+             * 
+             * Example:
+             * ```curl
+             * Wix Members Created Runs - {entityId}
+             * ```
+             */
+            enableSyncLogs?: boolean
         }
 
         /**
@@ -2163,6 +2175,21 @@ declare module '@exweiv/weiv-data' {
              * ```
              */
             "00024": "Wix Application Sync Error"
+
+            /**
+             * @description
+             * 
+             * Another common WixSync plug-in error, this means that event object is undefined and due to this sync function can't work. Make sure you pass the event object that's exported from the native Wix event hook.
+             */
+            "00025": "Wix Application Sync Error - Event data not found, don't forget to pass the event object from the Wix event function"
+
+            /**
+             * @description
+             * 
+             * This is also another error from WixSync plug-in it means that you didn't configure the database name you want to use for your sync operations.
+             * The selected database name will be used when saving/deleting the Wix applications data.
+             */
+            "00026": "You didn't configure any database name to sync Wix apps data!"
         }
     }
 
@@ -2205,15 +2232,216 @@ declare module '@exweiv/weiv-data' {
      * 
      * In case of an error you can find logs in `WeivDataWixAppsSyncLogs` database in your MongoDB cluster. In this database you will have multiple collections to collect logs about each individual application.
      * You can find error logs and it's details there. Plugin only save unexpected error logs not any other logs.
+     * 
+     * **Note:**
+     * _id fields are automatically generated and they are ObjectId, instead of _id fields you can use entityId field which will be the equivalent of actual item _id.
+     * 
+     * Basically if you want to find a member by it's _id then use entityId field not _id field.
      */
     namespace SyncWixApps {
+        /**
+         * ## Wix Members Sync Plug-in
+         * 
+         * This plug-in allows you to sync Wix Members collections into your MongoDB cluster. In this was you can perform your data works with WeivData for Wix Members app data.
+         * You can also perform lookups easily (references/includes) with any other collection you have in your MongoDB.
+         * 
+         * And there aren't any filtering etc. limit when you use WeivData, you can filter and query data however you want.
+         * 
+         * Right now you have 6 functions to sync these collections:
+         * 
+         * - Badges (WixMembersBadges)
+         * - FullData (WixMembersFullData)
+         * - PrivateMembersData (WixMembersPrivateData)
+         * - PublicData (WixMembersPublicData)
+         * 
+         * The database name depends on your choice. You can configure it with config function.
+         * 
+         * ---
+         * 
+         * We do not suggest writing to these collections, use these collections to only read data from it.
+         * 
+         * ---
+         * 
+         * Functions are designed to work with `wix-members.v2` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         */
         interface wixMembers {
-            onMemberCreated(event: any): void;
-            onMemberUpdated(event: any): void;
-            onMemberDeleted(event: any): void;
+            onMemberCreated(event: any): Promise<void>;
+            onMemberUpdated(event: any): Promise<void>;
+            onMemberDeleted(event: any): Promise<void>;
+
+            onBadgeCreated(event: any): Promise<void>;
+            onBadgeUpdated(event: any): Promise<void>;
+            onBadgeDeleted(event: any): Promise<void>;
+        }
+
+        /**
+         * ## Wix Stores Sync Plug-in
+         * 
+         * This plug-in allows you to sync some Wix Stores collections into your MongoDB cluster. In this way you can perform queries, lookups and all other things easily with WeivData.
+         * There isn't any filtering etc. limit for these collections which you may see when you use WixData.
+         * 
+         * Right now you have 6 functions to sync these collections:
+         * 
+         * - Collections (WixStoresCollections)
+         * - InventoryItems (WixStoresInventoryItems)
+         * - Products (WixStoresProducts)
+         * - Variants (WixStoresVariants)
+         * 
+         * The database name depends on your choice. You can configure it with config function.
+         * 
+         * ---
+         * 
+         * We do not suggest writing to these collections, use these collections to only read data from it.
+         * 
+         * ---
+         * 
+         * Functions are designed to work with `wix-stores-backend` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         */
+        interface wixStores {
+            onProductCreated(event: any): Promise<void>;
+            onProductUpdated(event: any): Promise<void>;
+            onProductDeleted(event: any): Promise<void>;
+
+            onCollectionCreated(event: any): Promise<void>;
+            onCollectionUpdated(event: any): Promise<void>;
+            onCollectionDeleted(event: any): Promise<void>;
+        }
+
+        /**
+         * ## Wix eCommerce Sync Plug-in
+         * 
+         * This plug-in allows you to sync orders and abandoned checkouts collections into your MongoDB cluster. In this way you can perform queries, lookups and all other things easily with WeivData.
+         * There isn't any filtering etc. limit for these collections which you may see when you use WixData.
+         * 
+         * Right now you have 4 functions to sync these collections:
+         * 
+         * - Orders (WixeComOrders)
+         * - AbandonedCheckouts (WixeComAbandonedCheckouts)
+         * 
+         * > Orders collection is normally inside the Wix Stores database in Wix so the "orders" collection we are referring here is that collection.
+         * 
+         * The database name depends on your choice. You can configure it with config function.
+         * 
+         * ---
+         * 
+         * We do not suggest writing to these collections, use these collections to only read data from it.
+         * 
+         * ---
+         * 
+         * Functions are designed to work with `wix-ecom-backend` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         */
+        interface wixEcom {
+            onOrderCreated(event: any): Promise<void>;
+            onOrderUpdated(event: any): Promise<void>;
+
+            onAbandonedCheckoutCreated(event: any): Promise<void>;
+            onAbandonedCheckoutRecovered(event: any): Promise<void>;
+        }
+
+        /**
+         * ## Wix Marketing Sync Plug-in
+         * 
+         * This plug-in allows you to sync coupons collection into your MongoDB cluster. In this way you can perform queries, lookups and all other things easily with WeivData.
+         * There isn't any filtering etc. limit for these collections which you may see when you use WixData.
+         * 
+         * Right now you have 3 functions to sync these collections:
+         * 
+         * - Coupons (WixMarketingCoupons)
+         * 
+         * The database name depends on your choice. You can configure it with config function.
+         * 
+         * ---
+         * 
+         * We do not suggest writing to these collections, use these collections to only read data from it.
+         * 
+         * ---
+         * 
+         * Functions are designed to work with `wix-marketing.v2` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         */
+        interface wixMarketing {
+            onCouponCreated(event: any): Promise<void>;
+            onCouponUpdated(event: any): Promise<void>;
+            onCouponDeleted(event: any): Promise<void>;
+        }
+
+        /**
+         * ## Wix Pricing Plans Sync Plug-in
+         * 
+         * This plug-in allows you to sync plans collection into your MongoDB cluster. In this way you can perform queries, lookups and all other things easily with WeivData.
+         * There isn't any filtering etc. limit for these collections which you may see when you use WixData.
+         * 
+         * Right now you have 3 functions to sync these collections:
+         * 
+         * - Plans (WixPricingPlansPlans)
+         * 
+         * The database name depends on your choice. You can configure it with config function.
+         * 
+         * ---
+         * 
+         * We do not suggest writing to these collections, use these collections to only read data from it.
+         * 
+         * ---
+         * 
+         * Functions are designed to work with `wix-pricing-plans.v2` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         */
+        interface wixPricingPlans {
+            onPlanCreated(event: any): Promise<void>;
+            onPlanUpdated(event: any): Promise<void>;
+            onPlanArchived(event: any, deletePlan?: boolean): Promise<void>;
+        }
+
+        /**
+         * ## Wix Blog Sync Plug-in
+         * 
+         * This plug-in allows you to sync some collections into your MongoDB cluster. In this way you can perform queries, lookups and all other things easily with WeivData.
+         * There isn't any filtering etc. limit for these collections which you may see when you use WixData.
+         * 
+         * Right now you have 9 functions to sync these collections:
+         * 
+         * - Posts (WixBlogPosts)
+         * - Categories (WixBlogCategories)
+         * - Tags (WixBlogTags)
+         * 
+         * The database name depends on your choice. You can configure it with config function.
+         * 
+         * ---
+         * 
+         * We do not suggest writing to these collections, use these collections to only read data from it.
+         * 
+         * ---
+         * 
+         * Functions are designed to work with `wix-blog-backend` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         */
+        interface wixBlog {
+            onPostCreated(event: any): Promise<void>;
+            onPostUpdated(event: any): Promise<void>;
+            onPostDeleted(event: any): Promise<void>;
+
+            onCategoryCreated(event: any): Promise<void>;
+            onCategoryUpdated(event: any): Promise<void>;
+            onCategoryDeleted(event: any): Promise<void>;
+
+            onTagCreated(event: any): Promise<void>;
+            onTagUpdated(event: any): Promise<void>;
+            onTagDeleted(event: any): Promise<void>;
         }
 
         /**@internal */
         const wixMembers: wixMembers;
+
+        /**@internal */
+        const wixStores: wixStores;
+
+        /**@internal */
+        const wixEcom: wixEcom;
+
+        /**@internal */
+        const wixMarketing: wixMarketing;
+
+        /**@internal */
+        const wixPricingPlans: wixPricingPlans;
+
+        /**@internal */
+        const wixBlog: wixBlog;
     }
 }
