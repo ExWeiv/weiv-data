@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -79,11 +102,19 @@ const filter = () => new data_filter_1.WeivDataFilter();
 exports.filter = filter;
 const _version = () => package_json_1.default.version;
 exports._version = _version;
-const wix_members_1 = require("./Apps/wix_members");
-const wix_stores_1 = require("./Apps/wix_stores");
+const wixMembers = __importStar(require("./Apps/wix_members"));
+const wixStores = __importStar(require("./Apps/wix_stores"));
+const wixBlog = __importStar(require("./Apps/wix_blog"));
+const wixEcom = __importStar(require("./Apps/wix_ecom"));
+const wixMarketing = __importStar(require("./Apps/wix_marketing"));
+const wixPricingPlans = __importStar(require("./Apps/wix_pricingplans"));
 const SyncWixApps = {
-    wixMembers: { onMemberCreated: wix_members_1.onMemberCreated, onMemberUpdated: wix_members_1.onMemberUpdated, onMemberDeleted: wix_members_1.onMemberDeleted, onBadgeCreated: wix_members_1.onBadgeCreated, onBadgeUpdated: wix_members_1.onBadgeUpdated, onBadgeDeleted: wix_members_1.onBadgeDeleted },
-    wixStores: { onCollectionCreated: wix_stores_1.onCollectionCreated, onCollectionUpdated: wix_stores_1.onCollectionUpdated, onCollectionDeleted: wix_stores_1.onCollectionDeleted, onProductCreated: wix_stores_1.onProductCreated, onProductUpdated: wix_stores_1.onProductUpdated, onProductDeleted: wix_stores_1.onProductDeleted }
+    wixBlog,
+    wixEcom,
+    wixMarketing,
+    wixMembers,
+    wixPricingPlans,
+    wixStores,
 };
 exports.SyncWixApps = SyncWixApps;
 exports.default = {
