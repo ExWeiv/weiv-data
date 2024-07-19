@@ -2263,6 +2263,20 @@ declare module '@exweiv/weiv-data' {
          * ---
          * 
          * Functions are designed to work with `wix-members.v2` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         * 
+         * Example:
+         * 
+         * ```js
+         * import { SyncWixApps } from '@exweiv/weiv-data';
+         * const { wixMembers } = SyncWixApps;
+         * 
+         * export const wixMembers_onMemberCreated = (event) => wixMembers.onMemberCreated(event);
+         * export const wixMembers_onMemberUpdated = (event) => wixMembers.onMemberUpdated(event);
+         * export const wixMembers_onMemberDeleted = (event) => wixMembers.onMemberDeleted(event);
+         * export const wixBadges_onBadgeCreated = (event) => wixMembers.onBadgeCreated(event);
+         * export const wixBadges_onBadgeUpdated = (event) => wixMembers.onBadgeUpdated(event);
+         * export const wixBadges_onBadgeDeleted = (event) => wixMembers.onBadgeDeleted(event);
+         * ```
          */
         interface wixMembers {
             onMemberCreated(event: any): Promise<void>;
@@ -2296,6 +2310,20 @@ declare module '@exweiv/weiv-data' {
          * ---
          * 
          * Functions are designed to work with `wix-stores-backend` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         * 
+         * Example:
+         * 
+         * ```js
+         * import { SyncWixApps } from '@exweiv/weiv-data';
+         * const { wixStores } = SyncWixApps;
+         * 
+         * export const wixStores_onCollectionCreated = (event) => wixStores.onCollectionCreated(event);
+         * export const wixStores_onCollectionUpdated = (event) => wixStores.onCollectionUpdated(event);
+         * export const wixStores_onCollectionDeleted = (event) => wixStores.onCollectionDeleted(event);
+         * export const wixStores_onProductCreated = (event) => wixStores.onProductCreated(event);
+         * export const wixStores_onProductUpdated = (event) => wixStores.onProductUpdated(event);
+         * export const wixStores_onProductDeleted = (event) => wixStores.onProductDeleted(event);
+         * ```
          */
         interface wixStores {
             onProductCreated(event: any): Promise<void>;
@@ -2329,6 +2357,18 @@ declare module '@exweiv/weiv-data' {
          * ---
          * 
          * Functions are designed to work with `wix-ecom-backend` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         * 
+         * Example:
+         * 
+         * ```js
+         * import { SyncWixApps } from '@exweiv/weiv-data';
+         * const { wixEcom } = SyncWixApps;
+         * 
+         * export const wixEcom_onOrderCreated = (event) => wixEcom.onOrderCreated(event);
+         * export const wixEcom_onOrderUpdated = (event) => wixEcom.onOrderUpdated(event);
+         * export const wixEcom_onAbandonedCheckoutCreated = (event) => wixEcom.onAbandonedCheckoutCreated(event);
+         * export const wixEcom_onAbandonedCheckoutRecovered = (event) => wixEcom.onAbandonedCheckoutRecovered(event);
+         * ```
          */
         interface wixEcom {
             onOrderCreated(event: any): Promise<void>;
@@ -2357,6 +2397,17 @@ declare module '@exweiv/weiv-data' {
          * ---
          * 
          * Functions are designed to work with `wix-marketing.v2` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         * 
+         * Example:
+         * 
+         * ```js
+         * import { SyncWixApps } from '@exweiv/weiv-data';
+         * const { wixMarketing } = SyncWixApps;
+         * 
+         * export const wixMarketing_onCouponCreated = (event) => wixMarketing.onCouponCreated(event);
+         * export const wixMarketing_onCouponDeleted = (event) => wixMarketing.onCouponDeleted(event);
+         * export const wixMarketing_onCouponUpdated = (event) => wixMarketing.onCouponUpdated(event);
+         * ```
          */
         interface wixMarketing {
             onCouponCreated(event: any): Promise<void>;
@@ -2383,6 +2434,17 @@ declare module '@exweiv/weiv-data' {
          * ---
          * 
          * Functions are designed to work with `wix-pricing-plans.v2` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         * 
+         * Example:
+         * 
+         * ```js
+         * import { SyncWixApps } from '@exweiv/weiv-data';
+         * const { wixPricingPlans } = SyncWixApps;
+         * 
+         * export const wixPricingPlansV2_onPlanCreated = (event) => wixPricingPlans.onPlanCreated(event);
+         * export const wixPricingPlansV2_onPlanUpdated = (event) => wixPricingPlans.onPlanUpdated(event);
+         * export const wixPricingPlansV2_onPlanArchived = (event) => wixPricingPlans.onPlanArchived(event);
+         * ```
          */
         interface wixPricingPlans {
             onPlanCreated(event: any): Promise<void>;
@@ -2411,6 +2473,23 @@ declare module '@exweiv/weiv-data' {
          * ---
          * 
          * Functions are designed to work with `wix-blog-backend` APIs Events. Define events inside the `events.js` file and point the functions you import from this plugin.
+         * 
+         * Example:
+         * 
+         * ```js
+         * import { SyncWixApps } from '@exweiv/weiv-data';
+         * const { wixBlog } = SyncWixApps;
+         * 
+         * export const wixBlog_onCategoryCreated = (event) => wixBlog.onCategoryCreated(event);
+         * export const wixBlog_onCategoryDeleted = (event) => wixBlog.onCategoryDeleted(event);
+         * export const wixBlog_onCategoryUpdated = (event) => wixBlog.onCategoryUpdated(event);
+         * export const wixBlog_onTagCreated = (event) => wixBlog.onTagCreated(event);
+         * export const wixBlog_onTagDeleted = (event) => wixBlog.onTagDeleted(event);
+         * export const wixBlog_onTagUpdated = (event) => wixBlog.onTagUpdated(event);
+         * export const wixBlog_onPostCreated = (event) => wixBlog.onPostCreated(event);
+         * export const wixBlog_onPostDeleted = (event) => wixBlog.onPostDeleted(event);
+         * export const wixBlog_onPostUpdated = (event) => wixBlog.onPostUpdated(event);
+         * ```
          */
         interface wixBlog {
             onPostCreated(event: any): Promise<void>;

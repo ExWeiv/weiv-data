@@ -42,12 +42,20 @@ const query = (collectionId: CollectionID) => new QueryResult(collectionId);
 const filter = () => new WeivDataFilter();
 const _version = () => npm.version;
 
-import { onMemberCreated, onMemberUpdated, onMemberDeleted, onBadgeCreated, onBadgeUpdated, onBadgeDeleted } from "./Apps/wix_members";
-import { onCollectionCreated, onCollectionUpdated, onCollectionDeleted, onProductCreated, onProductUpdated, onProductDeleted } from "./Apps/wix_stores";
+import * as wixMembers from "./Apps/wix_members";
+import * as wixStores from "./Apps/wix_stores";
+import * as wixBlog from "./Apps/wix_blog";
+import * as wixEcom from "./Apps/wix_ecom";
+import * as wixMarketing from "./Apps/wix_marketing";
+import * as wixPricingPlans from "./Apps/wix_pricingplans";
 
 const SyncWixApps = {
-    wixMembers: { onMemberCreated, onMemberUpdated, onMemberDeleted, onBadgeCreated, onBadgeUpdated, onBadgeDeleted },
-    wixStores: { onCollectionCreated, onCollectionUpdated, onCollectionDeleted, onProductCreated, onProductUpdated, onProductDeleted }
+    wixBlog,
+    wixEcom,
+    wixMarketing,
+    wixMembers,
+    wixPricingPlans,
+    wixStores,
 };
 
 export {
