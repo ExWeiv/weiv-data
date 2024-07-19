@@ -80,8 +80,10 @@ exports.filter = filter;
 const _version = () => package_json_1.default.version;
 exports._version = _version;
 const wix_members_1 = require("./Apps/wix_members");
+const wix_stores_1 = require("./Apps/wix_stores");
 const SyncWixApps = {
-    wixMembers: { onMemberCreated: wix_members_1.onMemberCreated, onMemberUpdated: wix_members_1.onMemberUpdated, onMemberDeleted: wix_members_1.onMemberDeleted }
+    wixMembers: { onMemberCreated: wix_members_1.onMemberCreated, onMemberUpdated: wix_members_1.onMemberUpdated, onMemberDeleted: wix_members_1.onMemberDeleted, onBadgeCreated: wix_members_1.onBadgeCreated, onBadgeUpdated: wix_members_1.onBadgeUpdated, onBadgeDeleted: wix_members_1.onBadgeDeleted },
+    wixStores: { onCollectionCreated: wix_stores_1.onCollectionCreated, onCollectionUpdated: wix_stores_1.onCollectionUpdated, onCollectionDeleted: wix_stores_1.onCollectionDeleted, onProductCreated: wix_stores_1.onProductCreated, onProductUpdated: wix_stores_1.onProductUpdated, onProductDeleted: wix_stores_1.onProductDeleted }
 };
 exports.SyncWixApps = SyncWixApps;
 exports.default = {
