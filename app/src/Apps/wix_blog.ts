@@ -297,7 +297,7 @@ async function getBlogCategoryData(categoryId: string): Promise<Document> {
         }
 
         const blogCategory = await wixData.get("Blog/Categories", categoryId, { suppressAuth: true, consistentRead: true });
-        const readyBlogCategory = { ...blogCategory, entityId: categoryId };
+        const readyBlogCategory = { ...blogCategory, entityId: blogCategory._id };
         delete readyBlogCategory._id;
         return readyBlogCategory;
     } catch (err) {
