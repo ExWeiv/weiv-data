@@ -2217,6 +2217,11 @@ declare module '@exweiv/weiv-data' {
      * 
      * In case of an error you can find logs in `WeivDataWixAppsSyncLogs` database in your MongoDB cluster. In this database you will have multiple collections to collect logs about each individual application.
      * You can find error logs and it's details there. Plugin only save unexpected error logs not any other logs.
+     * 
+     * **Note:**
+     * _id fields are automatically generated and they are ObjectId, instead of _id fields you can use entityId field which will be the equivalent of actual item _id.
+     * 
+     * Basically if you want to find a member by it's _id then use entityId field not _id field.
      */
     namespace SyncWixApps {
         interface wixMembers {
