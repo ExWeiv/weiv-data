@@ -2175,6 +2175,21 @@ declare module '@exweiv/weiv-data' {
              * ```
              */
             "00024": "Wix Application Sync Error"
+
+            /**
+             * @description
+             * 
+             * Another common WixSync plug-in error, this means that event object is undefined and due to this sync function can't work. Make sure you pass the event object that's exported from the native Wix event hook.
+             */
+            "00025": "Wix Application Sync Error - Event data not found, don't forget to pass the event object from the Wix event function"
+
+            /**
+             * @description
+             * 
+             * This is also another error from WixSync plug-in it means that you didn't configure the database name you want to use for your sync operations.
+             * The selected database name will be used when saving/deleting the Wix applications data.
+             */
+            "00026": "You didn't configure any database name to sync Wix apps data!"
         }
     }
 
@@ -2244,10 +2259,56 @@ declare module '@exweiv/weiv-data' {
             onCollectionDeleted(event: any): Promise<void>;
         }
 
+        interface wixEcom {
+            onOrderCreated(event: any): Promise<void>;
+            onOrderUpdated(event: any): Promise<void>;
+
+            onAbandonedCheckoutCreated(event: any): Promise<void>;
+            onAbandonedCheckoutRecovered(event: any): Promise<void>;
+        }
+
+        interface wixMarketing {
+            onCouponCreated(event: any): Promise<void>;
+            onCouponUpdated(event: any): Promise<void>;
+            onCouponDeleted(event: any): Promise<void>;
+        }
+
+        interface wixPricingPlans {
+            onPlanCreated(event: any): Promise<void>;
+            onPlanUpdated(event: any): Promise<void>;
+            onPlanArchived(event: any, deletePlan?: boolean): Promise<void>;
+        }
+
+        interface wixBlog {
+            onPostCreated(event: any): Promise<void>;
+            onPostUpdated(event: any): Promise<void>;
+            onPostDeleted(event: any): Promise<void>;
+
+            onCategoryCreated(event: any): Promise<void>;
+            onCategoryUpdated(event: any): Promise<void>;
+            onCategoryDeleted(event: any): Promise<void>;
+
+            onTagCreated(event: any): Promise<void>;
+            onTagUpdated(event: any): Promise<void>;
+            onTagDeleted(event: any): Promise<void>;
+        }
+
         /**@internal */
         const wixMembers: wixMembers;
 
         /**@internal */
         const wixStores: wixStores;
+
+        /**@internal */
+        const wixEcom: wixEcom;
+
+        /**@internal */
+        const wixMarketing: wixMarketing;
+
+        /**@internal */
+        const wixPricingPlans: wixPricingPlans;
+
+        /**@internal */
+        const wixBlog: wixBlog;
     }
 }

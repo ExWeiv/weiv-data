@@ -4,10 +4,11 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
-### 4.6.0
+### 4.7.0
 
-- New Wix apps added to Sync plug-in including: Wix Stores, Wix eCommerce, Wix Marketing, Wix Paid Plans, Wix Blog, Wix Forum. Now you can sync all data from these apps easily.
+- New Wix apps added to Sync plug-in including: Wix Stores, Wix eCommerce, Wix Marketing, Wix Pricing Plans, Wix Blog. Now you can sync all data from these apps easily.
 - Wix Members now also has functions for badges collection.
+- Some BUG Fixes for sync plugins
 
 ### 4.5.1, 4.5.2
 
