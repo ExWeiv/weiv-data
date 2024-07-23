@@ -1,6 +1,6 @@
 import { ObjectId, Db, Collection } from 'mongodb/mongodb';
 import { getPipeline } from '../../Helpers/query_referenced_helpers';
-import type { CollectionID, WeivDataOptions, WeivDataQueryReferencedResult, WeivDataQueryReferencedOptions } from '@exweiv/weiv-data';
+import type { CollectionID, WeivDataOptions, WeivDataQueryReferencedResult, WeivDataQueryReferencedOptions, Item } from '@exweiv/weiv-data';
 import { connectionHandler } from '../../Helpers/connection_helpers';
 import { kaptanLogar } from '../../Errors/error_manager';
 import { recursivelyConvertIds } from '../../Helpers/internal_id_converter';
@@ -33,7 +33,7 @@ export class QueryReferencedResult {
         this.order = queryOptions.order || 'asc';
     }
 
-    async getResult(): Promise<WeivDataQueryReferencedResult> {
+    async getResult(): Promise<WeivDataQueryReferencedResult<Item>> {
         try {
             const { suppressAuth, readConcern, convertIds } = this.options;
             await this._handleConnection_(suppressAuth);

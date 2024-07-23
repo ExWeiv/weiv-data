@@ -158,7 +158,7 @@ export class QueryResult extends Query {
         }
     }
 
-    async distnict(propertyName: string, options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult> {
+    async distinct(propertyName: string, options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult<Item>> {
         try {
             if (!propertyName || typeof propertyName !== "string") {
                 kaptanLogar("00001", `propertyName is not string or not a valid value!`);
@@ -172,7 +172,12 @@ export class QueryResult extends Query {
 
             // Create distnict aggregate pipeline with filters only
             const pipeline: PipelineStage[] = [];
-            pipeline.push(this._filters);
+
+            // Apply filters only if exists
+            if (Object.keys(this._filters.$match).length > 0) {
+                pipeline.push(this._filters);
+            }
+
             pipeline.push({ $group: { _id: `$${propertyName}` } });
             pipeline.push({ $project: { distnict: "$_id", _id: 0 } });
 
@@ -195,11 +200,11 @@ export class QueryResult extends Query {
                 hasPrev: () => this.__hasPrev__(),
                 next: async () => {
                     this._currentPage++;
-                    return this.distnict(propertyName, options);
+                    return this.distinct(propertyName, options);
                 },
                 prev: async () => {
                     this._currentPage--;
-                    return this.distnict(propertyName, options);
+                    return this.distinct(propertyName, options);
                 },
                 _filters: this._filters,
                 _pipeline: pipeline
@@ -209,7 +214,7 @@ export class QueryResult extends Query {
         }
     }
 
-    async find(options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult> {
+    async find(options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult<Item>> {
         try {
             // Clear prototype pollution
             options = copyOwnPropsOnly(options || {});

@@ -4,6 +4,13 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.8.0
+
+- Better type support added for many functions with optional type parameters. Now optionally you can use TS generics to generate dynamically generated types for many functions but not for all.
+- Now all _id fields are automatically converted into ObjectId type including sub documents, arrays etc. Any _id field with valid ObjectId string will be converted into ObjectId type when passing to MongoDB driver.
+- Planning of better TS type support and schema validation feature started. We will add schema validation feature with the future updates.
+- Some BUG Fixes
+
 ### 4.7.1
 
 - Examples included in documentation.

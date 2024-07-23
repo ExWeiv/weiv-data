@@ -9,7 +9,7 @@ import { convertToStringId } from '../Helpers/internal_id_converter';
 import { ObjectId } from 'mongodb';
 import { convertIdToObjectId } from './id_converters';
 
-export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], options?: WeivDataOptionsOwner): Promise<BulkRemoveResult> {
+export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], options?: WeivDataOptionsOwner): Promise<BulkRemoveResult<ItemID>> {
     try {
         const { safeItemIds, safeOptions } = await validateParams<"bulkRemove">(
             { collectionId, itemIds, options },

@@ -9,7 +9,7 @@ import { kaptanLogar } from '../Errors/error_manager';
 import { convertDocumentIDs } from '../Helpers/internal_id_converter';
 import { convertIdToObjectId } from './id_converters';
 
-export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWriteOwner): Promise<SaveResult> {
+export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWriteOwner): Promise<SaveResult<Item>> {
     try {
         // Validate Params
         const { safeOptions, safeItem } = await validateParams<"save">({ collectionId, item, options }, ["collectionId", "item"], "save");

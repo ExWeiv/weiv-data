@@ -1,9 +1,9 @@
-import type { CollectionID, ItemID, WeivDataOptions, WeivDataQueryReferencedOptions, WeivDataQueryReferencedResult } from '@exweiv/weiv-data';
+import type { CollectionID, Item, ItemID, WeivDataOptions, WeivDataQueryReferencedOptions, WeivDataQueryReferencedResult } from '@exweiv/weiv-data';
 import { QueryReferencedResult } from './query_referenced_result';
 import { validateParams } from '../../Helpers/validator';
 import { kaptanLogar } from '../../Errors/error_manager';
 
-export async function queryReferenced(collectionId: CollectionID, targetCollectionId: string, itemId: ItemID, propertyName: string, queryOptions?: WeivDataQueryReferencedOptions, options?: WeivDataOptions): Promise<WeivDataQueryReferencedResult> {
+export async function queryReferenced(collectionId: CollectionID, targetCollectionId: string, itemId: ItemID, propertyName: string, queryOptions?: WeivDataQueryReferencedOptions, options?: WeivDataOptions): Promise<WeivDataQueryReferencedResult<Item>> {
     try {
         const { safeItemId, safeQueryOptions, safeOptions } = await validateParams<"queryReferenced">(
             { collectionId, targetCollectionId, itemId, propertyName, queryOptions, options },

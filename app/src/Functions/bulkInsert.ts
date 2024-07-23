@@ -8,7 +8,7 @@ import { validateParams } from '../Helpers/validator';
 import { kaptanLogar } from '../Errors/error_manager';
 import { convertToStringId, recursivelyConvertIds } from '../Helpers/internal_id_converter';
 
-export async function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWrite): Promise<BulkInsertResult> {
+export async function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWrite): Promise<BulkInsertResult<Item>> {
     try {
         const { safeItems, safeOptions } = await validateParams<"bulkInsert">(
             { collectionId, items, options },
