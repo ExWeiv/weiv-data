@@ -21,14 +21,14 @@ export class WeivDataFilter {
     }
 
     private memoizedBetween!: Function;
-    between(propertyName: string, rangeStart: any, rangeEnd: any): WeivDataFilter {
+    between(propertyName: string, rangeStart: any, rangeEnd: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || typeof propertyName !== "string" || !rangeStart || !rangeEnd) {
             kaptanLogar("00020", `propertyName, rangeStart and rangeEnd must have valid values to work with between method!`);
         }
 
         if (!this.memoizedBetween) {
             this.memoizedBetween = memoize((propertyName, rangeStart, rangeEnd) => {
-                if (propertyName === "_id") {
+                if (propertyName === "_id" || convertIds) {
                     return this.addFilter(propertyName, {
                         $gte: convertIdToObjectId(rangeStart),
                         $lte: convertIdToObjectId(rangeEnd),
@@ -85,14 +85,14 @@ export class WeivDataFilter {
     }
 
     private memoizedEq!: Function;
-    eq(propertyName: string, value: any): WeivDataFilter {
+    eq(propertyName: string, value: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || value === undefined || typeof propertyName !== "string") {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with eq method!`);
         }
 
         if (!this.memoizedEq) {
             this.memoizedEq = memoize((propertyName, value) => {
-                if (propertyName === "_id") {
+                if (propertyName === "_id" || convertIds) {
                     return this.addFilter(propertyName, {
                         $eq: convertIdToObjectId(value),
                     });
@@ -141,14 +141,14 @@ export class WeivDataFilter {
     }
 
     private memoizedHasAll!: Function;
-    hasAll(propertyName: string, value: any): WeivDataFilter {
+    hasAll(propertyName: string, value: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with hasAll method!`);
         }
 
         if (!Array.isArray(value)) { value = [value]; }
 
-        if (propertyName === "_id") {
+        if (propertyName === "_id" || convertIds) {
             let values = [];
             for (const v of value) {
                 values.push(convertIdToObjectId(v));
@@ -172,14 +172,14 @@ export class WeivDataFilter {
     }
 
     private memoizedHasSome!: Function;
-    hasSome(propertyName: string, value: any): WeivDataFilter {
+    hasSome(propertyName: string, value: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with hasSome method!`);
         }
 
         if (!Array.isArray(value)) { value = [value]; }
 
-        if (propertyName === "_id") {
+        if (propertyName === "_id" || convertIds) {
             let values = [];
             for (const v of value) {
                 values.push(convertIdToObjectId(v));
@@ -267,14 +267,14 @@ export class WeivDataFilter {
     }
 
     private memoizedNe!: Function;
-    ne(propertyName: string, value: any): WeivDataFilter {
+    ne(propertyName: string, value: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || value === undefined || typeof propertyName !== "string") {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with ne method!`);
         }
 
         if (!this.memoizedNe) {
             this.memoizedNe = memoize((propertyName, value) => {
-                if (propertyName === "_id") {
+                if (propertyName === "_id" || convertIds) {
                     return this.addFilter(propertyName, {
                         $ne: convertIdToObjectId(value),
                     });

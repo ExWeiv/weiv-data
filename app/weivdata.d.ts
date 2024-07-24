@@ -520,9 +520,10 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The property whose value will be compared with `rangeStart` and `rangeEnd`.
          * @param rangeStart The beginning value of the range to match against.
          * @param rangeEnd The ending value of the range to match against.
+         * @param convertIds When enabled passed value will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        between<K extends Internal.CItemKeys<CItem>>(propertyName: K, rangeStart: CItem[K], rangeEnd: CItem[K]): WeivDataFilter<CItem>;
+        between<K extends Internal.CItemKeys<CItem>>(propertyName: K, rangeStart: CItem[K], rangeEnd: CItem[K], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -550,9 +551,10 @@ declare module '@exweiv/weiv-data' {
          * 
          * @param propertyName The property whose value will be compared with `value`.
          * @param value The value to match against.
+         * @param convertIds When enabled passed value will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        eq<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataFilter<CItem>;
+        eq<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -580,9 +582,10 @@ declare module '@exweiv/weiv-data' {
          * 
          * @param propertyName The property whose value will be compared with `value`.
          * @param value The values to match against.
+         * @param convertIds When enabled passed values will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        hasAll<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K][]): WeivDataFilter<CItem>;
+        hasAll<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K][], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -590,9 +593,10 @@ declare module '@exweiv/weiv-data' {
          * 
          * @param propertyName The property whose value will be compared with `value`.
          * @param value The values to match against.
+         * @param convertIds When enabled passed values will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        hasSome<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K][]): WeivDataFilter<CItem>;
+        hasSome<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K][], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -638,9 +642,10 @@ declare module '@exweiv/weiv-data' {
          * 
          * @param propertyName The property whose value will be compared with `value`.
          * @param value The value to match against.
+         * @param convertIds When enabled passed value will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        ne<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataFilter<CItem>;
+        ne<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
