@@ -4,7 +4,7 @@ exports.convertDocumentIDs = convertDocumentIDs;
 exports.recursivelyConvertIds = recursivelyConvertIds;
 exports.convertToStringId = convertToStringId;
 const mongodb_1 = require("mongodb");
-function convertDocumentIDs(doc, returnType = "String") {
+function convertDocumentIDs(doc, returnType = 'String') {
     if (Array.isArray(doc)) {
         for (let i = 0; i < doc.length; i++) {
             convertDocumentIDs(doc[i], returnType);
@@ -29,8 +29,8 @@ function convertDocumentIDs(doc, returnType = "String") {
     }
     return doc;
 }
-function recursivelyConvertIds(docs) {
-    docs.forEach(doc => convertDocumentIDs(doc));
+function recursivelyConvertIds(docs, returnType = 'String') {
+    docs.forEach(doc => convertDocumentIDs(doc, returnType));
     return docs;
 }
 function convertToStringId(id, encoding) {

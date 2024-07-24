@@ -9,7 +9,7 @@ import { kaptanLogar } from '../Errors/error_manager';
 import { recursivelyConvertIds } from '../Helpers/internal_id_converter';
 import { convertIdToObjectId } from './id_converters';
 
-export async function bulkUpdate(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsOwner): Promise<BulkUpdateResult> {
+export async function bulkUpdate(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsOwner): Promise<BulkUpdateResult<Item>> {
     try {
         const { safeItems, safeOptions } = await validateParams<"bulkUpdate">(
             { collectionId, items, options },

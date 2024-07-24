@@ -4,6 +4,7 @@ exports.WeivDataFilter = void 0;
 const lodash_1 = require("lodash");
 const validator_1 = require("../Helpers/validator");
 const error_manager_1 = require("../Errors/error_manager");
+const id_converters_1 = require("../Functions/id_converters");
 class WeivDataFilter {
     constructor() {
         this.filters = {};
@@ -18,12 +19,18 @@ class WeivDataFilter {
         this.filters["$and"].push((0, validator_1.copyOwnPropsOnly)(query.filters));
         return this;
     }
-    between(propertyName, rangeStart, rangeEnd) {
+    between(propertyName, rangeStart, rangeEnd, convertIds) {
         if (!propertyName || typeof propertyName !== "string" || !rangeStart || !rangeEnd) {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName, rangeStart and rangeEnd must have valid values to work with between method!`);
         }
         if (!this.memoizedBetween) {
             this.memoizedBetween = (0, lodash_1.memoize)((propertyName, rangeStart, rangeEnd) => {
+                if (propertyName === "_id" || convertIds) {
+                    return this.addFilter(propertyName, {
+                        $gte: (0, id_converters_1.convertIdToObjectId)(rangeStart),
+                        $lte: (0, id_converters_1.convertIdToObjectId)(rangeEnd),
+                    });
+                }
                 return this.addFilter(propertyName, {
                     $gte: rangeStart,
                     $lte: rangeEnd,
@@ -63,12 +70,17 @@ class WeivDataFilter {
         this.memoizedEndsWith(propertyName, string);
         return this;
     }
-    eq(propertyName, value) {
+    eq(propertyName, value, convertIds) {
         if (!propertyName || value === undefined || typeof propertyName !== "string") {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName and value parameter must be valid to work with eq method!`);
         }
         if (!this.memoizedEq) {
             this.memoizedEq = (0, lodash_1.memoize)((propertyName, value) => {
+                if (propertyName === "_id" || convertIds) {
+                    return this.addFilter(propertyName, {
+                        $eq: (0, id_converters_1.convertIdToObjectId)(value),
+                    });
+                }
                 return this.addFilter(propertyName, {
                     $eq: value,
                 });
@@ -101,32 +113,58 @@ class WeivDataFilter {
         this.memoizedGt(propertyName, value);
         return this;
     }
-    hasAll(propertyName, value) {
+    hasAll(propertyName, value, convertIds) {
         if (!propertyName || !value || typeof propertyName !== "string") {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName and value parameter must be valid to work with hasAll method!`);
         }
         if (!Array.isArray(value)) {
             value = [value];
         }
-        if (!this.memoizedHasAll) {
-            this.memoizedHasAll = (0, lodash_1.memoize)((propertyName, value) => {
-                return this.addFilter(propertyName, { $all: value });
-            });
+        if (propertyName === "_id" || convertIds) {
+            let values = [];
+            for (const v of value) {
+                values.push((0, id_converters_1.convertIdToObjectId)(v));
+            }
+            if (!this.memoizedHasAll) {
+                this.memoizedHasAll = (0, lodash_1.memoize)((propertyName, values) => {
+                    return this.addFilter(propertyName, { $all: values });
+                });
+            }
+        }
+        else {
+            if (!this.memoizedHasAll) {
+                this.memoizedHasAll = (0, lodash_1.memoize)((propertyName, value) => {
+                    return this.addFilter(propertyName, { $all: value });
+                });
+            }
         }
         this.memoizedHasAll(propertyName, value);
         return this;
     }
-    hasSome(propertyName, value) {
+    hasSome(propertyName, value, convertIds) {
         if (!propertyName || !value || typeof propertyName !== "string") {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName and value parameter must be valid to work with hasSome method!`);
         }
         if (!Array.isArray(value)) {
             value = [value];
         }
-        if (!this.memoizedHasSome) {
-            this.memoizedHasSome = (0, lodash_1.memoize)((propertyName, value) => {
-                return this.addFilter(propertyName, { $in: value });
-            });
+        if (propertyName === "_id" || convertIds) {
+            let values = [];
+            for (const v of value) {
+                values.push((0, id_converters_1.convertIdToObjectId)(v));
+            }
+            if (!this.memoizedHasSome) {
+                this.memoizedHasSome = (0, lodash_1.memoize)((propertyName, values) => {
+                    return this.addFilter(propertyName, { $in: values });
+                });
+            }
+        }
+        else {
+            if (!this.memoizedHasSome) {
+                this.memoizedHasSome = (0, lodash_1.memoize)((propertyName, value) => {
+                    return this.addFilter(propertyName, { $in: value });
+                });
+            }
         }
         this.memoizedHasSome(propertyName, value);
         return this;
@@ -179,12 +217,17 @@ class WeivDataFilter {
         this.memoizedLt(propertyName, value);
         return this;
     }
-    ne(propertyName, value) {
+    ne(propertyName, value, convertIds) {
         if (!propertyName || value === undefined || typeof propertyName !== "string") {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName and value parameter must be valid to work with ne method!`);
         }
         if (!this.memoizedNe) {
             this.memoizedNe = (0, lodash_1.memoize)((propertyName, value) => {
+                if (propertyName === "_id" || convertIds) {
+                    return this.addFilter(propertyName, {
+                        $ne: (0, id_converters_1.convertIdToObjectId)(value),
+                    });
+                }
                 return this.addFilter(propertyName, { $ne: value });
             });
         }

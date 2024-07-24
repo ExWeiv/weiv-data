@@ -2,11 +2,15 @@
  * WeivData is a package that's built top of native MongoDB NodeJS driver. This package provides similar/same APIs with wix-data to make it easier for Velo developers to find an external DB solution.
  */
 declare module '@exweiv/weiv-data' {
+    /**@internal */
+    import { Collection, CollectionInfo, CreateCollectionOptions, Document, ListCollectionsOptions, MongoClientOptions, ObjectId, RenameOptions } from 'mongodb';
+    import { Options } from 'node-cache';
+
     /**
      * @description
      * An object to define some options when including other relational fields.
      */
-    type IncludeObject = {
+    interface IncludeObject {
         /**
          * @description
          * Collection of referenced item/s (only collection name)
@@ -98,7 +102,7 @@ declare module '@exweiv/weiv-data' {
     /**
      * Items are basically objects. Most of the time they include an _id field.
      */
-    type Item = { [key: string]: any };
+    interface Item { [key: string]: any }
 
     /**
      * @description
@@ -109,7 +113,7 @@ declare module '@exweiv/weiv-data' {
     /**
      * An object that you pass as the `options` parameter that modifies how an operation is performed.
      */
-    type WeivDataOptions = {
+    interface WeivDataOptions {
         /**
          * @description
          * An option to bypass permissions and perform operations in admin level.
@@ -140,7 +144,7 @@ declare module '@exweiv/weiv-data' {
      * @description
      * An object that you pass as the `options` parameter that modifies how an operation is performed. Unlike `WeivDataOptions` this type has cache control over the action.
      */
-    type WeivDataOptionsCache = {
+    interface WeivDataOptionsCache extends WeivDataOptions {
         /**
          * @description
          * Enable or disable the cache for the current function.
@@ -153,13 +157,13 @@ declare module '@exweiv/weiv-data' {
          * (Anything above 6 min won't work since Wix website containers don't live longer than 6min)
          */
         cacheTimeout?: number
-    } & WeivDataOptions;
+    }
 
     /**
      * @description
      * WeivData options only for some write functions like insert. Where you can insert new data into collection.
      */
-    type WeivDataOptionsWrite = {
+    interface WeivDataOptionsWrite extends WeivDataOptions {
         /**
          * @description
          * An option to use visitorId. This option will try to get the id of current user on the site.
@@ -170,38 +174,45 @@ declare module '@exweiv/weiv-data' {
          * > For members you don't need this option to be true, weivData always knows the member ids.
          **/
         enableVisitorId?: boolean,
-    } & WeivDataOptions;
+    }
 
     /**
      * @description
      * WeivData options only for query function.
      */
-    type WeivDataOptionsQuery = {
+    interface WeivDataOptionsQuery extends WeivDataOptions {
         /**
          * @description
          * By default this is true and you can disable it if you want, when it's disabled (false) we won't fetch the total count of the items.
          */
         omitTotalCount?: boolean
-    } & WeivDataOptions;
+    }
 
     /**
      * @description
      * WeivData options where onlyOwner is possible.
      */
-    type WeivDataOptionsOwner = {
+    interface WeivDataOptionsOwner extends WeivDataOptions {
         /**
          * @description
          * When sert to true WeivData will add another filter and check if _owner field of the item matches with current member id.
          * This will make it possible to take action only if current member is the owner of the data.
          */
         onlyOwner?: boolean
-    } & WeivDataOptions;
+    }
 
     /**
      * @description
      * WeivData options where onlyOwner is possible with enableVisitorId.
      */
-    type WeivDataOptionsWriteOwner = WeivDataOptionsOwner & WeivDataOptionsWrite;
+    interface WeivDataOptionsWriteOwner extends WeivDataOptionsWrite {
+        /**
+         * @description
+         * When sert to true WeivData will add another filter and check if _owner field of the item matches with current member id.
+         * This will make it possible to take action only if current member is the owner of the data.
+         */
+        onlyOwner?: boolean
+    }
 
     /**
      * @description
@@ -232,6 +243,41 @@ declare module '@exweiv/weiv-data' {
      */
     type PipelineStage = { [K in PipelineStageKey]?: any };
 
+    // HELPER TYPES FOR STRONG TYPE SAFETY
+    // HELPER TYPES FOR STRONG TYPE SAFETY
+    // HELPER TYPES FOR STRONG TYPE SAFETY
+    // HELPER TYPES FOR STRONG TYPE SAFETY
+    // HELPER TYPES FOR STRONG TYPE SAFETY
+
+    /**@internal */
+    namespace Internal {
+        /**@internal */
+        type GroupedID<T> = { [K in keyof T]: T[K] };
+
+        /**@internal */
+        type UpdatedCItemWithGroupedID<RCItem, GroupedFields extends keyof RCItem, CItem> = Omit<RCItem, '_id' | GroupedFields> & {
+            _id: GroupedID<Pick<RCItem, GroupedFields>>;
+        } & CItem;
+
+        /**@internal */
+        type UpdateCItem<C, K extends string, V> = C & { [P in K]: V };
+
+        /**@internal */
+        type CItemKeys<T> = Extract<keyof T, string>;
+
+        /**@internal */
+        type ProjectedName<P, K extends string, S extends string> = P extends undefined ? `${K}${S}` : P;
+
+        /**@internal */
+        type UpdateCItemIDToNull<C> = C extends { _id: string | ObjectId | undefined } ? { _id: null; } & Omit<C, "_id"> : C;
+    }
+
+    // STARTING OF THE ACTUAL FUNCTIONS
+    // STARTING OF THE ACTUAL FUNCTIONS
+    // STARTING OF THE ACTUAL FUNCTIONS
+    // STARTING OF THE ACTUAL FUNCTIONS
+    // STARTING OF THE ACTUAL FUNCTIONS
+
     /**
      * @description
      * Creates an aggregation.
@@ -239,7 +285,7 @@ declare module '@exweiv/weiv-data' {
      * @param collectionId The ID of the collection to run the aggregation on.
      * @returns An aggregation cursor.
      */
-    function aggregate(collectionId: CollectionID): WeivDataAggregate;
+    function aggregate<CItem = Item>(collectionId: CollectionID): WeivDataAggregate<CItem, CItem>;
 
     /**
      * @description
@@ -263,7 +309,7 @@ declare module '@exweiv/weiv-data' {
      * const result = await weivData.aggreagte('ExWeiv/Istanbul').avg('cpuScore').run();
      * console.log(result);
      */
-    interface WeivDataAggregate {
+    interface WeivDataAggregate<CItem, ReservedCItem> {
         /**
          * @description
          * Adds a sort to an aggregation, sorting by the items or groups by the specified properties in ascending order.
@@ -271,7 +317,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The properties used in the sort.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        ascending(propertyName: string): WeivDataAggregate;
+        ascending(propertyName: Internal.CItemKeys<CItem>): WeivDataAggregate<CItem, ReservedCItem>;
 
         /**
          * @description
@@ -281,7 +327,12 @@ declare module '@exweiv/weiv-data' {
          * @param projectedName The name of the property in the aggregation results containing the average value.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        avg(propertyName: string, projectedName?: string): WeivDataAggregate;
+        avg<K extends Internal.CItemKeys<CItem>, P extends undefined | string = undefined>(propertyName: K, projectedName?: P): WeivDataAggregate<
+            Pick<
+                Internal.UpdateCItem<Internal.UpdateCItemIDToNull<CItem>, Internal.ProjectedName<P, K, "Avg">, number>,
+                '_id' extends keyof Internal.UpdateCItemIDToNull<CItem> ? "_id" | Internal.ProjectedName<P, K, "Avg"> : Internal.ProjectedName<P, K, "Avg">
+            >, ReservedCItem
+        >;
 
         /**
          * @description
@@ -289,7 +340,7 @@ declare module '@exweiv/weiv-data' {
          * 
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        count(): WeivDataAggregate;
+        count(): WeivDataAggregate<Internal.UpdateCItem<CItem, "count", number>, ReservedCItem>;
 
         /**
          * @description
@@ -298,7 +349,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The properties used in the sort.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        descending(propertyName: string): WeivDataAggregate;
+        descending(propertyName: Internal.CItemKeys<CItem>): WeivDataAggregate<CItem, ReservedCItem>;
 
         /**
          * @description
@@ -307,7 +358,7 @@ declare module '@exweiv/weiv-data' {
          * @param filter The filter to use to filter out items from being used in the aggregation.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        filter(filter: WeivDataFilter): WeivDataAggregate;
+        filter(filter: WeivDataFilter<Internal.CItemKeys<CItem>>): WeivDataAggregate<CItem, ReservedCItem>;
 
         /**
          * @description
@@ -316,7 +367,10 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The property or properties to group on.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        group(...propertyName: string[]): WeivDataAggregate;
+        group<K extends Internal.CItemKeys<ReservedCItem>>(...propertyName: K[]): WeivDataAggregate<
+            Internal.UpdatedCItemWithGroupedID<ReservedCItem, K, CItem>,
+            ReservedCItem
+        >;
 
         /**
          * @description
@@ -325,7 +379,7 @@ declare module '@exweiv/weiv-data' {
          * @param limit The number of items or groups to return.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        limit(limit: number): WeivDataAggregate;
+        limit(limit: number): WeivDataAggregate<CItem, ReservedCItem>;
 
         /**
          * @description
@@ -335,7 +389,13 @@ declare module '@exweiv/weiv-data' {
          * @param projectedName The name of the property in the aggregation results containing the maximum value.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        max(propertyName: string, projectedName?: string): WeivDataAggregate;
+        max<K extends Internal.CItemKeys<CItem>, P extends string | undefined = undefined>(propertyName: K, projectedName?: P): WeivDataAggregate<
+            Pick<
+                Internal.UpdateCItem<Internal.UpdateCItemIDToNull<CItem>, Internal.ProjectedName<P, K, "Max">, number>,
+                '_id' extends keyof Internal.UpdateCItemIDToNull<CItem> ? "_id" | Internal.ProjectedName<P, K, "Max"> : Internal.ProjectedName<P, K, "Max">
+            >,
+            ReservedCItem
+        >;
 
         /**
          * @description
@@ -345,7 +405,13 @@ declare module '@exweiv/weiv-data' {
          * @param projectedName The name of the property in the aggregation results containing the minimum value.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        min(propertyName: string, projectedName?: string): WeivDataAggregate;
+        min<K extends Internal.CItemKeys<CItem>, P extends string | undefined = undefined>(propertyName: K, projectedName?: P): WeivDataAggregate<
+            Pick<
+                Internal.UpdateCItem<Internal.UpdateCItemIDToNull<CItem>, Internal.ProjectedName<P, K, "Min">, number>,
+                '_id' extends keyof Internal.UpdateCItemIDToNull<CItem> ? "_id" | Internal.ProjectedName<P, K, "Min"> : Internal.ProjectedName<P, K, "Min">
+            >,
+            ReservedCItem
+        >;
 
         /**
          * @description
@@ -354,7 +420,7 @@ declare module '@exweiv/weiv-data' {
          * @param options Options to use when running an aggregation.
          * @returns Fulfilled - A Promise that resolves to the results of the aggregation. Rejected - Error that caused the aggregation to fail.
          */
-        run(options?: WeivDataAggregateRunOptions): Promise<WeivDataAggregateResult>;
+        run(options?: WeivDataAggregateRunOptions): Promise<WeivDataAggregateResult<CItem>>;
 
         /**
          * @description
@@ -363,7 +429,7 @@ declare module '@exweiv/weiv-data' {
          * @param skip The number of items or groups to skip in the aggregation results before returning the results.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        skip(skip: number): WeivDataAggregate;
+        skip(skip: number): WeivDataAggregate<CItem, ReservedCItem>;
 
         /**
          * @description
@@ -373,7 +439,13 @@ declare module '@exweiv/weiv-data' {
          * @param projectedName The name of the property in the aggregation results containing the sum.
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        sum(propertyName: string, projectedName?: string): WeivDataAggregate;
+        sum<K extends Internal.CItemKeys<CItem>, P extends string | undefined = undefined>(propertyName: K, projectedName?: P): WeivDataAggregate<
+            Pick<
+                Internal.UpdateCItem<Internal.UpdateCItemIDToNull<CItem>, Internal.ProjectedName<P, K, "Sum">, number>,
+                '_id' extends keyof Internal.UpdateCItemIDToNull<CItem> ? "_id" | Internal.ProjectedName<P, K, "Sum"> : Internal.ProjectedName<P, K, "Sum">
+            >,
+            ReservedCItem
+        >;
 
         /**
          * @description
@@ -382,15 +454,15 @@ declare module '@exweiv/weiv-data' {
          * @param pipelineStage 
          * @returns A `WeivDataAggregate` cursor representing the refined aggregation.
          */
-        stage(...stage: PipelineStage[]): WeivDataAggregate;
+        stage<NewCItem = {}>(...stage: PipelineStage[]): WeivDataAggregate<NewCItem & CItem, ReservedCItem>;
     }
 
-    interface WeivDataAggregateResult {
+    interface WeivDataAggregateResult<CItem> {
         /**
          * @description
          * Gets the aggregated values.
          */
-        readonly items: Item[];
+        readonly items: CItem[];
 
         /**
          * @description
@@ -408,13 +480,13 @@ declare module '@exweiv/weiv-data' {
          * @description
          * Retrieves the next page of aggregate results.
          */
-        next(): Promise<WeivDataAggregateResult>;
+        next(): Promise<WeivDataAggregateResult<CItem>>;
 
         /**
          * @description
          * Returns the pipeline created when performing the aggregation.
          */
-        readonly pipeline: import('mongodb/mongodb').Document[];
+        readonly pipeline: Document;
     }
 
     type WeivDataAggregateRunOptions = {
@@ -429,9 +501,9 @@ declare module '@exweiv/weiv-data' {
      * 
      * @returns A filter object.
      */
-    function filter(): WeivDataFilter;
+    function filter<CItem = Item>(): WeivDataFilter<CItem>;
 
-    interface WeivDataFilter {
+    interface WeivDataFilter<CItem> {
         /**
          * @description
          * Adds an and condition to the query or filter.
@@ -439,7 +511,7 @@ declare module '@exweiv/weiv-data' {
          * @param query A query to add to the initial query as an and condition.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        and(query: WeivDataFilter): WeivDataFilter;
+        and(query: WeivDataFilter<Internal.CItemKeys<CItem>>): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -448,9 +520,10 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The property whose value will be compared with `rangeStart` and `rangeEnd`.
          * @param rangeStart The beginning value of the range to match against.
          * @param rangeEnd The ending value of the range to match against.
+         * @param convertIds When enabled passed value will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        between(propertyName: string, rangeStart: any, rangeEnd: any): WeivDataFilter;
+        between<K extends Internal.CItemKeys<CItem>>(propertyName: K, rangeStart: CItem[K], rangeEnd: CItem[K], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -460,7 +533,7 @@ declare module '@exweiv/weiv-data' {
          * @param string The string to look for inside the specified property value.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        contains(propertyName: string, string: string): WeivDataFilter;
+        contains(propertyName: Internal.CItemKeys<CItem>, string: string): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -470,7 +543,7 @@ declare module '@exweiv/weiv-data' {
          * @param string The string to look for at the end of the specified property value.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        endsWith(propertyName: string, string: string): WeivDataFilter;
+        endsWith(propertyName: Internal.CItemKeys<CItem>, string: string): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -478,9 +551,10 @@ declare module '@exweiv/weiv-data' {
          * 
          * @param propertyName The property whose value will be compared with `value`.
          * @param value The value to match against.
+         * @param convertIds When enabled passed value will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        eq(propertyName: string, value: any): WeivDataFilter;
+        eq<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -490,7 +564,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        ge(propertyName: string, value: any): WeivDataFilter;
+        ge<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -500,7 +574,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        gt(propertyName: string, value: any): WeivDataFilter;
+        gt<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -508,9 +582,10 @@ declare module '@exweiv/weiv-data' {
          * 
          * @param propertyName The property whose value will be compared with `value`.
          * @param value The values to match against.
+         * @param convertIds When enabled passed values will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        hasAll(propertyName: string, value: any): WeivDataFilter;
+        hasAll<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K][], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -518,9 +593,10 @@ declare module '@exweiv/weiv-data' {
          * 
          * @param propertyName The property whose value will be compared with `value`.
          * @param value The values to match against.
+         * @param convertIds When enabled passed values will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        hasSome(propertyName: string, value: any): WeivDataFilter;
+        hasSome<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K][], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -529,7 +605,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The the property in which to check for a value.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        isEmpty(propertyName: string): WeivDataFilter;
+        isEmpty(propertyName: Internal.CItemKeys<CItem>): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -538,7 +614,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The property in which to check for a value.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        isNotEmpty(propertyName: string): WeivDataFilter;
+        isNotEmpty(propertyName: Internal.CItemKeys<CItem>): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -548,7 +624,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        le(propertyName: string, value: any): WeivDataFilter;
+        le<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -558,7 +634,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        lt(propertyName: string, value: any): WeivDataFilter;
+        lt<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -566,9 +642,10 @@ declare module '@exweiv/weiv-data' {
          * 
          * @param propertyName The property whose value will be compared with `value`.
          * @param value The value to match against.
+         * @param convertIds When enabled passed value will be converted to ObjectId from string. Defaults to false.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        ne(propertyName: string, value: any): WeivDataFilter;
+        ne<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K], convertIds?: boolean): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -577,7 +654,7 @@ declare module '@exweiv/weiv-data' {
          * @param query A query to add to the initial query as a not condition.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        not(query: WeivDataFilter): WeivDataFilter;
+        not(query: WeivDataFilter<CItem>): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -586,7 +663,7 @@ declare module '@exweiv/weiv-data' {
          * @param query A query to add to the initial query as an `or` condition.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        or(query: WeivDataFilter): WeivDataFilter;
+        or(query: WeivDataFilter<CItem>): WeivDataFilter<CItem>;
 
         /**
          * @description
@@ -596,7 +673,7 @@ declare module '@exweiv/weiv-data' {
          * @param string The string to look for at the beginning of the specified property value.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        startsWith(propertyName: string, string: string): WeivDataFilter;
+        startsWith(propertyName: Internal.CItemKeys<CItem>, string: string): WeivDataFilter<CItem>;
     }
 
     /**
@@ -606,7 +683,7 @@ declare module '@exweiv/weiv-data' {
      * @param collectionId The ID of the collection to run the query on.
      * @returns A query object.
      */
-    function query(collectionId: CollectionID): WeivDataQuery;
+    function query<CItem = Item>(collectionId: CollectionID): WeivDataQuery<CItem>;
 
     /**
      * @description
@@ -621,7 +698,7 @@ declare module '@exweiv/weiv-data' {
      * const result = await weivData.query('ExWeiv/Clusters').eq('location', 'Istanbul').gt('cpuScores', 18000).find();
      * console.log(result);
      */
-    interface WeivDataQuery {
+    interface WeivDataQuery<CItem> {
         /**
          * @description
          * Adds an and condition to the query or filter.
@@ -629,7 +706,7 @@ declare module '@exweiv/weiv-data' {
          * @param query A query to add to the initial query as an and condition.
          * @returns  A `WeivDataFilter` cursor representing the refined filters.
          */
-        and(query: WeivDataQuery): WeivDataQuery;
+        and(query: WeivDataQuery<CItem>): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -640,7 +717,7 @@ declare module '@exweiv/weiv-data' {
          * @param rangeEnd The ending value of the range to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        between(propertyName: string, rangeStart: any, rangeEnd: any): WeivDataQuery;
+        between<K extends Internal.CItemKeys<CItem>>(propertyName: K, rangeStart: CItem[K], rangeEnd: CItem[K]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -650,7 +727,7 @@ declare module '@exweiv/weiv-data' {
          * @param string The string to look for inside the specified property value.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        contains(propertyName: string, string: string): WeivDataQuery;
+        contains(propertyName: Internal.CItemKeys<CItem>, string: string): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -660,7 +737,7 @@ declare module '@exweiv/weiv-data' {
          * @param string The string to look for at the end of the specified property value.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        endsWith(propertyName: string, string: string): WeivDataQuery;
+        endsWith(propertyName: Internal.CItemKeys<CItem>, string: string): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -670,7 +747,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        eq(propertyName: string, value: any): WeivDataQuery;
+        eq<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -680,7 +757,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        ge(propertyName: string, value: any): WeivDataQuery;
+        ge<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -690,7 +767,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        gt(propertyName: string, value: any): WeivDataQuery;
+        gt<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -700,7 +777,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The values to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        hasAll(propertyName: string, value: any): WeivDataQuery;
+        hasAll<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K][]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -710,7 +787,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The values to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        hasSome(propertyName: string, value: any): WeivDataQuery;
+        hasSome<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K][]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -719,7 +796,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The the property in which to check for a value.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        isEmpty(propertyName: string): WeivDataQuery;
+        isEmpty(propertyName: Internal.CItemKeys<CItem>): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -728,7 +805,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The property in which to check for a value.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        isNotEmpty(propertyName: string): WeivDataQuery;
+        isNotEmpty(propertyName: Internal.CItemKeys<CItem>): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -738,7 +815,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        le(propertyName: string, value: any): WeivDataQuery;
+        le<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -748,7 +825,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        lt(propertyName: string, value: any): WeivDataQuery;
+        lt<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -758,7 +835,7 @@ declare module '@exweiv/weiv-data' {
          * @param value The value to match against.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        ne(propertyName: string, value: any): WeivDataQuery;
+        ne<K extends Internal.CItemKeys<CItem>>(propertyName: K, value: CItem[K]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -767,7 +844,7 @@ declare module '@exweiv/weiv-data' {
          * @param query A query to add to the initial query as a not condition.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        not(query: WeivDataQuery): WeivDataQuery;
+        not(query: WeivDataQuery<CItem>): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -776,7 +853,7 @@ declare module '@exweiv/weiv-data' {
          * @param query A query to add to the initial query as an `or` condition.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        or(query: WeivDataQuery): WeivDataQuery;
+        or(query: WeivDataQuery<CItem>): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -786,7 +863,7 @@ declare module '@exweiv/weiv-data' {
          * @param string The string to look for at the beginning of the specified property value.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        startsWith(propertyName: string, string: string): WeivDataQuery;
+        startsWith(propertyName: Internal.CItemKeys<CItem>, string: string): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -795,7 +872,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The properties used in the sort.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        ascending(...propertyName: string[]): WeivDataQuery;
+        ascending(...propertyName: Internal.CItemKeys<CItem>[]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -813,7 +890,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName The properties used in the sort.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        descending(...propertyName: string[]): WeivDataQuery;
+        descending(...propertyName: Internal.CItemKeys<CItem>[]): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -823,7 +900,7 @@ declare module '@exweiv/weiv-data' {
          * @param options An object containing options to use when processing this operation.
          * @returns Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
          */
-        distinct(propertyName: string, options?: WeivDataOptions): Promise<WeivDataQueryResult>;
+        distinct<K extends Internal.CItemKeys<CItem>>(propertyName: K, options?: WeivDataOptions): Promise<WeivDataQueryResult<CItem[K]>>;
 
         /**
          * @description
@@ -832,7 +909,7 @@ declare module '@exweiv/weiv-data' {
          * @param propertyName Properties to return. To return multiple properties, pass properties as additional arguments.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        fields(...propertyName: string[]): WeivDataQuery;
+        fields<K extends Internal.CItemKeys<CItem>>(...propertyName: K[]): WeivDataQuery<Pick<CItem, K>>;
 
         /**
          * @description
@@ -841,7 +918,7 @@ declare module '@exweiv/weiv-data' {
          * @param options An object containing options to use when processing this operation.
          * @returns Fulfilled - A Promise that resolves to the results of the query. Rejected - Error that caused the query to fail.
          */
-        find(options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult>;
+        find(options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult<CItem>>;
 
         /**
          * @description
@@ -850,7 +927,7 @@ declare module '@exweiv/weiv-data' {
          * @param includes Array of objects that you want to include with details
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        include(...includes: IncludeObject[]): WeivDataQuery;
+        include<NewCItem = {}>(...includes: IncludeObject[]): WeivDataQuery<CItem & NewCItem>;
 
         /**
          * @description
@@ -859,7 +936,7 @@ declare module '@exweiv/weiv-data' {
          * @param limit The number of items to return, which is also the `pageSize` of the results object.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        limit(limit: number): WeivDataQuery;
+        limit(limit: number): WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -868,10 +945,10 @@ declare module '@exweiv/weiv-data' {
          * @param skip The number of items to skip in the query results before returning the results.
          * @returns  A `WeivDataQuery` cursor representing the refined filters.
          */
-        skip(skip: number): WeivDataQuery;
+        skip(skip: number): WeivDataQuery<CItem>;
     }
 
-    interface WeivDataQueryResult {
+    interface WeivDataQueryResult<CItem> {
         /**
          * @description
          * Returns the index of the current results page number.
@@ -882,7 +959,7 @@ declare module '@exweiv/weiv-data' {
          * @description
          * Returns the items that match the query.
          */
-        readonly items: Item[];
+        readonly items: CItem[];
 
         /**
          * @description
@@ -939,7 +1016,7 @@ declare module '@exweiv/weiv-data' {
          * 
          * @returns Fulfilled - A query result object with the next page of query results. Rejected - The errors that caused the rejection.
          */
-        next(): Promise<WeivDataQueryResult>;
+        next(): Promise<WeivDataQueryResult<CItem>>;
 
         /**
          * @description
@@ -947,7 +1024,7 @@ declare module '@exweiv/weiv-data' {
          * 
          * @returns Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
          */
-        prev(): Promise<WeivDataQueryResult>;
+        prev(): Promise<WeivDataQueryResult<CItem>>;
     }
 
     /**
@@ -959,9 +1036,9 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The results of the bulk insert. Rejected - The error that caused the rejection.
      */
-    function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWrite): Promise<BulkInsertResult>;
+    function bulkInsert<CItem = Item>(collectionId: CollectionID, items: CItem[], options?: WeivDataOptionsWrite): Promise<BulkInsertResult<CItem>>;
 
-    type BulkInsertResult = {
+    type BulkInsertResult<CItem> = {
         /**
          * @description
          * Total number of inserted items.
@@ -972,13 +1049,13 @@ declare module '@exweiv/weiv-data' {
          * @description
          * Item ids as string objectId
          */
-        insertedItemIds: string[]
+        insertedItemIds: ItemID[]
 
         /**
          * @description
          * Inserted items.
          */
-        insertedItems: Item[]
+        insertedItems: CItem[]
     }
 
     /**
@@ -990,9 +1067,9 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The results of the bulk remove. Rejected - The error that caused the rejection.
      */
-    function bulkRemove(collectionId: CollectionID, itemsIds: ItemID[], options?: WeivDataOptionsOwner): Promise<BulkRemoveResult>;
+    function bulkRemove<CItemID = ItemID>(collectionId: CollectionID, itemsIds: CItemID[], options?: WeivDataOptionsOwner): Promise<BulkRemoveResult<CItemID>>;
 
-    type BulkRemoveResult = {
+    type BulkRemoveResult<CItemID> = {
         /**
          * @description
          * Total number of removed items.
@@ -1003,7 +1080,7 @@ declare module '@exweiv/weiv-data' {
          * @description
          * Removed item ids as string objectId
          */
-        removedItemIds: ItemID[]
+        removedItemIds: CItemID[]
     }
 
     /**
@@ -1014,9 +1091,9 @@ declare module '@exweiv/weiv-data' {
      * @param items The items to insert or update.
      * @param options An object containing options to use when processing this operation.
      */
-    function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWriteOwner): Promise<BulkSaveResult>;
+    function bulkSave<CItem = Item>(collectionId: CollectionID, items: CItem[], options?: WeivDataOptionsWriteOwner): Promise<BulkSaveResult<CItem>>;
 
-    type BulkSaveResult = {
+    type BulkSaveResult<CItem> = {
         /**
          * @description
          * Total number of inserted items.
@@ -1027,13 +1104,13 @@ declare module '@exweiv/weiv-data' {
          * @description
          * Inserted item ids as string objectid
          */
-        insertedItemIds: string[],
+        insertedItemIds: ItemID[],
 
         /**
          * @description
          * Updated items.
          */
-        savedItems: Item[],
+        savedItems: CItem[],
 
         /**
          * @description
@@ -1051,9 +1128,9 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The results of the bulk save. Rejected - The error that caused the rejection.
      */
-    function bulkUpdate(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWriteOwner): Promise<BulkUpdateResult>;
+    function bulkUpdate<CItem = Item>(collectionId: CollectionID, items: CItem[], options?: WeivDataOptionsWriteOwner): Promise<BulkUpdateResult<CItem>>;
 
-    type BulkUpdateResult = {
+    type BulkUpdateResult<CItem> = {
         /**
          * @description
          * Total number of updated items.
@@ -1064,7 +1141,7 @@ declare module '@exweiv/weiv-data' {
          * @description
          * Updated items.
          */
-        updatedItems: Item[]
+        updatedItems: CItem[]
     }
 
     /**
@@ -1075,7 +1152,7 @@ declare module '@exweiv/weiv-data' {
      * @param suppressAuth A boolean value to bypass permissions.
      * @param options Native options of MongoDB driver when creating a collection. [Read Here](https://mongodb.github.io/node-mongodb-native/6.6/interfaces/CreateCollectionOptions.html)
      */
-    function createCollection(collectionId: CollectionID, suppressAuth?: boolean, options?: import('mongodb').CreateCollectionOptions): Promise<void>;
+    function createCollection(collectionId: CollectionID, suppressAuth?: boolean, options?: CreateCollectionOptions): Promise<void>;
 
     /**
      * @description
@@ -1085,7 +1162,7 @@ declare module '@exweiv/weiv-data' {
      * @param suppressAuth A boolean value to bypass permissions.
      * @param options Native options of MongoDB driver when deleting a collection. [Read Here](https://mongodb.github.io/node-mongodb-native/6.6/interfaces/DropCollectionOptions.html)
      */
-    function deleteCollection(collectionId: CollectionID, suppressAuth?: boolean, options?: import('mongodb').CreateCollectionOptions): Promise<boolean>;
+    function deleteCollection(collectionId: CollectionID, suppressAuth?: boolean, options?: CreateCollectionOptions): Promise<boolean>;
 
     /**
      * @description
@@ -1097,7 +1174,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Found item. Rejected - The error caused the rejection.
      */
-    function findOne(collectionId: CollectionID, propertyName: string, value: any, options?: WeivDataOptionsCache): Promise<Item | undefined>;
+    function findOne<CItem = Item>(collectionId: CollectionID, propertyName: Internal.CItemKeys<CItem>, value: any, options?: WeivDataOptionsCache): Promise<Item | undefined>;
 
     /**
      * @description
@@ -1139,7 +1216,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function getAndReplace(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined>;
+    function getAndReplace<CItem = Item>(collectionId: CollectionID, itemId: ItemID, value: CItem, options?: WeivDataOptionsOwner): Promise<CItem | undefined>;
 
     /**
      * @description
@@ -1151,7 +1228,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function getAndUpdate(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined>;
+    function getAndUpdate<CItem = Item>(collectionId: CollectionID, itemId: ItemID, value: CItem, options?: WeivDataOptionsOwner): Promise<CItem | undefined>;
 
     /**
      * @description
@@ -1170,7 +1247,7 @@ declare module '@exweiv/weiv-data' {
      * @param id ID you want to convert can be string or a valid ObjectId
      * @returns Fulfilled - ObjectId version of the id.
      */
-    function convertIdToObjectId(id: ItemID): import('mongodb').ObjectId;
+    function convertIdToObjectId(id: ItemID): ObjectId;
 
     /**
      * @description
@@ -1183,7 +1260,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function increment(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions): Promise<Item | null>;
+    function increment<CItem = Item>(collectionId: CollectionID, itemId: ItemID, propertyName: Internal.CItemKeys<CItem>, value: number, options?: WeivDataOptions): Promise<CItem | null>;
 
     /**
      * @description
@@ -1194,7 +1271,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The item that was added. Rejected - The error that caused the rejection.
      */
-    function insert(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWrite): Promise<Item>;
+    function insert<CItem = Item>(collectionId: CollectionID, item: CItem, options?: WeivDataOptionsWrite): Promise<CItem>;
 
     /**
      * @description
@@ -1241,7 +1318,7 @@ declare module '@exweiv/weiv-data' {
      * @param listOptions MongoDB native listCollections options. [Read More](https://mongodb.github.io/node-mongodb-native/6.6/classes/Db.html#listCollections).
      * @returns Fulfilled - Array of [CollectionInfo](https://mongodb.github.io/node-mongodb-native/6.6/interfaces/CollectionInfo.html).
      */
-    function listCollections(databaseName: string, suppressAuth?: boolean, filter?: Item, listOptions?: import('mongodb').ListCollectionsOptions): Promise<import('mongodb').CollectionInfo[]>;
+    function listCollections(databaseName: string, suppressAuth?: boolean, filter?: Document, listOptions?: ListCollectionsOptions): Promise<CollectionInfo[]>;
 
     /**
      * @description
@@ -1254,7 +1331,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function multiply(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: number, options?: WeivDataOptions): Promise<Item | null>;
+    function multiply<CItem = Item>(collectionId: CollectionID, itemId: ItemID, propertyName: Internal.CItemKeys<CItem>, value: number, options?: WeivDataOptions): Promise<CItem | null>;
 
     /**
      * @description
@@ -1267,7 +1344,7 @@ declare module '@exweiv/weiv-data' {
      * @param suppressAuth Set to false by default you can set to true if you want to bypass the permissions and run it as Admin.
      * @returns Fulfilled - Native MongoDB [Collection Cursor](https://mongodb.github.io/node-mongodb-native/6.6/classes/Collection.html).
      */
-    function native(collectionId: CollectionID, suppressAuth?: boolean): Promise<import('mongodb').Collection>;
+    function native(collectionId: CollectionID, suppressAuth?: boolean): Promise<Collection>;
 
     /**
      * @description
@@ -1280,7 +1357,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function pull(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null>;
+    function pull<CItem = Item>(collectionId: CollectionID, itemId: ItemID, propertyName: Internal.CItemKeys<CItem>, value: any, options?: WeivDataOptions): Promise<CItem | null>;
 
     /**
      * @description
@@ -1293,7 +1370,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - Updated item. Rejected - The error caused the rejection.
      */
-    function push(collectionId: CollectionID, itemId: ItemID, propertyName: string, value: any, options?: WeivDataOptions): Promise<Item | null>;
+    function push<CItem = Item>(collectionId: CollectionID, itemId: ItemID, propertyName: Internal.CItemKeys<CItem>, value: any, options?: WeivDataOptions): Promise<CItem | null>;
 
     /**
      * @description
@@ -1307,13 +1384,13 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The referenced items. Rejected - The error that caused the rejection.
      */
-    function queryReferenced(
+    function queryReferenced<CItem = Item>(
         collectionId: CollectionID,
         targetCollectionId: string,
         itemId: ItemID,
-        propertyName: string,
+        propertyName: Internal.CItemKeys<CItem>,
         queryOptions: WeivDataQueryReferencedOptions,
-        options?: WeivDataOptions): Promise<WeivDataQueryReferencedResult>;
+        options?: WeivDataOptions): Promise<WeivDataQueryReferencedResult<CItem>>;
 
     type WeivDataQueryReferencedOptions = {
         /**
@@ -1329,12 +1406,12 @@ declare module '@exweiv/weiv-data' {
         pageSize: number
     }
 
-    interface WeivDataQueryReferencedResult {
+    interface WeivDataQueryReferencedResult<CItem> {
         /**
          * @description
          * Returns the items that match the reference query.
          */
-        items: Item[];
+        items: CItem[];
 
         /**
          * @description
@@ -1360,7 +1437,7 @@ declare module '@exweiv/weiv-data' {
          * 
          * @returns Fulfilled - A reference query result object with the next page of query results. Rejected - The errors that caused the rejection.
          */
-        next(): Promise<WeivDataQueryReferencedResult>;
+        next(): Promise<WeivDataQueryReferencedResult<CItem>>;
 
         /**
          * @description
@@ -1368,7 +1445,7 @@ declare module '@exweiv/weiv-data' {
          * 
          * @returns Fulfilled - A query result object with the previous page of query results. Rejected - The errors that caused the rejection.
          */
-        prev(): Promise<WeivDataQueryReferencedResult>;
+        prev(): Promise<WeivDataQueryReferencedResult<CItem>>;
     }
 
     /**
@@ -1380,7 +1457,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The removed item, or null if the item was not found. Rejected - The error that caused the rejection.
      */
-    function remove(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsOwner): Promise<Item | null>;
+    function remove<CItem = Item>(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptionsOwner): Promise<CItem | null>;
 
     /**
      * @description
@@ -1393,9 +1470,9 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - When the references have been removed. Rejected - The error that caused the rejection.
      */
-    function removeReference(
+    function removeReference<CItem = Item>(
         collectionId: CollectionID,
-        propertyName: string,
+        propertyName: Internal.CItemKeys<CItem>,
         referringItem: ItemID | Item,
         referencedItem: Item | Item[] | ItemID | ItemID[],
         options?: WeivDataOptions): Promise<void>;
@@ -1409,7 +1486,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @param renameOptions Native options of MongoDB driver when renaming a collection. [Read More](https://mongodb.github.io/node-mongodb-native/6.6/classes/Db.html#renameCollection).
      */
-    function renameCollection(collectionId: CollectionID, newCollectionName: string, options?: WeivDataOptions, renameOptions?: import('mongodb').RenameOptions): Promise<void>;
+    function renameCollection(collectionId: CollectionID, newCollectionName: string, options?: WeivDataOptions, renameOptions?: RenameOptions): Promise<void>;
 
     /**
      * @description
@@ -1422,7 +1499,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The item that was replaced. Rejected - The error that caused the rejection.
      */
-    function replace(collectionId: CollectionID, item: Item, options?: WeivDataOptionsOwner): Promise<Item>;
+    function replace<CItem = Item>(collectionId: CollectionID, item: CItem, options?: WeivDataOptionsOwner): Promise<CItem>;
 
     /**
      * @description
@@ -1435,9 +1512,9 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - When the references have been inserted into relation array field. Rejected - The error that caused the rejection.
      */
-    function replaceReferences(
+    function replaceReferences<CItem = Item>(
         collectionId: CollectionID,
-        propertyName: string,
+        propertyName: Internal.CItemKeys<CItem>,
         referringItem: ItemID | Item,
         referencedItem: Item | Item[] | ItemID | ItemID[],
         options?: WeivDataOptions): Promise<void>;
@@ -1450,15 +1527,15 @@ declare module '@exweiv/weiv-data' {
      * @param item The item to insert or update.
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The item that was either inserted or updated, depending on whether it previously existed in the collection. Rejected - The error that caused the rejection.
-     */
-    function save(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWriteOwner): Promise<SaveResult>;
+     */ //@ts-ignore
+    function save<CItem = Item>(collectionId: CollectionID, item: CItem, options?: WeivDataOptionsWriteOwner): Promise<SaveResult<CItem["_id"] extends string | ObjectId ? CItem : CItem & { _id: ItemID }>>;
 
-    type SaveResult = {
+    type SaveResult<CItem> = {
         /**
          * @description
          * Saved item.
          */
-        item: Item,
+        item: CItem,
 
         /**
          * @description
@@ -1488,7 +1565,7 @@ declare module '@exweiv/weiv-data' {
      * @param options An object containing options to use when processing this operation.
      * @returns Fulfilled - The object that was updated. Rejected - The error that caused the rejection.
      */
-    function update(collectionId: CollectionID, item: Item, options?: WeivDataOptionsOwner): Promise<Item>;
+    function update<CItem = Item>(collectionId: CollectionID, item: CItem, options?: WeivDataOptionsOwner): Promise<CItem>;
 
     /**
      * Hooks are just like in wix-data but we have some notes for you:
@@ -1557,7 +1634,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The item to return to `get()` instead of the retrieved item. Returning a rejected promise will not block the operation, but will return a rejected promise to the operation caller as well as trigger the `onFailure()` hook.
          */
-        function afterGet(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterGet<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1567,7 +1644,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The item to return to `insert()` instead of the inserted item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterInsert(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterInsert<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1577,7 +1654,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The item to return to `find` instead of the item retrieved from the database. Returning a rejected promise will not block the operation, but will return a rejected promise to the operation caller as well as trigger the `onFailure()` hook.
          */
-        function afterQuery(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterQuery<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1587,7 +1664,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The item to return to `remove()` instead of the deleted item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterRemove(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterRemove<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1597,7 +1674,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The item to return to `update()` instead of the updated item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterUpdate(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterUpdate<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1607,7 +1684,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The query to be used for the `count()` operation instead of the original query. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function beforeCount(query: WeivDataQuery, context: Hooks.HookContext): Promise<WeivDataQuery> | WeivDataQuery;
+        function beforeCount<CItem = Item>(query: WeivDataQuery<CItem>, context: Hooks.HookContext): Promise<WeivDataQuery<CItem>> | WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -1627,7 +1704,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The item to be inserted instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function beforeInsert(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function beforeInsert<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1637,7 +1714,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The query to use instead of the original query specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the operation caller as well as trigger the `onFailure()` hook.
          */
-        function beforeQuery(query: WeivDataQuery, context: Hooks.HookContext): Promise<WeivDataQuery> | WeivDataQuery;
+        function beforeQuery<CItem = Item>(query: WeivDataQuery<CItem>, context: Hooks.HookContext): Promise<WeivDataQuery<CItem>> | WeivDataQuery<CItem>;
 
         /**
          * @description
@@ -1657,7 +1734,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The item to be updated instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function beforeUpdate(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function beforeUpdate<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1667,7 +1744,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns Fulfilled - Returning a fulfilled promise will result in a fulfilled data operation with the provided result. Rejected - Returning a rejected promise will result in returning a rejected promise to the caller of the data operation.
          */
-        function onFailure(error: Error, context: Hooks.HookContext): Promise<Object>;
+        function onFailure(error: Error, context: Hooks.HookContext): Promise<Record<string, any>>;
 
         /**
          * @description
@@ -1677,7 +1754,7 @@ declare module '@exweiv/weiv-data' {
          * @param context Contextual information about the hook.
          * @returns The item to be replaced instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function beforeReplace(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function beforeReplace<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1687,7 +1764,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to return to `replace()` instead of the replaced item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterReplace(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterReplace<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1707,7 +1784,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to return to `findOne()` instead of the found item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterFindOne(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterFindOne<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1717,7 +1794,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to be updated instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function beforeGetAndUpdate(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function beforeGetAndUpdate<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1727,7 +1804,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to return to `getAndUpdate()` instead of the updated item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterGetAndUpdate(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterGetAndUpdate<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1737,7 +1814,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to be replaced instead of the original item specified by the caller. Returning a rejected promise will block the operation and will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function beforeGetAndReplace(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function beforeGetAndReplace<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1747,7 +1824,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to return to `getAndReplace()` instead of the replaced item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
         */
-        function afterGetAndReplace(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterGetAndReplace<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1767,7 +1844,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to return to `getAndRemove()` instead of the removed item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterGetAndRemove(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterGetAndRemove<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1787,7 +1864,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to return to `increment()` instead of the incremented item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterIncrement(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterIncrement<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1807,7 +1884,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to return to `multiply()` instead of the multiplied item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterMultiply(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterMultiply<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1827,7 +1904,7 @@ declare module '@exweiv/weiv-data' {
          * @param context 
          * @returns The item to return to `push()` instead of the updated item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterPush(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterPush<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
 
         /**
          * @description
@@ -1846,7 +1923,7 @@ declare module '@exweiv/weiv-data' {
          * @param item The updated item with pull.
          * @param context The item to return to `pull()` instead of the updated item. Returning a rejected promise will not block the operation, but will return a rejected promise to the caller as well as trigger the `onFailure()` hook.
          */
-        function afterPull(item: Item, context: Hooks.HookContext): Promise<Object> | Object;
+        function afterPull<CItem = Item>(item: CItem, context: Hooks.HookContext): Promise<Record<string, any>> | Record<string, any>;
     }
 
     /**
@@ -1902,7 +1979,7 @@ declare module '@exweiv/weiv-data' {
              * 
              * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
              */
-            adminClientOptions: () => import('mongodb').MongoClientOptions | Promise<import('mongodb').MongoClientOptions>;
+            adminClientOptions: () => MongoClientOptions | Promise<MongoClientOptions>;
 
             /**
              * @description
@@ -1910,7 +1987,7 @@ declare module '@exweiv/weiv-data' {
              * 
              * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
              */
-            memberClientOptions: () => import('mongodb').MongoClientOptions | Promise<import('mongodb').MongoClientOptions>;
+            memberClientOptions: () => MongoClientOptions | Promise<MongoClientOptions>;
 
             /**
              * @description
@@ -1918,7 +1995,7 @@ declare module '@exweiv/weiv-data' {
              * 
              * [Read more about MongoClientOptions](https://mongodb.github.io/node-mongodb-native/6.5/interfaces/MongoClientOptions.html)
              */
-            visitorClientOptions: () => import('mongodb').MongoClientOptions | Promise<import('mongodb').MongoClientOptions>;
+            visitorClientOptions: () => MongoClientOptions | Promise<MongoClientOptions>;
 
             /**
              * @description
@@ -1926,7 +2003,7 @@ declare module '@exweiv/weiv-data' {
              * 
              * [Read more about NodeCache.Options](https://github.com/node-cache/node-cache/blob/master/index.d.ts#L149)
              */
-            clientCacheRules: () => import('node-cache').Options | Promise<import('node-cache').Options>;
+            clientCacheRules: () => Options | Promise<Options>;
         }
 
         /**

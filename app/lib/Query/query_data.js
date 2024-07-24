@@ -124,7 +124,7 @@ class QueryResult extends Query {
             (0, error_manager_1.kaptanLogar)("00004", `${err}`);
         }
     }
-    async distnict(propertyName, options) {
+    async distinct(propertyName, options) {
         try {
             if (!propertyName || typeof propertyName !== "string") {
                 (0, error_manager_1.kaptanLogar)("00001", `propertyName is not string or not a valid value!`);
@@ -133,7 +133,9 @@ class QueryResult extends Query {
             const { suppressAuth, readConcern, convertIds } = options;
             await this._handleConnection_(suppressAuth);
             const pipeline = [];
-            pipeline.push(this._filters);
+            if (Object.keys(this._filters.$match).length > 0) {
+                pipeline.push(this._filters);
+            }
             pipeline.push({ $group: { _id: `$${propertyName}` } });
             pipeline.push({ $project: { distnict: "$_id", _id: 0 } });
             const aggregationCursor = this._collection.aggregate(pipeline, { readConcern });
@@ -151,11 +153,11 @@ class QueryResult extends Query {
                 hasPrev: () => this.__hasPrev__(),
                 next: async () => {
                     this._currentPage++;
-                    return this.distnict(propertyName, options);
+                    return this.distinct(propertyName, options);
                 },
                 prev: async () => {
                     this._currentPage--;
-                    return this.distnict(propertyName, options);
+                    return this.distinct(propertyName, options);
                 },
                 _filters: this._filters,
                 _pipeline: pipeline

@@ -230,7 +230,7 @@ export class AggregateResult extends Aggregate {
     private _pageSize: number = 50;
     private _currentPage: number = 1;
 
-    async run(options: WeivDataAggregateRunOptions): Promise<WeivDataAggregateResult> {
+    async run(options: WeivDataAggregateRunOptions): Promise<WeivDataAggregateResult<Item>> {
         try {
             const { readConcern, suppressAuth, convertIds } = options || {};
             await this._handleConnection_(suppressAuth);
@@ -250,7 +250,7 @@ export class AggregateResult extends Aggregate {
             const items: Item[] = await this._collection.aggregate(pipeline, { readConcern }).toArray();
             const length: number = items.length;
             const hasNext: () => boolean = () => this._currentPage * this._pageSize < items.length;
-            const next: () => Promise<WeivDataAggregateResult> = async () => {
+            const next: () => Promise<WeivDataAggregateResult<Item>> = async () => {
                 try {
                     this._currentPage++;
                     return await this.run(options)
