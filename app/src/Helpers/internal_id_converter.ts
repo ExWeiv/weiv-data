@@ -1,7 +1,7 @@
 import { Document, ObjectId } from 'mongodb';
 
 // Convert single document's all _id fields into string from ObjectId.
-export function convertDocumentIDs(doc: Document, returnType: 'String' | 'ObjectID' = "String"): Document {
+export function convertDocumentIDs(doc: Document, returnType: 'String' | 'ObjectID' = 'String'): Document {
     if (Array.isArray(doc)) {
         // If the document is an array, recursively process each element.
         for (let i = 0; i < doc.length; i++) {
@@ -31,8 +31,8 @@ export function convertDocumentIDs(doc: Document, returnType: 'String' | 'Object
 }
 
 // Convert all _id fields into string. Including sub arrays and more.
-export function recursivelyConvertIds(docs: Document[]) {
-    docs.forEach(doc => convertDocumentIDs(doc));
+export function recursivelyConvertIds(docs: Document[], returnType: 'String' | 'ObjectID' = 'String') {
+    docs.forEach(doc => convertDocumentIDs(doc, returnType));
     return docs;
 }
 

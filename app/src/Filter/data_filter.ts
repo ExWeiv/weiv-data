@@ -2,6 +2,7 @@ import { memoize } from 'lodash';
 import { copyOwnPropsOnly } from '../Helpers/validator';
 import { kaptanLogar } from '../Errors/error_manager';
 import type { Document } from 'mongodb/mongodb';
+import { convertIdToObjectId } from '../Functions/id_converters';
 
 export class WeivDataFilter {
     private readonly filters: { [key: string]: any } = {};
@@ -27,12 +28,20 @@ export class WeivDataFilter {
 
         if (!this.memoizedBetween) {
             this.memoizedBetween = memoize((propertyName, rangeStart, rangeEnd) => {
+                if (propertyName === "_id") {
+                    return this.addFilter(propertyName, {
+                        $gte: convertIdToObjectId(rangeStart),
+                        $lte: convertIdToObjectId(rangeEnd),
+                    });
+                }
+
                 return this.addFilter(propertyName, {
                     $gte: rangeStart,
                     $lte: rangeEnd,
                 });
             })
         }
+
         this.memoizedBetween(propertyName, rangeStart, rangeEnd);
         return this;
     }
@@ -51,6 +60,7 @@ export class WeivDataFilter {
                 });
             })
         }
+
         this.memoizedContains(propertyName, string);
         return this;
     }
@@ -69,6 +79,7 @@ export class WeivDataFilter {
                 });
             })
         }
+
         this.memoizedEndsWith(propertyName, string);
         return this;
     }
@@ -81,11 +92,18 @@ export class WeivDataFilter {
 
         if (!this.memoizedEq) {
             this.memoizedEq = memoize((propertyName, value) => {
+                if (propertyName === "_id") {
+                    return this.addFilter(propertyName, {
+                        $eq: convertIdToObjectId(value),
+                    });
+                }
+
                 return this.addFilter(propertyName, {
                     $eq: value,
                 });
             })
         }
+
         this.memoizedEq(propertyName, value);
         return this;
     }
@@ -101,6 +119,7 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $gte: value });
             })
         }
+
         this.memoizedGe(propertyName, value);
         return this;
     }
@@ -116,6 +135,7 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $gt: value });
             })
         }
+
         this.memoizedGt(propertyName, value);
         return this;
     }
@@ -126,15 +146,27 @@ export class WeivDataFilter {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with hasAll method!`);
         }
 
-        if (!Array.isArray(value)) {
-            value = [value];
+        if (!Array.isArray(value)) { value = [value]; }
+
+        if (propertyName === "_id") {
+            let values = [];
+            for (const v of value) {
+                values.push(convertIdToObjectId(v));
+            }
+
+            if (!this.memoizedHasAll) {
+                this.memoizedHasAll = memoize((propertyName, values) => {
+                    return this.addFilter(propertyName, { $all: values });
+                })
+            }
+        } else {
+            if (!this.memoizedHasAll) {
+                this.memoizedHasAll = memoize((propertyName, value) => {
+                    return this.addFilter(propertyName, { $all: value });
+                })
+            }
         }
 
-        if (!this.memoizedHasAll) {
-            this.memoizedHasAll = memoize((propertyName, value) => {
-                return this.addFilter(propertyName, { $all: value });
-            })
-        }
         this.memoizedHasAll(propertyName, value);
         return this;
     }
@@ -145,15 +177,27 @@ export class WeivDataFilter {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with hasSome method!`);
         }
 
-        if (!Array.isArray(value)) {
-            value = [value];
+        if (!Array.isArray(value)) { value = [value]; }
+
+        if (propertyName === "_id") {
+            let values = [];
+            for (const v of value) {
+                values.push(convertIdToObjectId(v));
+            }
+
+            if (!this.memoizedHasSome) {
+                this.memoizedHasSome = memoize((propertyName, values) => {
+                    return this.addFilter(propertyName, { $in: values });
+                })
+            }
+        } else {
+            if (!this.memoizedHasSome) {
+                this.memoizedHasSome = memoize((propertyName, value) => {
+                    return this.addFilter(propertyName, { $in: value });
+                })
+            }
         }
 
-        if (!this.memoizedHasSome) {
-            this.memoizedHasSome = memoize((propertyName, value) => {
-                return this.addFilter(propertyName, { $in: value });
-            })
-        }
         this.memoizedHasSome(propertyName, value);
         return this;
     }
@@ -169,6 +213,7 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $exists: false });
             })
         }
+
         this.memoizedIsEmpty(propertyName);
         return this;
     }
@@ -184,6 +229,7 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $exists: true });
             })
         }
+
         this.memoizedIsNotEmpty(propertyName);
         return this;
     }
@@ -199,6 +245,7 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $lte: value });
             })
         }
+
         this.memoizedLe(propertyName, value);
         return this;
     }
@@ -214,6 +261,7 @@ export class WeivDataFilter {
                 return this.addFilter(propertyName, { $lt: value });
             })
         }
+
         this.memoizedLt(propertyName, value);
         return this;
     }
@@ -226,9 +274,16 @@ export class WeivDataFilter {
 
         if (!this.memoizedNe) {
             this.memoizedNe = memoize((propertyName, value) => {
+                if (propertyName === "_id") {
+                    return this.addFilter(propertyName, {
+                        $ne: convertIdToObjectId(value),
+                    });
+                }
+
                 return this.addFilter(propertyName, { $ne: value });
             })
         }
+
         this.memoizedNe(propertyName, value);
         return this;
     }
