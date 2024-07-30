@@ -7,6 +7,7 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 ### 4.9.1
 
 - BUG fix for query and aggregation filters (weivData.filters).
+- New config option: `defaultDatabaseName` enables you to specify default database name.
 
 ### 4.9.0
 

@@ -6,6 +6,7 @@ import type { Collection, Db, MongoClientOptions } from 'mongodb/mongodb';
 import type { CollectionID } from '@exweiv/weiv-data';
 import type { Options } from 'node-cache';
 import { kaptanLogar } from '../Errors/error_manager';
+import { getWeivDataConfigs } from '../Config/weiv_data_config';
 
 export type ConnectionHandlerResult = {
     memberId?: string,
@@ -27,7 +28,8 @@ export async function connectionHandler(collectionId: CollectionID, suppressAuth
         if (dbName && typeof dbName === "string") {
             db = pool.db(dbName);
         } else {
-            db = pool.db("ExWeiv");
+            const { defaultDatabaseName } = getWeivDataConfigs();
+            db = pool.db(defaultDatabaseName || "ExWeiv");
         }
 
         return { memberId, database: db, collection: db.collection(collectionName) };

@@ -184,7 +184,8 @@ In WeivData you can configure some settings via `config.js` file. All you need t
 ```js
 export const config = { 
    defaultIdType: "String",
-   syncDatabase: "MyDBName"
+   syncDatabase: "MyDBName",
+   defaultDatabaseName: "ExWeiv"
 };
 ```
 

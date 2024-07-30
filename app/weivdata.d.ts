@@ -2037,6 +2037,13 @@ declare module '@exweiv/weiv-data' {
              * There are only two options: "String" or "ObjectID". If you don't pick any of these default will be "String".
              */
             defaultIdType?: "String" | "ObjectID"
+
+            /**
+             * @description
+             * 
+             * You can specify the default database name here, this is optional and can be overwritten by the collectionId you pass to functions. If not defined default value will be ExWeiv.
+             */
+            defaultDatabaseName?: string
         }
 
         /**
