@@ -23,10 +23,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getConvertIdsValue = void 0;
 exports.getWeivDataConfigs = getWeivDataConfigs;
 const weivDataConfigs = __importStar(require("../../../../../../../../../user-code/backend/WeivData/config"));
 const error_manager_1 = require("../Errors/error_manager");
-var __weivDatasavedConfigs__ = {};
+const lodash_1 = require("lodash");
+var __weivDatasavedConfigs__ = {
+    defaultIdType: "String"
+};
 function getWeivDataConfigs() {
     try {
         const configs = weivDataConfigs["config"];
@@ -40,3 +44,10 @@ function getWeivDataConfigs() {
         (0, error_manager_1.kaptanLogar)("00021", `while getting configs of WeivData library, ${err}`);
     }
 }
+const memoizedCheckIdType = (0, lodash_1.memoize)(() => {
+    return getWeivDataConfigs().defaultIdType === "String" ? true : false;
+});
+const getConvertIdsValue = () => {
+    return memoizedCheckIdType();
+};
+exports.getConvertIdsValue = getConvertIdsValue;

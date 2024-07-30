@@ -8,11 +8,12 @@ const hook_helpers_1 = require("../Helpers/hook_helpers");
 const validator_1 = require("../Helpers/validator");
 const error_manager_1 = require("../Errors/error_manager");
 const internal_id_converter_1 = require("../Helpers/internal_id_converter");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 async function bulkInsert(collectionId, items, options) {
     try {
         const { safeItems, safeOptions } = await (0, validator_1.validateParams)({ collectionId, items, options }, ["collectionId", "items"], "bulkInsert");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...safeOptions };
         let ownerId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
         let editedItems = safeItems.map(async (item) => {
             item._updatedDate = new Date();

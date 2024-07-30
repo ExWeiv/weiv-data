@@ -10,11 +10,12 @@ const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const error_manager_1 = require("../Errors/error_manager");
 const internal_id_converter_1 = require("../Helpers/internal_id_converter");
 const id_converters_1 = require("./id_converters");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 async function save(collectionId, item, options) {
     try {
         const { safeOptions, safeItem } = await (0, validator_1.validateParams)({ collectionId, item, options }, ["collectionId", "item"], "save");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...safeOptions };
         let editedItem;
         if (safeItem._id) {
             safeItem._id = (0, id_converters_1.convertIdToObjectId)(safeItem._id);

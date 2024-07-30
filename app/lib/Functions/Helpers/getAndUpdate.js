@@ -8,11 +8,12 @@ const validator_1 = require("../../Helpers/validator");
 const member_id_helpers_1 = require("../../Helpers/member_id_helpers");
 const error_manager_1 = require("../../Errors/error_manager");
 const internal_id_converter_1 = require("../../Helpers/internal_id_converter");
+const weiv_data_config_1 = require("../../Config/weiv_data_config");
 async function getAndUpdate(collectionId, itemId, value, options) {
     try {
         const { safeItemId, safeValue, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemId, value, options }, ["collectionId", "itemId", "value"], "getAndUpdate");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...safeOptions };
         let editedItem = safeValue;
         if (suppressHooks != true) {
             const modifiedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeGetAndUpdate", [safeValue, context]).catch((err) => {
