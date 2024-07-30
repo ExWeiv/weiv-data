@@ -23,6 +23,7 @@ export async function connectionHandler(collectionId: CollectionID, suppressAuth
         const { dbName, collectionName } = splitCollectionId(collectionId);
         const { pool, memberId } = await useClient(suppressAuth);
 
+        // If no dbname provided, default db will be used which is ExWeiv
         if (dbName && typeof dbName === "string") {
             db = pool.db(dbName);
         } else {
