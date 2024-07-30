@@ -18,11 +18,13 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         const context = prepareHookContext(collectionId);
         const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
 
-        // Convert ID to ObjectId if exist
+        let actionType: "insert" | "update" = "insert";
         let editedItem;
+
         if (safeItem._id) {
             // Update
             safeItem._id = convertIdToObjectId(safeItem._id);
+            actionType = "update";
 
             if (suppressHooks != true) {
                 editedItem = await runDataHook<'beforeUpdate'>(collectionId, "beforeUpdate", [safeItem, context]).catch((err) => {
@@ -32,6 +34,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         } else {
             // Insert
             safeItem._owner = await getOwnerId(enableVisitorId);
+            actionType = "insert";
 
             if (suppressHooks != true) {
                 editedItem = await runDataHook<'beforeInsert'>(collectionId, "beforeInsert", [safeItem, context]).catch((err) => {
@@ -46,9 +49,8 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         }
 
         // For updates
-        let filter: { _id: ObjectId, _owner?: string } | undefined;
-        if (safeItem._id && typeof safeItem._id === "string" && onlyOwner) {
-            filter = { _id: editedItem._id };
+        const filter: { _id: ObjectId, _owner?: string } = safeItem._id ? { _id: safeItem._id } : { _id: new ObjectId() };
+        if (onlyOwner) {
             const currentMemberId = await getOwnerId(enableVisitorId);
             if (currentMemberId) {
                 filter._owner = currentMemberId;
@@ -56,17 +58,15 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         }
 
         const { collection } = await connectionHandler(collectionId, suppressAuth);
-        const { upsertedId, acknowledged } = await collection.updateOne(
-            filter ? filter : { _id: new ObjectId() },
+        const returnedItem = await collection.findOneAndUpdate(
+            filter,
             { $set: { ...editedItem, _updatedDate: new Date() }, $setOnInsert: !editedItem._createdDate ? { _createdDate: new Date() } : {} },
-            { readConcern, upsert: true }
+            { readConcern, upsert: true, returnDocument: "after" }
         );
 
-        const returnedItem = { ...editedItem, _id: editedItem._id };
-
-        if (acknowledged) {
+        if (returnedItem) {
             // Hooks handling
-            if (upsertedId) {
+            if (actionType === "insert") {
                 // Item Inserted
                 const editedResult = await runDataHook<'afterInsert'>(collectionId, "afterInsert", [convertIds ? convertDocumentIDs(returnedItem) : returnedItem, context]).catch((err) => {
                     kaptanLogar("00003", `afterInsert Hook Failure ${err}`);
@@ -77,7 +77,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 } else {
                     return convertIds ? { item: convertDocumentIDs(returnedItem) } : { item: returnedItem };
                 }
-            } else {
+            } else if (actionType === "update") {
                 // Item Updated
                 const editedResult = await runDataHook<'afterUpdate'>(collectionId, "afterUpdate", [convertIds ? convertDocumentIDs(returnedItem) : returnedItem, context]).catch((err) => {
                     kaptanLogar("00003", `afterUpdate Hook Failure ${err}`);
@@ -88,9 +88,11 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 } else {
                     return convertIds ? { item: convertDocumentIDs(returnedItem) } : { item: returnedItem };
                 }
+            } else {
+                kaptanLogar("00016", `this error is not expected, try again or create a issue in WeivData GitHub repo`);
             }
         } else {
-            kaptanLogar("00016", `acknowledged is not true for (save function)`);
+            kaptanLogar("00016", `couldn't save item, this error is unexpected`);
         }
     } catch (err) {
         kaptanLogar("00016", `when saving an item to collection: ${err}`);

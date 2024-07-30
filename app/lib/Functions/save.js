@@ -16,9 +16,11 @@ async function save(collectionId, item, options) {
         const { safeOptions, safeItem } = await (0, validator_1.validateParams)({ collectionId, item, options }, ["collectionId", "item"], "save");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
         const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...safeOptions };
+        let actionType = "insert";
         let editedItem;
         if (safeItem._id) {
             safeItem._id = (0, id_converters_1.convertIdToObjectId)(safeItem._id);
+            actionType = "update";
             if (suppressHooks != true) {
                 editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeUpdate", [safeItem, context]).catch((err) => {
                     (0, error_manager_1.kaptanLogar)("00002", `beforeUpdate (save) Hook Failure ${err}`);
@@ -27,6 +29,7 @@ async function save(collectionId, item, options) {
         }
         else {
             safeItem._owner = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
+            actionType = "insert";
             if (suppressHooks != true) {
                 editedItem = await (0, hook_manager_1.runDataHook)(collectionId, "beforeInsert", [safeItem, context]).catch((err) => {
                     (0, error_manager_1.kaptanLogar)("00002", `beforeInsert (save) Hook Failure ${err}`);
@@ -37,19 +40,17 @@ async function save(collectionId, item, options) {
             ...safeItem,
             ...editedItem
         };
-        let filter;
-        if (safeItem._id && typeof safeItem._id === "string" && onlyOwner) {
-            filter = { _id: editedItem._id };
+        const filter = safeItem._id ? { _id: safeItem._id } : { _id: new mongodb_1.ObjectId() };
+        if (onlyOwner) {
             const currentMemberId = await (0, member_id_helpers_1.getOwnerId)(enableVisitorId);
             if (currentMemberId) {
                 filter._owner = currentMemberId;
             }
         }
         const { collection } = await (0, connection_helpers_1.connectionHandler)(collectionId, suppressAuth);
-        const { upsertedId, acknowledged } = await collection.updateOne(filter ? filter : { _id: new mongodb_1.ObjectId() }, { $set: { ...editedItem, _updatedDate: new Date() }, $setOnInsert: !editedItem._createdDate ? { _createdDate: new Date() } : {} }, { readConcern, upsert: true });
-        const returnedItem = { ...editedItem, _id: editedItem._id };
-        if (acknowledged) {
-            if (upsertedId) {
+        const returnedItem = await collection.findOneAndUpdate(filter, { $set: { ...editedItem, _updatedDate: new Date() }, $setOnInsert: !editedItem._createdDate ? { _createdDate: new Date() } : {} }, { readConcern, upsert: true, returnDocument: "after" });
+        if (returnedItem) {
+            if (actionType === "insert") {
                 const editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterInsert", [convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(returnedItem) : returnedItem, context]).catch((err) => {
                     (0, error_manager_1.kaptanLogar)("00003", `afterInsert Hook Failure ${err}`);
                 });
@@ -60,7 +61,7 @@ async function save(collectionId, item, options) {
                     return convertIds ? { item: (0, internal_id_converter_1.convertDocumentIDs)(returnedItem) } : { item: returnedItem };
                 }
             }
-            else {
+            else if (actionType === "update") {
                 const editedResult = await (0, hook_manager_1.runDataHook)(collectionId, "afterUpdate", [convertIds ? (0, internal_id_converter_1.convertDocumentIDs)(returnedItem) : returnedItem, context]).catch((err) => {
                     (0, error_manager_1.kaptanLogar)("00003", `afterUpdate Hook Failure ${err}`);
                 });
@@ -71,9 +72,12 @@ async function save(collectionId, item, options) {
                     return convertIds ? { item: (0, internal_id_converter_1.convertDocumentIDs)(returnedItem) } : { item: returnedItem };
                 }
             }
+            else {
+                (0, error_manager_1.kaptanLogar)("00016", `this error is not expected, try again or create a issue in WeivData GitHub repo`);
+            }
         }
         else {
-            (0, error_manager_1.kaptanLogar)("00016", `acknowledged is not true for (save function)`);
+            (0, error_manager_1.kaptanLogar)("00016", `couldn't save item, this error is unexpected`);
         }
     }
     catch (err) {
