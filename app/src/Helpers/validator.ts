@@ -9,7 +9,8 @@ import type {
     WeivDataQueryReferencedOptions,
     WeivDataOptionsWrite,
     WeivDataOptionsOwner,
-    WeivDataOptionsWriteOwner
+    WeivDataOptionsWriteOwner,
+    WeivDataAggregateRunOptions
 } from "@exweiv/weiv-data";
 import { type CreateCollectionOptions, type DropCollectionOptions, type ListCollectionsOptions, type Document, RenameOptions, ObjectId } from "mongodb";
 import { getReferencesItemIds, getReferenceItemId } from "./reference_helpers";
@@ -88,7 +89,7 @@ type ValidateResponse<FName> =
 export async function validateParams<T>(params: ValidateParameters<T>, requiredParams: string[], func: FName): Promise<ValidateResponse<T>> {
     try {
         let safeItem: Item | undefined;
-        let safeOptions: WeivDataOptions | WeivDataOptionsCache | CreateCollectionOptions | DropCollectionOptions | ListCollectionsOptions | WeivDataOptionsWrite | WeivDataOptionsOwner | WeivDataOptionsWriteOwner | undefined;
+        let safeOptions: WeivDataAggregateRunOptions | WeivDataOptions | WeivDataOptionsCache | CreateCollectionOptions | DropCollectionOptions | ListCollectionsOptions | WeivDataOptionsWrite | WeivDataOptionsOwner | WeivDataOptionsWriteOwner | undefined;
         let safeReferringItemId: ObjectId | undefined;
         let safeReferencedItemIds: ObjectId[] | undefined;
         let safeItemId: ObjectId | undefined;

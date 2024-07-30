@@ -6,6 +6,7 @@ import { validateParams } from '../Helpers/validator';
 import { kaptanLogar } from '../Errors/error_manager';
 import { convertDocumentIDs } from '../Helpers/internal_id_converter';
 import { convertIdToObjectId } from './id_converters';
+import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export async function get(collectionId: CollectionID, itemId: ItemID, options?: WeivDataOptions): Promise<Item | null> {
     try {
@@ -16,7 +17,7 @@ export async function get(collectionId: CollectionID, itemId: ItemID, options?: 
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
 
         let editedItemId;
         if (suppressHooks != true) {

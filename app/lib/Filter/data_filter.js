@@ -5,6 +5,7 @@ const lodash_1 = require("lodash");
 const validator_1 = require("../Helpers/validator");
 const error_manager_1 = require("../Errors/error_manager");
 const id_converters_1 = require("../Functions/id_converters");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 class WeivDataFilter {
     constructor() {
         this.filters = {};
@@ -19,7 +20,7 @@ class WeivDataFilter {
         this.filters["$and"].push((0, validator_1.copyOwnPropsOnly)(query.filters));
         return this;
     }
-    between(propertyName, rangeStart, rangeEnd, convertIds) {
+    between(propertyName, rangeStart, rangeEnd, convertIds = (0, weiv_data_config_1.getConvertIdsValue)()) {
         if (!propertyName || typeof propertyName !== "string" || !rangeStart || !rangeEnd) {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName, rangeStart and rangeEnd must have valid values to work with between method!`);
         }
@@ -70,7 +71,7 @@ class WeivDataFilter {
         this.memoizedEndsWith(propertyName, string);
         return this;
     }
-    eq(propertyName, value, convertIds) {
+    eq(propertyName, value, convertIds = (0, weiv_data_config_1.getConvertIdsValue)()) {
         if (!propertyName || value === undefined || typeof propertyName !== "string") {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName and value parameter must be valid to work with eq method!`);
         }
@@ -113,7 +114,7 @@ class WeivDataFilter {
         this.memoizedGt(propertyName, value);
         return this;
     }
-    hasAll(propertyName, value, convertIds) {
+    hasAll(propertyName, value, convertIds = (0, weiv_data_config_1.getConvertIdsValue)()) {
         if (!propertyName || !value || typeof propertyName !== "string") {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName and value parameter must be valid to work with hasAll method!`);
         }
@@ -141,7 +142,7 @@ class WeivDataFilter {
         this.memoizedHasAll(propertyName, value);
         return this;
     }
-    hasSome(propertyName, value, convertIds) {
+    hasSome(propertyName, value, convertIds = (0, weiv_data_config_1.getConvertIdsValue)()) {
         if (!propertyName || !value || typeof propertyName !== "string") {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName and value parameter must be valid to work with hasSome method!`);
         }
@@ -217,7 +218,7 @@ class WeivDataFilter {
         this.memoizedLt(propertyName, value);
         return this;
     }
-    ne(propertyName, value, convertIds) {
+    ne(propertyName, value, convertIds = (0, weiv_data_config_1.getConvertIdsValue)()) {
         if (!propertyName || value === undefined || typeof propertyName !== "string") {
             (0, error_manager_1.kaptanLogar)("00020", `propertyName and value parameter must be valid to work with ne method!`);
         }

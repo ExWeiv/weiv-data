@@ -3,7 +3,7 @@
  */
 declare module '@exweiv/weiv-data' {
     /**@internal */
-    import { Collection, CollectionInfo, CreateCollectionOptions, Document, ListCollectionsOptions, MongoClientOptions, ObjectId, RenameOptions } from 'mongodb';
+    import { Collection, CollectionInfo, CreateCollectionOptions, Document, ListCollectionsOptions, MongoClientOptions, ObjectId, RenameOptions } from 'mongodb'; /**@internal */
     import { Options } from 'node-cache';
 
     /**
@@ -2029,6 +2029,14 @@ declare module '@exweiv/weiv-data' {
              * ```
              */
             enableSyncLogs?: boolean
+
+            /**
+             * @description
+             * 
+             * You can change the default _id type in WeivData, this option can be overwritten by the options you pass to the functions.
+             * There are only two options: "String" or "ObjectID". If you don't pick any of these default will be "String".
+             */
+            defaultIdType?: "String" | "ObjectID"
         }
 
         /**

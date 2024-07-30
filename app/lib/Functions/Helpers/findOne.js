@@ -7,11 +7,12 @@ const hook_manager_1 = require("../../Hooks/hook_manager");
 const validator_1 = require("../../Helpers/validator");
 const error_manager_1 = require("../../Errors/error_manager");
 const internal_id_converter_1 = require("../../Helpers/internal_id_converter");
+const weiv_data_config_1 = require("../../Config/weiv_data_config");
 async function findOne(collectionId, propertyName, value, options) {
     try {
         const { safeValue, safeOptions } = await (0, validator_1.validateParams)({ collectionId, propertyName, value, options }, ["collectionId", "propertyName", "value"], "findOne");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...safeOptions };
         let editedFilter = { propertyName, value: safeValue };
         if (suppressHooks != true) {
             const modifiedFilter = await (0, hook_manager_1.runDataHook)(collectionId, "beforeFindOne", [{ propertyName, value: safeValue }, context]).catch((err) => {

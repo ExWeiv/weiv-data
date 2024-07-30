@@ -9,6 +9,7 @@ const hook_helpers_1 = require("../Helpers/hook_helpers");
 const hook_manager_1 = require("../Hooks/hook_manager");
 const error_manager_1 = require("../Errors/error_manager");
 const internal_id_converter_1 = require("../Helpers/internal_id_converter");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 class Query extends data_filter_1.WeivDataFilter {
     constructor(collectionId) {
         super();
@@ -129,7 +130,7 @@ class QueryResult extends Query {
             if (!propertyName || typeof propertyName !== "string") {
                 (0, error_manager_1.kaptanLogar)("00001", `propertyName is not string or not a valid value!`);
             }
-            options = (0, validator_1.copyOwnPropsOnly)(options || {});
+            options = options ? { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...(0, validator_1.copyOwnPropsOnly)(options) } : { convertIds: (0, weiv_data_config_1.getConvertIdsValue)() };
             const { suppressAuth, readConcern, convertIds } = options;
             await this._handleConnection_(suppressAuth);
             const pipeline = [];
@@ -169,7 +170,7 @@ class QueryResult extends Query {
     }
     async find(options) {
         try {
-            options = (0, validator_1.copyOwnPropsOnly)(options || {});
+            options = options ? { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...(0, validator_1.copyOwnPropsOnly)(options) } : { convertIds: (0, weiv_data_config_1.getConvertIdsValue)() };
             const { suppressAuth, suppressHooks, readConcern, omitTotalCount, convertIds } = options;
             await this._handleConnection_(suppressAuth);
             const context = (0, hook_helpers_1.prepareHookContext)(this._collectionId);

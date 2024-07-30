@@ -4,6 +4,12 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.9.0
+
+- New config option `defaultIdType` is now available for setting the default returned id type globally. This option can be overwritten by the options of each function.
+- Small security updates.
+- Documentation updates.
+
 ### 4.8.0
 
 - Better type support added for many functions with optional type parameters. Now optionally you can use TS generics to generate dynamically generated types for many functions but not for all.

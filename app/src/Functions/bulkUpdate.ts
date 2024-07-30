@@ -8,6 +8,7 @@ import { getOwnerId } from '../Helpers/member_id_helpers';
 import { kaptanLogar } from '../Errors/error_manager';
 import { recursivelyConvertIds } from '../Helpers/internal_id_converter';
 import { convertIdToObjectId } from './id_converters';
+import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export async function bulkUpdate(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsOwner): Promise<BulkUpdateResult<Item>> {
     try {
@@ -18,7 +19,7 @@ export async function bulkUpdate(collectionId: CollectionID, items: Item[], opti
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
         const currentMemberId = await getOwnerId();
 
         let editedItems: Item[] | Promise<Item[]>[] = safeItems.map(async (item) => {

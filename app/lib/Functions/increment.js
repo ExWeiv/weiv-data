@@ -8,11 +8,12 @@ const validator_1 = require("../Helpers/validator");
 const error_manager_1 = require("../Errors/error_manager");
 const internal_id_converter_1 = require("../Helpers/internal_id_converter");
 const id_converters_1 = require("./id_converters");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 async function increment(collectionId, itemId, propertyName, value, options) {
     try {
         const { safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemId, propertyName, value, options }, ["collectionId", "itemId", "propertyName", "value"], "increment");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...safeOptions };
         let editedModify = { propertyName, value };
         if (suppressHooks != true) {
             const modifiedParams = await (0, hook_manager_1.runDataHook)(collectionId, "beforeIncrement", [{ propertyName, value }, context]).catch((err) => {

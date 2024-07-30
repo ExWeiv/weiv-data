@@ -6,6 +6,7 @@ const validator_1 = require("../Helpers/validator");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const internal_id_converter_1 = require("../Helpers/internal_id_converter");
 const error_manager_1 = require("../Errors/error_manager");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 class Aggregate {
     constructor(collectionId) {
         this._pipeline = new Array();
@@ -194,7 +195,7 @@ class Aggregate {
 class AggregateResult extends Aggregate {
     async run(options) {
         try {
-            const { readConcern, suppressAuth, convertIds } = options || {};
+            const { readConcern, suppressAuth, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...(0, validator_1.copyOwnPropsOnly)(options) };
             await this._handleConnection_(suppressAuth);
             const pipeline = [...this._pipeline];
             this._pageSize = this._limitNumber || 50;

@@ -8,6 +8,7 @@ import { kaptanLogar } from '../Errors/error_manager';
 import { convertToStringId } from '../Helpers/internal_id_converter';
 import { ObjectId } from 'mongodb';
 import { convertIdToObjectId } from './id_converters';
+import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], options?: WeivDataOptionsOwner): Promise<BulkRemoveResult<ItemID>> {
     try {
@@ -18,7 +19,7 @@ export async function bulkRemove(collectionId: CollectionID, itemIds: ItemID[], 
         )
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
 
         let currentMemberId: string | null;
         if (onlyOwner) {

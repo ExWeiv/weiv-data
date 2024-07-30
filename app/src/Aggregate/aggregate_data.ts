@@ -6,6 +6,7 @@ import { CollectionID, Item, PipelineStage, WeivDataAggregateResult, WeivDataAgg
 import { connectionHandler } from "../Helpers/connection_helpers";
 import { recursivelyConvertIds } from "../Helpers/internal_id_converter";
 import { kaptanLogar } from "../Errors/error_manager";
+import { getConvertIdsValue } from "../Config/weiv_data_config";
 
 class Aggregate {
     protected readonly _collectionId: CollectionID;
@@ -232,7 +233,7 @@ export class AggregateResult extends Aggregate {
 
     async run(options: WeivDataAggregateRunOptions): Promise<WeivDataAggregateResult<Item>> {
         try {
-            const { readConcern, suppressAuth, convertIds } = options || {};
+            const { readConcern, suppressAuth, convertIds } = { convertIds: getConvertIdsValue(), ...copyOwnPropsOnly(options) };
             await this._handleConnection_(suppressAuth);
 
             // Copy pipeline (not reference copy, deep copy)

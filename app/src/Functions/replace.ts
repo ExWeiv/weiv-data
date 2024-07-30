@@ -8,13 +8,14 @@ import type { ObjectId } from 'mongodb/mongodb';
 import { kaptanLogar } from '../Errors/error_manager';
 import { convertDocumentIDs } from '../Helpers/internal_id_converter';
 import { convertIdToObjectId } from './id_converters';
+import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export async function replace(collectionId: CollectionID, item: Item, options?: WeivDataOptionsOwner): Promise<Item> {
     try {
         const { safeItem, safeOptions } = await validateParams<'replace'>({ collectionId, item, options }, ["collectionId", "item"], "replace");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
 
         let editedItem;
         if (suppressHooks != true) {

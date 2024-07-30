@@ -5,6 +5,8 @@ const query_referenced_helpers_1 = require("../../Helpers/query_referenced_helpe
 const connection_helpers_1 = require("../../Helpers/connection_helpers");
 const error_manager_1 = require("../../Errors/error_manager");
 const internal_id_converter_1 = require("../../Helpers/internal_id_converter");
+const validator_1 = require("../../Helpers/validator");
+const weiv_data_config_1 = require("../../Config/weiv_data_config");
 class QueryReferencedResult {
     constructor(collectionId, targetCollectionId, itemId, propertyName, queryOptions, options) {
         this.currentPage = 0;
@@ -22,7 +24,7 @@ class QueryReferencedResult {
     }
     async getResult() {
         try {
-            const { suppressAuth, readConcern, convertIds } = this.options;
+            const { suppressAuth, readConcern, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...(0, validator_1.copyOwnPropsOnly)(this.options) };
             await this._handleConnection_(suppressAuth);
             const pipelineOptions = this.__getPipelineOptions__();
             const pipeline = (0, query_referenced_helpers_1.getPipeline)(this.itemId, this.targetCollectionId, this.propertyName, pipelineOptions);

@@ -6,6 +6,7 @@ Contents:
 - Security in WeivData and MongoDB
 - About Data Hooks in WeivData
 - Cold Start of WeivData
+- Setting Up Configuration in WeivData
 - Help
 
 ---
@@ -175,6 +176,19 @@ backend/
 ```
 
 9. You should be good to go!
+
+## Setting Up Configuration in WeivData
+
+In WeivData you can configure some settings via `config.js` file. All you need to do is export an object and name it as `config`, as an example:
+
+```js
+export const config = { 
+   defaultIdType: "String",
+   syncDatabase: "MyDBName"
+};
+```
+
+That config will be used by the library to customize or setup some setting/features in the library for you.
 
 ## Security in WeivData and MongoDB
 

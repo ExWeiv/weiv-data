@@ -9,11 +9,12 @@ const member_id_helpers_1 = require("../Helpers/member_id_helpers");
 const error_manager_1 = require("../Errors/error_manager");
 const internal_id_converter_1 = require("../Helpers/internal_id_converter");
 const id_converters_1 = require("./id_converters");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 async function bulkRemove(collectionId, itemIds, options) {
     try {
         const { safeItemIds, safeOptions } = await (0, validator_1.validateParams)({ collectionId, itemIds, options }, ["collectionId", "itemIds"], "bulkRemove");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...safeOptions };
         let currentMemberId;
         if (onlyOwner) {
             currentMemberId = await (0, member_id_helpers_1.getOwnerId)();

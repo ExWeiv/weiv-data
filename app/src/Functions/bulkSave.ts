@@ -8,6 +8,7 @@ import type { ObjectId } from 'mongodb';
 import { kaptanLogar } from '../Errors/error_manager';
 import { convertToStringId, recursivelyConvertIds } from '../Helpers/internal_id_converter';
 import { convertIdToObjectId } from './id_converters';
+import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export async function bulkSave(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWriteOwner): Promise<BulkSaveResult<Item>> {
     try {
@@ -18,7 +19,7 @@ export async function bulkSave(collectionId: CollectionID, items: Item[], option
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, onlyOwner, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, onlyOwner, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
         const currentMemberId = await getOwnerId(enableVisitorId);
 
         let ownerId = await getOwnerId(enableVisitorId);

@@ -7,6 +7,7 @@ import type { CollectionID, Item, BulkInsertResult, WeivDataOptionsWrite } from 
 import { validateParams } from '../Helpers/validator';
 import { kaptanLogar } from '../Errors/error_manager';
 import { convertToStringId, recursivelyConvertIds } from '../Helpers/internal_id_converter';
+import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export async function bulkInsert(collectionId: CollectionID, items: Item[], options?: WeivDataOptionsWrite): Promise<BulkInsertResult<Item>> {
     try {
@@ -17,7 +18,7 @@ export async function bulkInsert(collectionId: CollectionID, items: Item[], opti
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
 
         let ownerId = await getOwnerId(enableVisitorId);
         let editedItems: Document[] | Promise<Document>[] = safeItems.map(async (item) => {

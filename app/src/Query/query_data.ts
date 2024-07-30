@@ -8,6 +8,7 @@ import { prepareHookContext } from "../Helpers/hook_helpers";
 import { runDataHook } from "../Hooks/hook_manager";
 import { kaptanLogar } from '../Errors/error_manager';
 import { convertDocumentIDs, recursivelyConvertIds } from "../Helpers/internal_id_converter";
+import { getConvertIdsValue } from "../Config/weiv_data_config";
 
 class Query extends WeivDataFilter {
     protected readonly _collectionId: CollectionID;
@@ -164,9 +165,8 @@ export class QueryResult extends Query {
                 kaptanLogar("00001", `propertyName is not string or not a valid value!`);
             }
 
-            // Clear prototype pollution
-            options = copyOwnPropsOnly(options || {});
-
+            // Clear prototype pollution and pass default id type option
+            options = options ? { convertIds: getConvertIdsValue(), ...copyOwnPropsOnly(options) } : { convertIds: getConvertIdsValue() };
             const { suppressAuth, readConcern, convertIds } = options;
             await this._handleConnection_(suppressAuth);
 
@@ -217,7 +217,7 @@ export class QueryResult extends Query {
     async find(options?: WeivDataOptionsQuery): Promise<WeivDataQueryResult<Item>> {
         try {
             // Clear prototype pollution
-            options = copyOwnPropsOnly(options || {});
+            options = options ? { convertIds: getConvertIdsValue(), ...copyOwnPropsOnly(options) } : { convertIds: getConvertIdsValue() };
             const { suppressAuth, suppressHooks, readConcern, omitTotalCount, convertIds } = options;
             await this._handleConnection_(suppressAuth);
 

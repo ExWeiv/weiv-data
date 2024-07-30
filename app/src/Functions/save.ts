@@ -8,6 +8,7 @@ import { getOwnerId } from '../Helpers/member_id_helpers';
 import { kaptanLogar } from '../Errors/error_manager';
 import { convertDocumentIDs } from '../Helpers/internal_id_converter';
 import { convertIdToObjectId } from './id_converters';
+import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export async function save(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWriteOwner): Promise<SaveResult<Item>> {
     try {
@@ -15,7 +16,7 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
         const { safeOptions, safeItem } = await validateParams<"save">({ collectionId, item, options }, ["collectionId", "item"], "save");
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, enableVisitorId, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
 
         // Convert ID to ObjectId if exist
         let editedItem;

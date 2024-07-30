@@ -9,11 +9,12 @@ const hook_helpers_1 = require("../Helpers/hook_helpers");
 const validator_1 = require("../Helpers/validator");
 const error_manager_1 = require("../Errors/error_manager");
 const internal_id_converter_1 = require("../Helpers/internal_id_converter");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 async function insert(collectionId, item, options) {
     try {
         const { safeItem, safeOptions } = await (0, validator_1.validateParams)({ collectionId, item, options }, ["collectionId", "item"], "insert");
         const context = (0, hook_helpers_1.prepareHookContext)(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = { convertIds: (0, weiv_data_config_1.getConvertIdsValue)(), ...safeOptions };
         const defaultValues = {
             _updatedDate: new Date(),
             _createdDate: new Date(),

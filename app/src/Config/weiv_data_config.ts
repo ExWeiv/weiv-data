@@ -2,8 +2,11 @@
 import * as weivDataConfigs from '../../../../../../../../../user-code/backend/WeivData/config';
 import type { CustomOptions } from '@exweiv/weiv-data';
 import { kaptanLogar } from '../Errors/error_manager';
+import { memoize } from 'lodash';
 
-var __weivDatasavedConfigs__: CustomOptions.WeivDataConfig = {};
+var __weivDatasavedConfigs__: CustomOptions.WeivDataConfig = {
+    defaultIdType: "String"
+};
 
 export function getWeivDataConfigs(): CustomOptions.WeivDataConfig {
     try {
@@ -19,3 +22,11 @@ export function getWeivDataConfigs(): CustomOptions.WeivDataConfig {
         kaptanLogar("00021", `while getting configs of WeivData library, ${err}`);
     }
 }
+
+const memoizedCheckIdType = memoize(() => {
+    return getWeivDataConfigs().defaultIdType === "String" ? true : false;
+});
+
+export const getConvertIdsValue = () => {
+    return memoizedCheckIdType();
+};
