@@ -7,6 +7,7 @@ import type { ObjectId } from 'mongodb';
 import { getOwnerId } from '../../Helpers/member_id_helpers';
 import { kaptanLogar } from '../../Errors/error_manager';
 import { convertDocumentIDs } from '../../Helpers/internal_id_converter';
+import { getConvertIdsValue } from '../../Config/weiv_data_config';
 
 export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, value: Item, options?: WeivDataOptionsOwner): Promise<Item | undefined> {
     try {
@@ -17,7 +18,7 @@ export async function getAndReplace(collectionId: CollectionID, itemId: ItemID, 
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, readConcern, onlyOwner, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
 
         let editedItem = safeValue;
         if (suppressHooks != true) {

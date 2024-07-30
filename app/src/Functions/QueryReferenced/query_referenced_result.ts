@@ -4,6 +4,8 @@ import type { CollectionID, WeivDataOptions, WeivDataQueryReferencedResult, Weiv
 import { connectionHandler } from '../../Helpers/connection_helpers';
 import { kaptanLogar } from '../../Errors/error_manager';
 import { recursivelyConvertIds } from '../../Helpers/internal_id_converter';
+import { copyOwnPropsOnly } from '../../Helpers/validator';
+import { getConvertIdsValue } from '../../Config/weiv_data_config';
 
 export class QueryReferencedResult {
     private targetCollectionId: string;
@@ -35,7 +37,7 @@ export class QueryReferencedResult {
 
     async getResult(): Promise<WeivDataQueryReferencedResult<Item>> {
         try {
-            const { suppressAuth, readConcern, convertIds } = this.options;
+            const { suppressAuth, readConcern, convertIds } = { convertIds: getConvertIdsValue(), ...copyOwnPropsOnly(this.options) };
             await this._handleConnection_(suppressAuth);
 
             const pipelineOptions = this.__getPipelineOptions__();

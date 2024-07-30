@@ -7,6 +7,7 @@ import type { CollectionID, Item, WeivDataOptionsWrite } from '@exweiv/weiv-data
 import { validateParams } from '../Helpers/validator';
 import { kaptanLogar } from '../Errors/error_manager';
 import { convertDocumentIDs, convertToStringId } from '../Helpers/internal_id_converter';
+import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export async function insert(collectionId: CollectionID, item: Item, options?: WeivDataOptionsWrite): Promise<Item> {
     try {
@@ -17,7 +18,7 @@ export async function insert(collectionId: CollectionID, item: Item, options?: W
         );
 
         const context = prepareHookContext(collectionId);
-        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = safeOptions || {};
+        const { suppressAuth, suppressHooks, enableVisitorId, readConcern, convertIds } = { convertIds: getConvertIdsValue(), ...safeOptions };
         const defaultValues: { [key: string]: any } = {
             _updatedDate: new Date(),
             _createdDate: new Date(),
