@@ -30,6 +30,7 @@ const customConnectionOptions = __importStar(require("../../../../../../../../..
 const automatic_connection_provider_1 = require("../Connection/automatic_connection_provider");
 const name_helpers_1 = require("./name_helpers");
 const error_manager_1 = require("../Errors/error_manager");
+const weiv_data_config_1 = require("../Config/weiv_data_config");
 async function connectionHandler(collectionId, suppressAuth = false) {
     try {
         if (!collectionId || typeof collectionId !== "string") {
@@ -42,7 +43,8 @@ async function connectionHandler(collectionId, suppressAuth = false) {
             db = pool.db(dbName);
         }
         else {
-            db = pool.db("ExWeiv");
+            const { defaultDatabaseName } = (0, weiv_data_config_1.getWeivDataConfigs)();
+            db = pool.db(defaultDatabaseName || "ExWeiv");
         }
         return { memberId, database: db, collection: db.collection(collectionName) };
     }

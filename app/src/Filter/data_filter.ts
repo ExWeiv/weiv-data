@@ -3,7 +3,6 @@ import { copyOwnPropsOnly } from '../Helpers/validator';
 import { kaptanLogar } from '../Errors/error_manager';
 import type { Document } from 'mongodb/mongodb';
 import { convertIdToObjectId } from '../Functions/id_converters';
-import { getConvertIdsValue } from '../Config/weiv_data_config';
 
 export class WeivDataFilter {
     private readonly filters: { [key: string]: any } = {};
@@ -22,7 +21,7 @@ export class WeivDataFilter {
     }
 
     private memoizedBetween!: Function;
-    between(propertyName: string, rangeStart: any, rangeEnd: any, convertIds: boolean = getConvertIdsValue()): WeivDataFilter {
+    between(propertyName: string, rangeStart: any, rangeEnd: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || typeof propertyName !== "string" || !rangeStart || !rangeEnd) {
             kaptanLogar("00020", `propertyName, rangeStart and rangeEnd must have valid values to work with between method!`);
         }
@@ -86,7 +85,7 @@ export class WeivDataFilter {
     }
 
     private memoizedEq!: Function;
-    eq(propertyName: string, value: any, convertIds: boolean = getConvertIdsValue()): WeivDataFilter {
+    eq(propertyName: string, value: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || value === undefined || typeof propertyName !== "string") {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with eq method!`);
         }
@@ -142,7 +141,7 @@ export class WeivDataFilter {
     }
 
     private memoizedHasAll!: Function;
-    hasAll(propertyName: string, value: any, convertIds: boolean = getConvertIdsValue()): WeivDataFilter {
+    hasAll(propertyName: string, value: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with hasAll method!`);
         }
@@ -173,7 +172,7 @@ export class WeivDataFilter {
     }
 
     private memoizedHasSome!: Function;
-    hasSome(propertyName: string, value: any, convertIds: boolean = getConvertIdsValue()): WeivDataFilter {
+    hasSome(propertyName: string, value: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || !value || typeof propertyName !== "string") {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with hasSome method!`);
         }
@@ -268,7 +267,7 @@ export class WeivDataFilter {
     }
 
     private memoizedNe!: Function;
-    ne(propertyName: string, value: any, convertIds: boolean = getConvertIdsValue()): WeivDataFilter {
+    ne(propertyName: string, value: any, convertIds?: boolean): WeivDataFilter {
         if (!propertyName || value === undefined || typeof propertyName !== "string") {
             kaptanLogar("00020", `propertyName and value parameter must be valid to work with ne method!`);
         }

@@ -29,16 +29,20 @@ const weivDataConfigs = __importStar(require("../../../../../../../../../user-co
 const error_manager_1 = require("../Errors/error_manager");
 const lodash_1 = require("lodash");
 var __weivDatasavedConfigs__ = {
-    defaultIdType: "String"
+    defaultIdType: "String",
+    defaultDatabaseName: "ExWeiv"
 };
+const memoizedConfig = (0, lodash_1.memoize)(() => {
+    const configs = weivDataConfigs["config"];
+    if (configs && Object.keys(__weivDatasavedConfigs__).length === 0) {
+        const userConfig = configs();
+        __weivDatasavedConfigs__ = { ...__weivDatasavedConfigs__, ...userConfig };
+    }
+    return __weivDatasavedConfigs__;
+});
 function getWeivDataConfigs() {
     try {
-        const configs = weivDataConfigs["config"];
-        if (configs && Object.keys(__weivDatasavedConfigs__).length === 0) {
-            const userConfig = configs();
-            __weivDatasavedConfigs__ = { ...__weivDatasavedConfigs__, ...userConfig };
-        }
-        return __weivDatasavedConfigs__;
+        return memoizedConfig();
     }
     catch (err) {
         (0, error_manager_1.kaptanLogar)("00021", `while getting configs of WeivData library, ${err}`);
