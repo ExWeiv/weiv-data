@@ -73,9 +73,9 @@ export async function save(collectionId: CollectionID, item: Item, options?: Wei
                 });
 
                 if (editedResult) {
-                    return convertIds ? { item: convertDocumentIDs(editedResult) } : { item: editedResult };
+                    return convertIds ? { item: convertDocumentIDs(editedResult), upsertedId: editedResult._id } : { item: editedResult, upsertedId: editedResult._id };
                 } else {
-                    return convertIds ? { item: convertDocumentIDs(returnedItem) } : { item: returnedItem };
+                    return convertIds ? { item: convertDocumentIDs(returnedItem), upsertedId: returnedItem._id } : { item: returnedItem, upsertedId: returnedItem._id };
                 }
             } else if (actionType === "update") {
                 // Item Updated
