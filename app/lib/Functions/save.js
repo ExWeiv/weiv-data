@@ -55,10 +55,10 @@ async function save(collectionId, item, options) {
                     (0, error_manager_1.kaptanLogar)("00003", `afterInsert Hook Failure ${err}`);
                 });
                 if (editedResult) {
-                    return convertIds ? { item: (0, internal_id_converter_1.convertDocumentIDs)(editedResult) } : { item: editedResult };
+                    return convertIds ? { item: (0, internal_id_converter_1.convertDocumentIDs)(editedResult), upsertedId: editedResult._id } : { item: editedResult, upsertedId: editedResult._id };
                 }
                 else {
-                    return convertIds ? { item: (0, internal_id_converter_1.convertDocumentIDs)(returnedItem) } : { item: returnedItem };
+                    return convertIds ? { item: (0, internal_id_converter_1.convertDocumentIDs)(returnedItem), upsertedId: returnedItem._id } : { item: returnedItem, upsertedId: returnedItem._id };
                 }
             }
             else if (actionType === "update") {
