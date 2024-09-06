@@ -8,7 +8,7 @@ async function listCollections(databaseName, suppressAuth, filter, listOptions) 
     try {
         const { safeCollectionFilter, safeCollectionOptions } = await (0, validator_1.validateParams)({ databaseName, suppressAuth, collectionFilter: filter, collectionOptions: listOptions }, ["databaseName"], "listCollections");
         const { database } = await (0, connection_helpers_1.connectionHandler)(`${databaseName}/`, suppressAuth);
-        return await database.listCollections(safeCollectionFilter, safeCollectionOptions).toArray();
+        return await database.listCollections(safeCollectionFilter || undefined, safeCollectionOptions || undefined).toArray();
     }
     catch (err) {
         (0, error_manager_1.kaptanLogar)("00022", `when listing all collections in a database, details: ${err}`);

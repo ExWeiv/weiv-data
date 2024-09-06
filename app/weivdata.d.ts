@@ -1318,7 +1318,7 @@ declare module '@exweiv/weiv-data' {
      * @param listOptions MongoDB native listCollections options. [Read More](https://mongodb.github.io/node-mongodb-native/6.6/classes/Db.html#listCollections).
      * @returns Fulfilled - Array of [CollectionInfo](https://mongodb.github.io/node-mongodb-native/6.6/interfaces/CollectionInfo.html).
      */
-    function listCollections(databaseName: string, suppressAuth?: boolean, filter?: Document, listOptions?: ListCollectionsOptions): Promise<CollectionInfo[]>;
+    function listCollections(databaseName: string, suppressAuth: boolean, filter?: Document, listOptions?: ListCollectionsOptions): Promise<CollectionInfo[]>;
 
     /**
      * @description
