@@ -4,6 +4,11 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.9.7
+
+- BUG Fix for listCollections function
+- Version Updates
+
 ### 4.9.3^
 
 - BUG Fixes for some functions.
