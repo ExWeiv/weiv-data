@@ -3,7 +3,7 @@ name: "🏗️ Build TS + Docs"
 on:
   workflow_dispatch:
   push:
-    branches: [dev, test]
+    branches: [main]
 
 jobs:
   build:
