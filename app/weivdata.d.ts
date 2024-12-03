@@ -102,7 +102,7 @@ declare module '@exweiv/weiv-data' {
     /**
      * Items are basically objects. Most of the time they include an _id field.
      */
-    interface Item { [key: string]: any }
+    type Item = { [key: string]: any };
 
     /**
      * @description
