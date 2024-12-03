@@ -11,7 +11,7 @@
   ],
   "types": "weivdata.d.ts",
   "scripts": {
-    "build": "tsc & npx typedoc --favicon https://static.wixstatic.com/media/510eca_9c4238093ad44527867402ae5fc8d7dd~mv2.png --footerLastModified true"
+    "build": "tsc & npx typedoc"
   },
   "keywords": [
     "exweiv",
@@ -35,16 +35,15 @@
     "lodash": "^4.17.21",
     "mongodb": "^6.8.0",
     "node-cache": "^5.1.2",
-    "uuid": "^10.0.0"
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.5.4",
     "@types/uuid": "^10.0.0",
-    "typedoc": "^0.26.6",
-    "typedoc-plugin-extras": "^3.1.0",
-    "typescript": "^5.5.4"
+    "typedoc": "^0.27.2",
+    "typescript": "^5.7.2"
   },
   "publishConfig": {
     "access": "public",

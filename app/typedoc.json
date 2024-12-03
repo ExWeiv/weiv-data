@@ -15,7 +15,5 @@
     "excludeProtected": true,
     "excludeInternal": true,
     "excludeExternals": true,
-    "plugin": [
-        "typedoc-plugin-extras"
-    ],
+    "favicon": "../ExWeivAppsIcon.svg"
 }
