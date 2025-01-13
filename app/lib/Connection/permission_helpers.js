@@ -7,11 +7,11 @@ exports.getMongoURI = getMongoURI;
 exports.getPermissionsCache = getPermissionsCache;
 const wix_users_backend_1 = require("wix-users-backend");
 const secret_helpers_1 = require("../Helpers/secret_helpers");
-const node_cache_1 = __importDefault(require("node-cache"));
+const cacheable_1 = require("cacheable");
 const crypto_js_1 = __importDefault(require("crypto-js"));
 const encrypt_helpers_1 = require("../Helpers/encrypt_helpers");
 const error_manager_1 = require("../Errors/error_manager");
-const cache = new node_cache_1.default({ useClones: false, deleteOnExpire: true });
+const cache = new cacheable_1.CacheableMemory({ useClone: false, checkInterval: 5000 });
 async function getMongoURI(suppressAuth = false) {
     try {
         if (suppressAuth != true) {

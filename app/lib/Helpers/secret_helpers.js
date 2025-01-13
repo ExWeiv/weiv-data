@@ -32,17 +32,14 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCachedSecret = getCachedSecret;
 exports.getHelperSecretsCache = getHelperSecretsCache;
 const wix_secrets_backend_v2_1 = require("wix-secrets-backend.v2");
 const wixAuth = __importStar(require("wix-auth"));
-const node_cache_1 = __importDefault(require("node-cache"));
+const cacheable_1 = require("cacheable");
 const error_manager_1 = require("../Errors/error_manager");
-const cache = new node_cache_1.default();
+const cache = new cacheable_1.CacheableMemory({ useClone: false, ttl: undefined });
 const getSecretValue = wixAuth.elevate(wix_secrets_backend_v2_1.secrets.getSecretValue);
 async function getCachedSecret(secretName, parse) {
     try {

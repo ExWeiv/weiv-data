@@ -35,7 +35,7 @@ function flushCache(filters) {
             cachesToFlush.push(cacheValue);
         }
         for (const cacheData of cachesToFlush) {
-            cacheData.flushAll();
+            cacheData.clear();
         }
     }
     catch (err) {

@@ -1,16 +1,13 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useClient = useClient;
 exports.getClientCache = getClientCache;
 const mongodb_1 = require("mongodb");
 const permission_helpers_1 = require("./permission_helpers");
 const connection_helpers_1 = require("../Helpers/connection_helpers");
-const node_cache_1 = __importDefault(require("node-cache"));
+const cacheable_1 = require("cacheable");
 const error_manager_1 = require("../Errors/error_manager");
-const clientCache = new node_cache_1.default({ useClones: false });
+const clientCache = new cacheable_1.CacheableMemory({ useClone: false, ttl: undefined });
 let nodeCacheListeners = false;
 async function setupClient(uri, role) {
     try {
@@ -55,10 +52,10 @@ const connectClient = async (client, uri) => {
     try {
         if (!listenersMap.has(uri.slice(14, 40))) {
             const handleClose = async () => {
-                clientCache.del(uri.slice(14, 40));
+                clientCache.delete(uri.slice(14, 40));
             };
             const handleError = async () => {
-                clientCache.del(uri.slice(14, 40));
+                clientCache.delete(uri.slice(14, 40));
                 (0, error_manager_1.kaptanLogar)("00009", `when trying to connect client (connection error): ${uri.slice(14, 40)}`);
             };
             client.on('close', handleClose);

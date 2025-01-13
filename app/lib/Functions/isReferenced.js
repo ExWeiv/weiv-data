@@ -1,18 +1,15 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isReferenced = isReferenced;
 exports.getIsReferencedCache = getIsReferencedCache;
 const connection_helpers_1 = require("../Helpers/connection_helpers");
 const validator_1 = require("../Helpers/validator");
-const node_cache_1 = __importDefault(require("node-cache"));
+const cacheable_1 = require("cacheable");
 const error_manager_1 = require("../Errors/error_manager");
-const cache = new node_cache_1.default({
-    checkperiod: 5,
-    useClones: false,
-    deleteOnExpire: true
+const cache = new cacheable_1.CacheableMemory({
+    checkInterval: 5000,
+    useClone: false,
+    ttl: 10 * 1000
 });
 async function isReferenced(collectionId, propertyName, referringItem, referencedItem, options) {
     try {
