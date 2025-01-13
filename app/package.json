@@ -11,7 +11,7 @@
   ],
   "types": "weivdata.d.ts",
   "scripts": {
-    "build": "tsc & npx typedoc"
+    "build": "tsc & npx typedoc --favicon https://static.wixstatic.com/media/510eca_9c4238093ad44527867402ae5fc8d7dd~mv2.png --footerLastModified true"
   },
   "keywords": [
     "exweiv",
@@ -43,6 +43,7 @@
     "@types/node": "^22.5.4",
     "@types/uuid": "^10.0.0",
     "typedoc": "^0.27.2",
+    "typedoc-plugin-extras": "^4.0.0",
     "typescript": "^5.7.2"
   },
   "publishConfig": {
