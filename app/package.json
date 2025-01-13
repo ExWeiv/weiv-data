@@ -11,7 +11,7 @@
   ],
   "types": "weivdata.d.ts",
   "scripts": {
-    "build": "tsc & npx typedoc --favicon https://static.wixstatic.com/media/510eca_9c4238093ad44527867402ae5fc8d7dd~mv2.png --footerLastModified true"
+    "build": "tsc & npx typedoc"
   },
   "keywords": [
     "exweiv",
