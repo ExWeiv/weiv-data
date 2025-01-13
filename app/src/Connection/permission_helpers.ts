@@ -1,7 +1,7 @@
 //@ts-ignore
 import { currentUser } from "wix-users-backend";
 import { getCachedSecret } from '../Helpers/secret_helpers';
-import NodeCache from 'node-cache';
+import { CacheableMemory } from 'cacheable';
 import type { CustomOptionsRole } from '../Helpers/connection_helpers';
 import CryptoJS from 'crypto-js';
 import { getSecretKey } from '../Helpers/encrypt_helpers';
@@ -17,7 +17,7 @@ export type GetMongoURIResult = {
 /*
 This is a global cache for this file which is used to cache data in it.
 */
-const cache = new NodeCache({ useClones: false, deleteOnExpire: true });
+const cache = new CacheableMemory({ useClone: false, checkInterval: 5000 });
 
 /**
  * @description Get's the current member and returns the URI with permissions based on that
@@ -61,7 +61,7 @@ const getVisitorURI = async (): Promise<GetMongoURIResult> => {
         const secret = await getSecretURI("visitor");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
-            cache.set<CryptoJS.lib.CipherParams>("VisitorMongoDB_URI", encryptedURI, 60 * 5);
+            cache.set("VisitorMongoDB_URI", encryptedURI, 60 * 5);
             return { uri: secret, role: "visitorClientOptions" }
         } else {
             kaptanLogar("00009", `WeivDataURIs Secret Not Found or Not Configured Correctly`);
@@ -93,7 +93,7 @@ const getAdminURI = async (): Promise<GetMongoURIResult> => {
         const secret = await getSecretURI("admin");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
-            cache.set<CryptoJS.lib.CipherParams>("AdminMongoDB_URI", encryptedURI, 60 * 5);
+            cache.set("AdminMongoDB_URI", encryptedURI, 60 * 5);
             return {
                 uri: secret,
                 memberId: currentUser.id,
@@ -152,7 +152,7 @@ const getMemberURI = async (): Promise<GetMongoURIResult> => {
         const secret = await getSecretURI("member");
         if (secret) {
             const encryptedURI = await encryptURI(secret);
-            cache.set<CryptoJS.lib.CipherParams>(`MemberURI${currentUser.id}`, encryptedURI, 60 * 5);
+            cache.set(`MemberURI${currentUser.id}`, encryptedURI, 60 * 5);
 
             return {
                 uri: secret,

@@ -1,14 +1,14 @@
 import type { CollectionID, WeivDataOptionsCache, ReferringItem, ReferencedItem } from '@exweiv/weiv-data';
 import { connectionHandler } from '../Helpers/connection_helpers';
 import { validateParams } from '../Helpers/validator';
-import NodeCache from "node-cache";
+import { CacheableMemory } from 'cacheable';
 import { kaptanLogar } from '../Errors/error_manager';
 
-const cache = new NodeCache({
-    checkperiod: 5,
-    useClones: false,
-    deleteOnExpire: true
-})
+const cache = new CacheableMemory({
+    checkInterval: 5000,
+    useClone: false,
+    ttl: 10 * 1000
+});
 
 export async function isReferenced(collectionId: CollectionID, propertyName: string, referringItem: ReferringItem, referencedItem: ReferencedItem, options?: WeivDataOptionsCache): Promise<boolean> {
     try {

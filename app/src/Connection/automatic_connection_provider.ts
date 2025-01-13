@@ -1,11 +1,11 @@
 import { MongoClient } from 'mongodb';
 import { getMongoURI } from './permission_helpers';
 import { loadConnectionOptions, type CustomOptionsRole } from '../Helpers/connection_helpers';
-import NodeCache from 'node-cache';
+import { CacheableMemory } from 'cacheable';
 import { kaptanLogar } from '../Errors/error_manager';
 
 // MongoClient cache manabed by NodeCache with customizable options and a flag to check if we set event listeners for NodeCache expires/deletions
-const clientCache = new NodeCache({ useClones: false });
+const clientCache = new CacheableMemory({ useClone: false, ttl: undefined });
 let nodeCacheListeners: boolean = false;
 
 async function setupClient(uri: string, role: CustomOptionsRole): Promise<MongoClient> {
@@ -68,12 +68,12 @@ const connectClient = async (client: MongoClient, uri: string): Promise<MongoCli
 
             // delete cached client and status on close event **so we know we need to reconnect again
             const handleClose = async () => {
-                clientCache.del(uri.slice(14, 40));
+                clientCache.delete(uri.slice(14, 40));
             };
 
             // delete cached client and status on error event and throw an error
             const handleError = async () => {
-                clientCache.del(uri.slice(14, 40));
+                clientCache.delete(uri.slice(14, 40));
                 kaptanLogar("00009", `when trying to connect client (connection error): ${uri.slice(14, 40)}`); // Rethrow with URI for context
             };
 
@@ -89,7 +89,7 @@ const connectClient = async (client: MongoClient, uri: string): Promise<MongoCli
         await client.connect();
 
         // Save this MongoClient to cache and set status as true
-        clientCache.set<MongoClient>(uri.slice(14, 40), client);
+        clientCache.set(uri.slice(14, 40), client);
 
         // Return connected MongoClient
         return client;

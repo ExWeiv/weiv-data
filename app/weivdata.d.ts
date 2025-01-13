@@ -4,7 +4,7 @@
 declare module '@exweiv/weiv-data' {
     /**@internal */
     import { Collection, CollectionInfo, CreateCollectionOptions, Document, ListCollectionsOptions, MongoClientOptions, ObjectId, RenameOptions } from 'mongodb'; /**@internal */
-    import { Options } from 'node-cache';
+    import { CacheableMemoryOptions } from 'cacheable';
 
     /**
      * @description
@@ -2001,9 +2001,9 @@ declare module '@exweiv/weiv-data' {
              * @description
              * This is general cache rules for all MongoClients you can define `node-cache` options here. These options will apply to all roles clients.
              * 
-             * [Read more about NodeCache.Options](https://github.com/node-cache/node-cache/blob/master/index.d.ts#L149)
+             * [Read more about CacheableMemoryOptions](https://cacheable.org/docs/cacheable/)
              */
-            clientCacheRules: () => Options | Promise<Options>;
+            clientCacheRules: () => CacheableMemoryOptions | Promise<CacheableMemoryOptions>;
         }
 
         /**

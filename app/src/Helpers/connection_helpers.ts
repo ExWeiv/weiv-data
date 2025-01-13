@@ -4,7 +4,7 @@ import { useClient } from '../Connection/automatic_connection_provider';
 import { splitCollectionId } from './name_helpers';
 import type { Collection, Db, MongoClientOptions } from 'mongodb/mongodb';
 import type { CollectionID } from '@exweiv/weiv-data';
-import type { Options } from 'node-cache';
+import type { CacheableMemoryOptions } from 'cacheable';
 import { kaptanLogar } from '../Errors/error_manager';
 import { getWeivDataConfigs } from '../Config/weiv_data_config';
 
@@ -60,7 +60,7 @@ export async function loadConnectionOptions(role: CustomOptionsRole): Promise<Mo
 
 export async function getCustomCacheRules() {
     try {
-        const cacheRules: (() => Options | Promise<Options>) | undefined = customConnectionOptions["clientCacheRules"];
+        const cacheRules: (() => CacheableMemoryOptions | Promise<CacheableMemoryOptions>) | undefined = customConnectionOptions["clientCacheRules"];
         if (cacheRules) {
             const loadedCacheRules = await cacheRules();
             return loadedCacheRules;

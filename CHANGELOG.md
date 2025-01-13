@@ -4,6 +4,12 @@ In this file you can find what's changed in each version. (Versions with -dev, -
 
 ---
 
+### 4.10.0
+
+- Caching library has changed to cacheable from node-cache.
+- This update can contain BUGs, be careful with it and please report if BUGs are existing about caching or performance.
+- **Breaking change! Update your custom caching options if required!**
+
 ### 4.9.8
 
 - Package Updates for security and performance.

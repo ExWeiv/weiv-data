@@ -2,12 +2,12 @@ import { getPermissionsCache } from '../Connection/permission_helpers';
 import { getIsReferencedCache } from '../Functions/isReferenced';
 import { getHelperSecretsCache } from '../Helpers/secret_helpers';
 import { getClientCache } from '../Connection/automatic_connection_provider';
-import NodeCache from 'node-cache';
+import { CacheableMemory } from 'cacheable';
 import type { CacheSelections } from '@exweiv/weiv-data';
 import { kaptanLogar } from '../Errors/error_manager';
 
 type CacheSelectionsObject = {
-    [Key in CacheSelections as string]: () => NodeCache; // Define the value type as a function returning any
+    [Key in CacheSelections as string]: () => CacheableMemory; // Define the value type as a function returning any
 };
 
 const cacheSelections: CacheSelectionsObject = {
@@ -30,20 +30,20 @@ export function flushCache(filters?: CacheSelections[]): void {
                 }
             } else {
                 for (const key of Object.keys(cacheSelections)) {
-                    const cacheValue: NodeCache = cacheSelections[key]();
+                    const cacheValue: CacheableMemory = cacheSelections[key]();
                     cachesToFlush.push(cacheValue);
                 }
             }
         }
 
         for (const key of Object.keys(cacheSelections)) {
-            const cacheValue: NodeCache = cacheSelections[key]();
+            const cacheValue: CacheableMemory = cacheSelections[key]();
             cachesToFlush.push(cacheValue);
         }
 
 
         for (const cacheData of cachesToFlush) {
-            cacheData.flushAll();
+            cacheData.clear();
         }
     } catch (err) {
         kaptanLogar("00019", `${err}`);

@@ -1,11 +1,11 @@
 //@ts-ignore
 import { secrets } from "wix-secrets-backend.v2"; //@ts-ignore
 import * as wixAuth from 'wix-auth';
-import NodeCache from 'node-cache';
+import { CacheableMemory } from 'cacheable';
 import { kaptanLogar } from "../Errors/error_manager";
 
 // Initialize a global cache instance
-const cache = new NodeCache();
+const cache = new CacheableMemory({ useClone: false, ttl: undefined });
 const getSecretValue: (secretName: string) => Promise<{ value: string }> = wixAuth.elevate(secrets.getSecretValue);
 
 type SecretResponse<T> = T extends "URI" ? { visitor: string, member: string, admin: string } : string;
