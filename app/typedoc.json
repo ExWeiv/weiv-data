@@ -5,7 +5,7 @@
         "node_modules/**/*",
         "lib/**/*",
     ],
-    "name": "WeivData API Reference | ExWeiv Apps",
+    "name": "WeivData API Reference",
     "readme": "DOCS.md",
     "entryPoints": [
         "weivdata.d.ts",
@@ -15,5 +15,5 @@
     "excludeProtected": true,
     "excludeInternal": true,
     "excludeExternals": true,
-    "favicon": "../ExWeivAppsIcon.svg"
+    "favicon": "https://raw.githubusercontent.com/ExWeiv/public/main/exweiv-studio/images/icon.png"
 }
