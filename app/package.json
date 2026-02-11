@@ -1,7 +1,7 @@
 {
   "name": "@exweiv/weiv-data",
-  "version": "4.10.1",
-  "description": "Custom API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
+  "version": "4.11.0",
+  "description": "API Library for Wix sites to connect MongoDB. Designed to easily switch from wix-data APIs.",
   "main": "./lib/index.js",
   "files": [
     "lib",
@@ -14,23 +14,14 @@
     "build": "tsc & npx typedoc"
   },
   "keywords": [
-    "exweiv",
+    "exweiv-studio",
     "wix",
     "velo",
     "wix-data",
-    "weiv-data",
-    "mongodb",
-    "nosql",
-    "database",
     "weivdata",
-    "wixdata",
-    "exweiv apps"
+    "mongodb"
   ],
-  "author": {
-    "name": "ExWeiv Apps Team",
-    "email": "info@apps.exweiv.com"
-  },
-  "license": "Apache-2.0",
+  "license": "MIT",
   "dependencies": {
     "cacheable": "^1.10.1",
     "crypto-js": "^4.2.0",
@@ -54,17 +45,6 @@
     "url": "git@github.com:ExWeiv/weiv-data.git",
     "type": "git"
   },
-  "homepage": "https://weiv-data.apps.exweiv.com/",
-  "bugs": {
-    "url": "https://github.com/ExWeiv/weiv-data/issues",
-    "email": "info@apps.exweiv.com"
-  },
-  "contributors": [
-    {
-      "name": "Enes Bekar",
-      "url": "https://github.com/loeiks"
-    }
-  ],
   "engines": {
     "node": ">=18.17.1"
   }

@@ -9,21 +9,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
           registry-url: https://registry.npmjs.org
-      - name: install dependencies
-        run: npm install
+
+      - run: npm install
         working-directory: app
-      - name: Build
-        run: npm run build
+
+      - run: npm run build
         working-directory: app
-      - name: Commit and Push Changes
-        run: |
+
+      - run: |
           git config --global user.email "git-bot@exweiv.com"
           git config --global user.name "ExWeiv GitHub BOT"
           git add .

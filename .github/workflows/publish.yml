@@ -5,23 +5,25 @@ on:
   release:
     types: [created]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   install:
     name: install
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
           registry-url: https://registry.npmjs.org
-      - name: install dependencies
-        run: npm install
+
+      - run: npm install
         working-directory: app
-      - name: Upload files
-        uses: actions/upload-artifact@v4
+
+      - uses: actions/upload-artifact@v4
         with:
           name: weiv-data
           path: .
@@ -29,11 +31,10 @@ jobs:
   deploy_to_firebase:
     needs: install
     runs-on: ubuntu-latest
+
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: deploy
-        uses: FirebaseExtended/action-hosting-deploy@v0
+      - uses: actions/checkout@v4
+      - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_WEIV_DATA }}"
@@ -43,19 +44,17 @@ jobs:
   publish_to_npm:
     needs: deploy_to_firebase
     runs-on: ubuntu-latest
+
     steps:
-      - name: node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 24
           registry-url: https://registry.npmjs.org
-      - name: Download files
-        uses: actions/download-artifact@v4
+
+      - uses: actions/download-artifact@v4
         with:
           name: weiv-data
           path: .
-      - name: publish
-        run: npm publish --access public
+
+      - run: npm publish
         working-directory: app
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
